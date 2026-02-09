@@ -1,9 +1,10 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Shield, Users, Wrench } from "lucide-react";
+import { LogOut, Shield, Users, Wrench, Tag } from "lucide-react";
 import AdminCustomerList from "@/components/admin/AdminCustomerList";
 import AdminProviderList from "@/components/admin/AdminProviderList";
+import AdminCategoryList from "@/components/admin/AdminCategoryList";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -30,8 +31,8 @@ const AdminDashboard = () => {
 
       <main className="container py-8">
         <div className="mb-6">
-          <h2 className="font-display text-2xl font-bold">User Management</h2>
-          <p className="text-muted-foreground">View and manage all platform users</p>
+          <h2 className="font-display text-2xl font-bold">Platform Management</h2>
+          <p className="text-muted-foreground">Manage users and trade categories</p>
         </div>
 
         <Tabs defaultValue="providers" className="space-y-4">
@@ -44,12 +45,19 @@ const AdminDashboard = () => {
               <Users className="h-4 w-4" />
               Customers
             </TabsTrigger>
+            <TabsTrigger value="categories" className="gap-1.5">
+              <Tag className="h-4 w-4" />
+              Categories
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="providers">
             <AdminProviderList />
           </TabsContent>
           <TabsContent value="customers">
             <AdminCustomerList />
+          </TabsContent>
+          <TabsContent value="categories">
+            <AdminCategoryList />
           </TabsContent>
         </Tabs>
       </main>

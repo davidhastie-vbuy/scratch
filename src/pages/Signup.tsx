@@ -10,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Mail, Lock, User, Phone, MapPin, Briefcase } from "lucide-react";
-import { TRADE_CATEGORIES } from "@/lib/trade-categories";
+import { useTradeCategories } from "@/hooks/use-trade-categories";
 
 const Signup = () => {
   // Common fields
@@ -40,6 +40,7 @@ const Signup = () => {
   const [businessDescription, setBusinessDescription] = useState("");
 
   const isCustomer = role === "customer";
+  const { categories: tradeCategories } = useTradeCategories(true);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,8 +244,8 @@ const Signup = () => {
                           <SelectValue placeholder="Select trade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {TRADE_CATEGORIES.map((cat) => (
-                            <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                          {tradeCategories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.slug}>{cat.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>

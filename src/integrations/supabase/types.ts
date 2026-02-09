@@ -72,7 +72,7 @@ export type Database = {
           phone: string
           postcode: string
           status: Database["public"]["Enums"]["provider_status"]
-          trade_category: Database["public"]["Enums"]["trade_category"]
+          trade_category: string
           updated_at: string
           user_id: string
         }
@@ -88,7 +88,7 @@ export type Database = {
           phone: string
           postcode: string
           status?: Database["public"]["Enums"]["provider_status"]
-          trade_category?: Database["public"]["Enums"]["trade_category"]
+          trade_category?: string
           updated_at?: string
           user_id: string
         }
@@ -104,9 +104,36 @@ export type Database = {
           phone?: string
           postcode?: string
           status?: Database["public"]["Enums"]["provider_status"]
-          trade_category?: Database["public"]["Enums"]["trade_category"]
+          trade_category?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      trade_categories: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
         }
         Relationships: []
       }
