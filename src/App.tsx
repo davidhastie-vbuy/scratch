@@ -9,6 +9,7 @@ import HomeRedirect from "@/components/HomeRedirect";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import CustomerDashboard from "@/pages/CustomerDashboard";
+import CustomerProfile from "@/pages/CustomerProfile";
 import ProviderDashboard from "@/pages/ProviderDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["customer"]}>
                   <CustomerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/profile"
+              element={
+                <ProtectedRoute allowedRoles={["customer"]}>
+                  <CustomerProfile />
                 </ProtectedRoute>
               }
             />

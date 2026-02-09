@@ -1,10 +1,12 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, User, Home } from "lucide-react";
+import { LogOut, User, Home, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CustomerDashboard = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,13 +35,19 @@ const CustomerDashboard = () => {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
+          <Card
+            className="cursor-pointer transition-colors hover:bg-accent/50"
+            onClick={() => navigate("/dashboard/profile")}
+          >
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <User className="h-5 w-5 text-primary" />
-                Profile
+              <CardTitle className="flex items-center justify-between text-lg">
+                <span className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-primary" />
+                  Profile
+                </span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </CardTitle>
-              <CardDescription>Your account information</CardDescription>
+              <CardDescription>View and edit your profile</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
