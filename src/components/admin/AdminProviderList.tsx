@@ -10,13 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Search, Pencil, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { TRADE_CATEGORIES } from "@/lib/trade-categories";
+import { useTradeCategories } from "@/hooks/use-trade-categories";
 import type { Tables } from "@/integrations/supabase/types";
 import type { Database } from "@/integrations/supabase/types";
 
 type ProviderProfile = Tables<"provider_profiles">;
 type ProviderStatus = Database["public"]["Enums"]["provider_status"];
-type TradeCategory = Database["public"]["Enums"]["trade_category"];
 
 const statusConfig: Record<ProviderStatus, { label: string; icon: typeof CheckCircle; variant: "default" | "secondary" | "destructive" }> = {
   active: { label: "Active", icon: CheckCircle, variant: "default" },
@@ -33,6 +32,7 @@ const AdminProviderList = () => {
   const [form, setForm] = useState<Partial<ProviderProfile>>({});
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { categories: tradeCategories } = useTradeCategories(false);
 
   const fetchProviders = async () => {
     setLoading(true);
@@ -94,7 +94,7 @@ const AdminProviderList = () => {
     }
   };
 
-  const tradeName = (cat: TradeCategory) => TRADE_CATEGORIES.find((t) => t.value === cat)?.label ?? cat;
+  const tradeName = (cat: string) => tradeCategories.find((t) => t.slug === cat)?.name ?? cat;
 
   return (
     <div className="space-y-4">
@@ -201,11 +201,11 @@ const AdminProviderList = () => {
             ))}
             <div className="grid gap-1.5">
               <Label>Trade category</Label>
-              <Select value={form.trade_category ?? ""} onValueChange={(v) => setForm((f) => ({ ...f, trade_category: v as TradeCategory }))}>
+              <Select value={form.trade_category ?? ""} onValueChange={(v) => setForm((f) => ({ ...f, trade_category: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {TRADE_CATEGORIES.map((t) => (
-                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  {tradeCategories.map((t) => (
+                    <SelectItem key={t.id} value={t.slug}>{t.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

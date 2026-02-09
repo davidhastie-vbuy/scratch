@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save, Camera, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { TRADE_CATEGORIES } from "@/lib/trade-categories";
+import { useTradeCategories } from "@/hooks/use-trade-categories";
 
 interface ProviderProfileData {
   business_name: string;
@@ -30,6 +30,7 @@ const ProviderProfile = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { categories: tradeCategories } = useTradeCategories(true);
 
   const [profile, setProfile] = useState<ProviderProfileData>({
     business_name: "",
@@ -189,7 +190,7 @@ const ProviderProfile = () => {
               <div>
                 <p className="font-medium">{profile.business_name}</p>
                 <p className="text-sm text-muted-foreground">
-                  {TRADE_CATEGORIES.find((c) => c.value === profile.trade_category)?.label ?? profile.trade_category}
+                {tradeCategories.find((c) => c.slug === profile.trade_category)?.name ?? profile.trade_category}
                 </p>
               </div>
             </div>
@@ -274,9 +275,9 @@ const ProviderProfile = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {TRADE_CATEGORIES.map((cat) => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          {cat.label}
+                      {tradeCategories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.slug}>
+                          {cat.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
