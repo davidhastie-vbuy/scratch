@@ -11,6 +11,7 @@ import Signup from "@/pages/Signup";
 import CustomerDashboard from "@/pages/CustomerDashboard";
 import CustomerProfile from "@/pages/CustomerProfile";
 import ProviderDashboard from "@/pages/ProviderDashboard";
+import ProviderProfile from "@/pages/ProviderProfile";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -48,6 +49,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["provider"]}>
                   <ProviderDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/provider/profile"
+              element={
+                <ProtectedRoute allowedRoles={["provider"]}>
+                  <ProviderProfile />
                 </ProtectedRoute>
               }
             />
