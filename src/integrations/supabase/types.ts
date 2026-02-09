@@ -59,6 +59,57 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_profiles: {
+        Row: {
+          business_address: string
+          business_description: string | null
+          business_name: string
+          contact_first_name: string
+          contact_last_name: string
+          created_at: string
+          id: string
+          logo_url: string | null
+          phone: string
+          postcode: string
+          status: Database["public"]["Enums"]["provider_status"]
+          trade_category: Database["public"]["Enums"]["trade_category"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_address: string
+          business_description?: string | null
+          business_name: string
+          contact_first_name: string
+          contact_last_name: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          phone: string
+          postcode: string
+          status?: Database["public"]["Enums"]["provider_status"]
+          trade_category?: Database["public"]["Enums"]["trade_category"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_address?: string
+          business_description?: string | null
+          business_name?: string
+          contact_first_name?: string
+          contact_last_name?: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          phone?: string
+          postcode?: string
+          status?: Database["public"]["Enums"]["provider_status"]
+          trade_category?: Database["public"]["Enums"]["trade_category"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -96,6 +147,21 @@ export type Database = {
     }
     Enums: {
       app_role: "customer" | "provider" | "admin"
+      provider_status: "pending" | "active" | "suspended"
+      trade_category:
+        | "plumbing"
+        | "electrical"
+        | "carpentry"
+        | "painting_decorating"
+        | "roofing"
+        | "landscaping"
+        | "plastering"
+        | "tiling"
+        | "gas_heating"
+        | "locksmith"
+        | "cleaning"
+        | "general_maintenance"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -224,6 +290,22 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["customer", "provider", "admin"],
+      provider_status: ["pending", "active", "suspended"],
+      trade_category: [
+        "plumbing",
+        "electrical",
+        "carpentry",
+        "painting_decorating",
+        "roofing",
+        "landscaping",
+        "plastering",
+        "tiling",
+        "gas_heating",
+        "locksmith",
+        "cleaning",
+        "general_maintenance",
+        "other",
+      ],
     },
   },
 } as const
