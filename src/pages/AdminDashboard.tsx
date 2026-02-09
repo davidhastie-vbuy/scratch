@@ -1,10 +1,12 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, Shield, Users, Settings } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LogOut, Shield, Users, Wrench } from "lucide-react";
+import AdminCustomerList from "@/components/admin/AdminCustomerList";
+import AdminProviderList from "@/components/admin/AdminProviderList";
 
 const AdminDashboard = () => {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,51 +29,29 @@ const AdminDashboard = () => {
       </header>
 
       <main className="container py-8">
-        <div className="mb-8">
-          <h2 className="font-display text-2xl font-bold">Admin Panel</h2>
-          <p className="text-muted-foreground">Platform management & oversight</p>
+        <div className="mb-6">
+          <h2 className="font-display text-2xl font-bold">User Management</h2>
+          <p className="text-muted-foreground">View and manage all platform users</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Users className="h-5 w-5 text-primary" />
-                Users
-              </CardTitle>
-              <CardDescription>Manage platform users</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">View and manage all registered users and their roles.</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Shield className="h-5 w-5 text-primary" />
-                Roles
-              </CardTitle>
-              <CardDescription>Access control</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Manage user roles and permissions across the platform.</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Settings className="h-5 w-5 text-primary" />
-                Settings
-              </CardTitle>
-              <CardDescription>Platform configuration</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Configure platform settings and preferences.</p>
-            </CardContent>
-          </Card>
-        </div>
+        <Tabs defaultValue="providers" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="providers" className="gap-1.5">
+              <Wrench className="h-4 w-4" />
+              Providers
+            </TabsTrigger>
+            <TabsTrigger value="customers" className="gap-1.5">
+              <Users className="h-4 w-4" />
+              Customers
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="providers">
+            <AdminProviderList />
+          </TabsContent>
+          <TabsContent value="customers">
+            <AdminCustomerList />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
