@@ -18,6 +18,7 @@ interface ProviderData {
   business_description: string | null;
   public_bio: string | null;
   logo_url: string | null;
+  banner_url: string | null;
   postcode: string;
   years_experience: string | null;
   accreditations: string[] | null;
@@ -49,7 +50,7 @@ const ProviderPublicPage = () => {
   const fetchProvider = async () => {
     const { data: profile } = await supabase
       .from("provider_profiles")
-      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, postcode, years_experience, accreditations, operating_areas, about_work")
+      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work")
       .eq("user_id", providerId!)
       .eq("status", "active" as any)
       .single();
@@ -94,7 +95,10 @@ const ProviderPublicPage = () => {
       </Button>
 
       {/* Header */}
-      <Card>
+      <Card className="overflow-hidden">
+        {provider.banner_url && (
+          <img src={provider.banner_url} alt="Banner" className="w-full h-40 object-cover" />
+        )}
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
             <Avatar className="h-20 w-20">

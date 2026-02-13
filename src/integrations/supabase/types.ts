@@ -414,6 +414,7 @@ export type Database = {
           about_work: string | null
           accreditations: string[] | null
           admin_note: string | null
+          banner_url: string | null
           business_address: string
           business_description: string | null
           business_name: string
@@ -438,6 +439,7 @@ export type Database = {
           about_work?: string | null
           accreditations?: string[] | null
           admin_note?: string | null
+          banner_url?: string | null
           business_address: string
           business_description?: string | null
           business_name: string
@@ -462,6 +464,7 @@ export type Database = {
           about_work?: string | null
           accreditations?: string[] | null
           admin_note?: string | null
+          banner_url?: string | null
           business_address?: string
           business_description?: string | null
           business_name?: string

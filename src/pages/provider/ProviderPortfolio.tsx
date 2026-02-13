@@ -71,7 +71,7 @@ const ProviderPortfolio = () => {
   const fetchAll = async () => {
     const { data: profile } = await supabase
       .from("provider_profiles")
-      .select("id, status, public_bio, logo_url, business_description, contact_first_name, contact_last_name")
+      .select("id, status, public_bio, logo_url, banner_url, business_description, contact_first_name, contact_last_name")
       .eq("user_id", user!.id)
       .single();
 
@@ -80,7 +80,7 @@ const ProviderPortfolio = () => {
     setStatus(profile.status as string);
     setPublicBio((profile as any).public_bio ?? "");
     setLogoUrl(profile.logo_url ?? "");
-    setBannerUrl(""); // banner stored separately below
+    setBannerUrl((profile as any).banner_url ?? "");
     setBusinessDescription(profile.business_description ?? "");
 
     const { data: projs } = await supabase
@@ -141,6 +141,7 @@ const ProviderPortfolio = () => {
     if (error) { toast({ title: "Upload failed", variant: "destructive" }); setUploadingBanner(false); return; }
     const { data: urlData } = supabase.storage.from("logos").getPublicUrl(path);
     const url = `${urlData.publicUrl}?t=${Date.now()}`;
+    await supabase.from("provider_profiles").update({ banner_url: url } as any).eq("user_id", user!.id);
     setBannerUrl(url);
     toast({ title: "Banner uploaded" });
     setUploadingBanner(false);
