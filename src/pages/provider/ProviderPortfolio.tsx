@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Plus, Trash2, Image as ImageIcon, Save, GripVertical, Eye, Camera, Upload } from "lucide-react";
+import { Loader2, Plus, Trash2, Image as ImageIcon, Save, GripVertical, Eye, Camera, Upload, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PortfolioProject {
@@ -57,6 +57,12 @@ const ProviderPortfolio = () => {
   // Image upload target
   const [uploadingProjectId, setUploadingProjectId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  // Edit project dialog
+  const [editingProject, setEditingProject] = useState<PortfolioProject | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     if (user) fetchAll();
@@ -165,6 +171,28 @@ const ProviderPortfolio = () => {
     const { error } = await supabase.from("provider_portfolio_projects").delete().eq("id", projectId);
     if (error) toast({ title: "Delete failed", variant: "destructive" });
     else { toast({ title: "Project deleted" }); fetchAll(); }
+  };
+
+  const openEditProject = (project: PortfolioProject) => {
+    setEditingProject(project);
+    setEditTitle(project.title);
+    setEditDesc(project.description ?? "");
+  };
+
+  const saveEditProject = async () => {
+    if (!editingProject || !editTitle.trim()) return;
+    setSavingEdit(true);
+    const { error } = await supabase
+      .from("provider_portfolio_projects")
+      .update({ title: editTitle.trim(), description: editDesc.trim() || null } as any)
+      .eq("id", editingProject.id);
+    if (error) toast({ title: "Update failed", description: error.message, variant: "destructive" });
+    else {
+      toast({ title: "Project updated" });
+      setEditingProject(null);
+      fetchAll();
+    }
+    setSavingEdit(false);
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -345,6 +373,15 @@ const ProviderPortfolio = () => {
                   variant="outline"
                   size="icon"
                   className="h-8 w-8"
+                  onClick={() => openEditProject(project)}
+                  title="Edit project"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
                   onClick={() => {
                     setUploadingProjectId(project.id);
                     fileInputRef.current?.click();
@@ -425,6 +462,32 @@ const ProviderPortfolio = () => {
             <Button onClick={createProject} disabled={creatingProject || !newTitle.trim()}>
               {creatingProject ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
               Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Project Dialog */}
+      <Dialog open={!!editingProject} onOpenChange={open => { if (!open) setEditingProject(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Project Title</Label>
+              <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} maxLength={200} />
+            </div>
+            <div className="space-y-2">
+              <Label>Description (optional)</Label>
+              <Textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={3} maxLength={1000} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingProject(null)}>Cancel</Button>
+            <Button onClick={saveEditProject} disabled={savingEdit || !editTitle.trim()}>
+              {savingEdit ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>
