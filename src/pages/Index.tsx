@@ -7,7 +7,7 @@ const Index = () => {
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b bg-card">
         <div className="container flex h-16 items-center justify-between">
-          <h1 className="font-display text-xl font-bold text-foreground">TradeConnect</h1>
+          <h1 className="font-display text-xl font-bold text-foreground">BookATrade</h1>
           <div className="flex items-center gap-3">
             <Button variant="ghost" asChild>
               <Link to="/login">Sign in</Link>
