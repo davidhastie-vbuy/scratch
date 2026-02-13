@@ -35,7 +35,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
           ) : (
             <Home className="h-5 w-5 text-primary" />
           )}
-          <span className="font-display text-lg font-bold">TradeTrust</span>
+          <span className="font-display text-lg font-bold">BookATrade</span>
         </div>
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => (
