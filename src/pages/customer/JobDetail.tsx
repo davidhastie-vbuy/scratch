@@ -205,11 +205,16 @@ const JobDetail = () => {
                   {q.availability && <span>Available: {q.availability}</span>}
                   {q.estimated_duration && <span>Duration: {q.estimated_duration}</span>}
                 </div>
-                {q.status === "pending" && job.status !== "cancelled" && (
-                  <Button size="sm" onClick={() => acceptQuote(q.id, q.provider_user_id)}>
-                    <Check className="mr-2 h-4 w-4" /> Accept Quote
+                <div className="flex gap-2 items-center">
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/providers/${q.provider_user_id}`)}>
+                    View Provider
                   </Button>
-                )}
+                  {q.status === "pending" && job.status !== "cancelled" && (
+                    <Button size="sm" onClick={() => acceptQuote(q.id, q.provider_user_id)}>
+                      <Check className="mr-2 h-4 w-4" /> Accept Quote
+                    </Button>
+                  )}
+                </div>
               </div>
             ))
           )}

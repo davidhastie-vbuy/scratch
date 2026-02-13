@@ -27,6 +27,11 @@ import ProviderJobDetail from "@/pages/provider/ProviderJobDetail";
 import MyQuotes from "@/pages/provider/MyQuotes";
 import ProviderMessages from "@/pages/provider/ProviderMessages";
 import ProviderProfile from "@/pages/ProviderProfile";
+import ProviderPortfolio from "@/pages/provider/ProviderPortfolio";
+
+// Customer provider views
+import ProviderDirectory from "@/pages/customer/ProviderDirectory";
+import ProviderPublicPage from "@/pages/customer/ProviderPublicPage";
 
 // Shared
 import SupportPage from "@/pages/shared/SupportPage";
@@ -62,6 +67,8 @@ const App = () => (
               <Route path="jobs" element={<MyJobs />} />
               <Route path="jobs/:jobId" element={<JobDetail />} />
               <Route path="messages" element={<CustomerMessages />} />
+              <Route path="providers" element={<ProviderDirectory />} />
+              <Route path="providers/:providerId" element={<ProviderPublicPage />} />
               <Route path="support" element={<SupportPage />} />
               <Route path="profile" element={<CustomerProfile />} />
             </Route>
@@ -80,6 +87,7 @@ const App = () => (
               <Route path="jobs/:jobId" element={<ProviderJobDetail />} />
               <Route path="quotes" element={<MyQuotes />} />
               <Route path="messages" element={<ProviderMessages />} />
+              <Route path="portfolio" element={<ProviderPortfolio />} />
               <Route path="support" element={<SupportPage />} />
               <Route path="profile" element={<ProviderProfile />} />
             </Route>

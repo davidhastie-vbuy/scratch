@@ -327,6 +327,88 @@ export type Database = {
           },
         ]
       }
+      provider_portfolio_images: {
+        Row: {
+          caption: string | null
+          created_at: string
+          file_name: string
+          file_url: string
+          id: string
+          project_id: string
+          sort_order: number
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          file_name: string
+          file_url: string
+          id?: string
+          project_id: string
+          sort_order?: number
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          project_id?: string
+          sort_order?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_portfolio_images_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "provider_portfolio_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_portfolio_projects: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          provider_profile_id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          provider_profile_id: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          provider_profile_id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_portfolio_projects_provider_profile_id_fkey"
+            columns: ["provider_profile_id"]
+            isOneToOne: false
+            referencedRelation: "provider_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       provider_profiles: {
         Row: {
           about_work: string | null
@@ -343,6 +425,7 @@ export type Database = {
           operating_areas: string[] | null
           phone: string
           postcode: string
+          public_bio: string | null
           qualifications_certifications: string | null
           status: Database["public"]["Enums"]["provider_status"]
           supporting_documents: string[] | null
@@ -366,6 +449,7 @@ export type Database = {
           operating_areas?: string[] | null
           phone: string
           postcode: string
+          public_bio?: string | null
           qualifications_certifications?: string | null
           status?: Database["public"]["Enums"]["provider_status"]
           supporting_documents?: string[] | null
@@ -389,6 +473,7 @@ export type Database = {
           operating_areas?: string[] | null
           phone?: string
           postcode?: string
+          public_bio?: string | null
           qualifications_certifications?: string | null
           status?: Database["public"]["Enums"]["provider_status"]
           supporting_documents?: string[] | null
