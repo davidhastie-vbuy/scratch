@@ -8,12 +8,31 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import HomeRedirect from "@/components/HomeRedirect";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
-import CustomerDashboard from "@/pages/CustomerDashboard";
-import CustomerProfile from "@/pages/CustomerProfile";
-import ProviderDashboard from "@/pages/ProviderDashboard";
-import ProviderProfile from "@/pages/ProviderProfile";
-import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+
+// Customer
+import CustomerDashboard from "@/pages/CustomerDashboard";
+import CustomerHome from "@/pages/customer/CustomerHome";
+import PostJob from "@/pages/customer/PostJob";
+import MyJobs from "@/pages/customer/MyJobs";
+import JobDetail from "@/pages/customer/JobDetail";
+import CustomerMessages from "@/pages/customer/CustomerMessages";
+import CustomerProfile from "@/pages/CustomerProfile";
+
+// Provider
+import ProviderDashboard from "@/pages/ProviderDashboard";
+import ProviderHome from "@/pages/provider/ProviderHome";
+import AvailableJobs from "@/pages/provider/AvailableJobs";
+import ProviderJobDetail from "@/pages/provider/ProviderJobDetail";
+import MyQuotes from "@/pages/provider/MyQuotes";
+import ProviderMessages from "@/pages/provider/ProviderMessages";
+import ProviderProfile from "@/pages/ProviderProfile";
+
+// Shared
+import SupportPage from "@/pages/shared/SupportPage";
+
+// Admin
+import AdminDashboard from "@/pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +47,8 @@ const App = () => (
             <Route path="/" element={<HomeRedirect />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+
+            {/* Customer routes */}
             <Route
               path="/dashboard"
               element={
@@ -35,15 +56,17 @@ const App = () => (
                   <CustomerDashboard />
                 </ProtectedRoute>
               }
-            />
-            <Route
-              path="/dashboard/profile"
-              element={
-                <ProtectedRoute allowedRoles={["customer"]}>
-                  <CustomerProfile />
-                </ProtectedRoute>
-              }
-            />
+            >
+              <Route index element={<CustomerHome />} />
+              <Route path="post-job" element={<PostJob />} />
+              <Route path="jobs" element={<MyJobs />} />
+              <Route path="jobs/:jobId" element={<JobDetail />} />
+              <Route path="messages" element={<CustomerMessages />} />
+              <Route path="support" element={<SupportPage />} />
+              <Route path="profile" element={<CustomerProfile />} />
+            </Route>
+
+            {/* Provider routes */}
             <Route
               path="/provider"
               element={
@@ -51,15 +74,17 @@ const App = () => (
                   <ProviderDashboard />
                 </ProtectedRoute>
               }
-            />
-            <Route
-              path="/provider/profile"
-              element={
-                <ProtectedRoute allowedRoles={["provider"]}>
-                  <ProviderProfile />
-                </ProtectedRoute>
-              }
-            />
+            >
+              <Route index element={<ProviderHome />} />
+              <Route path="jobs" element={<AvailableJobs />} />
+              <Route path="jobs/:jobId" element={<ProviderJobDetail />} />
+              <Route path="quotes" element={<MyQuotes />} />
+              <Route path="messages" element={<ProviderMessages />} />
+              <Route path="support" element={<SupportPage />} />
+              <Route path="profile" element={<ProviderProfile />} />
+            </Route>
+
+            {/* Admin */}
             <Route
               path="/admin"
               element={
