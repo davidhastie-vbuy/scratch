@@ -15,6 +15,8 @@ Deno.serve(async (req) => {
     const userId = formData.get("user_id") as string | null;
     const userEmail = formData.get("user_email") as string | null;
     const message = formData.get("message") as string | null;
+    const customerName = formData.get("customer_name") as string | null;
+    const customerPostcode = formData.get("customer_postcode") as string | null;
 
     if (!message && formData.getAll("photos").length === 0) {
       return new Response(JSON.stringify({ error: "Nothing to submit" }), {
@@ -56,6 +58,8 @@ Deno.serve(async (req) => {
         user_email: userEmail || null,
         message: message || null,
         photo_urls: photoUrls,
+        customer_name: customerName || null,
+        customer_postcode: customerPostcode || null,
       });
 
     if (insertError) {

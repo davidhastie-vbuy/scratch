@@ -37,17 +37,29 @@ const AdminRecommendations = () => {
         <Card key={rec.id}>
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-primary" />
-                {rec.user_email || "Unknown user"}
-              </CardTitle>
-              <Badge variant="outline" className="text-xs">
-                {format(new Date(rec.created_at), "dd MMM yyyy HH:mm")}
-              </Badge>
+           <CardTitle className="text-base flex items-center gap-2">
+                 <MessageSquare className="h-4 w-4 text-primary" />
+                 {rec.customer_name || rec.user_email || "Unknown user"}
+               </CardTitle>
+              <div className="flex flex-col items-end gap-1">
+                <Badge variant="outline" className="text-xs">
+                  {format(new Date(rec.created_at), "dd MMM yyyy HH:mm")}
+                </Badge>
+                {rec.customer_postcode && (
+                  <Badge variant="secondary" className="text-xs">
+                    {rec.customer_postcode}
+                  </Badge>
+                )}
+              </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {rec.message && <p className="text-sm whitespace-pre-wrap">{rec.message}</p>}
+           <CardContent className="space-y-3">
+             {rec.user_email && (
+               <p className="text-xs text-muted-foreground">
+                 Email: <span className="font-medium">{rec.user_email}</span>
+               </p>
+             )}
+             {rec.message && <p className="text-sm whitespace-pre-wrap">{rec.message}</p>}
             {rec.photo_urls && rec.photo_urls.length > 0 && (
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground flex items-center gap-1">

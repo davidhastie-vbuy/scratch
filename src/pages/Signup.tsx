@@ -52,6 +52,8 @@ const Signup = () => {
       const formData = new FormData();
       formData.append("user_id", userId);
       formData.append("user_email", userEmail);
+      formData.append("customer_name", `${firstName} ${lastName}`.trim());
+      formData.append("customer_postcode", postcode);
       if (recommendation.trim()) formData.append("message", recommendation.trim());
       recPhotos.forEach((photo) => formData.append("photos", photo));
 
