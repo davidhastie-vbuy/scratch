@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye, AlertTriangle, History, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 import type { Tables } from "@/integrations/supabase/types";
 import type { Database } from "@/integrations/supabase/types";
@@ -26,11 +28,25 @@ interface ProviderDocument {
   uploaded_at: string;
 }
 
-const statusConfig: Record<ProviderStatus, { label: string; icon: typeof CheckCircle; variant: "default" | "secondary" | "destructive" }> = {
-  active: { label: "Active", icon: CheckCircle, variant: "default" },
-  pending: { label: "Pending", icon: Clock, variant: "secondary" },
-  suspended: { label: "Suspended", icon: XCircle, variant: "destructive" },
-};
+interface StatusHistoryEntry {
+  id: string;
+  old_status: string | null;
+  new_status: string;
+  note: string | null;
+  created_at: string;
+}
+
+const STATUS_ALL: { value: string; label: string; icon: typeof CheckCircle; variant: "default" | "secondary" | "destructive" | "outline" }[] = [
+  { value: "pending", label: "Pending", icon: Clock, variant: "secondary" },
+  { value: "pending_review", label: "Pending Review", icon: Clock, variant: "secondary" },
+  { value: "active", label: "Active", icon: CheckCircle, variant: "default" },
+  { value: "suspended", label: "Suspended", icon: AlertTriangle, variant: "destructive" },
+  { value: "denied", label: "Denied", icon: XCircle, variant: "destructive" },
+  { value: "changes_requested", label: "Changes Requested", icon: MessageSquare, variant: "outline" },
+];
+
+const getStatusConfig = (status: string) =>
+  STATUS_ALL.find((s) => s.value === status) ?? { value: status, label: status, icon: Clock, variant: "secondary" as const };
 
 const formatSize = (bytes: number) => {
   if (bytes < 1024) return `${bytes} B`;
@@ -39,6 +55,7 @@ const formatSize = (bytes: number) => {
 };
 
 const AdminProviderList = () => {
+  const { user } = useAuth();
   const [providers, setProviders] = useState<ProviderProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -46,9 +63,14 @@ const AdminProviderList = () => {
   const [editing, setEditing] = useState<ProviderProfile | null>(null);
   const [viewing, setViewing] = useState<ProviderProfile | null>(null);
   const [viewDocs, setViewDocs] = useState<ProviderDocument[]>([]);
+  const [viewHistory, setViewHistory] = useState<StatusHistoryEntry[]>([]);
   const [docsLoading, setDocsLoading] = useState(false);
   const [form, setForm] = useState<Partial<ProviderProfile>>({});
   const [saving, setSaving] = useState(false);
+  // Deny / changes_requested dialog
+  const [actionDialog, setActionDialog] = useState<{ provider: ProviderProfile; action: "denied" | "changes_requested" } | null>(null);
+  const [adminNote, setAdminNote] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
   const { toast } = useToast();
   const { categories: tradeCategories } = useTradeCategories(false);
 
@@ -74,13 +96,52 @@ const AdminProviderList = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const updateStatus = async (id: string, status: ProviderStatus) => {
-    const { error } = await supabase.from("provider_profiles").update({ status }).eq("id", id);
+  const changeStatus = async (profileId: string, oldStatus: string, newStatus: ProviderStatus, note?: string) => {
+    const { error } = await supabase.from("provider_profiles").update({
+      status: newStatus,
+      admin_note: note ?? null,
+    } as any).eq("id", profileId);
+
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: `Provider ${status}` });
-      fetchProviders();
+      return false;
+    }
+
+    // Log to status history
+    await supabase.from("application_status_history").insert({
+      provider_profile_id: profileId,
+      old_status: oldStatus,
+      new_status: newStatus,
+      changed_by: user!.id,
+      note: note || null,
+    } as any);
+
+    toast({ title: `Provider ${newStatus.replace("_", " ")}` });
+    fetchProviders();
+    return true;
+  };
+
+  const handleApprove = async (p: ProviderProfile) => {
+    await changeStatus(p.id, p.status, "active" as ProviderStatus);
+  };
+
+  const handleActionSubmit = async () => {
+    if (!actionDialog) return;
+    if (actionDialog.action === "denied" && !adminNote.trim()) {
+      toast({ title: "Note required", description: "Please provide a reason for denying this application.", variant: "destructive" });
+      return;
+    }
+    setActionLoading(true);
+    const ok = await changeStatus(
+      actionDialog.provider.id,
+      actionDialog.provider.status,
+      actionDialog.action as ProviderStatus,
+      adminNote.trim()
+    );
+    setActionLoading(false);
+    if (ok) {
+      setActionDialog(null);
+      setAdminNote("");
     }
   };
 
@@ -115,12 +176,22 @@ const AdminProviderList = () => {
   const openView = async (p: ProviderProfile) => {
     setViewing(p);
     setDocsLoading(true);
-    const { data } = await supabase
-      .from("provider_documents")
-      .select("id, file_url, file_name, file_type, file_size, uploaded_at")
-      .eq("provider_profile_id", p.id)
-      .order("uploaded_at", { ascending: false });
-    setViewDocs((data as ProviderDocument[]) ?? []);
+
+    const [docsRes, historyRes] = await Promise.all([
+      supabase
+        .from("provider_documents")
+        .select("id, file_url, file_name, file_type, file_size, uploaded_at")
+        .eq("provider_profile_id", p.id)
+        .order("uploaded_at", { ascending: false }),
+      supabase
+        .from("application_status_history")
+        .select("id, old_status, new_status, note, created_at")
+        .eq("provider_profile_id", p.id)
+        .order("created_at", { ascending: false }),
+    ]);
+
+    setViewDocs((docsRes.data as ProviderDocument[]) ?? []);
+    setViewHistory((historyRes.data as StatusHistoryEntry[]) ?? []);
     setDocsLoading(false);
   };
 
@@ -133,7 +204,6 @@ const AdminProviderList = () => {
       toast({ title: "Download failed", description: error?.message ?? "Could not generate download link", variant: "destructive" });
       return;
     }
-
     window.open(data.signedUrl, "_blank");
   };
 
@@ -147,14 +217,14 @@ const AdminProviderList = () => {
           <Input placeholder="Search providers…" value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-sm" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[180px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="suspended">Suspended</SelectItem>
+            {STATUS_ALL.map((s) => (
+              <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -171,19 +241,21 @@ const AdminProviderList = () => {
                 <TableHead>Business</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead>Trade</TableHead>
+                <TableHead>Submitted</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-[220px]">Actions</TableHead>
+                <TableHead className="w-[260px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((p) => {
-                const cfg = statusConfig[p.status];
+                const cfg = getStatusConfig(p.status);
                 const Icon = cfg.icon;
                 return (
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{p.business_name}</TableCell>
                     <TableCell>{p.contact_first_name} {p.contact_last_name}</TableCell>
                     <TableCell>{tradeName(p.trade_category)}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Badge variant={cfg.variant} className="gap-1">
                         <Icon className="h-3 w-3" />
@@ -191,19 +263,29 @@ const AdminProviderList = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1">
-                        {p.status === "pending" && (
-                          <Button variant="ghost" size="sm" className="text-primary" onClick={() => updateStatus(p.id, "active")}>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {(p.status === "pending" || p.status === "pending_review" as string || p.status === "changes_requested" as string) && (
+                          <Button variant="ghost" size="sm" className="text-primary" onClick={() => handleApprove(p)}>
                             Approve
                           </Button>
                         )}
+                        {(p.status === "pending" || p.status === "pending_review" as string || p.status === "changes_requested" as string) && (
+                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => { setActionDialog({ provider: p, action: "denied" }); setAdminNote(""); }}>
+                            Deny
+                          </Button>
+                        )}
+                        {(p.status === "pending" || p.status === "pending_review" as string) && (
+                          <Button variant="ghost" size="sm" onClick={() => { setActionDialog({ provider: p, action: "changes_requested" }); setAdminNote(""); }}>
+                            Request Changes
+                          </Button>
+                        )}
                         {p.status === "active" && (
-                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => updateStatus(p.id, "suspended")}>
+                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => changeStatus(p.id, p.status, "suspended" as ProviderStatus)}>
                             Suspend
                           </Button>
                         )}
                         {p.status === "suspended" && (
-                          <Button variant="ghost" size="sm" className="text-primary" onClick={() => updateStatus(p.id, "active")}>
+                          <Button variant="ghost" size="sm" className="text-primary" onClick={() => changeStatus(p.id, p.status, "active" as ProviderStatus)}>
                             Reactivate
                           </Button>
                         )}
@@ -223,6 +305,45 @@ const AdminProviderList = () => {
         </div>
       )}
 
+      {/* Deny / Request Changes Dialog */}
+      <Dialog open={!!actionDialog} onOpenChange={(o) => !o && setActionDialog(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {actionDialog?.action === "denied" ? "Deny Application" : "Request Changes"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-muted-foreground">
+              {actionDialog?.action === "denied"
+                ? `Denying application for ${actionDialog.provider.business_name}. A reason is required.`
+                : `Request changes from ${actionDialog?.provider.business_name}. Provide details about what needs to be updated.`
+              }
+            </p>
+            <div className="space-y-2">
+              <Label>Admin Note {actionDialog?.action === "denied" && <span className="text-destructive">*</span>}</Label>
+              <Textarea
+                value={adminNote}
+                onChange={(e) => setAdminNote(e.target.value)}
+                placeholder={actionDialog?.action === "denied" ? "Reason for denial..." : "What changes are needed..."}
+                rows={4}
+                maxLength={1000}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setActionDialog(null)}>Cancel</Button>
+            <Button
+              variant={actionDialog?.action === "denied" ? "destructive" : "default"}
+              onClick={handleActionSubmit}
+              disabled={actionLoading}
+            >
+              {actionLoading ? "Processing..." : actionDialog?.action === "denied" ? "Deny Application" : "Request Changes"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* View Application Dialog */}
       <Dialog open={!!viewing} onOpenChange={(o) => !o && setViewing(null)}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
@@ -237,6 +358,12 @@ const AdminProviderList = () => {
                 <div className="flex justify-between"><span className="text-muted-foreground">Address</span><span className="font-medium">{viewing.business_address}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Postcode</span><span className="font-medium">{viewing.postcode}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Trade</span><span className="font-medium">{tradeName(viewing.trade_category)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Submitted</span><span className="font-medium">{new Date(viewing.created_at).toLocaleDateString()}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Status</span>
+                  <Badge variant={getStatusConfig(viewing.status).variant} className="gap-1">
+                    {getStatusConfig(viewing.status).label}
+                  </Badge>
+                </div>
                 {(viewing as any).years_experience && (
                   <div className="flex justify-between"><span className="text-muted-foreground">Experience</span><span className="font-medium">{(viewing as any).years_experience}</span></div>
                 )}
@@ -266,12 +393,19 @@ const AdminProviderList = () => {
                     </div>
                   </div>
                 )}
+                {(viewing as any).admin_note && (
+                  <div className="rounded border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+                    <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">Admin Note</span>
+                    <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">{(viewing as any).admin_note}</p>
+                  </div>
+                )}
                 {viewing.business_description && (
                   <div><span className="text-muted-foreground">Description</span><p className="mt-1 font-medium">{viewing.business_description}</p></div>
                 )}
               </div>
 
-              {/* Documents section */}
+              {/* Documents */}
+              <Separator />
               <div className="space-y-2">
                 <h4 className="font-semibold text-foreground flex items-center gap-1.5">
                   <FileText className="h-4 w-4" />
@@ -298,6 +432,40 @@ const AdminProviderList = () => {
                   </div>
                 )}
               </div>
+
+              {/* Status History */}
+              {viewHistory.length > 0 && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground flex items-center gap-1.5">
+                      <History className="h-4 w-4" />
+                      Status History
+                    </h4>
+                    <div className="space-y-2">
+                      {viewHistory.map((h) => (
+                        <div key={h.id} className="rounded border border-border bg-muted/30 px-3 py-2 text-xs">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
+                              {h.old_status && (
+                                <>
+                                  <Badge variant="outline" className="text-[10px]">{h.old_status.replace("_", " ")}</Badge>
+                                  <span>→</span>
+                                </>
+                              )}
+                              <Badge variant={getStatusConfig(h.new_status).variant} className="text-[10px]">
+                                {getStatusConfig(h.new_status).label}
+                              </Badge>
+                            </div>
+                            <span className="text-muted-foreground">{new Date(h.created_at).toLocaleString()}</span>
+                          </div>
+                          {h.note && <p className="mt-1 text-muted-foreground">{h.note}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </DialogContent>

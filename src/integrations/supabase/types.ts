@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      application_status_history: {
+        Row: {
+          changed_by: string
+          created_at: string
+          id: string
+          new_status: string
+          note: string | null
+          old_status: string | null
+          provider_profile_id: string
+        }
+        Insert: {
+          changed_by: string
+          created_at?: string
+          id?: string
+          new_status: string
+          note?: string | null
+          old_status?: string | null
+          provider_profile_id: string
+        }
+        Update: {
+          changed_by?: string
+          created_at?: string
+          id?: string
+          new_status?: string
+          note?: string | null
+          old_status?: string | null
+          provider_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_status_history_provider_profile_id_fkey"
+            columns: ["provider_profile_id"]
+            isOneToOne: false
+            referencedRelation: "provider_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address_line_1: string | null
@@ -104,6 +142,7 @@ export type Database = {
         Row: {
           about_work: string | null
           accreditations: string[] | null
+          admin_note: string | null
           business_address: string
           business_description: string | null
           business_name: string
@@ -126,6 +165,7 @@ export type Database = {
         Insert: {
           about_work?: string | null
           accreditations?: string[] | null
+          admin_note?: string | null
           business_address: string
           business_description?: string | null
           business_name: string
@@ -148,6 +188,7 @@ export type Database = {
         Update: {
           about_work?: string | null
           accreditations?: string[] | null
+          admin_note?: string | null
           business_address?: string
           business_description?: string | null
           business_name?: string
@@ -233,7 +274,13 @@ export type Database = {
     }
     Enums: {
       app_role: "customer" | "provider" | "admin"
-      provider_status: "pending" | "active" | "suspended"
+      provider_status:
+        | "pending"
+        | "active"
+        | "suspended"
+        | "pending_review"
+        | "denied"
+        | "changes_requested"
       trade_category:
         | "plumbing"
         | "electrical"
@@ -376,7 +423,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["customer", "provider", "admin"],
-      provider_status: ["pending", "active", "suspended"],
+      provider_status: [
+        "pending",
+        "active",
+        "suspended",
+        "pending_review",
+        "denied",
+        "changes_requested",
+      ],
       trade_category: [
         "plumbing",
         "electrical",
