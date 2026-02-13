@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
@@ -33,6 +33,17 @@ const PostJob = () => {
     budget: "",
     additionalNotes: "",
   });
+
+  useEffect(() => {
+    if (user) {
+      supabase.from("profiles").select("postcode").eq("id", user.id).single().then(({ data }) => {
+        if (data?.postcode) {
+          const district = data.postcode.trim().split(" ")[0].toUpperCase();
+          setForm(f => f.postcodeDistrict ? f : { ...f, postcodeDistrict: district });
+        }
+      });
+    }
+  }, [user]);
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
