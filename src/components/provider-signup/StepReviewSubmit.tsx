@@ -1,10 +1,16 @@
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { FileText } from "lucide-react";
 import type { ProviderFormData } from "./ProviderSignupStepper";
 
 interface Props {
   form: ProviderFormData;
   tradeCategories: { id: string; name: string; slug: string }[];
+  agreements: { callback: boolean; terms: boolean };
+  onAgreementsChange: (a: { callback: boolean; terms: boolean }) => void;
+  errors: Record<string, string>;
 }
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -21,7 +27,7 @@ const Row = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-const StepReviewSubmit = ({ form, tradeCategories }: Props) => {
+const StepReviewSubmit = ({ form, tradeCategories, agreements, onAgreementsChange, errors }: Props) => {
   const categoryName = tradeCategories.find((c) => c.slug === form.tradeCategory)?.name ?? form.tradeCategory;
 
   return (
@@ -30,7 +36,7 @@ const StepReviewSubmit = ({ form, tradeCategories }: Props) => {
         Please review your details before submitting. You can go back to make changes.
       </p>
 
-      <Section title="Business Details">
+      <Section title="Personal & Business Details">
         <Row label="Email" value={form.email} />
         <Row label="Business Name" value={form.businessName} />
         <Row label="Contact" value={`${form.contactFirstName} ${form.contactLastName}`} />
@@ -57,7 +63,7 @@ const StepReviewSubmit = ({ form, tradeCategories }: Props) => {
         )}
         {form.supportingDocuments.length > 0 && (
           <div>
-            <span className="text-muted-foreground">Documents</span>
+            <span className="text-muted-foreground">Documents ({form.supportingDocuments.length})</span>
             <div className="mt-1 space-y-1">
               {form.supportingDocuments.map((f, i) => (
                 <div key={i} className="flex items-center gap-1 text-xs">
@@ -76,6 +82,35 @@ const StepReviewSubmit = ({ form, tradeCategories }: Props) => {
           ))}
         </div>
       </Section>
+
+      {/* Agreement checkboxes */}
+      <div className="space-y-3 rounded-lg border border-border p-4">
+        <h3 className="text-sm font-semibold text-foreground">Agreements</h3>
+
+        <div className="flex items-start gap-2">
+          <Checkbox
+            id="agree-callback"
+            checked={agreements.callback}
+            onCheckedChange={(checked) => onAgreementsChange({ ...agreements, callback: !!checked })}
+          />
+          <Label htmlFor="agree-callback" className="text-xs font-normal leading-tight cursor-pointer">
+            I understand I must respond to callback requests within 24 hours if I accept them, and follow through on commitments.
+          </Label>
+        </div>
+
+        <div className="flex items-start gap-2">
+          <Checkbox
+            id="agree-terms"
+            checked={agreements.terms}
+            onCheckedChange={(checked) => onAgreementsChange({ ...agreements, terms: !!checked })}
+          />
+          <Label htmlFor="agree-terms" className="text-xs font-normal leading-tight cursor-pointer">
+            I agree to the Terms of Service and Privacy Policy, including the commission structure.
+          </Label>
+        </div>
+
+        {errors.agreements && <p className="text-xs text-destructive">{errors.agreements}</p>}
+      </div>
     </div>
   );
 };

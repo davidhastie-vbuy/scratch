@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { UserPlus, ArrowLeft, ArrowRight, Check, CheckCircle2, Mail } from "lucide-react";
 import StepBusinessDetails from "./StepBusinessDetails";
 import StepTradeDetails from "./StepTradeDetails";
 import StepOperatingAreas from "./StepOperatingAreas";
@@ -38,7 +38,9 @@ const ProviderSignupStepper = () => {
   const { categories: tradeCategories } = useTradeCategories(true);
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [agreements, setAgreements] = useState({ callback: false, terms: false });
 
   const [form, setForm] = useState<ProviderFormData>({
     email: "",
@@ -89,6 +91,12 @@ const ProviderSignupStepper = () => {
       if (form.operatingAreas.length === 0) errs.operatingAreas = "Add at least one area";
     }
 
+    if (s === 3) {
+      if (!agreements.callback || !agreements.terms) {
+        errs.agreements = "You must agree to both statements before submitting.";
+      }
+    }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -102,6 +110,7 @@ const ProviderSignupStepper = () => {
   const handleBack = () => setStep((s) => s - 1);
 
   const handleSubmit = async () => {
+    if (!validateStep(3)) return;
     setLoading(true);
 
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -132,7 +141,7 @@ const ProviderSignupStepper = () => {
 
     const userId = signUpData.user?.id;
     if (userId) {
-      // Update provider profile with extra fields
+      // Update provider profile with extra fields and set status to pending_review
       const { data: profileData } = await supabase
         .from("provider_profiles")
         .update({
@@ -141,6 +150,7 @@ const ProviderSignupStepper = () => {
           about_work: form.aboutWork,
           accreditations: form.accreditations,
           operating_areas: form.operatingAreas,
+          status: "pending_review",
         } as any)
         .eq("user_id", userId)
         .select("id")
@@ -148,7 +158,7 @@ const ProviderSignupStepper = () => {
 
       const profileId = profileData?.id;
 
-      // Upload supporting documents to storage and insert records
+      // Upload supporting documents
       if (profileId && form.supportingDocuments.length > 0) {
         for (const file of form.supportingDocuments) {
           const storagePath = `${userId}/${Date.now()}-${file.name}`;
@@ -157,10 +167,6 @@ const ProviderSignupStepper = () => {
             .upload(storagePath, file);
 
           if (!uploadErr) {
-            const { data: urlData } = supabase.storage
-              .from("provider-documents")
-              .getPublicUrl(storagePath);
-
             await supabase.from("provider_documents").insert({
               provider_profile_id: profileId,
               user_id: userId,
@@ -174,13 +180,48 @@ const ProviderSignupStepper = () => {
       }
     }
 
-    toast({
-      title: "Application submitted!",
-      description: "An admin will review and approve your account. Check your email for verification.",
-    });
-    navigate("/login");
+    setSubmitted(true);
     setLoading(false);
   };
+
+  // Success screen
+  if (submitted) {
+    return (
+      <div className="w-full max-w-lg">
+        <Card className="text-center">
+          <CardContent className="pt-8 pb-8 space-y-4">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <CheckCircle2 className="h-8 w-8 text-primary" />
+            </div>
+            <h2 className="font-display text-2xl font-bold text-foreground">Application Submitted!</h2>
+            <p className="text-muted-foreground">
+              Thank you for applying to join TradeTrust. Your application is now under review.
+            </p>
+            <div className="rounded-lg border border-border bg-muted/30 p-4 text-left space-y-2">
+              <h3 className="font-semibold text-sm text-foreground">What happens next?</h3>
+              <div className="space-y-1.5 text-sm text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>Check your email and verify your account by clicking the confirmation link.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>An admin will review your application. This usually takes 1–2 business days.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>Once approved, you'll be able to log in and start quoting on jobs in your area.</span>
+                </div>
+              </div>
+            </div>
+            <Button onClick={() => navigate("/login")} className="mt-4">
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-lg">
@@ -231,7 +272,15 @@ const ProviderSignupStepper = () => {
           {step === 0 && <StepBusinessDetails form={form} updateForm={updateForm} errors={errors} />}
           {step === 1 && <StepTradeDetails form={form} updateForm={updateForm} errors={errors} tradeCategories={tradeCategories} />}
           {step === 2 && <StepOperatingAreas form={form} updateForm={updateForm} errors={errors} />}
-          {step === 3 && <StepReviewSubmit form={form} tradeCategories={tradeCategories} />}
+          {step === 3 && (
+            <StepReviewSubmit
+              form={form}
+              tradeCategories={tradeCategories}
+              agreements={agreements}
+              onAgreementsChange={setAgreements}
+              errors={errors}
+            />
+          )}
         </CardContent>
         <CardFooter className="flex justify-between gap-3">
           {step > 0 ? (
