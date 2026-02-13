@@ -20,6 +20,10 @@ import type { Database } from "@/integrations/supabase/types";
 type ProviderProfile = Tables<"provider_profiles">;
 type ProviderStatus = Database["public"]["Enums"]["provider_status"];
 
+interface ProviderWithEmail extends ProviderProfile {
+  email?: string;
+}
+
 interface ProviderDocument {
   id: string;
   file_url: string;
@@ -57,12 +61,12 @@ const formatSize = (bytes: number) => {
 
 const AdminProviderList = () => {
   const { user } = useAuth();
-  const [providers, setProviders] = useState<ProviderProfile[]>([]);
+  const [providers, setProviders] = useState<ProviderWithEmail[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [editing, setEditing] = useState<ProviderProfile | null>(null);
-  const [viewing, setViewing] = useState<ProviderProfile | null>(null);
+  const [editing, setEditing] = useState<ProviderWithEmail | null>(null);
+  const [viewing, setViewing] = useState<ProviderWithEmail | null>(null);
   const [viewDocs, setViewDocs] = useState<ProviderDocument[]>([]);
   const [viewHistory, setViewHistory] = useState<StatusHistoryEntry[]>([]);
   const [docsLoading, setDocsLoading] = useState(false);
@@ -81,7 +85,23 @@ const AdminProviderList = () => {
   const fetchProviders = async () => {
     setLoading(true);
     const { data } = await supabase.from("provider_profiles").select("*").order("created_at", { ascending: false });
-    setProviders(data ?? []);
+    
+    if (data) {
+      // Fetch emails from profiles table for each provider
+      const providersWithEmails = await Promise.all(
+        data.map(async (provider) => {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("email")
+            .eq("id", provider.user_id)
+            .single();
+          return { ...provider, email: profile?.email };
+        })
+      );
+      setProviders(providersWithEmails);
+    } else {
+      setProviders([]);
+    }
     setLoading(false);
   };
 
@@ -149,7 +169,7 @@ const AdminProviderList = () => {
     }
   };
 
-  const openEdit = (p: ProviderProfile) => {
+  const openEdit = (p: ProviderWithEmail) => {
     setEditing(p);
     setForm({
       business_name: p.business_name,
@@ -227,7 +247,7 @@ const AdminProviderList = () => {
     }
   };
 
-  const openView = async (p: ProviderProfile) => {
+  const openView = async (p: ProviderWithEmail) => {
     setViewing(p);
     setDocsLoading(true);
 
@@ -290,10 +310,11 @@ const AdminProviderList = () => {
       ) : (
         <div className="rounded-md border">
           <Table>
-            <TableHeader>
+             <TableHeader>
               <TableRow>
                 <TableHead>Business</TableHead>
                 <TableHead>Contact</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Trade</TableHead>
                 <TableHead>Submitted</TableHead>
                 <TableHead>Status</TableHead>
@@ -308,6 +329,7 @@ const AdminProviderList = () => {
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{p.business_name}</TableCell>
                     <TableCell>{p.contact_first_name} {p.contact_last_name}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{p.email || "N/A"}</TableCell>
                     <TableCell>{tradeName(p.trade_category)}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
@@ -404,13 +426,14 @@ const AdminProviderList = () => {
           <DialogHeader>
             <DialogTitle>Application Review — {viewing?.business_name}</DialogTitle>
           </DialogHeader>
-          {viewing && (
-            <div className="space-y-4 py-2 text-sm">
-              <div className="grid gap-2">
-                <div className="flex justify-between"><span className="text-muted-foreground">Contact</span><span className="font-medium">{viewing.contact_first_name} {viewing.contact_last_name}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Phone</span><span className="font-medium">{viewing.phone}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Address</span><span className="font-medium">{viewing.business_address}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Postcode</span><span className="font-medium">{viewing.postcode}</span></div>
+           {viewing && (
+             <div className="space-y-4 py-2 text-sm">
+               <div className="grid gap-2">
+                 <div className="flex justify-between"><span className="text-muted-foreground">Contact</span><span className="font-medium">{viewing.contact_first_name} {viewing.contact_last_name}</span></div>
+                 <div className="flex justify-between"><span className="text-muted-foreground">Email</span><span className="font-medium">{viewing.email || "N/A"}</span></div>
+                 <div className="flex justify-between"><span className="text-muted-foreground">Phone</span><span className="font-medium">{viewing.phone}</span></div>
+                 <div className="flex justify-between"><span className="text-muted-foreground">Address</span><span className="font-medium">{viewing.business_address}</span></div>
+                 <div className="flex justify-between"><span className="text-muted-foreground">Postcode</span><span className="font-medium">{viewing.postcode}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Trade</span><span className="font-medium">{tradeName(viewing.trade_category)}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Submitted</span><span className="font-medium">{new Date(viewing.created_at).toLocaleDateString()}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Status</span>
