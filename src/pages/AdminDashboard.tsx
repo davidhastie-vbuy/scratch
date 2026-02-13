@@ -1,11 +1,12 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Shield, Users, Wrench, Tag, HelpCircle } from "lucide-react";
+import { LogOut, Shield, Users, Wrench, Tag, HelpCircle, UserPlus } from "lucide-react";
 import AdminCustomerList from "@/components/admin/AdminCustomerList";
 import AdminProviderList from "@/components/admin/AdminProviderList";
 import AdminCategoryList from "@/components/admin/AdminCategoryList";
 import AdminSupportTickets from "@/components/admin/AdminSupportTickets";
+import AdminCreateAdmin from "@/components/admin/AdminCreateAdmin";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -54,6 +55,10 @@ const AdminDashboard = () => {
               <HelpCircle className="h-4 w-4" />
               Support Tickets
             </TabsTrigger>
+            <TabsTrigger value="admins" className="gap-1.5">
+              <UserPlus className="h-4 w-4" />
+              Admins
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="providers">
             <AdminProviderList />
@@ -66,6 +71,9 @@ const AdminDashboard = () => {
           </TabsContent>
           <TabsContent value="support">
             <AdminSupportTickets />
+          </TabsContent>
+          <TabsContent value="admins">
+            <AdminCreateAdmin />
           </TabsContent>
         </Tabs>
       </main>
