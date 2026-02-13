@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 import { useNavigate } from "react-router-dom";
@@ -24,31 +25,56 @@ interface ProviderListItem {
 }
 
 const ProviderDirectory = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { categories } = useTradeCategories(true);
   const [providers, setProviders] = useState<ProviderListItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("all");
+  const [customerPostcode, setCustomerPostcode] = useState("");
 
   useEffect(() => {
-    fetchProviders();
-  }, []);
+    if (user) fetchData();
+  }, [user]);
 
-  const fetchProviders = async () => {
-    const { data } = await supabase
-      .from("provider_profiles")
-      .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, business_description, logo_url, postcode, years_experience, operating_areas")
-      .eq("status", "active" as any)
-      .order("business_name");
-    setProviders((data as any[]) ?? []);
+  const fetchData = async () => {
+    // Get customer's postcode
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("postcode")
+      .eq("id", user!.id)
+      .single();
+
+    const postcode = profile?.postcode ?? "";
+    setCustomerPostcode(postcode);
+
+    // Extract postcode district (e.g. "SW1A 1AA" -> "SW1A", "B1 1AA" -> "B1")
+    const district = postcode.trim().split(" ")[0]?.toUpperCase() || "";
+
+    if (!district) {
+      // No postcode set — show all active providers
+      const { data } = await supabase
+        .from("provider_profiles")
+        .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, business_description, logo_url, postcode, years_experience, operating_areas")
+        .eq("status", "active" as any)
+        .order("business_name");
+      setProviders((data as any[]) ?? []);
+    } else {
+      // Filter to providers whose operating_areas contain the customer's postcode district
+      const { data } = await supabase
+        .from("provider_profiles")
+        .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, business_description, logo_url, postcode, years_experience, operating_areas")
+        .eq("status", "active" as any)
+        .contains("operating_areas", [district])
+        .order("business_name");
+      setProviders((data as any[]) ?? []);
+    }
+
     setLoading(false);
   };
 
   const filtered = providers.filter(p => {
-    const matchSearch = !search || p.business_name.toLowerCase().includes(search.toLowerCase());
-    const matchCat = catFilter === "all" || p.trade_category === catFilter;
-    return matchSearch && matchCat;
+    return catFilter === "all" || p.trade_category === catFilter;
   });
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -56,22 +82,17 @@ const ProviderDirectory = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-display text-2xl font-bold">Find a Tradesperson</h2>
-        <p className="text-muted-foreground text-sm">Browse our vetted and approved providers</p>
+        <h2 className="font-display text-2xl font-bold">Local Trades</h2>
+        <p className="text-muted-foreground text-sm">
+          {customerPostcode
+            ? `Vetted providers serving your area (${customerPostcode.trim().split(" ")[0]?.toUpperCase()})`
+            : "Update your profile postcode to see providers in your area"}
+        </p>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by business name..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
         <Select value={catFilter} onValueChange={setCatFilter}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-56">
             <SelectValue placeholder="All trades" />
           </SelectTrigger>
           <SelectContent>
@@ -82,7 +103,7 @@ const ProviderDirectory = () => {
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">No providers found matching your criteria.</p>
+        <p className="text-center text-muted-foreground py-8">No providers found in your area{catFilter !== "all" ? " for this trade" : ""}.</p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {filtered.map(p => {
