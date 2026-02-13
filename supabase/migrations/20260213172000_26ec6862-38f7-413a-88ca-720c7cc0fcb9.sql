@@ -1,0 +1,1 @@
+ALTER TABLE public.provider_profiles ADD COLUMN banner_url text;
