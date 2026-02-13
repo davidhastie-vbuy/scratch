@@ -129,6 +129,11 @@ const ProviderSignupStepper = () => {
           postcode: form.postcode,
           trade_category: form.tradeCategory,
           business_description: form.businessDescription,
+          years_experience: form.yearsExperience,
+          qualifications_certifications: form.qualificationsCertifications,
+          about_work: form.aboutWork,
+          accreditations: form.accreditations,
+          operating_areas: form.operatingAreas,
         },
       },
     });
@@ -141,19 +146,11 @@ const ProviderSignupStepper = () => {
 
     const userId = signUpData.user?.id;
     if (userId) {
-      // Update provider profile with extra fields and set status to pending_review
+      // Fetch the provider profile ID created by the trigger
       const { data: profileData } = await supabase
         .from("provider_profiles")
-        .update({
-          years_experience: form.yearsExperience,
-          qualifications_certifications: form.qualificationsCertifications,
-          about_work: form.aboutWork,
-          accreditations: form.accreditations,
-          operating_areas: form.operatingAreas,
-          status: "pending_review",
-        } as any)
-        .eq("user_id", userId)
         .select("id")
+        .eq("user_id", userId)
         .single();
 
       const profileId = profileData?.id;
