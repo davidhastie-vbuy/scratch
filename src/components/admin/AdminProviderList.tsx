@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Search, Pencil, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 import type { Tables } from "@/integrations/supabase/types";
@@ -17,10 +17,25 @@ import type { Database } from "@/integrations/supabase/types";
 type ProviderProfile = Tables<"provider_profiles">;
 type ProviderStatus = Database["public"]["Enums"]["provider_status"];
 
+interface ProviderDocument {
+  id: string;
+  file_url: string;
+  file_name: string;
+  file_type: string;
+  file_size: number;
+  uploaded_at: string;
+}
+
 const statusConfig: Record<ProviderStatus, { label: string; icon: typeof CheckCircle; variant: "default" | "secondary" | "destructive" }> = {
   active: { label: "Active", icon: CheckCircle, variant: "default" },
   pending: { label: "Pending", icon: Clock, variant: "secondary" },
   suspended: { label: "Suspended", icon: XCircle, variant: "destructive" },
+};
+
+const formatSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
 const AdminProviderList = () => {
@@ -29,6 +44,9 @@ const AdminProviderList = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [editing, setEditing] = useState<ProviderProfile | null>(null);
+  const [viewing, setViewing] = useState<ProviderProfile | null>(null);
+  const [viewDocs, setViewDocs] = useState<ProviderDocument[]>([]);
+  const [docsLoading, setDocsLoading] = useState(false);
   const [form, setForm] = useState<Partial<ProviderProfile>>({});
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -94,6 +112,31 @@ const AdminProviderList = () => {
     }
   };
 
+  const openView = async (p: ProviderProfile) => {
+    setViewing(p);
+    setDocsLoading(true);
+    const { data } = await supabase
+      .from("provider_documents")
+      .select("id, file_url, file_name, file_type, file_size, uploaded_at")
+      .eq("provider_profile_id", p.id)
+      .order("uploaded_at", { ascending: false });
+    setViewDocs((data as ProviderDocument[]) ?? []);
+    setDocsLoading(false);
+  };
+
+  const downloadDoc = async (doc: ProviderDocument) => {
+    const { data, error } = await supabase.storage
+      .from("provider-documents")
+      .createSignedUrl(doc.file_url, 60);
+
+    if (error || !data?.signedUrl) {
+      toast({ title: "Download failed", description: error?.message ?? "Could not generate download link", variant: "destructive" });
+      return;
+    }
+
+    window.open(data.signedUrl, "_blank");
+  };
+
   const tradeName = (cat: string) => tradeCategories.find((t) => t.slug === cat)?.name ?? cat;
 
   return (
@@ -129,7 +172,7 @@ const AdminProviderList = () => {
                 <TableHead>Contact</TableHead>
                 <TableHead>Trade</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-[180px]">Actions</TableHead>
+                <TableHead className="w-[220px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -164,7 +207,10 @@ const AdminProviderList = () => {
                             Reactivate
                           </Button>
                         )}
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(p)}>
+                        <Button variant="ghost" size="icon" onClick={() => openView(p)} title="View application">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(p)} title="Edit profile">
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </div>
@@ -177,6 +223,87 @@ const AdminProviderList = () => {
         </div>
       )}
 
+      {/* View Application Dialog */}
+      <Dialog open={!!viewing} onOpenChange={(o) => !o && setViewing(null)}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Application Review — {viewing?.business_name}</DialogTitle>
+          </DialogHeader>
+          {viewing && (
+            <div className="space-y-4 py-2 text-sm">
+              <div className="grid gap-2">
+                <div className="flex justify-between"><span className="text-muted-foreground">Contact</span><span className="font-medium">{viewing.contact_first_name} {viewing.contact_last_name}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Phone</span><span className="font-medium">{viewing.phone}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Address</span><span className="font-medium">{viewing.business_address}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Postcode</span><span className="font-medium">{viewing.postcode}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Trade</span><span className="font-medium">{tradeName(viewing.trade_category)}</span></div>
+                {(viewing as any).years_experience && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">Experience</span><span className="font-medium">{(viewing as any).years_experience}</span></div>
+                )}
+                {(viewing as any).qualifications_certifications && (
+                  <div><span className="text-muted-foreground">Qualifications</span><p className="mt-1 font-medium">{(viewing as any).qualifications_certifications}</p></div>
+                )}
+                {(viewing as any).about_work && (
+                  <div><span className="text-muted-foreground">About Work</span><p className="mt-1 font-medium">{(viewing as any).about_work}</p></div>
+                )}
+                {(viewing as any).accreditations?.length > 0 && (
+                  <div>
+                    <span className="text-muted-foreground">Accreditations</span>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {((viewing as any).accreditations as string[]).map((a) => (
+                        <Badge key={a} variant="outline" className="text-xs">{a}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {(viewing as any).operating_areas?.length > 0 && (
+                  <div>
+                    <span className="text-muted-foreground">Operating Areas</span>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {((viewing as any).operating_areas as string[]).map((a) => (
+                        <Badge key={a} variant="secondary" className="text-xs">{a}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {viewing.business_description && (
+                  <div><span className="text-muted-foreground">Description</span><p className="mt-1 font-medium">{viewing.business_description}</p></div>
+                )}
+              </div>
+
+              {/* Documents section */}
+              <div className="space-y-2">
+                <h4 className="font-semibold text-foreground flex items-center gap-1.5">
+                  <FileText className="h-4 w-4" />
+                  Supporting Documents
+                </h4>
+                {docsLoading ? (
+                  <p className="text-muted-foreground text-xs">Loading documents…</p>
+                ) : viewDocs.length === 0 ? (
+                  <p className="text-muted-foreground text-xs">No documents uploaded.</p>
+                ) : (
+                  <div className="space-y-1">
+                    {viewDocs.map((doc) => (
+                      <div key={doc.id} className="flex items-center gap-2 rounded border border-border bg-muted/50 px-3 py-2">
+                        <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        <div className="flex-1 min-w-0">
+                          <p className="truncate font-medium text-xs">{doc.file_name}</p>
+                          <p className="text-[10px] text-muted-foreground">{formatSize(doc.file_size)} · {new Date(doc.uploaded_at).toLocaleDateString()}</p>
+                        </div>
+                        <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => downloadDoc(doc)} title="Download">
+                          <Download className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Provider Dialog */}
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
