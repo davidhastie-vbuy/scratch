@@ -87,6 +87,8 @@ export type Database = {
       customer_recommendations: {
         Row: {
           created_at: string
+          customer_name: string | null
+          customer_postcode: string | null
           id: string
           message: string | null
           photo_urls: string[] | null
@@ -95,6 +97,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          customer_name?: string | null
+          customer_postcode?: string | null
           id?: string
           message?: string | null
           photo_urls?: string[] | null
@@ -103,6 +107,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          customer_name?: string | null
+          customer_postcode?: string | null
           id?: string
           message?: string | null
           photo_urls?: string[] | null
