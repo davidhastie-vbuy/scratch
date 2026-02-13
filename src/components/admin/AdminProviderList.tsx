@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye, AlertTriangle, History, MessageSquare } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
@@ -71,6 +72,9 @@ const AdminProviderList = () => {
   const [actionDialog, setActionDialog] = useState<{ provider: ProviderProfile; action: "denied" | "changes_requested" } | null>(null);
   const [adminNote, setAdminNote] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
+  const [editDocs, setEditDocs] = useState<ProviderDocument[]>([]);
+  const [editDocsLoading, setEditDocsLoading] = useState(false);
+  const [newArea, setNewArea] = useState("");
   const { toast } = useToast();
   const { categories: tradeCategories } = useTradeCategories(false);
 
@@ -156,7 +160,57 @@ const AdminProviderList = () => {
       postcode: p.postcode,
       trade_category: p.trade_category,
       business_description: p.business_description,
+      years_experience: p.years_experience,
+      qualifications_certifications: p.qualifications_certifications,
+      about_work: p.about_work,
+      accreditations: p.accreditations,
+      operating_areas: p.operating_areas,
     });
+    // Also load docs for the edit dialog
+    loadEditDocs(p.id);
+  };
+
+
+  const loadEditDocs = async (profileId: string) => {
+    setEditDocsLoading(true);
+    const { data } = await supabase
+      .from("provider_documents")
+      .select("id, file_url, file_name, file_type, file_size, uploaded_at")
+      .eq("provider_profile_id", profileId)
+      .order("uploaded_at", { ascending: false });
+    setEditDocs((data as ProviderDocument[]) ?? []);
+    setEditDocsLoading(false);
+  };
+
+  const EXPERIENCE_OPTIONS = [
+    "Less than 1 year", "1-3 years", "3-5 years", "5-10 years", "10-20 years", "20+ years",
+  ];
+
+  const ACCREDITATION_OPTIONS = [
+    "Public Liability Insurance", "Gas Safe Registered", "NICEIC / Electrical Certification",
+  ];
+
+  const toggleEditAccreditation = (value: string) => {
+    const current = (form.accreditations as string[]) ?? [];
+    setForm((f) => ({
+      ...f,
+      accreditations: current.includes(value)
+        ? current.filter((a) => a !== value)
+        : [...current, value],
+    }));
+  };
+
+  const addOperatingArea = () => {
+    const trimmed = newArea.trim().toUpperCase();
+    if (!trimmed) return;
+    const current = (form.operating_areas as string[]) ?? [];
+    if (!current.includes(trimmed)) {
+      setForm((f) => ({ ...f, operating_areas: [...current, trimmed] }));
+    }
+    setNewArea("");
+  };
+  const removeOperatingArea = (area: string) => {
+    setForm((f) => ({ ...f, operating_areas: ((f.operating_areas as string[]) ?? []).filter((a) => a !== area) }));
   };
 
   const saveEdit = async () => {
@@ -473,11 +527,13 @@ const AdminProviderList = () => {
 
       {/* Edit Provider Dialog */}
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Provider</DialogTitle>
+            <DialogTitle>Edit Provider — {editing?.business_name}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-2">
+            {/* Business Details */}
+            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Business Details</h4>
             {[
               { key: "business_name", label: "Business name" },
               { key: "contact_first_name", label: "First name" },
@@ -495,6 +551,18 @@ const AdminProviderList = () => {
               </div>
             ))}
             <div className="grid gap-1.5">
+              <Label>Description</Label>
+              <Textarea
+                value={form.business_description ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, business_description: e.target.value.slice(0, 300) }))}
+                maxLength={300}
+              />
+            </div>
+
+            <Separator />
+            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Trade Details</h4>
+
+            <div className="grid gap-1.5">
               <Label>Trade category</Label>
               <Select value={form.trade_category ?? ""} onValueChange={(v) => setForm((f) => ({ ...f, trade_category: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -505,14 +573,103 @@ const AdminProviderList = () => {
                 </SelectContent>
               </Select>
             </div>
+
             <div className="grid gap-1.5">
-              <Label>Description</Label>
+              <Label>Years of Experience</Label>
+              <Select value={form.years_experience ?? ""} onValueChange={(v) => setForm((f) => ({ ...f, years_experience: v }))}>
+                <SelectTrigger><SelectValue placeholder="Select experience" /></SelectTrigger>
+                <SelectContent>
+                  {EXPERIENCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-1.5">
+              <Label>Qualifications & Certifications</Label>
               <Textarea
-                value={form.business_description ?? ""}
-                onChange={(e) => setForm((f) => ({ ...f, business_description: e.target.value.slice(0, 300) }))}
-                maxLength={300}
+                value={form.qualifications_certifications ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, qualifications_certifications: e.target.value }))}
+                maxLength={1000}
+                rows={3}
               />
             </div>
+
+            <div className="grid gap-1.5">
+              <Label>About Work</Label>
+              <Textarea
+                value={form.about_work ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, about_work: e.target.value }))}
+                maxLength={1000}
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Accreditations</Label>
+              {ACCREDITATION_OPTIONS.map((opt) => (
+                <div key={opt} className="flex items-center gap-2">
+                  <Checkbox
+                    id={`edit-accred-${opt}`}
+                    checked={((form.accreditations as string[]) ?? []).includes(opt)}
+                    onCheckedChange={() => toggleEditAccreditation(opt)}
+                  />
+                  <Label htmlFor={`edit-accred-${opt}`} className="text-sm font-normal cursor-pointer">{opt}</Label>
+                </div>
+              ))}
+            </div>
+
+            <Separator />
+            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Operating Areas</h4>
+
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add postcode district e.g. SW1"
+                  value={newArea}
+                  onChange={(e) => setNewArea(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addOperatingArea())}
+                  className="flex-1"
+                />
+                <Button type="button" variant="outline" size="sm" onClick={addOperatingArea}>Add</Button>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {((form.operating_areas as string[]) ?? []).map((area) => (
+                  <Badge key={area} variant="secondary" className="gap-1">
+                    {area}
+                    <button type="button" onClick={() => removeOperatingArea(area)} className="ml-1 text-muted-foreground hover:text-destructive">×</button>
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Documents (read-only view) */}
+            <Separator />
+            <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+              <FileText className="h-4 w-4" />
+              Uploaded Documents
+            </h4>
+            {editDocsLoading ? (
+              <p className="text-muted-foreground text-xs">Loading documents…</p>
+            ) : editDocs.length === 0 ? (
+              <p className="text-muted-foreground text-xs">No documents uploaded.</p>
+            ) : (
+              <div className="space-y-1">
+                {editDocs.map((doc) => (
+                  <div key={doc.id} className="flex items-center gap-2 rounded border border-border bg-muted/50 px-3 py-2">
+                    <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate font-medium text-xs">{doc.file_name}</p>
+                      <p className="text-[10px] text-muted-foreground">{formatSize(doc.file_size)} · {new Date(doc.uploaded_at).toLocaleDateString()}</p>
+                    </div>
+                    <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => downloadDoc(doc)} title="Download">
+                      <Download className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
