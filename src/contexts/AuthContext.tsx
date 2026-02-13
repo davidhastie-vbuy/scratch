@@ -28,38 +28,54 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchRole = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .single();
-    return (data?.role as AppRole) ?? null;
+  const fetchRole = async (userId: string): Promise<AppRole | null> => {
+    try {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .single();
+      if (error) {
+        console.error("Failed to fetch role:", error.message);
+        return null;
+      }
+      return (data?.role as AppRole) ?? null;
+    } catch (err) {
+      console.error("Role fetch exception:", err);
+      return null;
+    }
   };
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          const userRole = await fetchRole(session.user.id);
-          setRole(userRole);
+          // Defer role fetch to avoid blocking onAuthStateChange
+          setTimeout(async () => {
+            const userRole = await fetchRole(session.user.id);
+            setRole(userRole);
+            setLoading(false);
+          }, 0);
         } else {
           setRole(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        const userRole = await fetchRole(session.user.id);
-        setRole(userRole);
+        fetchRole(session.user.id).then((userRole) => {
+          setRole(userRole);
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
