@@ -61,6 +61,8 @@ export type Database = {
       }
       provider_profiles: {
         Row: {
+          about_work: string | null
+          accreditations: string[] | null
           business_address: string
           business_description: string | null
           business_name: string
@@ -69,14 +71,20 @@ export type Database = {
           created_at: string
           id: string
           logo_url: string | null
+          operating_areas: string[] | null
           phone: string
           postcode: string
+          qualifications_certifications: string | null
           status: Database["public"]["Enums"]["provider_status"]
+          supporting_documents: string[] | null
           trade_category: string
           updated_at: string
           user_id: string
+          years_experience: string | null
         }
         Insert: {
+          about_work?: string | null
+          accreditations?: string[] | null
           business_address: string
           business_description?: string | null
           business_name: string
@@ -85,14 +93,20 @@ export type Database = {
           created_at?: string
           id?: string
           logo_url?: string | null
+          operating_areas?: string[] | null
           phone: string
           postcode: string
+          qualifications_certifications?: string | null
           status?: Database["public"]["Enums"]["provider_status"]
+          supporting_documents?: string[] | null
           trade_category?: string
           updated_at?: string
           user_id: string
+          years_experience?: string | null
         }
         Update: {
+          about_work?: string | null
+          accreditations?: string[] | null
           business_address?: string
           business_description?: string | null
           business_name?: string
@@ -101,12 +115,16 @@ export type Database = {
           created_at?: string
           id?: string
           logo_url?: string | null
+          operating_areas?: string[] | null
           phone?: string
           postcode?: string
+          qualifications_certifications?: string | null
           status?: Database["public"]["Enums"]["provider_status"]
+          supporting_documents?: string[] | null
           trade_category?: string
           updated_at?: string
           user_id?: string
+          years_experience?: string | null
         }
         Relationships: []
       }
