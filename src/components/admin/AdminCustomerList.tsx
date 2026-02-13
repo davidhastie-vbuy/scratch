@@ -5,11 +5,28 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Pencil } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Search, Pencil, Briefcase, ArrowLeft, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTradeCategories } from "@/hooks/use-trade-categories";
 import type { Tables } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
+type Job = Tables<"jobs">;
+type JobStatus = Database["public"]["Enums"]["job_status"];
+
+const JOB_STATUS_CONFIG: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+  open: { label: "Open", variant: "default" },
+  quoted: { label: "Quoted", variant: "secondary" },
+  quotes_closed: { label: "Quotes Closed", variant: "outline" },
+  accepted: { label: "Accepted", variant: "default" },
+  in_progress: { label: "In Progress", variant: "secondary" },
+  completed: { label: "Completed", variant: "default" },
+  cancelled: { label: "Cancelled", variant: "destructive" },
+};
 
 const AdminCustomerList = () => {
   const [customers, setCustomers] = useState<(Profile & { role: string })[]>([]);
@@ -19,6 +36,17 @@ const AdminCustomerList = () => {
   const [form, setForm] = useState<Partial<Profile>>({});
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { categories: tradeCategories } = useTradeCategories(false);
+
+  // Jobs view state
+  const [viewingCustomer, setViewingCustomer] = useState<Profile | null>(null);
+  const [customerJobs, setCustomerJobs] = useState<Job[]>([]);
+  const [jobsLoading, setJobsLoading] = useState(false);
+
+  // Job edit state
+  const [editingJob, setEditingJob] = useState<Job | null>(null);
+  const [jobForm, setJobForm] = useState<Partial<Job>>({});
+  const [jobSaving, setJobSaving] = useState(false);
 
   const fetchCustomers = async () => {
     setLoading(true);
@@ -80,6 +108,209 @@ const AdminCustomerList = () => {
     }
   };
 
+  const openCustomerJobs = async (customer: Profile) => {
+    setViewingCustomer(customer);
+    setJobsLoading(true);
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("*")
+      .eq("customer_user_id", customer.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast({ title: "Error loading jobs", description: error.message, variant: "destructive" });
+    }
+    setCustomerJobs(data ?? []);
+    setJobsLoading(false);
+  };
+
+  const openJobEdit = (job: Job) => {
+    setEditingJob(job);
+    setJobForm({
+      title: job.title,
+      description: job.description,
+      category: job.category,
+      postcode_district: job.postcode_district,
+      budget: job.budget,
+      timeline: job.timeline,
+      status: job.status,
+    });
+  };
+
+  const saveJobEdit = async () => {
+    if (!editingJob) return;
+    setJobSaving(true);
+    const { error } = await supabase
+      .from("jobs")
+      .update(jobForm)
+      .eq("id", editingJob.id);
+    setJobSaving(false);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Job updated" });
+      setEditingJob(null);
+      // Refresh jobs list
+      if (viewingCustomer) openCustomerJobs(viewingCustomer);
+    }
+  };
+
+  const tradeName = (cat: string) => tradeCategories.find((t) => t.slug === cat)?.name ?? cat;
+
+  const getStatusBadge = (status: string) => {
+    const cfg = JOB_STATUS_CONFIG[status] ?? { label: status, variant: "outline" as const };
+    return <Badge variant={cfg.variant}>{cfg.label}</Badge>;
+  };
+
+  // If viewing a customer's jobs, show that view
+  if (viewingCustomer) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={() => { setViewingCustomer(null); setCustomerJobs([]); }}>
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Customers
+          </Button>
+          <h3 className="font-display text-lg font-semibold">
+            Jobs posted by {viewingCustomer.full_name || viewingCustomer.email || "Customer"}
+          </h3>
+        </div>
+
+        {jobsLoading ? (
+          <p className="text-muted-foreground text-sm">Loading jobs…</p>
+        ) : customerJobs.length === 0 ? (
+          <p className="text-muted-foreground text-sm">This customer has not posted any jobs yet.</p>
+        ) : (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Postcode</TableHead>
+                  <TableHead>Budget</TableHead>
+                  <TableHead>Quotes</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Posted</TableHead>
+                  <TableHead className="w-[80px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {customerJobs.map((job) => (
+                  <TableRow key={job.id}>
+                    <TableCell className="font-medium">{job.title}</TableCell>
+                    <TableCell>{tradeName(job.category)}</TableCell>
+                    <TableCell>{job.postcode_district}</TableCell>
+                    <TableCell>{job.budget || "—"}</TableCell>
+                    <TableCell>{job.quote_count}/3</TableCell>
+                    <TableCell>{getStatusBadge(job.status)}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {new Date(job.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" onClick={() => openJobEdit(job)} title="Edit job">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+
+        {/* Edit Job Dialog */}
+        <Dialog open={!!editingJob} onOpenChange={(o) => !o && setEditingJob(null)}>
+          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Job</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-2">
+              <div className="grid gap-1.5">
+                <Label>Title</Label>
+                <Input
+                  value={jobForm.title ?? ""}
+                  onChange={(e) => setJobForm((f) => ({ ...f, title: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Description</Label>
+                <Textarea
+                  value={jobForm.description ?? ""}
+                  onChange={(e) => setJobForm((f) => ({ ...f, description: e.target.value }))}
+                  rows={4}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Category</Label>
+                <Select
+                  value={jobForm.category ?? ""}
+                  onValueChange={(v) => setJobForm((f) => ({ ...f, category: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tradeCategories.map((cat) => (
+                      <SelectItem key={cat.slug} value={cat.slug}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-1.5">
+                  <Label>Postcode District</Label>
+                  <Input
+                    value={jobForm.postcode_district ?? ""}
+                    onChange={(e) => setJobForm((f) => ({ ...f, postcode_district: e.target.value.toUpperCase() }))}
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Budget</Label>
+                  <Input
+                    value={jobForm.budget ?? ""}
+                    onChange={(e) => setJobForm((f) => ({ ...f, budget: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-1.5">
+                  <Label>Timeline</Label>
+                  <Input
+                    value={jobForm.timeline ?? ""}
+                    onChange={(e) => setJobForm((f) => ({ ...f, timeline: e.target.value }))}
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Status</Label>
+                  <Select
+                    value={jobForm.status ?? ""}
+                    onValueChange={(v) => setJobForm((f) => ({ ...f, status: v as JobStatus }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(JOB_STATUS_CONFIG).map(([value, { label }]) => (
+                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditingJob(null)}>Cancel</Button>
+              <Button onClick={saveJobEdit} disabled={jobSaving}>
+                {jobSaving ? "Saving…" : "Save"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -100,7 +331,7 @@ const AdminCustomerList = () => {
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>City</TableHead>
-                <TableHead className="w-[80px]">Actions</TableHead>
+                <TableHead className="w-[120px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -111,9 +342,14 @@ const AdminCustomerList = () => {
                   <TableCell>{c.phone || "—"}</TableCell>
                   <TableCell>{c.city || "—"}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(c)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => openCustomerJobs(c)} title="View jobs">
+                        <Briefcase className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(c)} title="Edit profile">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
