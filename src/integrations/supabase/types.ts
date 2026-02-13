@@ -52,6 +52,162 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          created_at: string
+          customer_user_id: string
+          id: string
+          job_id: string
+          provider_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_user_id: string
+          id?: string
+          job_id: string
+          provider_user_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_user_id?: string
+          id?: string
+          job_id?: string
+          provider_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_media: {
+        Row: {
+          file_name: string
+          file_size: number
+          file_type: string
+          file_url: string
+          id: string
+          job_id: string
+          uploaded_at: string
+          user_id: string
+        }
+        Insert: {
+          file_name: string
+          file_size: number
+          file_type: string
+          file_url: string
+          id?: string
+          job_id: string
+          uploaded_at?: string
+          user_id: string
+        }
+        Update: {
+          file_name?: string
+          file_size?: number
+          file_type?: string
+          file_url?: string
+          id?: string
+          job_id?: string
+          uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_media_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          budget: string | null
+          category: string
+          created_at: string
+          customer_user_id: string
+          description: string
+          id: string
+          postcode_district: string
+          provider_id: string | null
+          quote_count: number
+          status: Database["public"]["Enums"]["job_status"]
+          timeline: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          budget?: string | null
+          category: string
+          created_at?: string
+          customer_user_id: string
+          description: string
+          id?: string
+          postcode_district: string
+          provider_id?: string | null
+          quote_count?: number
+          status?: Database["public"]["Enums"]["job_status"]
+          timeline?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          budget?: string | null
+          category?: string
+          created_at?: string
+          customer_user_id?: string
+          description?: string
+          id?: string
+          postcode_district?: string
+          provider_id?: string | null
+          quote_count?: number
+          status?: Database["public"]["Enums"]["job_status"]
+          timeline?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_user_id: string
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_user_id: string
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address_line_1: string | null
@@ -210,6 +366,121 @@ export type Database = {
         }
         Relationships: []
       }
+      quotes: {
+        Row: {
+          availability: string | null
+          created_at: string
+          estimated_duration: string | null
+          id: string
+          job_id: string
+          message: string | null
+          price_max: number
+          price_min: number
+          provider_user_id: string
+          status: Database["public"]["Enums"]["quote_status"]
+          updated_at: string
+        }
+        Insert: {
+          availability?: string | null
+          created_at?: string
+          estimated_duration?: string | null
+          id?: string
+          job_id: string
+          message?: string | null
+          price_max: number
+          price_min: number
+          provider_user_id: string
+          status?: Database["public"]["Enums"]["quote_status"]
+          updated_at?: string
+        }
+        Update: {
+          availability?: string | null
+          created_at?: string
+          estimated_duration?: string | null
+          id?: string
+          job_id?: string
+          message?: string | null
+          price_max?: number
+          price_min?: number
+          provider_user_id?: string
+          status?: Database["public"]["Enums"]["quote_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_ticket_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_internal_note: boolean
+          sender_user_id: string
+          ticket_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_internal_note?: boolean
+          sender_user_id: string
+          ticket_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_internal_note?: boolean
+          sender_user_id?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          status: Database["public"]["Enums"]["ticket_status"]
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trade_categories: {
         Row: {
           created_at: string
@@ -274,6 +545,14 @@ export type Database = {
     }
     Enums: {
       app_role: "customer" | "provider" | "admin"
+      job_status:
+        | "open"
+        | "quoted"
+        | "quotes_closed"
+        | "accepted"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
       provider_status:
         | "pending"
         | "active"
@@ -281,6 +560,8 @@ export type Database = {
         | "pending_review"
         | "denied"
         | "changes_requested"
+      quote_status: "pending" | "accepted" | "declined" | "withdrawn"
+      ticket_status: "open" | "in_progress" | "resolved" | "closed"
       trade_category:
         | "plumbing"
         | "electrical"
@@ -423,6 +704,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["customer", "provider", "admin"],
+      job_status: [
+        "open",
+        "quoted",
+        "quotes_closed",
+        "accepted",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
       provider_status: [
         "pending",
         "active",
@@ -431,6 +721,8 @@ export const Constants = {
         "denied",
         "changes_requested",
       ],
+      quote_status: ["pending", "accepted", "declined", "withdrawn"],
+      ticket_status: ["open", "in_progress", "resolved", "closed"],
       trade_category: [
         "plumbing",
         "electrical",

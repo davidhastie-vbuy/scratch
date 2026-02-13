@@ -1,10 +1,11 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Shield, Users, Wrench, Tag } from "lucide-react";
+import { LogOut, Shield, Users, Wrench, Tag, HelpCircle } from "lucide-react";
 import AdminCustomerList from "@/components/admin/AdminCustomerList";
 import AdminProviderList from "@/components/admin/AdminProviderList";
 import AdminCategoryList from "@/components/admin/AdminCategoryList";
+import AdminSupportTickets from "@/components/admin/AdminSupportTickets";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -15,7 +16,7 @@ const AdminDashboard = () => {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-sidebar-primary" />
-            <h1 className="font-display text-xl font-bold">TradeConnect Admin</h1>
+            <h1 className="font-display text-xl font-bold">TradeTrust Admin</h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="rounded-full bg-sidebar-accent px-3 py-1 text-xs font-medium text-sidebar-accent-foreground">
@@ -32,7 +33,7 @@ const AdminDashboard = () => {
       <main className="container py-8">
         <div className="mb-6">
           <h2 className="font-display text-2xl font-bold">Platform Management</h2>
-          <p className="text-muted-foreground">Manage users and trade categories</p>
+          <p className="text-muted-foreground">Manage users, categories, and support</p>
         </div>
 
         <Tabs defaultValue="providers" className="space-y-4">
@@ -49,6 +50,10 @@ const AdminDashboard = () => {
               <Tag className="h-4 w-4" />
               Categories
             </TabsTrigger>
+            <TabsTrigger value="support" className="gap-1.5">
+              <HelpCircle className="h-4 w-4" />
+              Support Tickets
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="providers">
             <AdminProviderList />
@@ -58,6 +63,9 @@ const AdminDashboard = () => {
           </TabsContent>
           <TabsContent value="categories">
             <AdminCategoryList />
+          </TabsContent>
+          <TabsContent value="support">
+            <AdminSupportTickets />
           </TabsContent>
         </Tabs>
       </main>
