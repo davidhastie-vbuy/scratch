@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Mail, Lock, User, Phone, MapPin } from "lucide-react";
+import { UserPlus, Mail, Lock, User, Phone, MapPin, Camera, X } from "lucide-react";
 import ProviderSignupStepper from "@/components/provider-signup/ProviderSignupStepper";
 
 const Signup = () => {
@@ -26,7 +27,41 @@ const Signup = () => {
   const [city, setCity] = useState("");
   const [postcode, setPostcode] = useState("");
 
+  // Optional recommendation
+  const [recommendation, setRecommendation] = useState("");
+  const [recPhotos, setRecPhotos] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const isCustomer = role === "customer";
+
+  const handleAddPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files).slice(0, 5 - recPhotos.length);
+      setRecPhotos((prev) => [...prev, ...newFiles].slice(0, 5));
+    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setRecPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const submitRecommendation = async (userId: string, userEmail: string) => {
+    if (!recommendation.trim() && recPhotos.length === 0) return;
+    try {
+      const formData = new FormData();
+      formData.append("user_id", userId);
+      formData.append("user_email", userEmail);
+      if (recommendation.trim()) formData.append("message", recommendation.trim());
+      recPhotos.forEach((photo) => formData.append("photos", photo));
+
+      await supabase.functions.invoke("submit-recommendation", {
+        body: formData,
+      });
+    } catch (err) {
+      console.error("Failed to submit recommendation:", err);
+    }
+  };
 
   const handleCustomerSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +78,7 @@ const Signup = () => {
       postcode,
     };
 
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: { emailRedirectTo: window.location.origin, data: metadata },
@@ -52,6 +87,10 @@ const Signup = () => {
     if (error) {
       toast({ title: "Signup failed", description: error.message, variant: "destructive" });
     } else {
+      // Submit optional recommendation in background
+      if (signUpData.user?.id) {
+        submitRecommendation(signUpData.user.id, email);
+      }
       toast({ title: "Check your email", description: "We've sent you a confirmation link to verify your account." });
       navigate("/login");
     }
@@ -167,6 +206,59 @@ const Signup = () => {
                   <Label htmlFor="postcode">Postcode</Label>
                   <Input id="postcode" placeholder="SW1A 1AA" value={postcode} onChange={(e) => setPostcode(e.target.value)} required maxLength={10} />
                 </div>
+              </div>
+
+              {/* Optional recommendation */}
+              <div className="space-y-2 rounded-lg border border-dashed border-muted-foreground/30 p-4">
+                <Label htmlFor="recommendation" className="text-sm leading-relaxed font-normal text-muted-foreground">
+                  If you would like to recommend a tradesperson you have hired in the past, please tell us about your experience and the work they completed for you. You can also attach photos. <span className="italic">(Optional)</span>
+                </Label>
+                <Textarea
+                  id="recommendation"
+                  placeholder="e.g. I hired John from ABC Plumbing to fix a leak. He was professional, on time, and did a great job..."
+                  value={recommendation}
+                  onChange={(e) => setRecommendation(e.target.value)}
+                  maxLength={2000}
+                  className="min-h-[100px]"
+                />
+                <div className="flex flex-wrap items-center gap-2">
+                  {recPhotos.map((photo, i) => (
+                    <div key={i} className="relative group">
+                      <img
+                        src={URL.createObjectURL(photo)}
+                        alt={`Photo ${i + 1}`}
+                        className="h-16 w-16 rounded-md object-cover border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePhoto(i)}
+                        className="absolute -top-1.5 -right-1.5 rounded-full bg-destructive text-destructive-foreground p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                  {recPhotos.length < 5 && (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex h-16 w-16 items-center justify-center rounded-md border-2 border-dashed border-muted-foreground/30 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                    >
+                      <Camera className="h-5 w-5" />
+                    </button>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleAddPhotos}
+                    className="hidden"
+                  />
+                </div>
+                {recPhotos.length > 0 && (
+                  <p className="text-xs text-muted-foreground">{recPhotos.length}/5 photos attached</p>
+                )}
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
