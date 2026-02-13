@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Trash2, Image as ImageIcon, Save, GripVertical, Eye } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Loader2, Plus, Trash2, Image as ImageIcon, Save, GripVertical, Eye, Camera, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PortfolioProject {
@@ -34,11 +35,18 @@ const ProviderPortfolio = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState("");
+  const [bannerUrl, setBannerUrl] = useState("");
+  const [businessDescription, setBusinessDescription] = useState("");
   const [publicBio, setPublicBio] = useState("");
   const [savingBio, setSavingBio] = useState(false);
   const [projects, setProjects] = useState<PortfolioProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("pending");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   // New project dialog
   const [showNewProject, setShowNewProject] = useState(false);
@@ -57,7 +65,7 @@ const ProviderPortfolio = () => {
   const fetchAll = async () => {
     const { data: profile } = await supabase
       .from("provider_profiles")
-      .select("id, status, public_bio")
+      .select("id, status, public_bio, logo_url, business_description, contact_first_name, contact_last_name")
       .eq("user_id", user!.id)
       .single();
 
@@ -65,6 +73,9 @@ const ProviderPortfolio = () => {
     setProfileId(profile.id);
     setStatus(profile.status as string);
     setPublicBio((profile as any).public_bio ?? "");
+    setLogoUrl(profile.logo_url ?? "");
+    setBannerUrl(""); // banner stored separately below
+    setBusinessDescription(profile.business_description ?? "");
 
     const { data: projs } = await supabase
       .from("provider_portfolio_projects")
@@ -85,15 +96,48 @@ const ProviderPortfolio = () => {
     setLoading(false);
   };
 
-  const saveBio = async () => {
+  const saveBioAndDescription = async () => {
     setSavingBio(true);
     const { error } = await supabase
       .from("provider_profiles")
-      .update({ public_bio: publicBio.trim() } as any)
+      .update({ public_bio: publicBio.trim(), business_description: businessDescription.trim() } as any)
       .eq("user_id", user!.id);
     if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
-    else toast({ title: "Bio saved" });
+    else toast({ title: "Details saved" });
     setSavingBio(false);
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { toast({ title: "Logo must be under 2MB", variant: "destructive" }); return; }
+    setUploadingLogo(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user!.id}/logo.${ext}`;
+    const { error } = await supabase.storage.from("logos").upload(path, file, { upsert: true });
+    if (error) { toast({ title: "Upload failed", variant: "destructive" }); setUploadingLogo(false); return; }
+    const { data: urlData } = supabase.storage.from("logos").getPublicUrl(path);
+    const url = `${urlData.publicUrl}?t=${Date.now()}`;
+    await supabase.from("provider_profiles").update({ logo_url: url } as any).eq("user_id", user!.id);
+    setLogoUrl(url);
+    toast({ title: "Logo updated" });
+    setUploadingLogo(false);
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast({ title: "Banner must be under 5MB", variant: "destructive" }); return; }
+    setUploadingBanner(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user!.id}/banner.${ext}`;
+    const { error } = await supabase.storage.from("logos").upload(path, file, { upsert: true });
+    if (error) { toast({ title: "Upload failed", variant: "destructive" }); setUploadingBanner(false); return; }
+    const { data: urlData } = supabase.storage.from("logos").getPublicUrl(path);
+    const url = `${urlData.publicUrl}?t=${Date.now()}`;
+    setBannerUrl(url);
+    toast({ title: "Banner uploaded" });
+    setUploadingBanner(false);
   };
 
   const createProject = async () => {
@@ -185,25 +229,87 @@ const ProviderPortfolio = () => {
         </Button>
       </div>
 
-      {/* Public Bio */}
+      {/* Logo & Banner */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Logo & Banner Image</CardTitle>
+          <CardDescription>Upload your business logo and a banner image for your profile page</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center gap-5">
+            <div className="relative">
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={logoUrl || undefined} />
+                <AvatarFallback className="text-lg">Logo</AvatarFallback>
+              </Avatar>
+              <button type="button" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo}
+                className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground hover:bg-primary/90">
+                {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+              </button>
+              <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+            </div>
+            <div>
+              <p className="font-medium text-sm">Business Logo</p>
+              <p className="text-xs text-muted-foreground">Square image, max 2MB</p>
+            </div>
+          </div>
+
+          <div>
+            <Label className="mb-2 block text-sm font-medium">Banner Image</Label>
+            {bannerUrl ? (
+              <div className="relative group">
+                <img src={bannerUrl} alt="Banner" className="w-full h-40 object-cover rounded-lg" />
+                <button type="button" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner}
+                  className="absolute bottom-2 right-2 flex h-8 items-center gap-1.5 px-3 rounded-md bg-background/80 text-foreground text-xs hover:bg-background border">
+                  {uploadingBanner ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                  Change
+                </button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner}
+                className="w-full h-32 rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/40 transition-colors">
+                {uploadingBanner ? <Loader2 className="h-6 w-6 animate-spin" /> : <Upload className="h-6 w-6" />}
+                <span className="text-sm">Upload banner (max 5MB)</span>
+              </button>
+            )}
+            <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* About Your Business */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">About Your Business</CardTitle>
-          <CardDescription>Write a detailed description for customers visiting your page</CardDescription>
+          <CardDescription>Write a description and detailed bio for customers visiting your page</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <Textarea
-            value={publicBio}
-            onChange={e => setPublicBio(e.target.value)}
-            rows={5}
-            maxLength={2000}
-            placeholder="Tell customers about your business, experience, approach to work..."
-          />
-          <div className="flex items-center justify-between">
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Short Description</Label>
+            <Textarea
+              value={businessDescription}
+              onChange={e => setBusinessDescription(e.target.value)}
+              rows={2}
+              maxLength={300}
+              placeholder="A brief summary shown in search results and listings..."
+            />
+            <p className="text-xs text-muted-foreground">{businessDescription.length}/300</p>
+          </div>
+          <div className="space-y-2">
+            <Label>Detailed Bio</Label>
+            <Textarea
+              value={publicBio}
+              onChange={e => setPublicBio(e.target.value)}
+              rows={5}
+              maxLength={2000}
+              placeholder="Tell customers about your business, experience, approach to work..."
+            />
             <p className="text-xs text-muted-foreground">{publicBio.length}/2000</p>
-            <Button size="sm" onClick={saveBio} disabled={savingBio}>
+          </div>
+          <div className="flex justify-end">
+            <Button size="sm" onClick={saveBioAndDescription} disabled={savingBio}>
               {savingBio ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              Save Bio
+              Save Details
             </Button>
           </div>
         </CardContent>
