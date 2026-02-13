@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { Upload, X, FileText } from "lucide-react";
 import type { ProviderFormData } from "./ProviderSignupStepper";
 
@@ -29,11 +30,21 @@ const ACCREDITATION_OPTIONS = [
   "NICEIC / Electrical Certification",
 ];
 
+const ACCEPTED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
 const FieldError = ({ msg }: { msg?: string }) =>
   msg ? <p className="text-xs text-destructive">{msg}</p> : null;
 
+const formatSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
 const StepTradeDetails = ({ form, updateForm, errors, tradeCategories }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const toggleAccreditation = (value: string) => {
     const current = form.accreditations;
@@ -46,11 +57,31 @@ const StepTradeDetails = ({ form, updateForm, errors, tradeCategories }: Props) 
 
   const handleFileAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    const valid = files.filter((f) => f.size <= 5 * 1024 * 1024);
-    if (valid.length < files.length) {
-      // silently skip oversized
+    const rejected: string[] = [];
+    const valid: File[] = [];
+
+    for (const file of files) {
+      if (!ACCEPTED_TYPES.includes(file.type)) {
+        rejected.push(`${file.name}: unsupported format (PDF, JPG, PNG only)`);
+      } else if (file.size > MAX_FILE_SIZE) {
+        rejected.push(`${file.name}: exceeds 5MB limit`);
+      } else {
+        valid.push(file);
+      }
     }
-    updateForm({ supportingDocuments: [...form.supportingDocuments, ...valid] });
+
+    if (rejected.length > 0) {
+      toast({
+        title: "Some files were rejected",
+        description: rejected.join("; "),
+        variant: "destructive",
+      });
+    }
+
+    if (valid.length > 0) {
+      updateForm({ supportingDocuments: [...form.supportingDocuments, ...valid] });
+    }
+
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -132,12 +163,12 @@ const StepTradeDetails = ({ form, updateForm, errors, tradeCategories }: Props) 
 
       <div className="space-y-2">
         <Label>Supporting Documents (optional)</Label>
-        <p className="text-xs text-muted-foreground">Upload qualifications, insurance certificates, etc. Max 5MB each.</p>
+        <p className="text-xs text-muted-foreground">Upload PDF, JPG, or PNG files. Max 5MB each.</p>
         <input
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+          accept=".pdf,.jpg,.jpeg,.png"
           className="hidden"
           onChange={handleFileAdd}
         />
@@ -149,9 +180,10 @@ const StepTradeDetails = ({ form, updateForm, errors, tradeCategories }: Props) 
           <div className="mt-2 space-y-1">
             {form.supportingDocuments.map((file, i) => (
               <div key={i} className="flex items-center gap-2 rounded border border-border bg-muted/50 px-3 py-1.5 text-sm">
-                <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 <span className="flex-1 truncate">{file.name}</span>
-                <button type="button" onClick={() => removeFile(i)} className="text-muted-foreground hover:text-destructive">
+                <span className="shrink-0 text-xs text-muted-foreground">{formatSize(file.size)}</span>
+                <button type="button" onClick={() => removeFile(i)} className="shrink-0 text-muted-foreground hover:text-destructive">
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>

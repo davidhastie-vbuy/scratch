@@ -104,9 +104,6 @@ const ProviderSignupStepper = () => {
   const handleSubmit = async () => {
     setLoading(true);
 
-    // Upload documents first
-    let documentUrls: string[] = [];
-
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
@@ -135,30 +132,46 @@ const ProviderSignupStepper = () => {
 
     const userId = signUpData.user?.id;
     if (userId) {
-      // Upload supporting documents
-      for (const file of form.supportingDocuments) {
-        const ext = file.name.split(".").pop();
-        const path = `${userId}/${Date.now()}-${file.name}`;
-        const { error: uploadErr } = await supabase.storage
-          .from("provider-documents")
-          .upload(path, file);
-        if (!uploadErr) {
-          documentUrls.push(path);
-        }
-      }
-
       // Update provider profile with extra fields
-      await supabase
+      const { data: profileData } = await supabase
         .from("provider_profiles")
         .update({
           years_experience: form.yearsExperience,
           qualifications_certifications: form.qualificationsCertifications,
           about_work: form.aboutWork,
           accreditations: form.accreditations,
-          supporting_documents: documentUrls,
           operating_areas: form.operatingAreas,
         } as any)
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .select("id")
+        .single();
+
+      const profileId = profileData?.id;
+
+      // Upload supporting documents to storage and insert records
+      if (profileId && form.supportingDocuments.length > 0) {
+        for (const file of form.supportingDocuments) {
+          const storagePath = `${userId}/${Date.now()}-${file.name}`;
+          const { error: uploadErr } = await supabase.storage
+            .from("provider-documents")
+            .upload(storagePath, file);
+
+          if (!uploadErr) {
+            const { data: urlData } = supabase.storage
+              .from("provider-documents")
+              .getPublicUrl(storagePath);
+
+            await supabase.from("provider_documents").insert({
+              provider_profile_id: profileId,
+              user_id: userId,
+              file_url: storagePath,
+              file_name: file.name,
+              file_type: file.type,
+              file_size: file.size,
+            } as any);
+          }
+        }
+      }
     }
 
     toast({
