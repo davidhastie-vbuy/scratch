@@ -185,6 +185,7 @@ const AdminProviderList = () => {
       about_work: p.about_work,
       accreditations: p.accreditations,
       operating_areas: p.operating_areas,
+      platform_fee_percent: (p as any).platform_fee_percent ?? 10,
     });
     // Also load docs for the edit dialog
     loadEditDocs(p.id);
@@ -580,6 +581,19 @@ const AdminProviderList = () => {
                 onChange={(e) => setForm((f) => ({ ...f, business_description: e.target.value.slice(0, 300) }))}
                 maxLength={300}
               />
+            </div>
+
+            <div className="grid gap-1.5">
+              <Label>Platform Fee (%)</Label>
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                step={0.5}
+                value={(form as any).platform_fee_percent ?? 10}
+                onChange={(e) => setForm((f) => ({ ...f, platform_fee_percent: parseFloat(e.target.value) || 0 }))}
+              />
+              <p className="text-xs text-muted-foreground">Percentage taken from each payment release to this provider.</p>
             </div>
 
             <Separator />

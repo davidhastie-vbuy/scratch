@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, ArrowLeft, Pencil, Save, X, Check, Image as ImageIcon, CalendarDays } from "lucide-react";
+import { Loader2, ArrowLeft, Pencil, Save, Check, CalendarDays, PoundSterling, CreditCard } from "lucide-react";
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
 import { format } from "date-fns";
@@ -21,25 +21,53 @@ const JobDetail = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { categories } = useTradeCategories(true);
 
   const [job, setJob] = useState<any>(null);
   const [quotes, setQuotes] = useState<any[]>([]);
   const [media, setMedia] = useState<any[]>([]);
+  const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: "", description: "", timeline: "", budget: "" });
   const [saving, setSaving] = useState(false);
 
+  // Accept quote with agreed price dialog
+  const [acceptDialog, setAcceptDialog] = useState<{ quoteId: string; providerUserId: string; priceMin: number; priceMax: number } | null>(null);
+  const [agreedPrice, setAgreedPrice] = useState("");
+
+  // Payment
+  const [payingAmount, setPayingAmount] = useState("");
+  const [processingPayment, setProcessingPayment] = useState(false);
+
   useEffect(() => {
     if (jobId) fetchAll();
   }, [jobId]);
 
+  // Check for payment confirmation on redirect
+  useEffect(() => {
+    if (searchParams.get("payment") === "success" && jobId) {
+      confirmPayment();
+    }
+  }, [searchParams, jobId]);
+
+  const confirmPayment = async () => {
+    const { error } = await supabase.functions.invoke("confirm-escrow-payment", {
+      body: { job_id: jobId },
+    });
+    if (!error) {
+      toast({ title: "Payment confirmed!", description: "Funds are now held in escrow." });
+      fetchAll();
+    }
+  };
+
   const fetchAll = async () => {
-    const [jobRes, quotesRes, mediaRes] = await Promise.all([
+    const [jobRes, quotesRes, mediaRes, paymentsRes] = await Promise.all([
       supabase.from("jobs").select("*").eq("id", jobId!).single(),
       supabase.from("quotes").select("*").eq("job_id", jobId!).order("created_at"),
       supabase.from("job_media").select("*").eq("job_id", jobId!).order("uploaded_at"),
+      supabase.from("escrow_payments").select("*").eq("job_id", jobId!).order("created_at"),
     ]);
     if (jobRes.data) {
       setJob(jobRes.data);
@@ -52,6 +80,7 @@ const JobDetail = () => {
     }
     setQuotes(quotesRes.data ?? []);
     setMedia(mediaRes.data ?? []);
+    setEscrowPayments(paymentsRes.data ?? []);
     setLoading(false);
   };
 
@@ -73,23 +102,65 @@ const JobDetail = () => {
     setSaving(false);
   };
 
-  const acceptQuote = async (quoteId: string, providerUserId: string) => {
-    // Accept the chosen quote
-    await supabase.from("quotes").update({ status: "accepted" } as any).eq("id", quoteId);
-    // Decline others
-    await supabase.from("quotes").update({ status: "declined" } as any).eq("job_id", jobId!).neq("id", quoteId);
-    // Update job
-    await supabase.from("jobs").update({ status: "accepted", provider_id: providerUserId } as any).eq("id", jobId!);
+  const openAcceptDialog = (q: any) => {
+    setAcceptDialog({
+      quoteId: q.id,
+      providerUserId: q.provider_user_id,
+      priceMin: Number(q.price_min),
+      priceMax: Number(q.price_max),
+    });
+    setAgreedPrice(String(Number(q.price_max)));
+  };
 
-    // Create conversation if not exists
+  const acceptQuote = async () => {
+    if (!acceptDialog) return;
+    const price = parseFloat(agreedPrice);
+    if (!price || price <= 0) {
+      toast({ title: "Please enter a valid agreed price", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+
+    // Accept the chosen quote
+    await supabase.from("quotes").update({ status: "accepted" } as any).eq("id", acceptDialog.quoteId);
+    // Decline others
+    await supabase.from("quotes").update({ status: "declined" } as any).eq("job_id", jobId!).neq("id", acceptDialog.quoteId);
+    // Update job with agreed price
+    await supabase.from("jobs").update({
+      status: "accepted",
+      provider_id: acceptDialog.providerUserId,
+      agreed_price: price,
+    } as any).eq("id", jobId!);
+
+    // Create conversation
     await supabase.from("conversations").upsert({
       job_id: jobId!,
       customer_user_id: user!.id,
-      provider_user_id: providerUserId,
+      provider_user_id: acceptDialog.providerUserId,
     } as any, { onConflict: "job_id,customer_user_id,provider_user_id" });
 
-    toast({ title: "Quote accepted!" });
+    toast({ title: "Quote accepted!", description: `Agreed price: £${price.toFixed(2)}` });
+    setAcceptDialog(null);
+    setSaving(false);
     fetchAll();
+  };
+
+  const makePayment = async () => {
+    const amount = parseFloat(payingAmount);
+    if (!amount || amount <= 0) {
+      toast({ title: "Enter a valid amount", variant: "destructive" });
+      return;
+    }
+    setProcessingPayment(true);
+    const { data, error } = await supabase.functions.invoke("create-escrow-payment", {
+      body: { job_id: jobId, amount },
+    });
+    if (error) {
+      toast({ title: "Payment failed", description: error.message, variant: "destructive" });
+    } else if (data?.url) {
+      window.open(data.url, "_blank");
+    }
+    setProcessingPayment(false);
   };
 
   const cancelJob = async () => {
@@ -102,6 +173,8 @@ const JobDetail = () => {
   if (!job) return <p className="text-muted-foreground">Job not found.</p>;
 
   const catName = categories.find(c => c.slug === job.category)?.name ?? job.category;
+  const totalHeld = escrowPayments.filter(p => p.status === "held").reduce((s, p) => s + Number(p.amount), 0);
+  const totalPending = escrowPayments.filter(p => p.status === "pending").reduce((s, p) => s + Number(p.amount), 0);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -152,11 +225,14 @@ const JobDetail = () => {
                 <div className="flex justify-between"><span className="text-muted-foreground">Timeline</span><span>{job.timeline || "—"}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Budget</span><span>{job.budget || "—"}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Quotes</span><span>{job.quote_count}/3</span></div>
-                {(job as any).scheduled_start && (
-                  <div className="flex justify-between"><span className="text-muted-foreground">Starts</span><span>{format(new Date((job as any).scheduled_start), "PPP 'at' h:mm a")}</span></div>
+                {job.agreed_price && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number(job.agreed_price).toFixed(2)}</span></div>
                 )}
-                {(job as any).scheduled_end && (
-                  <div className="flex justify-between"><span className="text-muted-foreground">Ends</span><span>{format(new Date((job as any).scheduled_end), "PPP 'at' h:mm a")}</span></div>
+                {job.scheduled_start && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">Starts</span><span>{format(new Date(job.scheduled_start), "PPP 'at' h:mm a")}</span></div>
+                )}
+                {job.scheduled_end && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">Ends</span><span>{format(new Date(job.scheduled_end), "PPP 'at' h:mm a")}</span></div>
                 )}
               </div>
               <p className="text-sm whitespace-pre-wrap">{job.description}</p>
@@ -219,7 +295,7 @@ const JobDetail = () => {
                     View Provider
                   </Button>
                   {q.status === "pending" && job.status !== "cancelled" && (
-                    <Button size="sm" onClick={() => acceptQuote(q.id, q.provider_user_id)}>
+                    <Button size="sm" onClick={() => openAcceptDialog(q)}>
                       <Check className="mr-2 h-4 w-4" /> Accept Quote
                     </Button>
                   )}
@@ -230,10 +306,65 @@ const JobDetail = () => {
         </CardContent>
       </Card>
 
+      {/* Payment Section - visible when job is accepted or in_progress */}
+      {["accepted", "in_progress"].includes(job.status) && job.agreed_price && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <CreditCard className="h-4 w-4" /> Payments
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2 text-sm">
+              <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number(job.agreed_price).toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Held in Escrow</span><span>£{totalHeld.toFixed(2)}</span></div>
+              {totalPending > 0 && (
+                <div className="flex justify-between"><span className="text-muted-foreground">Pending Confirmation</span><span>£{totalPending.toFixed(2)}</span></div>
+              )}
+            </div>
+
+            {/* Payment history */}
+            {escrowPayments.length > 0 && (
+              <div className="space-y-1">
+                {escrowPayments.map(p => (
+                  <div key={p.id} className="flex items-center justify-between text-xs rounded border p-2">
+                    <span>£{Number(p.amount).toFixed(2)}</span>
+                    <Badge variant={p.status === "held" ? "secondary" : p.status === "released" ? "default" : "outline"} className="text-xs">
+                      {p.status}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Make payment */}
+            <div className="space-y-2">
+              <Label>Make a Payment</Label>
+              <p className="text-xs text-muted-foreground">
+                Pay into escrow to cover upcoming milestones. Funds are held securely and released to the provider as milestones are accepted.
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder="£ Amount"
+                  value={payingAmount}
+                  onChange={e => setPayingAmount(e.target.value)}
+                  className="w-32"
+                />
+                <Button onClick={makePayment} disabled={processingPayment}>
+                  {processingPayment ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PoundSterling className="mr-2 h-4 w-4" />}
+                  Pay
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Work Tracker */}
       <WorkTracker jobId={jobId!} job={job} role="customer" onRefresh={fetchAll} />
 
-      {/* Schedule - visible when job is accepted or in_progress */}
+      {/* Schedule */}
       {["accepted", "in_progress"].includes(job.status) && (
         <Card>
           <CardHeader>
@@ -244,13 +375,46 @@ const JobDetail = () => {
           <CardContent>
             <JobScheduleForm
               jobId={jobId!}
-              currentStart={(job as any).scheduled_start}
-              currentEnd={(job as any).scheduled_end}
+              currentStart={job.scheduled_start}
+              currentEnd={job.scheduled_end}
               onSaved={fetchAll}
             />
           </CardContent>
         </Card>
       )}
+
+      {/* Accept Quote Dialog */}
+      <Dialog open={!!acceptDialog} onOpenChange={(o) => !o && setAcceptDialog(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Accept Quote & Agree Price</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-muted-foreground">
+              The provider quoted between £{acceptDialog?.priceMin?.toFixed(0)} and £{acceptDialog?.priceMax?.toFixed(0)}.
+              Please agree a final total price with the provider before accepting.
+            </p>
+            <div className="space-y-2">
+              <Label>Agreed Total Price (£)</Label>
+              <Input
+                type="number"
+                value={agreedPrice}
+                onChange={e => setAgreedPrice(e.target.value)}
+                placeholder="Enter agreed price"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              You will need to pay this amount (or portions for each milestone) into escrow before work can begin.
+            </p>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setAcceptDialog(null)}>Cancel</Button>
+            <Button onClick={acceptQuote} disabled={saving}>
+              {saving ? "Processing…" : "Accept & Agree Price"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

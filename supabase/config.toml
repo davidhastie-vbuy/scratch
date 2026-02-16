@@ -1,1 +1,22 @@
 project_id = "gkiohsumxlzqfnnjflgb"
+
+[functions.create-admin]
+verify_jwt = false
+
+[functions.create-first-admin]
+verify_jwt = false
+
+[functions.submit-recommendation]
+verify_jwt = false
+
+[functions.update-job-statuses]
+verify_jwt = false
+
+[functions.create-escrow-payment]
+verify_jwt = false
+
+[functions.confirm-escrow-payment]
+verify_jwt = false
+
+[functions.release-escrow-payment]
+verify_jwt = false
