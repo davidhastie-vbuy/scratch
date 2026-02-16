@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface ProviderData {
   id: string;
@@ -35,13 +38,22 @@ interface Project {
 
 const ProviderPublicPage = () => {
   const { providerId } = useParams(); // this is user_id
+  const { user, role } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { categories } = useTradeCategories(true);
 
   const [provider, setProvider] = useState<ProviderData | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+
+  // Invite to job state
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [customerJobs, setCustomerJobs] = useState<any[]>([]);
+  const [selectedJobId, setSelectedJobId] = useState("");
+  const [alreadyInvited, setAlreadyInvited] = useState<string[]>([]);
+  const [inviting, setInviting] = useState(false);
 
   useEffect(() => {
     if (providerId) fetchProvider();
@@ -75,6 +87,45 @@ const ProviderPublicPage = () => {
     }
     setProjects(withImages);
     setLoading(false);
+  };
+
+  const openInviteDialog = async () => {
+    if (!user || !providerId) return;
+    const { data: jobs } = await supabase
+      .from("jobs")
+      .select("id, title, status, category")
+      .eq("customer_user_id", user.id)
+      .in("status", ["open", "quoted"] as any)
+      .order("created_at", { ascending: false });
+    setCustomerJobs(jobs ?? []);
+
+    const { data: existing } = await supabase
+      .from("job_invitations")
+      .select("job_id")
+      .eq("provider_user_id", providerId)
+      .eq("customer_user_id", user.id);
+    setAlreadyInvited((existing ?? []).map((e: any) => e.job_id));
+
+    setSelectedJobId("");
+    setInviteOpen(true);
+  };
+
+  const sendInvitation = async () => {
+    if (!selectedJobId || !providerId || !user) return;
+    setInviting(true);
+    const { error } = await supabase.from("job_invitations").insert({
+      job_id: selectedJobId,
+      provider_user_id: providerId,
+      customer_user_id: user.id,
+    } as any);
+    if (error) {
+      toast({ title: "Could not send invitation", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Invitation sent!", description: "The provider will see your job in their dashboard." });
+      setAlreadyInvited(prev => [...prev, selectedJobId]);
+      setInviteOpen(false);
+    }
+    setInviting(false);
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -125,6 +176,11 @@ const ProviderPublicPage = () => {
               )}
             </div>
           </div>
+          {role === "customer" && (
+            <Button className="mt-4" onClick={openInviteDialog}>
+              <Send className="mr-2 h-4 w-4" /> Invite to Job
+            </Button>
+          )}
         </CardContent>
       </Card>
 
@@ -190,6 +246,40 @@ const ProviderPublicPage = () => {
       <Dialog open={!!lightboxImg} onOpenChange={() => setLightboxImg(null)}>
         <DialogContent className="max-w-3xl p-2">
           {lightboxImg && <img src={lightboxImg} alt="Project" className="w-full rounded-md" />}
+        </DialogContent>
+      </Dialog>
+
+      {/* Invite to Job Dialog */}
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invite to Job</DialogTitle>
+            <DialogDescription>
+              Select one of your open jobs to invite {provider?.business_name} to quote on.
+            </DialogDescription>
+          </DialogHeader>
+          {customerJobs.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4">You don't have any open jobs. Post a job first to invite providers.</p>
+          ) : (
+            <div className="space-y-4">
+              <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a job…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {customerJobs.map(j => (
+                    <SelectItem key={j.id} value={j.id} disabled={alreadyInvited.includes(j.id)}>
+                      {j.title} {alreadyInvited.includes(j.id) ? "(already invited)" : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button onClick={sendInvitation} disabled={!selectedJobId || inviting} className="w-full">
+                {inviting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+                Send Invitation
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

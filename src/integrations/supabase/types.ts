@@ -117,6 +117,41 @@ export type Database = {
         }
         Relationships: []
       }
+      job_invitations: {
+        Row: {
+          created_at: string
+          customer_user_id: string
+          id: string
+          job_id: string
+          provider_user_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          customer_user_id: string
+          id?: string
+          job_id: string
+          provider_user_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          customer_user_id?: string
+          id?: string
+          job_id?: string
+          provider_user_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_invitations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_media: {
         Row: {
           file_name: string
