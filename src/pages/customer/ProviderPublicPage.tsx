@@ -121,6 +121,13 @@ const ProviderPublicPage = () => {
     if (error) {
       toast({ title: "Could not send invitation", description: error.message, variant: "destructive" });
     } else {
+      // Create conversation so both parties can message each other
+      await supabase.from("conversations").upsert({
+        job_id: selectedJobId,
+        customer_user_id: user.id,
+        provider_user_id: providerId,
+      } as any, { onConflict: "job_id,customer_user_id,provider_user_id" });
+
       toast({ title: "Invitation sent!", description: "The provider will see your job in their dashboard." });
       setAlreadyInvited(prev => [...prev, selectedJobId]);
       setInviteOpen(false);
