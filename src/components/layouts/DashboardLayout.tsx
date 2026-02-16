@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut, Home, Wrench, Shield } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -70,7 +71,8 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
         <header className="border-b bg-card">
           <div className="flex h-16 items-center justify-between px-4 md:px-6">
             <h1 className="font-display text-xl font-bold truncate">{title}</h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <NotificationBell />
               {statusBadge}
               <Badge variant="secondary">{roleBadge}</Badge>
               <Button variant="ghost" size="sm" className="md:hidden" onClick={signOut}>
