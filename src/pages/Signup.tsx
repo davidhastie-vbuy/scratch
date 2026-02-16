@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Mail, Lock, User, Phone, MapPin, Camera, X } from "lucide-react";
+import { formatPostcode } from "@/lib/format-postcode";
 import ProviderSignupStepper from "@/components/provider-signup/ProviderSignupStepper";
 
 const Signup = () => {
@@ -77,7 +78,7 @@ const Signup = () => {
       phone,
       address_line_1: addressLine1,
       city,
-      postcode,
+      postcode: formatPostcode(postcode),
     };
 
     const { data: signUpData, error } = await supabase.auth.signUp({

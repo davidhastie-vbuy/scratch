@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { Save, Camera, Loader2 } from "lucide-react";
+import { formatPostcode } from "@/lib/format-postcode";
 
 interface ProfileData {
   first_name: string;
@@ -60,7 +61,7 @@ const CustomerProfile = () => {
     const { error } = await supabase.from("profiles").update({
       first_name: profile.first_name.trim(), last_name: profile.last_name.trim(),
       phone: profile.phone.trim(), address_line_1: profile.address_line_1.trim(),
-      city: profile.city.trim(), postcode: profile.postcode.trim(),
+      city: profile.city.trim(), postcode: formatPostcode(profile.postcode),
     }).eq("id", user!.id);
     if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
     else toast({ title: "Profile updated" });
