@@ -11,7 +11,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, ArrowLeft, Pencil, Save, X, Check, Image as ImageIcon } from "lucide-react";
+import { Loader2, ArrowLeft, Pencil, Save, X, Check, Image as ImageIcon, CalendarDays } from "lucide-react";
+import JobScheduleForm from "@/components/JobScheduleForm";
+import { format } from "date-fns";
 
 const JobDetail = () => {
   const { jobId } = useParams();
@@ -149,6 +151,12 @@ const JobDetail = () => {
                 <div className="flex justify-between"><span className="text-muted-foreground">Timeline</span><span>{job.timeline || "—"}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Budget</span><span>{job.budget || "—"}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Quotes</span><span>{job.quote_count}/3</span></div>
+                {(job as any).scheduled_start && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">Starts</span><span>{format(new Date((job as any).scheduled_start), "PPP 'at' h:mm a")}</span></div>
+                )}
+                {(job as any).scheduled_end && (
+                  <div className="flex justify-between"><span className="text-muted-foreground">Ends</span><span>{format(new Date((job as any).scheduled_end), "PPP 'at' h:mm a")}</span></div>
+                )}
               </div>
               <p className="text-sm whitespace-pre-wrap">{job.description}</p>
               <div className="flex gap-2">
@@ -220,6 +228,25 @@ const JobDetail = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Schedule - visible when job is accepted or in_progress */}
+      {["accepted", "in_progress"].includes(job.status) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <CalendarDays className="h-4 w-4" /> Job Schedule
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <JobScheduleForm
+              jobId={jobId!}
+              currentStart={(job as any).scheduled_start}
+              currentEnd={(job as any).scheduled_end}
+              onSaved={fetchAll}
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

@@ -204,6 +204,8 @@ export type Database = {
           postcode_district: string
           provider_id: string | null
           quote_count: number
+          scheduled_end: string | null
+          scheduled_start: string | null
           status: Database["public"]["Enums"]["job_status"]
           timeline: string | null
           title: string
@@ -219,6 +221,8 @@ export type Database = {
           postcode_district: string
           provider_id?: string | null
           quote_count?: number
+          scheduled_end?: string | null
+          scheduled_start?: string | null
           status?: Database["public"]["Enums"]["job_status"]
           timeline?: string | null
           title: string
@@ -234,6 +238,8 @@ export type Database = {
           postcode_district?: string
           provider_id?: string | null
           quote_count?: number
+          scheduled_end?: string | null
+          scheduled_start?: string | null
           status?: Database["public"]["Enums"]["job_status"]
           timeline?: string | null
           title?: string

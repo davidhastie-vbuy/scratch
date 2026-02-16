@@ -1,0 +1,110 @@
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, Loader2, Save } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+
+interface Props {
+  jobId: string;
+  currentStart?: string | null;
+  currentEnd?: string | null;
+  onSaved: () => void;
+}
+
+const JobScheduleForm = ({ jobId, currentStart, currentEnd, onSaved }: Props) => {
+  const { toast } = useToast();
+  const [startDate, setStartDate] = useState<Date | undefined>(currentStart ? new Date(currentStart) : undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(currentEnd ? new Date(currentEnd) : undefined);
+  const [startTime, setStartTime] = useState(currentStart ? format(new Date(currentStart), "HH:mm") : "09:00");
+  const [endTime, setEndTime] = useState(currentEnd ? format(new Date(currentEnd), "HH:mm") : "17:00");
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!startDate || !endDate) {
+      toast({ title: "Please select both start and end dates", variant: "destructive" });
+      return;
+    }
+
+    const [sh, sm] = startTime.split(":").map(Number);
+    const [eh, em] = endTime.split(":").map(Number);
+    const scheduledStart = new Date(startDate);
+    scheduledStart.setHours(sh, sm, 0, 0);
+    const scheduledEnd = new Date(endDate);
+    scheduledEnd.setHours(eh, em, 0, 0);
+
+    if (scheduledEnd <= scheduledStart) {
+      toast({ title: "End must be after start", variant: "destructive" });
+      return;
+    }
+
+    setSaving(true);
+    const { error } = await supabase
+      .from("jobs")
+      .update({ scheduled_start: scheduledStart.toISOString(), scheduled_end: scheduledEnd.toISOString() } as any)
+      .eq("id", jobId);
+
+    if (error) {
+      toast({ title: "Failed to save schedule", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Schedule saved!" });
+      onSaved();
+    }
+    setSaving(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Start Date</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !startDate && "text-muted-foreground")}>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {startDate ? format(startDate, "PPP") : "Pick a date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={startDate} onSelect={setStartDate} className="p-3 pointer-events-auto" />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div className="space-y-2">
+          <Label>Start Time</Label>
+          <Input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>End Date</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !endDate && "text-muted-foreground")}>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {endDate ? format(endDate, "PPP") : "Pick a date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={endDate} onSelect={setEndDate} className="p-3 pointer-events-auto" />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div className="space-y-2">
+          <Label>End Time</Label>
+          <Input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
+        </div>
+      </div>
+      <Button onClick={handleSave} disabled={saving}>
+        {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving…</> : <><Save className="mr-2 h-4 w-4" /> Save Schedule</>}
+      </Button>
+    </div>
+  );
+};
+
+export default JobScheduleForm;
