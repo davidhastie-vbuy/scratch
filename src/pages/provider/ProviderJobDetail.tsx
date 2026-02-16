@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays } from "lucide-react";
 import JobScheduleForm from "@/components/JobScheduleForm";
+import WorkTracker from "@/components/WorkTracker";
 import { format } from "date-fns";
 
 const ProviderJobDetail = () => {
@@ -201,6 +202,9 @@ const ProviderJobDetail = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Work Tracker */}
+      <WorkTracker jobId={jobId!} job={job} role="provider" onRefresh={fetchAll} />
 
       {/* Schedule - visible when provider's quote was accepted */}
       {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && (
