@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Briefcase } from "lucide-react";
+import { Loader2, Briefcase, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const AvailableJobs = () => {
@@ -12,21 +12,58 @@ const AvailableJobs = () => {
   const navigate = useNavigate();
   const { categories } = useTradeCategories(true);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [invitations, setInvitations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) fetchJobs();
+    if (user) fetchData();
   }, [user]);
 
-  const fetchJobs = async () => {
-    // RLS handles filtering - only eligible jobs visible
-    const { data } = await supabase
-      .from("jobs")
-      .select("*")
-      .in("status", ["open"])
-      .order("created_at", { ascending: false });
-    setJobs(data ?? []);
+  const fetchData = async () => {
+    const [jobsRes, invRes] = await Promise.all([
+      supabase
+        .from("jobs")
+        .select("*")
+        .in("status", ["open"])
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("job_invitations")
+        .select("*, jobs:job_id(id, title, description, category, postcode_district, budget, timeline, quote_count, status, created_at)")
+        .eq("provider_user_id", user!.id)
+        .eq("status", "pending" as any),
+    ]);
+
+    const allJobs = jobsRes.data ?? [];
+    const invData = (invRes.data ?? []) as any[];
+
+    // Get job IDs from invitations that are for jobs not already in the eligible list
+    const eligibleIds = new Set(allJobs.map((j: any) => j.id));
+    const invitedJobs = invData
+      .filter((inv: any) => inv.jobs && !eligibleIds.has(inv.jobs.id) && inv.jobs.status === "open")
+      .map((inv: any) => ({ ...inv.jobs, _invited: true, _invitation_id: inv.id }));
+
+    // Mark eligible jobs that also have invitations
+    const invitedJobIds = new Set(invData.map((inv: any) => inv.job_id));
+    const markedJobs = allJobs.map((j: any) => ({
+      ...j,
+      _invited: invitedJobIds.has(j.id),
+      _invitation_id: invData.find((inv: any) => inv.job_id === j.id)?.id,
+    }));
+
+    // Combine: invited-only jobs + eligible jobs, invited first
+    const combined = [...invitedJobs, ...markedJobs];
+    combined.sort((a, b) => {
+      if (a._invited && !b._invited) return -1;
+      if (!a._invited && b._invited) return 1;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+
+    setJobs(combined);
     setLoading(false);
+  };
+
+  const markViewed = async (invitationId: string) => {
+    await supabase.from("job_invitations").update({ status: "viewed" } as any).eq("id", invitationId);
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -46,10 +83,24 @@ const AvailableJobs = () => {
       <h2 className="font-display text-xl font-bold">Available Jobs</h2>
       <div className="grid gap-4">
         {jobs.map(job => (
-          <Card key={job.id} className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate(`/provider/jobs/${job.id}`)}>
+          <Card
+            key={job.id}
+            className={`cursor-pointer hover:bg-accent/30 transition-colors ${job._invited ? "border-primary/40" : ""}`}
+            onClick={() => {
+              if (job._invitation_id) markViewed(job._invitation_id);
+              navigate(`/provider/jobs/${job.id}`);
+            }}
+          >
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-base">{job.title}</CardTitle>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-base">{job.title}</CardTitle>
+                  {job._invited && (
+                    <Badge variant="default" className="gap-1 text-xs">
+                      <Mail className="h-3 w-3" /> Invited
+                    </Badge>
+                  )}
+                </div>
                 <Badge variant="secondary">{job.quote_count}/3 quotes</Badge>
               </div>
             </CardHeader>
