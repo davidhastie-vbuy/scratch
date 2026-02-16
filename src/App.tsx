@@ -28,6 +28,7 @@ import MyQuotes from "@/pages/provider/MyQuotes";
 import ProviderMessages from "@/pages/provider/ProviderMessages";
 import ProviderProfile from "@/pages/ProviderProfile";
 import ProviderPortfolio from "@/pages/provider/ProviderPortfolio";
+import ProviderCalendar from "@/pages/provider/ProviderCalendar";
 
 // Customer provider views
 import ProviderDirectory from "@/pages/customer/ProviderDirectory";
@@ -86,6 +87,7 @@ const App = () => (
               <Route path="jobs" element={<AvailableJobs />} />
               <Route path="jobs/:jobId" element={<ProviderJobDetail />} />
               <Route path="quotes" element={<MyQuotes />} />
+              <Route path="calendar" element={<ProviderCalendar />} />
               <Route path="messages" element={<ProviderMessages />} />
               <Route path="portfolio" element={<ProviderPortfolio />} />
               <Route path="support" element={<SupportPage />} />
