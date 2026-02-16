@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, ArrowLeft, Pencil, Save, X, Check, Image as ImageIcon, CalendarDays } from "lucide-react";
 import JobScheduleForm from "@/components/JobScheduleForm";
+import WorkTracker from "@/components/WorkTracker";
 import { format } from "date-fns";
 
 const JobDetail = () => {
@@ -228,6 +229,9 @@ const JobDetail = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Work Tracker */}
+      <WorkTracker jobId={jobId!} job={job} role="customer" onRefresh={fetchAll} />
 
       {/* Schedule - visible when job is accepted or in_progress */}
       {["accepted", "in_progress"].includes(job.status) && (

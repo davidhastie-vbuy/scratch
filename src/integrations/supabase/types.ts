@@ -117,6 +117,79 @@ export type Database = {
         }
         Relationships: []
       }
+      dispute_messages: {
+        Row: {
+          body: string
+          created_at: string
+          dispute_id: string
+          id: string
+          is_admin_only: boolean
+          sender_user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          dispute_id: string
+          id?: string
+          is_admin_only?: boolean
+          sender_user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          dispute_id?: string
+          id?: string
+          is_admin_only?: boolean
+          sender_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispute_messages_dispute_id_fkey"
+            columns: ["dispute_id"]
+            isOneToOne: false
+            referencedRelation: "job_disputes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_disputes: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          raised_by: string
+          reason: string
+          status: Database["public"]["Enums"]["dispute_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          raised_by: string
+          reason: string
+          status?: Database["public"]["Enums"]["dispute_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          raised_by?: string
+          reason?: string
+          status?: Database["public"]["Enums"]["dispute_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_disputes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_invitations: {
         Row: {
           created_at: string
@@ -186,6 +259,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "job_media_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_milestones: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          flag_count: number
+          id: string
+          is_auto: boolean
+          job_id: string
+          sort_order: number
+          status: Database["public"]["Enums"]["milestone_status"]
+          title: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          flag_count?: number
+          id?: string
+          is_auto?: boolean
+          job_id: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["milestone_status"]
+          title: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          flag_count?: number
+          id?: string
+          is_auto?: boolean
+          job_id?: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["milestone_status"]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_milestones_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs"
@@ -278,6 +398,41 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      milestone_comments: {
+        Row: {
+          action: string
+          body: string | null
+          created_at: string
+          id: string
+          milestone_id: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          milestone_id: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          milestone_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milestone_comments_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "job_milestones"
             referencedColumns: ["id"]
           },
         ]
@@ -740,6 +895,7 @@ export type Database = {
     }
     Enums: {
       app_role: "customer" | "provider" | "admin"
+      dispute_status: "open" | "under_review" | "resolved" | "closed"
       job_status:
         | "open"
         | "quoted"
@@ -748,6 +904,7 @@ export type Database = {
         | "in_progress"
         | "completed"
         | "cancelled"
+      milestone_status: "pending" | "completed" | "accepted" | "flagged"
       provider_status:
         | "pending"
         | "active"
@@ -899,6 +1056,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["customer", "provider", "admin"],
+      dispute_status: ["open", "under_review", "resolved", "closed"],
       job_status: [
         "open",
         "quoted",
@@ -908,6 +1066,7 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
+      milestone_status: ["pending", "completed", "accepted", "flagged"],
       provider_status: [
         "pending",
         "active",
