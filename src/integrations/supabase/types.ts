@@ -152,6 +152,72 @@ export type Database = {
           },
         ]
       }
+      escrow_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_user_id: string
+          id: string
+          job_id: string
+          milestone_id: string | null
+          platform_fee: number
+          provider_payout: number
+          provider_user_id: string
+          status: string
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_transfer_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_user_id: string
+          id?: string
+          job_id: string
+          milestone_id?: string | null
+          platform_fee?: number
+          provider_payout?: number
+          provider_user_id: string
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_user_id?: string
+          id?: string
+          job_id?: string
+          milestone_id?: string | null
+          platform_fee?: number
+          provider_payout?: number
+          provider_user_id?: string
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_payments_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "escrow_payments_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "job_milestones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_disputes: {
         Row: {
           created_at: string
@@ -275,6 +341,7 @@ export type Database = {
           id: string
           is_auto: boolean
           job_id: string
+          payment_amount: number | null
           sort_order: number
           status: Database["public"]["Enums"]["milestone_status"]
           title: string
@@ -287,6 +354,7 @@ export type Database = {
           id?: string
           is_auto?: boolean
           job_id: string
+          payment_amount?: number | null
           sort_order?: number
           status?: Database["public"]["Enums"]["milestone_status"]
           title: string
@@ -299,6 +367,7 @@ export type Database = {
           id?: string
           is_auto?: boolean
           job_id?: string
+          payment_amount?: number | null
           sort_order?: number
           status?: Database["public"]["Enums"]["milestone_status"]
           title?: string
@@ -315,6 +384,7 @@ export type Database = {
       }
       jobs: {
         Row: {
+          agreed_price: number | null
           budget: string | null
           category: string
           created_at: string
@@ -332,6 +402,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agreed_price?: number | null
           budget?: string | null
           category: string
           created_at?: string
@@ -349,6 +420,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agreed_price?: number | null
           budget?: string | null
           category?: string
           created_at?: string
@@ -654,6 +726,7 @@ export type Database = {
           logo_url: string | null
           operating_areas: string[] | null
           phone: string
+          platform_fee_percent: number
           postcode: string
           public_bio: string | null
           qualifications_certifications: string | null
@@ -679,6 +752,7 @@ export type Database = {
           logo_url?: string | null
           operating_areas?: string[] | null
           phone: string
+          platform_fee_percent?: number
           postcode: string
           public_bio?: string | null
           qualifications_certifications?: string | null
@@ -704,6 +778,7 @@ export type Database = {
           logo_url?: string | null
           operating_areas?: string[] | null
           phone?: string
+          platform_fee_percent?: number
           postcode?: string
           public_bio?: string | null
           qualifications_certifications?: string | null

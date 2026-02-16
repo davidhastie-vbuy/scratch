@@ -5,11 +5,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle2, Circle, Flag, Plus, Send, Loader2, AlertTriangle, MessageSquareWarning,
-  ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp, PoundSterling,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -33,12 +34,14 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   const [milestones, setMilestones] = useState<any[]>([]);
   const [comments, setComments] = useState<Record<string, any[]>>({});
+  const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // New milestone form
   const [showAdd, setShowAdd] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [newAmount, setNewAmount] = useState("");
   const [adding, setAdding] = useState(false);
 
   // Comment/action forms
@@ -55,15 +58,25 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   }, [jobId]);
 
   const fetchMilestones = async () => {
-    const { data: ms } = await supabase
-      .from("job_milestones")
-      .select("*")
-      .eq("job_id", jobId)
-      .order("sort_order");
-    setMilestones(ms ?? []);
+    const [msRes, paymentsRes] = await Promise.all([
+      supabase
+        .from("job_milestones")
+        .select("*")
+        .eq("job_id", jobId)
+        .order("sort_order"),
+      supabase
+        .from("escrow_payments")
+        .select("*")
+        .eq("job_id", jobId)
+        .order("created_at"),
+    ]);
+
+    const ms = msRes.data ?? [];
+    setMilestones(ms);
+    setEscrowPayments(paymentsRes.data ?? []);
 
     // Fetch comments for all milestones
-    if (ms && ms.length > 0) {
+    if (ms.length > 0) {
       const ids = ms.map((m: any) => m.id);
       const { data: cmts } = await supabase
         .from("milestone_comments")
@@ -83,7 +96,6 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const addMilestone = async () => {
     if (!newTitle.trim()) return;
     setAdding(true);
-    // Insert before "Work Complete" (sort_order 1000)
     const maxOrder = milestones
       .filter((m) => !m.is_auto || m.title !== "Work Complete")
       .reduce((max, m) => Math.max(max, m.sort_order), 0);
@@ -92,11 +104,13 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       title: newTitle.trim(),
       sort_order: maxOrder + 1,
       created_by: user!.id,
+      payment_amount: newAmount ? parseFloat(newAmount) : null,
     } as any);
     if (error) {
       toast({ title: "Failed to add milestone", description: error.message, variant: "destructive" });
     } else {
       setNewTitle("");
+      setNewAmount("");
       setShowAdd(false);
       fetchMilestones();
     }
@@ -139,6 +153,22 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       completed_at: (action === "complete" || action === "reconfirm") ? new Date().toISOString() : milestone?.completed_at,
     } as any).eq("id", milestoneId);
 
+    // If customer accepts a milestone, trigger payment release
+    if (action === "accept" && role === "customer") {
+      try {
+        const { error } = await supabase.functions.invoke("release-escrow-payment", {
+          body: { milestone_id: milestoneId, job_id: jobId },
+        });
+        if (error) {
+          console.error("Payment release error:", error);
+        } else {
+          toast({ title: "Payment released to provider" });
+        }
+      } catch (e) {
+        console.error("Payment release failed:", e);
+      }
+    }
+
     setActionComment((prev) => ({ ...prev, [milestoneId]: "" }));
     fetchMilestones();
     setActing(null);
@@ -162,7 +192,6 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     setRaisingDispute(false);
   };
 
-  // Check if provider can cancel (any milestone flagged 5+ times)
   const canProviderCancel = role === "provider" && milestones.some((m) => m.flag_count >= 5);
 
   const cancelJobDueToFlags = async () => {
@@ -170,6 +199,19 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     toast({ title: "Job cancelled due to unresolved flags." });
     onRefresh?.();
   };
+
+  // Payment helpers
+  const getPaymentForMilestone = (milestoneId: string) => {
+    return escrowPayments.find((p) => p.milestone_id === milestoneId);
+  };
+
+  const totalMilestoneAmounts = milestones.reduce((sum, m) => sum + (m.payment_amount ?? 0), 0);
+  const totalPaid = escrowPayments
+    .filter((p) => p.status === "held" || p.status === "released")
+    .reduce((sum, p) => sum + p.amount, 0);
+  const totalReleased = escrowPayments
+    .filter((p) => p.status === "released")
+    .reduce((sum, p) => sum + p.provider_payout, 0);
 
   if (loading) return <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
 
@@ -196,18 +238,38 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Payment summary */}
+        {job.agreed_price && (
+          <div className="rounded-lg border bg-muted/30 p-3 text-sm space-y-1">
+            <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number(job.agreed_price).toFixed(2)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Total in Escrow</span><span>£{totalPaid.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Released to Provider</span><span>£{totalReleased.toFixed(2)}</span></div>
+          </div>
+        )}
+
         {/* Add milestone form */}
         {showAdd && role === "provider" && (
-          <div className="flex gap-2">
-            <Input
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Milestone title…"
-              className="flex-1"
-            />
-            <Button size="sm" onClick={addMilestone} disabled={adding}>
-              {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
-            </Button>
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Input
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Milestone title…"
+                className="flex-1"
+              />
+              <div className="w-32">
+                <Input
+                  type="number"
+                  value={newAmount}
+                  onChange={(e) => setNewAmount(e.target.value)}
+                  placeholder="£ Amount"
+                />
+              </div>
+              <Button size="sm" onClick={addMilestone} disabled={adding}>
+                {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Set the payment amount due at this milestone. The customer must have paid this before work can continue.</p>
           </div>
         )}
 
@@ -254,12 +316,11 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
               const mComments = comments[m.id] || [];
               const isProvider = role === "provider";
               const isCustomer = role === "customer";
+              const payment = getPaymentForMilestone(m.id);
 
-              // Determine available actions
               const canComplete = isProvider && m.status === "pending" && !m.is_auto;
               const canReconfirm = isProvider && m.status === "flagged";
               const canAcceptOrFlag = isCustomer && m.status === "completed";
-              // "Work Complete" milestone - provider marks, customer accepts
               const isFinishMilestone = m.is_auto && m.title === "Work Complete";
               const canCompleteFinish = isProvider && isFinishMilestone && m.status === "pending";
 
@@ -281,11 +342,22 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                       )}
                       <span className="text-sm font-medium">{m.title}</span>
                       {m.is_auto && <Badge variant="outline" className="text-xs">Auto</Badge>}
+                      {m.payment_amount && (
+                        <Badge variant="secondary" className="text-xs gap-1">
+                          <PoundSterling className="h-3 w-3" />
+                          {Number(m.payment_amount).toFixed(2)}
+                        </Badge>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={STATUS_COLORS[m.status] || ""}>{m.status}</Badge>
                       {m.flag_count > 0 && (
                         <span className="text-xs text-destructive">({m.flag_count}/5 flags)</span>
+                      )}
+                      {payment && (
+                        <Badge variant={payment.status === "released" ? "default" : "outline"} className="text-xs">
+                          {payment.status === "released" ? "Paid" : payment.status === "held" ? "Held" : "Pending"}
+                        </Badge>
                       )}
                       {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </div>
@@ -367,7 +439,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                               disabled={acting === m.id}
                             >
                               {acting === m.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <CheckCircle2 className="mr-1 h-3 w-3" />}
-                              Accept
+                              Accept {m.payment_amount ? `& Release £${Number(m.payment_amount).toFixed(2)}` : ""}
                             </Button>
                             <Button
                               size="sm"
@@ -382,7 +454,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                       )}
 
                       {m.status === "accepted" && (
-                        <p className="text-xs text-green-600">✓ Milestone accepted by customer</p>
+                        <p className="text-xs text-green-600">✓ Milestone accepted by customer{payment?.status === "released" ? " — payment released" : ""}</p>
                       )}
                     </div>
                   )}
