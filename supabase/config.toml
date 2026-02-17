@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.release-escrow-payment]
 verify_jwt = false
+
+[functions.send-provider-email]
+verify_jwt = false

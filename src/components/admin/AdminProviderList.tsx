@@ -73,7 +73,7 @@ const AdminProviderList = () => {
   const [form, setForm] = useState<Partial<ProviderProfile>>({});
   const [saving, setSaving] = useState(false);
   // Deny / changes_requested dialog
-  const [actionDialog, setActionDialog] = useState<{ provider: ProviderProfile; action: "denied" | "changes_requested" } | null>(null);
+  const [actionDialog, setActionDialog] = useState<{ provider: ProviderWithEmail; action: "denied" | "changes_requested" } | null>(null);
   const [adminNote, setAdminNote] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [editDocs, setEditDocs] = useState<ProviderDocument[]>([]);
@@ -162,6 +162,35 @@ const AdminProviderList = () => {
       actionDialog.action as ProviderStatus,
       adminNote.trim()
     );
+    // Send email notification for changes_requested
+    if (ok && actionDialog.action === "changes_requested" && actionDialog.provider.email) {
+      const providerName = `${actionDialog.provider.contact_first_name} ${actionDialog.provider.contact_last_name}`.trim();
+      const dashboardLink = `${window.location.origin}/provider`;
+      try {
+        await supabase.functions.invoke("send-provider-email", {
+          body: {
+            to: actionDialog.provider.email,
+            subject: "TradeTrust — Changes requested on your application",
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #1a1a1a;">Hi ${providerName},</h2>
+                <p>The TradeTrust team has reviewed your provider application and requested some changes before approval.</p>
+                ${adminNote.trim() ? `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 16px 0; border-radius: 4px;"><strong>Admin feedback:</strong><br/>${adminNote.trim()}</div>` : ""}
+                <p>Please log in to your dashboard to review the feedback and update your application:</p>
+                <p style="margin: 24px 0;">
+                  <a href="${dashboardLink}" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Go to My Dashboard</a>
+                </p>
+                <p style="color: #6b7280; font-size: 14px;">If you have any questions, please contact our support team.</p>
+                <p style="color: #6b7280; font-size: 14px;">— The TradeTrust Team</p>
+              </div>
+            `,
+          },
+        });
+      } catch (emailErr) {
+        console.error("Failed to send changes-requested email:", emailErr);
+        // Non-blocking — status change already succeeded
+      }
+    }
     setActionLoading(false);
     if (ok) {
       setActionDialog(null);
