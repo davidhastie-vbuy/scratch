@@ -726,6 +726,7 @@ export type Database = {
           logo_url: string | null
           operating_areas: string[] | null
           pending_operating_areas: string[] | null
+          pending_trade_category: string | null
           phone: string
           platform_fee_percent: number
           postcode: string
@@ -753,6 +754,7 @@ export type Database = {
           logo_url?: string | null
           operating_areas?: string[] | null
           pending_operating_areas?: string[] | null
+          pending_trade_category?: string | null
           phone: string
           platform_fee_percent?: number
           postcode: string
@@ -780,6 +782,7 @@ export type Database = {
           logo_url?: string | null
           operating_areas?: string[] | null
           pending_operating_areas?: string[] | null
+          pending_trade_category?: string | null
           phone?: string
           platform_fee_percent?: number
           postcode?: string

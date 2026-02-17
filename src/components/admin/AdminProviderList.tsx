@@ -557,6 +557,37 @@ const AdminProviderList = () => {
                     </div>
                   </div>
                 )}
+                {(viewing as any).pending_trade_category && (
+                  <div className="rounded border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30 space-y-2">
+                    <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">Pending Trade Category Change</span>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">{tradeName(viewing!.trade_category)}</Badge>
+                      <span className="text-xs text-muted-foreground">→</span>
+                      <Badge variant="outline" className="text-xs">{tradeName((viewing as any).pending_trade_category)}</Badge>
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      <Button size="sm" variant="default" onClick={async () => {
+                        const { error } = await supabase.from("provider_profiles").update({
+                          trade_category: (viewing as any).pending_trade_category,
+                          pending_trade_category: null,
+                        } as any).eq("id", viewing!.id);
+                        if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+                        toast({ title: "Trade category updated" });
+                        setViewing(null);
+                        fetchProviders();
+                      }}>Approve</Button>
+                      <Button size="sm" variant="outline" onClick={async () => {
+                        const { error } = await supabase.from("provider_profiles").update({
+                          pending_trade_category: null,
+                        } as any).eq("id", viewing!.id);
+                        if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+                        toast({ title: "Category change rejected" });
+                        setViewing(null);
+                        fetchProviders();
+                      }}>Reject</Button>
+                    </div>
+                  </div>
+                )}
                 {(viewing as any).admin_note && (
                   <div className="rounded border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
                     <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">Admin Note</span>
