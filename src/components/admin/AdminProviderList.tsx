@@ -145,8 +145,34 @@ const AdminProviderList = () => {
     return true;
   };
 
-  const handleApprove = async (p: ProviderProfile) => {
-    await changeStatus(p.id, p.status, "active" as ProviderStatus);
+  const handleApprove = async (p: ProviderWithEmail) => {
+    const ok = await changeStatus(p.id, p.status, "active" as ProviderStatus);
+    if (ok && p.email) {
+      const providerName = `${p.contact_first_name} ${p.contact_last_name}`.trim();
+      const dashboardLink = `${window.location.origin}/provider`;
+      try {
+        await supabase.functions.invoke("send-provider-email", {
+          body: {
+            to: p.email,
+            subject: "TradeTrust — Your application has been approved! 🎉",
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #1a1a1a;">Congratulations, ${providerName}!</h2>
+                <p>Great news — your TradeTrust provider application has been <strong>approved</strong>.</p>
+                <p>You can now log in and start viewing jobs available in your local area, submit quotes, and grow your business through TradeTrust.</p>
+                <p style="margin: 24px 0;">
+                  <a href="${dashboardLink}" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">View Available Jobs</a>
+                </p>
+                <p style="color: #6b7280; font-size: 14px;">If you have any questions, please contact our support team.</p>
+                <p style="color: #6b7280; font-size: 14px;">— The TradeTrust Team</p>
+              </div>
+            `,
+          },
+        });
+      } catch (emailErr) {
+        console.error("Failed to send approval email:", emailErr);
+      }
+    }
   };
 
   const handleActionSubmit = async () => {
