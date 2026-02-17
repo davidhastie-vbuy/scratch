@@ -11,6 +11,7 @@ interface NavItem {
   label: string;
   path: string;
   icon: ReactNode;
+  badge?: number;
 }
 
 interface DashboardLayoutProps {
@@ -55,6 +56,11 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
             >
               {item.icon}
               {item.label}
+              {item.badge != null && item.badge > 0 && (
+                <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                  {item.badge > 9 ? "9+" : item.badge}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -98,6 +104,11 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
               >
                 {item.icon}
                 {item.label}
+                {item.badge != null && item.badge > 0 && (
+                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">
+                    {item.badge > 9 ? "9+" : item.badge}
+                  </span>
+                )}
               </NavLink>
             ))}
           </div>

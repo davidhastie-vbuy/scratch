@@ -33,6 +33,7 @@ const ProviderDashboard = () => {
   const { user } = useAuth();
   const location = useLocation();
   const [status, setStatus] = useState<string | null>(null);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
     if (user) {
@@ -44,11 +45,45 @@ const ProviderDashboard = () => {
         .then(({ data }) => {
           if (data) setStatus(data.status as string);
         });
+
+      // Fetch unread message count
+      const fetchUnread = async () => {
+        // Get conversations where this provider is involved
+        const { data: convs } = await supabase
+          .from("conversations")
+          .select("id")
+          .eq("provider_user_id", user.id);
+        if (!convs || convs.length === 0) return;
+        const convIds = convs.map(c => c.id);
+        const { count } = await supabase
+          .from("messages")
+          .select("id", { count: "exact", head: true })
+          .in("conversation_id", convIds)
+          .neq("sender_user_id", user.id)
+          .is("read_at", null);
+        setUnreadMessages(count ?? 0);
+      };
+      fetchUnread();
+
+      // Realtime for new messages
+      const channel = supabase
+        .channel("provider-unread-messages")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
+          fetchUnread();
+        })
+        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages" }, () => {
+          fetchUnread();
+        })
+        .subscribe();
+
+      return () => { supabase.removeChannel(channel); };
     }
   }, [user]);
 
   const isActive = status === "active";
-  const navItems = allNavItems.filter(item => isActive || item.alwaysVisible);
+  const navItems = allNavItems
+    .filter(item => isActive || item.alwaysVisible)
+    .map(item => item.label === "Messages" ? { ...item, badge: unreadMessages } : item);
 
   // Redirect non-active providers away from restricted routes
   if (status && !isActive) {
