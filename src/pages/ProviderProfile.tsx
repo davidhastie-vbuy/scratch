@@ -26,6 +26,8 @@ interface ProviderProfileData {
   operating_areas: string[];
   pending_operating_areas: string[] | null;
   pending_trade_category: string | null;
+  additional_categories: string[];
+  pending_additional_categories: string[] | null;
 }
 
 const ProviderProfile = () => {
@@ -39,6 +41,7 @@ const ProviderProfile = () => {
     phone: "", business_address: "", postcode: "",
     trade_category: "other", business_description: "", logo_url: "",
     operating_areas: [], pending_operating_areas: null, pending_trade_category: null,
+    additional_categories: [], pending_additional_categories: null,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -49,6 +52,8 @@ const ProviderProfile = () => {
   const [savingAreas, setSavingAreas] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
+  const [selectedAdditional, setSelectedAdditional] = useState("");
+  const [savingAdditional, setSavingAdditional] = useState(false);
 
   useEffect(() => {
     if (user) fetchProfile();
@@ -57,7 +62,7 @@ const ProviderProfile = () => {
   const fetchProfile = async () => {
     const { data } = await supabase
       .from("provider_profiles")
-      .select("business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category")
+      .select("business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category, additional_categories, pending_additional_categories")
       .eq("user_id", user!.id)
       .single();
     if (data) {
@@ -71,6 +76,8 @@ const ProviderProfile = () => {
         operating_areas: areas,
         pending_operating_areas: (data as any).pending_operating_areas ?? null,
         pending_trade_category: (data as any).pending_trade_category ?? null,
+        additional_categories: (data as any).additional_categories ?? [],
+        pending_additional_categories: (data as any).pending_additional_categories ?? null,
       });
       setEditedAreas(areas);
     }
@@ -160,6 +167,37 @@ const ProviderProfile = () => {
     setSavingCategory(false);
   };
 
+  const submitAdditionalCategory = async () => {
+    if (!selectedAdditional) return;
+    const allCurrent = [profile.trade_category, ...profile.additional_categories];
+    if (allCurrent.includes(selectedAdditional)) {
+      toast({ title: "Already added", description: "This category is already in your profile.", variant: "destructive" });
+      return;
+    }
+    const pendingOnes = profile.pending_additional_categories ?? [];
+    if (pendingOnes.includes(selectedAdditional)) {
+      toast({ title: "Already pending", description: "This category is already pending approval.", variant: "destructive" });
+      return;
+    }
+    if (profile.additional_categories.length + pendingOnes.length >= 2) {
+      toast({ title: "Maximum reached", description: "You can add up to 2 additional categories.", variant: "destructive" });
+      return;
+    }
+    setSavingAdditional(true);
+    const newPending = [...pendingOnes, selectedAdditional];
+    const { error } = await supabase.from("provider_profiles").update({
+      pending_additional_categories: newPending,
+    } as any).eq("user_id", user!.id);
+    if (error) {
+      toast({ title: "Save failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Additional category submitted", description: "Your request has been submitted for admin approval." });
+      setProfile(p => ({ ...p, pending_additional_categories: newPending }));
+      setSelectedAdditional("");
+    }
+    setSavingAdditional(false);
+  };
+
   const initials = `${profile.contact_first_name?.[0] ?? ""}${profile.contact_last_name?.[0] ?? ""}`.toUpperCase() || "?";
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -217,18 +255,19 @@ const ProviderProfile = () => {
         </CardContent>
       </Card>
 
-      {/* Trade Category Card */}
+      {/* Trade Categories Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wrench className="h-5 w-5 text-primary" />
-            Trade Category
+            Trade Categories
           </CardTitle>
-          <CardDescription>Your approved trade category. Changes require admin approval.</CardDescription>
+          <CardDescription>Your primary category and up to 2 additional categories. Changes require admin approval.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
+          {/* Primary category */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Current approved category</Label>
+            <Label className="text-sm font-medium">Primary category</Label>
             <Badge variant="secondary" className="text-sm">
               {tradeCategories.find(c => c.slug === profile.trade_category)?.name ?? profile.trade_category}
             </Badge>
@@ -239,7 +278,7 @@ const ProviderProfile = () => {
               <div className="flex items-start gap-2">
                 <Clock className="mt-0.5 h-4 w-4 text-amber-600" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Category change pending approval</p>
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Primary category change pending</p>
                   <Badge variant="outline" className="mt-1 text-xs">
                     {tradeCategories.find(c => c.slug === profile.pending_trade_category)?.name ?? profile.pending_trade_category}
                   </Badge>
@@ -249,7 +288,7 @@ const ProviderProfile = () => {
           )}
 
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Request category change</Label>
+            <Label className="text-sm font-medium">Change primary category</Label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger><SelectValue placeholder="Select a new category" /></SelectTrigger>
               <SelectContent>
@@ -262,9 +301,70 @@ const ProviderProfile = () => {
 
           {selectedCategory && selectedCategory !== profile.trade_category && (
             <Button onClick={submitCategoryChange} disabled={savingCategory} className="w-full">
-              {savingCategory ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : "Submit category change for approval"}
+              {savingCategory ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : "Submit primary category change for approval"}
             </Button>
           )}
+
+          {/* Additional categories */}
+          <div className="border-t pt-4 space-y-3">
+            <Label className="text-sm font-medium">Additional categories ({profile.additional_categories.length}/2)</Label>
+            {profile.additional_categories.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {profile.additional_categories.map(cat => (
+                  <Badge key={cat} variant="secondary" className="text-sm">
+                    {tradeCategories.find(c => c.slug === cat)?.name ?? cat}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No additional categories approved yet.</p>
+            )}
+
+            {/* Pending additional */}
+            {profile.pending_additional_categories && profile.pending_additional_categories.length > 0 && (
+              <div className="rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+                <div className="flex items-start gap-2">
+                  <Clock className="mt-0.5 h-4 w-4 text-amber-600" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Additional categories pending approval</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {profile.pending_additional_categories.map(cat => (
+                        <Badge key={cat} variant="outline" className="text-xs">
+                          {tradeCategories.find(c => c.slug === cat)?.name ?? cat}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Add additional category */}
+            {(() => {
+              const pendingCount = (profile.pending_additional_categories ?? []).length;
+              const totalSlots = profile.additional_categories.length + pendingCount;
+              if (totalSlots >= 2) return null;
+              const usedSlugs = [profile.trade_category, ...profile.additional_categories, ...(profile.pending_additional_categories ?? [])];
+              const available = tradeCategories.filter(c => !usedSlugs.includes(c.slug));
+              if (available.length === 0) return null;
+              return (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Add additional category</Label>
+                  <div className="flex gap-2">
+                    <Select value={selectedAdditional} onValueChange={setSelectedAdditional}>
+                      <SelectTrigger className="flex-1"><SelectValue placeholder="Select a category" /></SelectTrigger>
+                      <SelectContent>
+                        {available.map(c => <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <Button onClick={submitAdditionalCategory} disabled={!selectedAdditional || savingAdditional} variant="outline">
+                      {savingAdditional ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
         </CardContent>
       </Card>
 

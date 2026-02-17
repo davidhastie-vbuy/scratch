@@ -714,6 +714,7 @@ export type Database = {
         Row: {
           about_work: string | null
           accreditations: string[] | null
+          additional_categories: string[] | null
           admin_note: string | null
           banner_url: string | null
           business_address: string
@@ -725,6 +726,7 @@ export type Database = {
           id: string
           logo_url: string | null
           operating_areas: string[] | null
+          pending_additional_categories: string[] | null
           pending_operating_areas: string[] | null
           pending_trade_category: string | null
           phone: string
@@ -742,6 +744,7 @@ export type Database = {
         Insert: {
           about_work?: string | null
           accreditations?: string[] | null
+          additional_categories?: string[] | null
           admin_note?: string | null
           banner_url?: string | null
           business_address: string
@@ -753,6 +756,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           operating_areas?: string[] | null
+          pending_additional_categories?: string[] | null
           pending_operating_areas?: string[] | null
           pending_trade_category?: string | null
           phone: string
@@ -770,6 +774,7 @@ export type Database = {
         Update: {
           about_work?: string | null
           accreditations?: string[] | null
+          additional_categories?: string[] | null
           admin_note?: string | null
           banner_url?: string | null
           business_address?: string
@@ -781,6 +786,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           operating_areas?: string[] | null
+          pending_additional_categories?: string[] | null
           pending_operating_areas?: string[] | null
           pending_trade_category?: string | null
           phone?: string

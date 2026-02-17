@@ -588,6 +588,51 @@ const AdminProviderList = () => {
                     </div>
                   </div>
                 )}
+                {/* Additional categories */}
+                {(viewing as any).additional_categories?.length > 0 && (
+                  <div>
+                    <span className="text-muted-foreground">Additional Categories</span>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {((viewing as any).additional_categories as string[]).map((a) => (
+                        <Badge key={a} variant="secondary" className="text-xs">{tradeName(a)}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {(viewing as any).pending_additional_categories?.length > 0 && (
+                  <div className="rounded border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30 space-y-2">
+                    <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">Pending Additional Categories</span>
+                    <div className="flex flex-wrap gap-1">
+                      {((viewing as any).pending_additional_categories as string[]).map((a: string) => (
+                        <Badge key={a} variant="outline" className="text-xs">{tradeName(a)}</Badge>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      <Button size="sm" variant="default" onClick={async () => {
+                        const currentAdditional = ((viewing as any).additional_categories as string[]) ?? [];
+                        const pendingAdditional = ((viewing as any).pending_additional_categories as string[]) ?? [];
+                        const merged = [...currentAdditional, ...pendingAdditional].slice(0, 2);
+                        const { error } = await supabase.from("provider_profiles").update({
+                          additional_categories: merged,
+                          pending_additional_categories: null,
+                        } as any).eq("id", viewing!.id);
+                        if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+                        toast({ title: "Additional categories approved" });
+                        setViewing(null);
+                        fetchProviders();
+                      }}>Approve</Button>
+                      <Button size="sm" variant="outline" onClick={async () => {
+                        const { error } = await supabase.from("provider_profiles").update({
+                          pending_additional_categories: null,
+                        } as any).eq("id", viewing!.id);
+                        if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+                        toast({ title: "Additional categories rejected" });
+                        setViewing(null);
+                        fetchProviders();
+                      }}>Reject</Button>
+                    </div>
+                  </div>
+                )}
                 {(viewing as any).admin_note && (
                   <div className="rounded border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
                     <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">Admin Note</span>

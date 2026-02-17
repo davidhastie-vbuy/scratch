@@ -27,6 +27,7 @@ interface ProviderData {
   accreditations: string[] | null;
   operating_areas: string[] | null;
   about_work: string | null;
+  additional_categories: string[] | null;
 }
 
 interface Project {
@@ -62,7 +63,7 @@ const ProviderPublicPage = () => {
   const fetchProvider = async () => {
     const { data: profile } = await supabase
       .from("provider_profiles")
-      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work")
+      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work, additional_categories")
       .eq("user_id", providerId!)
       .eq("status", "active" as any)
       .single();
@@ -167,6 +168,13 @@ const ProviderPublicPage = () => {
               <h1 className="font-display text-2xl font-bold">{provider.business_name}</h1>
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge>{catName}</Badge>
+                {provider.additional_categories && provider.additional_categories.length > 0 && (
+                  provider.additional_categories.map(cat => (
+                    <Badge key={cat} variant="secondary">
+                      {categories.find(c => c.slug === cat)?.name ?? cat}
+                    </Badge>
+                  ))
+                )}
                 {provider.years_experience && (
                   <Badge variant="outline" className="gap-1">
                     <Calendar className="h-3 w-3" /> {provider.years_experience} years
