@@ -526,6 +526,37 @@ const AdminProviderList = () => {
                     </div>
                   </div>
                 )}
+                {(viewing as any).pending_operating_areas?.length > 0 && (
+                  <div className="rounded border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30 space-y-2">
+                    <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">Pending Area Change Request</span>
+                    <div className="flex flex-wrap gap-1">
+                      {((viewing as any).pending_operating_areas as string[]).map((a: string) => (
+                        <Badge key={a} variant="outline" className="text-xs">{a}</Badge>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      <Button size="sm" variant="default" onClick={async () => {
+                        const { error } = await supabase.from("provider_profiles").update({
+                          operating_areas: (viewing as any).pending_operating_areas,
+                          pending_operating_areas: null,
+                        } as any).eq("id", viewing!.id);
+                        if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+                        toast({ title: "Operating areas updated" });
+                        setViewing(null);
+                        fetchProviders();
+                      }}>Approve</Button>
+                      <Button size="sm" variant="outline" onClick={async () => {
+                        const { error } = await supabase.from("provider_profiles").update({
+                          pending_operating_areas: null,
+                        } as any).eq("id", viewing!.id);
+                        if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+                        toast({ title: "Area change rejected" });
+                        setViewing(null);
+                        fetchProviders();
+                      }}>Reject</Button>
+                    </div>
+                  </div>
+                )}
                 {(viewing as any).admin_note && (
                   <div className="rounded border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
                     <span className="text-xs font-semibold text-amber-800 dark:text-amber-200">Admin Note</span>
