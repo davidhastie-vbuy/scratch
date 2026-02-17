@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ interface ProviderProfileData {
   pending_trade_category: string | null;
   additional_categories: string[];
   pending_additional_categories: string[] | null;
+  email_notifications_enabled: boolean;
 }
 
 const ProviderProfile = () => {
@@ -42,6 +44,7 @@ const ProviderProfile = () => {
     trade_category: "other", business_description: "", logo_url: "",
     operating_areas: [], pending_operating_areas: null, pending_trade_category: null,
     additional_categories: [], pending_additional_categories: null,
+    email_notifications_enabled: true,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -62,7 +65,7 @@ const ProviderProfile = () => {
   const fetchProfile = async () => {
     const { data } = await supabase
       .from("provider_profiles")
-      .select("business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category, additional_categories, pending_additional_categories")
+      .select("business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category, additional_categories, pending_additional_categories, email_notifications_enabled")
       .eq("user_id", user!.id)
       .single();
     if (data) {
@@ -78,6 +81,7 @@ const ProviderProfile = () => {
         pending_trade_category: (data as any).pending_trade_category ?? null,
         additional_categories: (data as any).additional_categories ?? [],
         pending_additional_categories: (data as any).pending_additional_categories ?? null,
+        email_notifications_enabled: (data as any).email_notifications_enabled ?? true,
       });
       setEditedAreas(areas);
     }
@@ -444,6 +448,38 @@ const ProviderProfile = () => {
               {savingAreas ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : "Submit area change for approval"}
             </Button>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Email Notifications Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Email Notifications</CardTitle>
+          <CardDescription>Control whether you receive email alerts when customers message you.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">New message emails</p>
+              <p className="text-xs text-muted-foreground">Receive an email when a customer sends you a message</p>
+            </div>
+            <Switch
+              checked={profile.email_notifications_enabled}
+              onCheckedChange={async (checked) => {
+                setProfile(p => ({ ...p, email_notifications_enabled: checked }));
+                const { error } = await supabase
+                  .from("provider_profiles")
+                  .update({ email_notifications_enabled: checked } as any)
+                  .eq("user_id", user!.id);
+                if (error) {
+                  setProfile(p => ({ ...p, email_notifications_enabled: !checked }));
+                  toast({ title: "Failed to update", description: error.message, variant: "destructive" });
+                } else {
+                  toast({ title: checked ? "Email notifications enabled" : "Email notifications disabled" });
+                }
+              }}
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

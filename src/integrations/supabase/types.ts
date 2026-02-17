@@ -723,6 +723,7 @@ export type Database = {
           contact_first_name: string
           contact_last_name: string
           created_at: string
+          email_notifications_enabled: boolean
           id: string
           logo_url: string | null
           operating_areas: string[] | null
@@ -753,6 +754,7 @@ export type Database = {
           contact_first_name: string
           contact_last_name: string
           created_at?: string
+          email_notifications_enabled?: boolean
           id?: string
           logo_url?: string | null
           operating_areas?: string[] | null
@@ -783,6 +785,7 @@ export type Database = {
           contact_first_name?: string
           contact_last_name?: string
           created_at?: string
+          email_notifications_enabled?: boolean
           id?: string
           logo_url?: string | null
           operating_areas?: string[] | null
