@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Camera, Loader2, MapPin, Plus, X, Clock } from "lucide-react";
+import { Save, Camera, Loader2, MapPin, Plus, X, Clock, Wrench } from "lucide-react";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 
 interface ProviderProfileData {
@@ -25,6 +25,7 @@ interface ProviderProfileData {
   logo_url: string;
   operating_areas: string[];
   pending_operating_areas: string[] | null;
+  pending_trade_category: string | null;
 }
 
 const ProviderProfile = () => {
@@ -37,7 +38,7 @@ const ProviderProfile = () => {
     business_name: "", contact_first_name: "", contact_last_name: "",
     phone: "", business_address: "", postcode: "",
     trade_category: "other", business_description: "", logo_url: "",
-    operating_areas: [], pending_operating_areas: null,
+    operating_areas: [], pending_operating_areas: null, pending_trade_category: null,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -46,6 +47,8 @@ const ProviderProfile = () => {
   const [editedAreas, setEditedAreas] = useState<string[]>([]);
   const [areasEdited, setAreasEdited] = useState(false);
   const [savingAreas, setSavingAreas] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [savingCategory, setSavingCategory] = useState(false);
 
   useEffect(() => {
     if (user) fetchProfile();
@@ -54,7 +57,7 @@ const ProviderProfile = () => {
   const fetchProfile = async () => {
     const { data } = await supabase
       .from("provider_profiles")
-      .select("business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas")
+      .select("business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category")
       .eq("user_id", user!.id)
       .single();
     if (data) {
@@ -67,6 +70,7 @@ const ProviderProfile = () => {
         logo_url: data.logo_url ?? "",
         operating_areas: areas,
         pending_operating_areas: (data as any).pending_operating_areas ?? null,
+        pending_trade_category: (data as any).pending_trade_category ?? null,
       });
       setEditedAreas(areas);
     }
@@ -80,7 +84,7 @@ const ProviderProfile = () => {
       business_name: profile.business_name.trim(), contact_first_name: profile.contact_first_name.trim(),
       contact_last_name: profile.contact_last_name.trim(), phone: profile.phone.trim(),
       business_address: profile.business_address.trim(), postcode: profile.postcode.trim(),
-      trade_category: profile.trade_category as any, business_description: profile.business_description.trim(),
+      business_description: profile.business_description.trim(),
     }).eq("user_id", user!.id);
     if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
     else toast({ title: "Profile updated" });
@@ -137,6 +141,25 @@ const ProviderProfile = () => {
     setSavingAreas(false);
   };
 
+  const submitCategoryChange = async () => {
+    if (!selectedCategory || selectedCategory === profile.trade_category) {
+      toast({ title: "No change", description: "Please select a different category.", variant: "destructive" });
+      return;
+    }
+    setSavingCategory(true);
+    const { error } = await supabase.from("provider_profiles").update({
+      pending_trade_category: selectedCategory,
+    } as any).eq("user_id", user!.id);
+    if (error) {
+      toast({ title: "Save failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Category change submitted", description: "Your trade category change has been submitted for admin approval." });
+      setProfile(p => ({ ...p, pending_trade_category: selectedCategory }));
+      setSelectedCategory("");
+    }
+    setSavingCategory(false);
+  };
+
   const initials = `${profile.contact_first_name?.[0] ?? ""}${profile.contact_last_name?.[0] ?? ""}`.toUpperCase() || "?";
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -178,15 +201,9 @@ const ProviderProfile = () => {
             </div>
             <div className="space-y-2"><Label>Phone</Label><Input type="tel" value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} required maxLength={20} /></div>
             <div className="space-y-2"><Label>Business address</Label><Input value={profile.business_address} onChange={e => setProfile(p => ({ ...p, business_address: e.target.value }))} required maxLength={255} /></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2"><Label>Postcode</Label><Input value={profile.postcode} onChange={e => setProfile(p => ({ ...p, postcode: e.target.value }))} required maxLength={10} /></div>
-              <div className="space-y-2">
-                <Label>Trade category</Label>
-                <Select value={profile.trade_category} onValueChange={v => setProfile(p => ({ ...p, trade_category: v }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{tradeCategories.map(c => <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label>Postcode</Label>
+              <Input value={profile.postcode} onChange={e => setProfile(p => ({ ...p, postcode: e.target.value }))} required maxLength={10} />
             </div>
             <div className="space-y-2">
               <Label>Short description</Label>
@@ -197,6 +214,57 @@ const ProviderProfile = () => {
               {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <><Save className="mr-2 h-4 w-4" /> Save changes</>}
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Trade Category Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wrench className="h-5 w-5 text-primary" />
+            Trade Category
+          </CardTitle>
+          <CardDescription>Your approved trade category. Changes require admin approval.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Current approved category</Label>
+            <Badge variant="secondary" className="text-sm">
+              {tradeCategories.find(c => c.slug === profile.trade_category)?.name ?? profile.trade_category}
+            </Badge>
+          </div>
+
+          {profile.pending_trade_category && (
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+              <div className="flex items-start gap-2">
+                <Clock className="mt-0.5 h-4 w-4 text-amber-600" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Category change pending approval</p>
+                  <Badge variant="outline" className="mt-1 text-xs">
+                    {tradeCategories.find(c => c.slug === profile.pending_trade_category)?.name ?? profile.pending_trade_category}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Request category change</Label>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger><SelectValue placeholder="Select a new category" /></SelectTrigger>
+              <SelectContent>
+                {tradeCategories
+                  .filter(c => c.slug !== profile.trade_category)
+                  .map(c => <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {selectedCategory && selectedCategory !== profile.trade_category && (
+            <Button onClick={submitCategoryChange} disabled={savingCategory} className="w-full">
+              {savingCategory ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : "Submit category change for approval"}
+            </Button>
+          )}
         </CardContent>
       </Card>
 
