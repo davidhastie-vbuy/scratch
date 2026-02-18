@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake } from "lucide-react";
+import MilestonePaymentSection from "@/components/MilestonePaymentSection";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import JobScheduleForm from "@/components/JobScheduleForm";
@@ -514,8 +515,23 @@ const JobDetail = () => {
         </CardContent>
       </Card>
 
-      {/* Payment Section - visible when job is accepted or in_progress */}
-      {["accepted", "in_progress"].includes(job.status) && job.agreed_price && (
+      {/* Pending milestone setup notice */}
+      {job.status === "accepted" && !(job as any).milestones_confirmed && (
+        <Card>
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3 text-sm">
+              <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium">Awaiting milestone setup</p>
+                <p className="text-muted-foreground">Your provider is setting up the milestones and payment schedule for this job. You'll be asked to make payment once this is confirmed.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Payment Section - visible when milestones are confirmed */}
+      {["accepted", "in_progress"].includes(job.status) && job.agreed_price && (job as any).milestones_confirmed && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -545,26 +561,8 @@ const JobDetail = () => {
               </div>
             )}
 
-            {/* Make payment */}
-            <div className="space-y-2">
-              <Label>Make a Payment</Label>
-              <p className="text-xs text-muted-foreground">
-                Pay into escrow to cover upcoming milestones. Funds are held securely and released to the provider as milestones are accepted.
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  type="number"
-                  placeholder="£ Amount"
-                  value={payingAmount}
-                  onChange={e => setPayingAmount(e.target.value)}
-                  className="w-32"
-                />
-                <Button onClick={makePayment} disabled={processingPayment}>
-                  {processingPayment ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PoundSterling className="mr-2 h-4 w-4" />}
-                  Pay
-                </Button>
-              </div>
-            </div>
+            {/* Make payment for next milestone */}
+            <MilestonePaymentSection jobId={jobId!} agreedPrice={Number(job.agreed_price)} escrowPayments={escrowPayments} onPaymentComplete={fetchAll} />
           </CardContent>
         </Card>
       )}

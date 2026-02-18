@@ -391,6 +391,7 @@ export type Database = {
           customer_user_id: string
           description: string
           id: string
+          milestones_confirmed: boolean
           postcode_district: string
           provider_id: string | null
           quote_count: number
@@ -409,6 +410,7 @@ export type Database = {
           customer_user_id: string
           description: string
           id?: string
+          milestones_confirmed?: boolean
           postcode_district: string
           provider_id?: string | null
           quote_count?: number
@@ -427,6 +429,7 @@ export type Database = {
           customer_user_id?: string
           description?: string
           id?: string
+          milestones_confirmed?: boolean
           postcode_district?: string
           provider_id?: string | null
           quote_count?: number
