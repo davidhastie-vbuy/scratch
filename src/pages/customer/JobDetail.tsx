@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, ArrowLeft, Pencil, Save, Check, CalendarDays, PoundSterling, CreditCard } from "lucide-react";
+import { Loader2, ArrowLeft, Pencil, Save, Check, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send } from "lucide-react";
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
 import { format } from "date-fns";
@@ -40,6 +40,15 @@ const JobDetail = () => {
   // Payment
   const [payingAmount, setPayingAmount] = useState("");
   const [processingPayment, setProcessingPayment] = useState(false);
+
+  // Inline messaging
+  const [chatDialog, setChatDialog] = useState<{ providerUserId: string; quoteId: string } | null>(null);
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [chatMsg, setChatMsg] = useState("");
+  const [chatSending, setChatSending] = useState(false);
+  const [chatConvId, setChatConvId] = useState<string | null>(null);
+  const [chatLoading, setChatLoading] = useState(false);
+  const chatBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (jobId) fetchAll();
@@ -169,6 +178,86 @@ const JobDetail = () => {
     fetchAll();
   };
 
+  // --- Inline chat functions ---
+  const openChat = async (providerUserId: string, quoteId: string) => {
+    setChatDialog({ providerUserId, quoteId });
+    setChatLoading(true);
+    setChatMessages([]);
+    setChatConvId(null);
+
+    // Find or create conversation
+    const { data: existing } = await supabase
+      .from("conversations")
+      .select("id")
+      .eq("job_id", jobId!)
+      .eq("customer_user_id", user!.id)
+      .eq("provider_user_id", providerUserId)
+      .maybeSingle();
+
+    let convId = existing?.id;
+    if (!convId) {
+      const { data: created } = await supabase
+        .from("conversations")
+        .upsert({
+          job_id: jobId!,
+          customer_user_id: user!.id,
+          provider_user_id: providerUserId,
+        } as any, { onConflict: "job_id,customer_user_id,provider_user_id" })
+        .select("id")
+        .single();
+      convId = created?.id;
+    }
+
+    if (convId) {
+      setChatConvId(convId);
+      const { data: msgs } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", convId)
+        .order("created_at");
+      setChatMessages(msgs ?? []);
+      setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+    setChatLoading(false);
+  };
+
+  const sendChatMsg = async () => {
+    if (!chatMsg.trim() || !chatConvId) return;
+    setChatSending(true);
+    await supabase.from("messages").insert({
+      conversation_id: chatConvId,
+      sender_user_id: user!.id,
+      body: chatMsg.trim(),
+    } as any);
+    setChatMsg("");
+    const { data: msgs } = await supabase
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", chatConvId)
+      .order("created_at");
+    setChatMessages(msgs ?? []);
+    setChatSending(false);
+    setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+  };
+
+  // Realtime for chat dialog
+  useEffect(() => {
+    if (!chatConvId) return;
+    const channel = supabase
+      .channel(`chat-inline-${chatConvId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${chatConvId}` }, async () => {
+        const { data: msgs } = await supabase
+          .from("messages")
+          .select("*")
+          .eq("conversation_id", chatConvId)
+          .order("created_at");
+        setChatMessages(msgs ?? []);
+        setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [chatConvId]);
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!job) return <p className="text-muted-foreground">Job not found.</p>;
 
@@ -290,9 +379,12 @@ const JobDetail = () => {
                   {q.availability && <span>Available: {q.availability}</span>}
                   {q.estimated_duration && <span>Duration: {q.estimated_duration}</span>}
                 </div>
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2 items-center flex-wrap">
                   <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/providers/${q.provider_user_id}`)}>
                     View Provider
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => openChat(q.provider_user_id, q.id)}>
+                    <MessageSquare className="mr-2 h-4 w-4" /> Message Provider
                   </Button>
                   {q.status === "pending" && job.status !== "cancelled" && (
                     <Button size="sm" onClick={() => openAcceptDialog(q)}>
@@ -413,6 +505,66 @@ const JobDetail = () => {
               {saving ? "Processing…" : "Accept & Agree Price"}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Message Provider Chat Dialog */}
+      <Dialog open={!!chatDialog} onOpenChange={(o) => !o && setChatDialog(null)}>
+        <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" /> Message Provider
+            </DialogTitle>
+          </DialogHeader>
+          {chatLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : (
+            <>
+              <div className="flex-1 overflow-y-auto space-y-3 min-h-[200px] max-h-[400px] py-2">
+                {chatMessages.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-8">
+                    No messages yet. Start the conversation to discuss job details with the provider.
+                  </p>
+                )}
+                {chatMessages.map(m => {
+                  const isOwn = m.sender_user_id === user!.id;
+                  if ((m as any).message_type === "system") {
+                    return (
+                      <div key={m.id} className="flex justify-center">
+                        <div className="bg-muted/50 rounded-lg px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
+                          {m.body}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={m.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+                      <div className={`max-w-[70%] rounded-lg px-3 py-2 text-sm ${isOwn ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                        <p>{m.body}</p>
+                        <p className={`text-[10px] mt-1 ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                          {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={chatBottomRef} />
+              </div>
+              <div className="flex gap-2 pt-2 border-t">
+                <Input
+                  value={chatMsg}
+                  onChange={e => setChatMsg(e.target.value)}
+                  placeholder="Type a message…"
+                  onKeyDown={e => e.key === "Enter" && sendChatMsg()}
+                />
+                <Button size="icon" onClick={sendChatMsg} disabled={chatSending || !chatMsg.trim()}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
