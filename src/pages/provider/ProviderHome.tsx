@@ -85,35 +85,37 @@ const ProviderHome = () => {
         </Card>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate("/provider/jobs")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Briefcase className="h-5 w-5 text-primary" />
-              Available Jobs
-            </CardTitle>
-            <CardDescription>Browse and quote on matching jobs</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate("/provider/quotes")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <FileText className="h-5 w-5 text-primary" />
-              My Quotes
-            </CardTitle>
-            <CardDescription>Track your submitted quotes</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate("/provider/messages")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <MessageSquare className="h-5 w-5 text-primary" />
-              Messages
-            </CardTitle>
-            <CardDescription>Chat with customers</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
+      {status === "active" && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate("/provider/jobs")}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Briefcase className="h-5 w-5 text-primary" />
+                Available Jobs
+              </CardTitle>
+              <CardDescription>Browse and quote on matching jobs</CardDescription>
+            </CardHeader>
+          </Card>
+          <Card className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate("/provider/quotes")}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <FileText className="h-5 w-5 text-primary" />
+                My Quotes
+              </CardTitle>
+              <CardDescription>Track your submitted quotes</CardDescription>
+            </CardHeader>
+          </Card>
+          <Card className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate("/provider/messages")}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                Messages
+              </CardTitle>
+              <CardDescription>Chat with customers</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
