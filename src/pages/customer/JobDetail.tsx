@@ -11,7 +11,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, ArrowLeft, Pencil, Save, Check, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send } from "lucide-react";
+import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake } from "lucide-react";
+import NegotiateDialog from "@/components/messaging/NegotiateDialog";
+import ProposalCard from "@/components/messaging/ProposalCard";
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
 import { format } from "date-fns";
@@ -33,9 +35,8 @@ const JobDetail = () => {
   const [editForm, setEditForm] = useState({ title: "", description: "", timeline: "", budget: "" });
   const [saving, setSaving] = useState(false);
 
-  // Accept quote with agreed price dialog
-  const [acceptDialog, setAcceptDialog] = useState<{ quoteId: string; providerUserId: string; priceMin: number; priceMax: number } | null>(null);
-  const [agreedPrice, setAgreedPrice] = useState("");
+  // Negotiate dialog
+  const [negotiateDialog, setNegotiateDialog] = useState<{ quoteId: string; providerUserId: string; priceMin: number; priceMax: number } | null>(null);
 
   // Payment
   const [payingAmount, setPayingAmount] = useState("");
@@ -111,47 +112,63 @@ const JobDetail = () => {
     setSaving(false);
   };
 
-  const openAcceptDialog = (q: any) => {
-    setAcceptDialog({
+  const openNegotiateDialog = (q: any) => {
+    setNegotiateDialog({
       quoteId: q.id,
       providerUserId: q.provider_user_id,
       priceMin: Number(q.price_min),
       priceMax: Number(q.price_max),
     });
-    setAgreedPrice(String(Number(q.price_max)));
   };
 
-  const acceptQuote = async () => {
-    if (!acceptDialog) return;
-    const price = parseFloat(agreedPrice);
-    if (!price || price <= 0) {
-      toast({ title: "Please enter a valid agreed price", variant: "destructive" });
+  const sendNegotiation = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
+    if (!negotiateDialog) return;
+
+    // Find or create conversation
+    const { data: existing } = await supabase
+      .from("conversations")
+      .select("id")
+      .eq("job_id", jobId!)
+      .eq("customer_user_id", user!.id)
+      .eq("provider_user_id", negotiateDialog.providerUserId)
+      .maybeSingle();
+
+    let convId = existing?.id;
+    if (!convId) {
+      const { data: created } = await supabase
+        .from("conversations")
+        .upsert({
+          job_id: jobId!,
+          customer_user_id: user!.id,
+          provider_user_id: negotiateDialog.providerUserId,
+        } as any, { onConflict: "job_id,customer_user_id,provider_user_id" })
+        .select("id")
+        .single();
+      convId = created?.id;
+    }
+
+    if (!convId) {
+      toast({ title: "Could not create conversation", variant: "destructive" });
       return;
     }
-    setSaving(true);
 
-    // Accept the chosen quote
-    await supabase.from("quotes").update({ status: "accepted" } as any).eq("id", acceptDialog.quoteId);
-    // Decline others
-    await supabase.from("quotes").update({ status: "declined" } as any).eq("job_id", jobId!).neq("id", acceptDialog.quoteId);
-    // Update job with agreed price
-    await supabase.from("jobs").update({
-      status: "accepted",
-      provider_id: acceptDialog.providerUserId,
-      agreed_price: price,
-    } as any).eq("id", jobId!);
+    // Send as a proposal message
+    await supabase.from("messages").insert({
+      conversation_id: convId,
+      sender_user_id: user!.id,
+      body: `Proposal: £${data.agreed_price.toFixed(2)}, starting ${new Date(data.start_date).toLocaleDateString()}, duration: ${data.duration}`,
+      message_type: "proposal",
+      metadata: {
+        agreed_price: data.agreed_price,
+        start_date: data.start_date,
+        start_time: data.start_time,
+        duration: data.duration,
+        status: "pending",
+      },
+    } as any);
 
-    // Create conversation
-    await supabase.from("conversations").upsert({
-      job_id: jobId!,
-      customer_user_id: user!.id,
-      provider_user_id: acceptDialog.providerUserId,
-    } as any, { onConflict: "job_id,customer_user_id,provider_user_id" });
-
-    toast({ title: "Quote accepted!", description: `Agreed price: £${price.toFixed(2)}` });
-    setAcceptDialog(null);
-    setSaving(false);
-    fetchAll();
+    toast({ title: "Proposal sent to provider", description: "The provider can accept or counter your terms." });
+    setNegotiateDialog(null);
   };
 
   const makePayment = async () => {
@@ -387,8 +404,8 @@ const JobDetail = () => {
                     <MessageSquare className="mr-2 h-4 w-4" /> Message Provider
                   </Button>
                   {q.status === "pending" && job.status !== "cancelled" && (
-                    <Button size="sm" onClick={() => openAcceptDialog(q)}>
-                      <Check className="mr-2 h-4 w-4" /> Accept Quote
+                    <Button size="sm" onClick={() => openNegotiateDialog(q)}>
+                      <Handshake className="mr-2 h-4 w-4" /> Negotiate
                     </Button>
                   )}
                 </div>
@@ -475,38 +492,16 @@ const JobDetail = () => {
         </Card>
       )}
 
-      {/* Accept Quote Dialog */}
-      <Dialog open={!!acceptDialog} onOpenChange={(o) => !o && setAcceptDialog(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Accept Quote & Agree Price</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <p className="text-sm text-muted-foreground">
-              The provider quoted between £{acceptDialog?.priceMin?.toFixed(0)} and £{acceptDialog?.priceMax?.toFixed(0)}.
-              Please agree a final total price with the provider before accepting.
-            </p>
-            <div className="space-y-2">
-              <Label>Agreed Total Price (£)</Label>
-              <Input
-                type="number"
-                value={agreedPrice}
-                onChange={e => setAgreedPrice(e.target.value)}
-                placeholder="Enter agreed price"
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              You will need to pay this amount (or portions for each milestone) into escrow before work can begin.
-            </p>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setAcceptDialog(null)}>Cancel</Button>
-            <Button onClick={acceptQuote} disabled={saving}>
-              {saving ? "Processing…" : "Accept & Agree Price"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Negotiate Dialog */}
+      {negotiateDialog && (
+        <NegotiateDialog
+          open={!!negotiateDialog}
+          onClose={() => setNegotiateDialog(null)}
+          priceMin={negotiateDialog.priceMin}
+          priceMax={negotiateDialog.priceMax}
+          onSubmit={sendNegotiation}
+        />
+      )}
 
       {/* Message Provider Chat Dialog */}
       <Dialog open={!!chatDialog} onOpenChange={(o) => !o && setChatDialog(null)}>
@@ -530,6 +525,17 @@ const JobDetail = () => {
                 )}
                 {chatMessages.map(m => {
                   const isOwn = m.sender_user_id === user!.id;
+                  if ((m as any).message_type === "proposal") {
+                    return (
+                      <div key={m.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+                        <ProposalCard
+                          proposal={(m as any).metadata}
+                          isOwnMessage={isOwn}
+                          role="customer"
+                        />
+                      </div>
+                    );
+                  }
                   if ((m as any).message_type === "system") {
                     return (
                       <div key={m.id} className="flex justify-center">
