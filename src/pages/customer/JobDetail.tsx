@@ -38,6 +38,10 @@ const JobDetail = () => {
   // Negotiate dialog
   const [negotiateDialog, setNegotiateDialog] = useState<{ quoteId: string; providerUserId: string; priceMin: number; priceMax: number } | null>(null);
 
+  // Counter-propose from chat
+  const [counterDialog, setCounterDialog] = useState<{ priceMin: number; priceMax: number; defaults: any } | null>(null);
+  const [chatAccepting, setChatAccepting] = useState(false);
+
   // Payment
   const [payingAmount, setPayingAmount] = useState("");
   const [processingPayment, setProcessingPayment] = useState(false);
@@ -255,6 +259,101 @@ const JobDetail = () => {
     setChatMessages(msgs ?? []);
     setChatSending(false);
     setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+  };
+
+  // Accept proposal from provider in inline chat
+  const handleChatAccept = async (msg: any) => {
+    if (!chatConvId) return;
+    setChatAccepting(true);
+    const metadata = (msg as any).metadata;
+    await supabase.from("messages").update({
+      metadata: { ...metadata, status: "accepted" },
+    } as any).eq("id", msg.id);
+
+    // Update job
+    await supabase.from("jobs").update({
+      agreed_price: metadata.agreed_price,
+      provider_id: chatDialog!.providerUserId,
+      status: "accepted",
+      scheduled_start: metadata.start_date,
+      scheduled_end: metadata.end_date || null,
+    } as any).eq("id", jobId!);
+
+    // Decline other quotes, accept this provider's
+    await supabase.from("quotes").update({ status: "declined" } as any)
+      .eq("job_id", jobId!)
+      .neq("provider_user_id", chatDialog!.providerUserId);
+    await supabase.from("quotes").update({ status: "accepted" } as any)
+      .eq("job_id", jobId!)
+      .eq("provider_user_id", chatDialog!.providerUserId);
+
+    await supabase.from("messages").insert({
+      conversation_id: chatConvId,
+      sender_user_id: user!.id,
+      body: `Terms accepted! Job scheduled for £${Number(metadata.agreed_price).toFixed(2)}.`,
+      message_type: "system",
+    } as any);
+
+    toast({ title: "Terms accepted!", description: "The job has been scheduled." });
+    setChatAccepting(false);
+    const { data: msgs } = await supabase.from("messages").select("*").eq("conversation_id", chatConvId).order("created_at");
+    setChatMessages(msgs ?? []);
+    fetchAll();
+  };
+
+  const handleChatDecline = async (msg: any) => {
+    if (!chatConvId) return;
+    await supabase.from("messages").update({
+      metadata: { ...(msg as any).metadata, status: "declined" },
+    } as any).eq("id", msg.id);
+    await supabase.from("messages").insert({
+      conversation_id: chatConvId,
+      sender_user_id: user!.id,
+      body: "Proposal declined.",
+      message_type: "system",
+    } as any);
+    toast({ title: "Proposal declined" });
+    const { data: msgs } = await supabase.from("messages").select("*").eq("conversation_id", chatConvId).order("created_at");
+    setChatMessages(msgs ?? []);
+  };
+
+  const handleChatCounter = (msg: any) => {
+    const meta = (msg as any).metadata;
+    // Find the quote to get price range
+    const quote = quotes.find(q => q.provider_user_id === chatDialog?.providerUserId);
+    setCounterDialog({
+      priceMin: quote ? Number(quote.price_min) : 1,
+      priceMax: quote ? Number(quote.price_max) : 999999,
+      defaults: {
+        agreed_price: meta.agreed_price,
+        start_date: meta.start_date,
+        start_time: meta.start_time,
+        duration: meta.duration,
+      },
+    });
+  };
+
+  const sendCounterProposal = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
+    if (!chatConvId) return;
+    // Decline existing pending proposals
+    for (const m of chatMessages) {
+      if ((m as any).message_type === "proposal" && (m as any).metadata?.status === "pending") {
+        await supabase.from("messages").update({
+          metadata: { ...(m as any).metadata, status: "declined" },
+        } as any).eq("id", m.id);
+      }
+    }
+    await supabase.from("messages").insert({
+      conversation_id: chatConvId,
+      sender_user_id: user!.id,
+      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}, starting ${new Date(data.start_date).toLocaleDateString()}, duration: ${data.duration}`,
+      message_type: "proposal",
+      metadata: { ...data, status: "pending" },
+    } as any);
+    toast({ title: "Counter-proposal sent" });
+    setCounterDialog(null);
+    const { data: msgs } = await supabase.from("messages").select("*").eq("conversation_id", chatConvId).order("created_at");
+    setChatMessages(msgs ?? []);
   };
 
   // Realtime for chat dialog
@@ -532,6 +631,10 @@ const JobDetail = () => {
                           proposal={(m as any).metadata}
                           isOwnMessage={isOwn}
                           role="customer"
+                          onAccept={() => handleChatAccept(m)}
+                          onDecline={() => handleChatDecline(m)}
+                          onCounter={() => handleChatCounter(m)}
+                          accepting={chatAccepting}
                         />
                       </div>
                     );
@@ -573,6 +676,17 @@ const JobDetail = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Counter-propose dialog from inline chat */}
+      {counterDialog && (
+        <NegotiateDialog
+          open={!!counterDialog}
+          onClose={() => setCounterDialog(null)}
+          priceMin={counterDialog.priceMin}
+          priceMax={counterDialog.priceMax}
+          onSubmit={sendCounterProposal}
+        />
+      )}
     </div>
   );
 };

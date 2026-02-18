@@ -18,6 +18,8 @@ const ProviderMessages = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [proposeOpen, setProposeOpen] = useState(false);
+  const [proposeDefaults, setProposeDefaults] = useState<any>(undefined);
+  const [accepting, setAccepting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,7 +44,6 @@ const ProviderMessages = () => {
       .eq("conversation_id", conv.id)
       .order("created_at");
     setMessages(data ?? []);
-    // Mark messages as read
     await supabase
       .from("messages")
       .update({ read_at: new Date().toISOString() } as any)
@@ -76,8 +77,16 @@ const ProviderMessages = () => {
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
-  const sendProposal = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string }) => {
+  const sendProposal = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
     if (!selected) return;
+    // Decline any existing pending proposals first
+    for (const m of messages) {
+      if ((m as any).message_type === "proposal" && (m as any).metadata?.status === "pending") {
+        await supabase.from("messages").update({
+          metadata: { ...(m as any).metadata, status: "declined" },
+        } as any).eq("id", m.id);
+      }
+    }
     await supabase.from("messages").insert({
       conversation_id: selected.id,
       sender_user_id: user!.id,
@@ -86,15 +95,79 @@ const ProviderMessages = () => {
       metadata: { ...data, status: "pending" },
     } as any);
     toast({ title: "Proposal sent to customer" });
+    setProposeDefaults(undefined);
     await refreshMessages();
   };
 
-  // Check if there's already a pending proposal
-  const hasPendingProposal = messages.some(
-    m => (m as any).message_type === "proposal" && (m as any).metadata?.status === "pending"
-  );
+  const handleAcceptProposal = async (msg: any) => {
+    if (!selected) return;
+    setAccepting(true);
+    const metadata = (msg as any).metadata;
 
-  // Check if job already has agreed terms
+    // Update proposal status
+    await supabase.from("messages").update({
+      metadata: { ...metadata, status: "accepted" },
+    } as any).eq("id", msg.id);
+
+    // Update job with agreed terms
+    const conv = selected;
+    const updateData: any = {
+      agreed_price: metadata.agreed_price,
+      provider_id: user!.id,
+      status: "accepted",
+      scheduled_start: metadata.start_date,
+      scheduled_end: metadata.end_date || null,
+    };
+    await supabase.from("jobs").update(updateData).eq("id", conv.job_id);
+
+    // Decline other quotes
+    await supabase.from("quotes").update({ status: "declined" } as any)
+      .eq("job_id", conv.job_id)
+      .neq("provider_user_id", user!.id);
+    // Accept own quote
+    await supabase.from("quotes").update({ status: "accepted" } as any)
+      .eq("job_id", conv.job_id)
+      .eq("provider_user_id", user!.id);
+
+    // System message
+    await supabase.from("messages").insert({
+      conversation_id: selected.id,
+      sender_user_id: user!.id,
+      body: `Terms accepted! Job scheduled for £${Number(metadata.agreed_price).toFixed(2)}.`,
+      message_type: "system",
+    } as any);
+
+    toast({ title: "Terms accepted!", description: "The job has been scheduled." });
+    setAccepting(false);
+    await refreshMessages();
+    fetchConversations();
+  };
+
+  const handleDeclineProposal = async (msg: any) => {
+    await supabase.from("messages").update({
+      metadata: { ...(msg as any).metadata, status: "declined" },
+    } as any).eq("id", msg.id);
+    await supabase.from("messages").insert({
+      conversation_id: selected.id,
+      sender_user_id: user!.id,
+      body: "Proposal declined.",
+      message_type: "system",
+    } as any);
+    toast({ title: "Proposal declined" });
+    await refreshMessages();
+  };
+
+  const handleCounterProposal = (msg: any) => {
+    const meta = (msg as any).metadata;
+    setProposeDefaults({
+      agreed_price: meta.agreed_price,
+      start_date: meta.start_date,
+      start_time: meta.start_time,
+      duration: meta.duration,
+    });
+    setProposeOpen(true);
+  };
+
   const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
 
   useEffect(() => {
@@ -142,8 +215,8 @@ const ProviderMessages = () => {
           <>
             <div className="p-3 border-b flex items-center justify-between">
               <h3 className="font-semibold text-sm">{(selected as any).jobs?.title ?? "Chat"}</h3>
-              {!jobAccepted && !hasPendingProposal && (
-                <Button size="sm" variant="outline" onClick={() => setProposeOpen(true)}>
+              {!jobAccepted && (
+                <Button size="sm" variant="outline" onClick={() => { setProposeDefaults(undefined); setProposeOpen(true); }}>
                   <Handshake className="mr-2 h-4 w-4" /> Propose Terms
                 </Button>
               )}
@@ -158,6 +231,10 @@ const ProviderMessages = () => {
                         proposal={(m as any).metadata}
                         isOwnMessage={isOwn}
                         role="provider"
+                        onAccept={() => handleAcceptProposal(m)}
+                        onDecline={() => handleDeclineProposal(m)}
+                        onCounter={() => handleCounterProposal(m)}
+                        accepting={accepting}
                       />
                     </div>
                   );
@@ -196,8 +273,9 @@ const ProviderMessages = () => {
 
       <ProposeTermsDialog
         open={proposeOpen}
-        onClose={() => setProposeOpen(false)}
+        onClose={() => { setProposeOpen(false); setProposeDefaults(undefined); }}
         onSubmit={sendProposal}
+        defaults={proposeDefaults}
       />
     </div>
   );

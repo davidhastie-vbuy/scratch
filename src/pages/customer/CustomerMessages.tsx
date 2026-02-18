@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MessageSquare, Send } from "lucide-react";
+import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
 import ProposalCard from "@/components/messaging/ProposalCard";
+import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 
 const CustomerMessages = () => {
   const { user } = useAuth();
@@ -17,6 +18,7 @@ const CustomerMessages = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [accepting, setAccepting] = useState(false);
+  const [counterDialog, setCounterDialog] = useState<{ priceMin: number; priceMax: number } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,57 +81,25 @@ const CustomerMessages = () => {
       return;
     }
 
-    // Calculate scheduled_start and scheduled_end from proposal
-    const startDate = new Date(proposal.start_date);
-    const [sh, sm] = (proposal.start_time || "09:00").split(":").map(Number);
-    startDate.setHours(sh, sm, 0, 0);
-
-    // Parse duration for end date (simple: look for number + days/weeks)
-    const durationText = (proposal.duration || "").toLowerCase();
-    const endDate = new Date(startDate);
-    const daysMatch = durationText.match(/(\d+)\s*day/);
-    const weeksMatch = durationText.match(/(\d+)\s*week/);
-    if (weeksMatch) {
-      endDate.setDate(endDate.getDate() + parseInt(weeksMatch[1]) * 7);
-    } else if (daysMatch) {
-      endDate.setDate(endDate.getDate() + parseInt(daysMatch[1]));
-    } else {
-      // Default 1 day
-      endDate.setDate(endDate.getDate() + 1);
-    }
-    endDate.setHours(17, 0, 0, 0);
-
-    // Update job: set agreed_price, scheduled dates, status to accepted, provider_id
-    const { error: jobError } = await supabase.from("jobs").update({
-      agreed_price: proposal.agreed_price,
-      scheduled_start: startDate.toISOString(),
-      scheduled_end: endDate.toISOString(),
-      status: "accepted",
-      provider_id: selected.provider_user_id,
-    } as any).eq("id", jobId);
-
-    if (jobError) {
-      toast({ title: "Failed to confirm terms", description: jobError.message, variant: "destructive" });
-      setAccepting(false);
-      return;
-    }
-
-    // Accept the provider's quote (if exists)
-    await supabase.from("quotes").update({ status: "accepted" } as any)
-      .eq("job_id", jobId)
-      .eq("provider_user_id", selected.provider_user_id);
-
-    // Decline other quotes
-    await supabase.from("quotes").update({ status: "declined" } as any)
-      .eq("job_id", jobId)
-      .neq("provider_user_id", selected.provider_user_id);
-
-    // Update the proposal message metadata to "accepted"
     await supabase.from("messages").update({
       metadata: { ...proposal, status: "accepted" },
     } as any).eq("id", message.id);
 
-    // Send confirmation system message
+    await supabase.from("jobs").update({
+      agreed_price: proposal.agreed_price,
+      scheduled_start: proposal.start_date,
+      scheduled_end: proposal.end_date || null,
+      status: "accepted",
+      provider_id: selected.provider_user_id,
+    } as any).eq("id", jobId);
+
+    await supabase.from("quotes").update({ status: "accepted" } as any)
+      .eq("job_id", jobId)
+      .eq("provider_user_id", selected.provider_user_id);
+    await supabase.from("quotes").update({ status: "declined" } as any)
+      .eq("job_id", jobId)
+      .neq("provider_user_id", selected.provider_user_id);
+
     await supabase.from("messages").insert({
       conversation_id: selected.id,
       sender_user_id: user!.id,
@@ -137,20 +107,7 @@ const CustomerMessages = () => {
       message_type: "system",
     } as any);
 
-    // Send confirmation emails via edge function
-    try {
-      await supabase.functions.invoke("send-provider-email", {
-        body: {
-          to: "provider", // Will be resolved by checking profiles
-          subject: "TradeTrust — Job Terms Confirmed",
-          html: `<h2>Job Terms Confirmed</h2><p>The customer has confirmed the terms for the job.</p><p><strong>Price:</strong> £${Number(proposal.agreed_price).toFixed(2)}<br/><strong>Start:</strong> ${startDate.toLocaleDateString()}<br/><strong>Duration:</strong> ${proposal.duration}</p><p>Log in to your TradeTrust dashboard for more details.</p>`,
-        },
-      });
-    } catch {
-      // Email is best-effort
-    }
-
-    toast({ title: "Terms confirmed!", description: "Work has been scheduled in the provider's calendar." });
+    toast({ title: "Terms confirmed!", description: "Work has been scheduled." });
     setAccepting(false);
     await refreshMessages();
     fetchConversations();
@@ -160,12 +117,10 @@ const CustomerMessages = () => {
     setAccepting(true);
     const proposal = message.metadata;
 
-    // Update the proposal message metadata to "declined"
     await supabase.from("messages").update({
       metadata: { ...proposal, status: "declined" },
     } as any).eq("id", message.id);
 
-    // Send decline system message
     await supabase.from("messages").insert({
       conversation_id: selected.id,
       sender_user_id: user!.id,
@@ -178,7 +133,43 @@ const CustomerMessages = () => {
     await refreshMessages();
   };
 
-  // Realtime subscription
+  const handleCounterProposal = async (message: any) => {
+    // Get quote price range for this provider
+    const { data: quotes } = await supabase
+      .from("quotes")
+      .select("price_min, price_max")
+      .eq("job_id", selected.job_id)
+      .eq("provider_user_id", selected.provider_user_id)
+      .limit(1);
+    const quote = quotes?.[0];
+    setCounterDialog({
+      priceMin: quote ? Number(quote.price_min) : 1,
+      priceMax: quote ? Number(quote.price_max) : 999999,
+    });
+  };
+
+  const sendCounterNegotiation = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
+    if (!selected) return;
+    // Decline existing pending proposals
+    for (const m of messages) {
+      if ((m as any).message_type === "proposal" && (m as any).metadata?.status === "pending") {
+        await supabase.from("messages").update({
+          metadata: { ...(m as any).metadata, status: "declined" },
+        } as any).eq("id", m.id);
+      }
+    }
+    await supabase.from("messages").insert({
+      conversation_id: selected.id,
+      sender_user_id: user!.id,
+      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}, starting ${new Date(data.start_date).toLocaleDateString()}, duration: ${data.duration}`,
+      message_type: "proposal",
+      metadata: { ...data, status: "pending" },
+    } as any);
+    toast({ title: "Counter-proposal sent" });
+    setCounterDialog(null);
+    await refreshMessages();
+  };
+
   useEffect(() => {
     if (!selected) return;
     const channel = supabase
@@ -191,6 +182,8 @@ const CustomerMessages = () => {
   }, [selected]);
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+
+  const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
 
   return (
     <div className="flex gap-4 h-[calc(100vh-12rem)]">
@@ -238,6 +231,7 @@ const CustomerMessages = () => {
                         role="customer"
                         onAccept={() => handleAcceptProposal(m)}
                         onDecline={() => handleDeclineProposal(m)}
+                        onCounter={() => handleCounterProposal(m)}
                         accepting={accepting}
                       />
                     </div>
@@ -281,6 +275,16 @@ const CustomerMessages = () => {
           </>
         )}
       </div>
+
+      {counterDialog && (
+        <NegotiateDialog
+          open={!!counterDialog}
+          onClose={() => setCounterDialog(null)}
+          priceMin={counterDialog.priceMin}
+          priceMax={counterDialog.priceMax}
+          onSubmit={sendCounterNegotiation}
+        />
+      )}
     </div>
   );
 };
