@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Camera, Loader2, MapPin, Plus, X, Clock, Wrench } from "lucide-react";
+import { Save, Camera, Loader2, MapPin, Plus, X, Clock, Wrench, Mail } from "lucide-react";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 
 interface ProviderProfileData {
@@ -240,6 +240,14 @@ const ProviderProfile = () => {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2"><Label>Contact first name</Label><Input value={profile.contact_first_name} onChange={e => setProfile(p => ({ ...p, contact_first_name: e.target.value }))} required maxLength={100} /></div>
               <div className="space-y-2"><Label>Contact last name</Label><Input value={profile.contact_last_name} onChange={e => setProfile(p => ({ ...p, contact_last_name: e.target.value }))} required maxLength={100} /></div>
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input value={user?.email ?? ""} disabled className="pl-10 bg-muted" />
+              </div>
+              <p className="text-xs text-muted-foreground">To change your email, please contact support</p>
             </div>
             <div className="space-y-2"><Label>Phone</Label><Input type="tel" value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} required maxLength={20} /></div>
             <div className="space-y-2"><Label>Business address</Label><Input value={profile.business_address} onChange={e => setProfile(p => ({ ...p, business_address: e.target.value }))} required maxLength={255} /></div>
