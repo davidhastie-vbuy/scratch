@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Camera, Loader2, MapPin, Plus, X, Clock, Wrench, Mail } from "lucide-react";
+import { Save, Camera, Loader2, MapPin, Plus, X, Clock, Wrench, Mail, Upload, FileText, Trash2 } from "lucide-react";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 
 interface ProviderProfileData {
@@ -36,6 +36,7 @@ const ProviderProfile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
   const { categories: tradeCategories } = useTradeCategories(true);
 
   const [profile, setProfile] = useState<ProviderProfileData>({
@@ -57,6 +58,9 @@ const ProviderProfile = () => {
   const [savingCategory, setSavingCategory] = useState(false);
   const [selectedAdditional, setSelectedAdditional] = useState("");
   const [savingAdditional, setSavingAdditional] = useState(false);
+  const [documents, setDocuments] = useState<{ id: string; file_name: string; file_url: string; file_size: number; file_type: string; uploaded_at: string }[]>([]);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [providerProfileId, setProviderProfileId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) fetchProfile();
@@ -65,7 +69,7 @@ const ProviderProfile = () => {
   const fetchProfile = async () => {
     const { data } = await supabase
       .from("provider_profiles")
-      .select("business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category, additional_categories, pending_additional_categories, email_notifications_enabled")
+      .select("id, business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category, additional_categories, pending_additional_categories, email_notifications_enabled")
       .eq("user_id", user!.id)
       .single();
     if (data) {
@@ -84,6 +88,15 @@ const ProviderProfile = () => {
         email_notifications_enabled: (data as any).email_notifications_enabled ?? true,
       });
       setEditedAreas(areas);
+      setProviderProfileId(data.id);
+
+      // Fetch documents
+      const { data: docs } = await supabase
+        .from("provider_documents")
+        .select("id, file_name, file_url, file_size, file_type, uploaded_at")
+        .eq("user_id", user!.id)
+        .order("uploaded_at", { ascending: false });
+      if (docs) setDocuments(docs);
     }
     setLoading(false);
   };
@@ -200,6 +213,71 @@ const ProviderProfile = () => {
       setSelectedAdditional("");
     }
     setSavingAdditional(false);
+  };
+
+  const ACCEPTED_DOC_TYPES = ["application/pdf", "image/jpeg", "image/png"];
+  const MAX_DOC_SIZE = 5 * 1024 * 1024;
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (!providerProfileId) return;
+    setUploadingDoc(true);
+
+    for (const file of files) {
+      if (!ACCEPTED_DOC_TYPES.includes(file.type)) {
+        toast({ title: "Unsupported format", description: `${file.name}: only PDF, JPG, PNG allowed.`, variant: "destructive" });
+        continue;
+      }
+      if (file.size > MAX_DOC_SIZE) {
+        toast({ title: "File too large", description: `${file.name}: max 5MB.`, variant: "destructive" });
+        continue;
+      }
+
+      const storagePath = `${user!.id}/${Date.now()}-${file.name}`;
+      const { error: uploadErr } = await supabase.storage.from("provider-documents").upload(storagePath, file);
+      if (uploadErr) {
+        toast({ title: "Upload failed", description: uploadErr.message, variant: "destructive" });
+        continue;
+      }
+
+      const { data: docRow, error: insertErr } = await supabase.from("provider_documents").insert({
+        provider_profile_id: providerProfileId,
+        user_id: user!.id,
+        file_url: storagePath,
+        file_name: file.name,
+        file_type: file.type,
+        file_size: file.size,
+      } as any).select("id, file_name, file_url, file_size, file_type, uploaded_at").single();
+
+      if (insertErr) {
+        toast({ title: "Save failed", description: insertErr.message, variant: "destructive" });
+      } else if (docRow) {
+        setDocuments(prev => [docRow, ...prev]);
+      }
+    }
+
+    toast({ title: "Documents uploaded" });
+    setUploadingDoc(false);
+    if (docInputRef.current) docInputRef.current.value = "";
+  };
+
+  const handleDeleteDoc = async (doc: typeof documents[0]) => {
+    const { error: storageErr } = await supabase.storage.from("provider-documents").remove([doc.file_url]);
+    if (storageErr) console.error("Storage delete error:", storageErr);
+
+    const { error: dbErr } = await supabase.from("provider_documents").delete().eq("id", doc.id);
+    if (dbErr) {
+      toast({ title: "Delete failed", description: dbErr.message, variant: "destructive" });
+      return;
+    }
+    setDocuments(prev => prev.filter(d => d.id !== doc.id));
+    toast({ title: "Document deleted" });
   };
 
   const initials = `${profile.contact_first_name?.[0] ?? ""}${profile.contact_last_name?.[0] ?? ""}`.toUpperCase() || "?";
@@ -455,6 +533,47 @@ const ProviderProfile = () => {
             <Button onClick={submitAreaChange} disabled={savingAreas} className="w-full">
               {savingAreas ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : "Submit area change for approval"}
             </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Supporting Documents Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Supporting Documents
+          </CardTitle>
+          <CardDescription>Upload qualifications, certifications, insurance documents, or other supporting files. PDF, JPG, PNG — max 5MB each.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <input
+            ref={docInputRef}
+            type="file"
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png"
+            className="hidden"
+            onChange={handleDocUpload}
+          />
+          <Button type="button" variant="outline" onClick={() => docInputRef.current?.click()} disabled={uploadingDoc}>
+            {uploadingDoc ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</> : <><Upload className="mr-2 h-4 w-4" /> Upload documents</>}
+          </Button>
+
+          {documents.length > 0 ? (
+            <div className="space-y-2">
+              {documents.map(doc => (
+                <div key={doc.id} className="flex items-center gap-3 rounded-md border border-border bg-muted/30 px-3 py-2 text-sm">
+                  <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="flex-1 truncate">{doc.file_name}</span>
+                  <span className="shrink-0 text-xs text-muted-foreground">{formatFileSize(doc.file_size)}</span>
+                  <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteDoc(doc)}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No documents uploaded yet.</p>
           )}
         </CardContent>
       </Card>
