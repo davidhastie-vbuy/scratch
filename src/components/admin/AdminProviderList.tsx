@@ -191,7 +191,7 @@ const AdminProviderList = () => {
     // Send email notification for changes_requested
     if (ok && actionDialog.action === "changes_requested" && actionDialog.provider.email) {
       const providerName = `${actionDialog.provider.contact_first_name} ${actionDialog.provider.contact_last_name}`.trim();
-      const dashboardLink = `${window.location.origin}/provider`;
+      const profileLink = `${window.location.origin}/provider/profile`;
       try {
         await supabase.functions.invoke("send-provider-email", {
           body: {
@@ -204,7 +204,7 @@ const AdminProviderList = () => {
                 ${adminNote.trim() ? `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 16px 0; border-radius: 4px;"><strong>Admin feedback:</strong><br/>${adminNote.trim()}</div>` : ""}
                 <p>Please log in to your dashboard to review the feedback and update your application:</p>
                 <p style="margin: 24px 0;">
-                  <a href="${dashboardLink}" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Go to My Dashboard</a>
+                  <a href="${profileLink}" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Go to My Profile</a>
                 </p>
                 <p style="color: #6b7280; font-size: 14px;">If you have any questions, please contact our support team.</p>
                 <p style="color: #6b7280; font-size: 14px;">— The TradeTrust Team</p>
