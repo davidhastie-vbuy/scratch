@@ -55,7 +55,7 @@ const ProviderHome = () => {
             <div>
               <p className="font-medium text-amber-800 dark:text-amber-200">Changes requested by admin</p>
               {adminNote && <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">{adminNote}</p>}
-              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">Please update your profile and resubmit.</p>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">Please visit your profile page, update your details and click Save, and/or upload the requested documents.</p>
             </div>
           </CardContent>
         </Card>
