@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays } from "lucide-react";
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
+import MilestoneSetup from "@/components/MilestoneSetup";
 import { format } from "date-fns";
 
 const ProviderJobDetail = () => {
@@ -205,6 +206,30 @@ const ProviderJobDetail = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Milestone Setup - shown when job is accepted but milestones not yet confirmed */}
+      {existingQuote?.status === "accepted" && job.status === "accepted" && !(job as any).milestones_confirmed && job.agreed_price && (
+        <MilestoneSetup
+          jobId={jobId!}
+          agreedPrice={Number(job.agreed_price)}
+          onConfirmed={fetchAll}
+        />
+      )}
+
+      {/* Pending customer payment notice */}
+      {existingQuote?.status === "accepted" && job.status === "accepted" && (job as any).milestones_confirmed && (
+        <Card>
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3 text-sm">
+              <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium">Milestones confirmed — awaiting customer payment</p>
+                <p className="text-muted-foreground">The customer has been asked to make the first milestone payment. Work will begin once payment is received.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Work Tracker */}
       <WorkTracker jobId={jobId!} job={job} role="provider" onRefresh={fetchAll} />
