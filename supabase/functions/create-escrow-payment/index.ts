@@ -84,8 +84,8 @@ serve(async (req) => {
           type: "escrow",
         },
       },
-      success_url: `${req.headers.get("origin")}/dashboard/jobs/${job_id}?payment=success`,
-      cancel_url: `${req.headers.get("origin")}/dashboard/jobs/${job_id}?payment=cancelled`,
+      success_url: `${req.headers.get("origin")}/customer/jobs/${job_id}?payment=success`,
+      cancel_url: `${req.headers.get("origin")}/customer/jobs/${job_id}?payment=cancelled`,
     });
 
     // Create escrow payment record

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, PoundSterling, CheckCircle2, Circle } from "lucide-react";
+import { Loader2, PoundSterling, CheckCircle2, Circle, RefreshCw } from "lucide-react";
 
 interface MilestonePaymentSectionProps {
   jobId: string;
@@ -48,7 +48,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
     if (error) {
       toast({ title: "Payment failed", description: error.message, variant: "destructive" });
     } else if (data?.url) {
-      window.open(data.url, "_blank");
+      window.location.href = data.url;
     }
     setProcessingPayment(false);
   };
@@ -95,7 +95,26 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
                   </Badge>
                 )}
                 {pending && !paid && (
-                  <Badge variant="outline" className="text-xs">Pending confirmation</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">Pending confirmation</Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        const { error } = await supabase.functions.invoke("confirm-escrow-payment", {
+                          body: { job_id: jobId },
+                        });
+                        if (!error) {
+                          toast({ title: "Payment confirmed!" });
+                          onPaymentComplete();
+                        } else {
+                          toast({ title: "Not yet confirmed", description: "Please try again shortly.", variant: "destructive" });
+                        }
+                      }}
+                    >
+                      <RefreshCw className="mr-1 h-3 w-3" /> Confirm
+                    </Button>
+                  </div>
                 )}
                 {isNext && !pending && !paid && m.payment_amount && (
                   <Button
