@@ -112,7 +112,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
                         }
                       }}
                     >
-                      <RefreshCw className="mr-1 h-3 w-3" /> Confirm
+                      <RefreshCw className="mr-1 h-3 w-3" /> Check Status
                     </Button>
                   </div>
                 )}
