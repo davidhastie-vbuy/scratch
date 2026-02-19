@@ -10,11 +10,57 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays } from "lucide-react";
+import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, CheckCircle2 } from "lucide-react";
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
 import MilestoneSetup from "@/components/MilestoneSetup";
 import { format } from "date-fns";
+
+/** Shows "awaiting payment" only if no escrow payments are held yet */
+const AwaitingPaymentNotice = ({ jobId }: { jobId: string }) => {
+  const [hasPayment, setHasPayment] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from("escrow_payments")
+      .select("id")
+      .eq("job_id", jobId)
+      .in("status", ["held", "released"])
+      .limit(1)
+      .then(({ data }) => setHasPayment((data ?? []).length > 0));
+  }, [jobId]);
+
+  if (hasPayment === null) return null; // loading
+  if (hasPayment) {
+    return (
+      <Card>
+        <CardContent className="py-4">
+          <div className="flex items-start gap-3 text-sm">
+            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium">Customer payment received</p>
+              <p className="text-muted-foreground">The first milestone payment has been confirmed. The job will move to in-progress shortly.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardContent className="py-4">
+        <div className="flex items-start gap-3 text-sm">
+          <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium">Milestones confirmed — awaiting customer payment</p>
+            <p className="text-muted-foreground">The customer has been asked to make the first milestone payment. Work will begin once payment is received.</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const ProviderJobDetail = () => {
   const { jobId } = useParams();
@@ -216,19 +262,9 @@ const ProviderJobDetail = () => {
         />
       )}
 
-      {/* Pending customer payment notice */}
+      {/* Pending customer payment notice - only show if no escrow payments are held yet */}
       {existingQuote?.status === "accepted" && job.status === "accepted" && (job as any).milestones_confirmed && (
-        <Card>
-          <CardContent className="py-4">
-            <div className="flex items-start gap-3 text-sm">
-              <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0 mt-0.5" />
-              <div>
-                <p className="font-medium">Milestones confirmed — awaiting customer payment</p>
-                <p className="text-muted-foreground">The customer has been asked to make the first milestone payment. Work will begin once payment is received.</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <AwaitingPaymentNotice jobId={jobId!} />
       )}
 
       {/* Work Tracker */}
