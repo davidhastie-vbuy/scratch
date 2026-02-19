@@ -29,6 +29,7 @@ import ProviderMessages from "@/pages/provider/ProviderMessages";
 import ProviderProfile from "@/pages/ProviderProfile";
 import ProviderPortfolio from "@/pages/provider/ProviderPortfolio";
 import ProviderCalendar from "@/pages/provider/ProviderCalendar";
+import ProviderAccount from "@/pages/provider/ProviderAccount";
 
 // Customer provider views
 import ProviderDirectory from "@/pages/customer/ProviderDirectory";
@@ -90,6 +91,7 @@ const App = () => (
               <Route path="calendar" element={<ProviderCalendar />} />
               <Route path="messages" element={<ProviderMessages />} />
               <Route path="portfolio" element={<ProviderPortfolio />} />
+              <Route path="account" element={<ProviderAccount />} />
               <Route path="support" element={<SupportPage />} />
               <Route path="profile" element={<ProviderProfile />} />
             </Route>

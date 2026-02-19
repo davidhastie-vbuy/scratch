@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Shield, Users, Wrench, Tag, HelpCircle, UserPlus, Star, MessageSquareWarning } from "lucide-react";
+import { LogOut, Shield, Users, Wrench, Tag, HelpCircle, UserPlus, Star, MessageSquareWarning, Banknote } from "lucide-react";
 import AdminCustomerList from "@/components/admin/AdminCustomerList";
 import AdminProviderList from "@/components/admin/AdminProviderList";
 import AdminCategoryList from "@/components/admin/AdminCategoryList";
@@ -9,6 +9,7 @@ import AdminSupportTickets from "@/components/admin/AdminSupportTickets";
 import AdminCreateAdmin from "@/components/admin/AdminCreateAdmin";
 import AdminRecommendations from "@/components/admin/AdminRecommendations";
 import AdminDisputes from "@/components/admin/AdminDisputes";
+import AdminPayouts from "@/components/admin/AdminPayouts";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -69,6 +70,10 @@ const AdminDashboard = () => {
               <MessageSquareWarning className="h-4 w-4" />
               Disputes
             </TabsTrigger>
+            <TabsTrigger value="payouts" className="gap-1.5">
+              <Banknote className="h-4 w-4" />
+              Payouts
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="providers">
             <AdminProviderList />
@@ -90,6 +95,9 @@ const AdminDashboard = () => {
           </TabsContent>
           <TabsContent value="disputes">
             <AdminDisputes />
+          </TabsContent>
+          <TabsContent value="payouts">
+            <AdminPayouts />
           </TabsContent>
         </Tabs>
       </main>
