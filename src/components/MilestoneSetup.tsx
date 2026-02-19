@@ -89,6 +89,9 @@ const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps
     setConfirming(true);
 
     try {
+      // Remove any previously saved (non-auto) milestones to prevent duplicates
+      await supabase.from("job_milestones").delete().eq("job_id", jobId).eq("is_auto", false);
+
       if (noMilestones) {
         // Single full-payment milestone
         const { error } = await supabase.from("job_milestones").insert({
