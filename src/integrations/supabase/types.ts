@@ -551,6 +551,48 @@ export type Database = {
         }
         Relationships: []
       }
+      payout_requests: {
+        Row: {
+          admin_note: string | null
+          amount: number
+          created_at: string
+          id: string
+          net_amount: number
+          platform_fee: number
+          provider_user_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["payout_status"]
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          net_amount?: number
+          platform_fee?: number
+          provider_user_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["payout_status"]
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          net_amount?: number
+          platform_fee?: number
+          provider_user_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["payout_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address_line_1: string | null
@@ -592,6 +634,36 @@ export type Database = {
           last_name?: string | null
           phone?: string | null
           postcode?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      provider_bank_details: {
+        Row: {
+          account_name: string
+          account_number: string
+          created_at: string
+          id: string
+          provider_user_id: string
+          sort_code: string
+          updated_at: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          created_at?: string
+          id?: string
+          provider_user_id: string
+          sort_code: string
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          created_at?: string
+          id?: string
+          provider_user_id?: string
+          sort_code?: string
           updated_at?: string
         }
         Relationships: []
@@ -815,6 +887,64 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          job_id: string | null
+          milestone_id: string | null
+          payout_request_id: string | null
+          provider_user_id: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          job_id?: string | null
+          milestone_id?: string | null
+          payout_request_id?: string | null
+          provider_user_id: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          job_id?: string | null
+          milestone_id?: string | null
+          payout_request_id?: string | null
+          provider_user_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_transactions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_transactions_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "job_milestones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_transactions_payout_request_id_fkey"
+            columns: ["payout_request_id"]
+            isOneToOne: false
+            referencedRelation: "payout_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotes: {
         Row: {
           availability: string | null
@@ -1004,6 +1134,7 @@ export type Database = {
         | "completed"
         | "cancelled"
       milestone_status: "pending" | "completed" | "accepted" | "flagged"
+      payout_status: "pending" | "approved" | "rejected"
       provider_status:
         | "pending"
         | "active"
@@ -1166,6 +1297,7 @@ export const Constants = {
         "cancelled",
       ],
       milestone_status: ["pending", "completed", "accepted", "flagged"],
+      payout_status: ["pending", "approved", "rejected"],
       provider_status: [
         "pending",
         "active",
