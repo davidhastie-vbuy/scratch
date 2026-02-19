@@ -10,53 +10,82 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, CheckCircle2 } from "lucide-react";
+import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, CheckCircle2, Circle, PoundSterling } from "lucide-react";
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
 import MilestoneSetup from "@/components/MilestoneSetup";
 import { format } from "date-fns";
 
-/** Shows "awaiting payment" only if no escrow payments are held yet */
-const AwaitingPaymentNotice = ({ jobId }: { jobId: string }) => {
-  const [hasPayment, setHasPayment] = useState<boolean | null>(null);
+/** Shows milestone overview with payment statuses for provider */
+const ProviderMilestoneOverview = ({ jobId }: { jobId: string }) => {
+  const [milestones, setMilestones] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
-      .from("escrow_payments")
-      .select("id")
-      .eq("job_id", jobId)
-      .in("status", ["held", "released"])
-      .limit(1)
-      .then(({ data }) => setHasPayment((data ?? []).length > 0));
+    Promise.all([
+      supabase.from("job_milestones").select("*").eq("job_id", jobId).order("sort_order"),
+      supabase.from("escrow_payments").select("*").eq("job_id", jobId).order("created_at"),
+    ]).then(([msRes, payRes]) => {
+      setMilestones(msRes.data ?? []);
+      setPayments(payRes.data ?? []);
+      setLoading(false);
+    });
   }, [jobId]);
 
-  if (hasPayment === null) return null; // loading
-  if (hasPayment) {
-    return (
-      <Card>
-        <CardContent className="py-4">
-          <div className="flex items-start gap-3 text-sm">
-            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium">Customer payment received</p>
-              <p className="text-muted-foreground">The first milestone payment has been confirmed. The job will move to in-progress shortly.</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  if (loading) return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
+  if (milestones.length === 0) return null;
+
+  const getPayment = (milestoneId: string) =>
+    payments.find(p => p.milestone_id === milestoneId && (p.status === "held" || p.status === "released"));
+
+  const totalHeld = payments.filter(p => p.status === "held").reduce((s, p) => s + Number(p.amount), 0);
+  const totalReleased = payments.filter(p => p.status === "released").reduce((s, p) => s + Number(p.provider_payout), 0);
 
   return (
     <Card>
-      <CardContent className="py-4">
-        <div className="flex items-start gap-3 text-sm">
-          <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0 mt-0.5" />
-          <div>
-            <p className="font-medium">Milestones confirmed — awaiting customer payment</p>
-            <p className="text-muted-foreground">The customer has been asked to make the first milestone payment. Work will begin once payment is received.</p>
-          </div>
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <PoundSterling className="h-4 w-4" /> Milestones & Payments
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="rounded-lg border bg-muted/30 p-3 text-sm space-y-1">
+          <div className="flex justify-between"><span className="text-muted-foreground">Held in Escrow</span><span>£{totalHeld.toFixed(2)}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">Released to You</span><span>£{totalReleased.toFixed(2)}</span></div>
         </div>
+        <div className="space-y-2">
+          {milestones.map(m => {
+            const paid = getPayment(m.id);
+            return (
+              <div key={m.id} className="flex items-center justify-between rounded-lg border p-3 text-sm">
+                <div className="flex items-center gap-2">
+                  {paid ? (
+                    <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
+                  ) : (
+                    <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
+                  )}
+                  <div>
+                    <p className="font-medium">{m.title}</p>
+                    {m.payment_amount && (
+                      <p className="text-xs text-muted-foreground">£{Number(m.payment_amount).toFixed(2)}</p>
+                    )}
+                  </div>
+                </div>
+                {paid ? (
+                  <Badge variant="default" className="text-xs">
+                    {paid.status === "released" ? "Released" : "Paid"}
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs">Awaiting payment</Badge>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Funds are held securely and released as customers accept completed milestones.
+        </p>
       </CardContent>
     </Card>
   );
@@ -262,9 +291,9 @@ const ProviderJobDetail = () => {
         />
       )}
 
-      {/* Pending customer payment notice - only show if no escrow payments are held yet */}
+      {/* Milestone & payment overview for provider */}
       {existingQuote?.status === "accepted" && job.status === "accepted" && (job as any).milestones_confirmed && (
-        <AwaitingPaymentNotice jobId={jobId!} />
+        <ProviderMilestoneOverview jobId={jobId!} />
       )}
 
       {/* Work Tracker */}
