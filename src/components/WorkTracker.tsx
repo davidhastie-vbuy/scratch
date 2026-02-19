@@ -120,7 +120,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const performAction = async (milestoneId: string, action: "complete" | "accept" | "flag" | "reconfirm") => {
     const comment = actionComment[milestoneId] || "";
     if (action === "flag" && !comment.trim()) {
-      toast({ title: "Comment required", description: "Please explain why you're flagging this milestone.", variant: "destructive" });
+      toast({ title: "Comment required", description: "Please explain your query about this milestone.", variant: "destructive" });
       return;
     }
     setActing(milestoneId);
@@ -152,6 +152,31 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       flag_count: flagCount,
       completed_at: (action === "complete" || action === "reconfirm") ? new Date().toISOString() : milestone?.completed_at,
     } as any).eq("id", milestoneId);
+
+    // If customer queries (flags) a milestone, send a message in the conversation
+    if (action === "flag" && role === "customer" && comment.trim()) {
+      try {
+        // Find or create conversation for this job
+        const { data: conv } = await supabase
+          .from("conversations")
+          .select("id")
+          .eq("job_id", jobId)
+          .eq("customer_user_id", user!.id)
+          .limit(1)
+          .maybeSingle();
+
+        if (conv) {
+          await supabase.from("messages").insert({
+            conversation_id: conv.id,
+            sender_user_id: user!.id,
+            body: `📋 **Milestone query: "${milestone?.title}"**\n\n${comment}`,
+            message_type: "text",
+          } as any);
+        }
+      } catch (e) {
+        console.error("Failed to send milestone query message:", e);
+      }
+    }
 
     // If customer accepts a milestone, trigger payment release
     if (action === "accept" && role === "customer") {
@@ -215,7 +240,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   if (loading) return <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
 
-  const showTracker = ["in_progress"].includes(job.status);
+  const showTracker = ["in_progress"].includes(job.status) || (job.status === "accepted" && job.milestones_confirmed);
   if (!showTracker) return null;
 
   return (
@@ -428,7 +453,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                           <Textarea
                             value={actionComment[m.id] || ""}
                             onChange={(e) => setActionComment((prev) => ({ ...prev, [m.id]: e.target.value }))}
-                            placeholder="Leave a comment (required for flagging)…"
+                            placeholder="Leave a comment (required for querying)…"
                             rows={2}
                             className="text-sm"
                           />
@@ -443,11 +468,11 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                             </Button>
                             <Button
                               size="sm"
-                              variant="destructive"
+                              variant="outline"
                               onClick={() => performAction(m.id, "flag")}
                               disabled={acting === m.id}
                             >
-                              <Flag className="mr-1 h-3 w-3" /> Flag Issue
+                              <Flag className="mr-1 h-3 w-3" /> Query
                             </Button>
                           </div>
                         </div>
