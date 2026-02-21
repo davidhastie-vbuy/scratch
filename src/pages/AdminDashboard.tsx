@@ -2,6 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogOut, Shield, Users, Wrench, Tag, HelpCircle, UserPlus, Star, MessageSquareWarning, Banknote } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import AdminCustomerList from "@/components/admin/AdminCustomerList";
 import AdminProviderList from "@/components/admin/AdminProviderList";
 import AdminCategoryList from "@/components/admin/AdminCategoryList";
@@ -23,6 +24,7 @@ const AdminDashboard = () => {
             <h1 className="font-display text-xl font-bold">BookATrade Admin</h1>
           </div>
           <div className="flex items-center gap-4">
+            <NotificationBell />
             <span className="rounded-full bg-sidebar-accent px-3 py-1 text-xs font-medium text-sidebar-accent-foreground">
               Admin
             </span>
