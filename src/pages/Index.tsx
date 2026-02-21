@@ -215,7 +215,7 @@ const Index = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="text-base border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
+            <Button size="lg" variant="outline" asChild className="text-base bg-transparent border-primary-foreground/60 text-primary-foreground hover:bg-primary-foreground/15 focus:bg-primary-foreground/15">
               <Link to="/login">Sign in</Link>
             </Button>
           </div>
