@@ -61,6 +61,8 @@ const ProviderProfile = () => {
   const [documents, setDocuments] = useState<{ id: string; file_name: string; file_url: string; file_size: number; file_type: string; uploaded_at: string }[]>([]);
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [providerProfileId, setProviderProfileId] = useState<string | null>(null);
+  const [providerStatus, setProviderStatus] = useState<string | null>(null);
+  const [resubmitting, setResubmitting] = useState(false);
 
   useEffect(() => {
     if (user) fetchProfile();
@@ -69,7 +71,7 @@ const ProviderProfile = () => {
   const fetchProfile = async () => {
     const { data } = await supabase
       .from("provider_profiles")
-      .select("id, business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category, additional_categories, pending_additional_categories, email_notifications_enabled")
+      .select("id, status, business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category, additional_categories, pending_additional_categories, email_notifications_enabled")
       .eq("user_id", user!.id)
       .single();
     if (data) {
@@ -89,6 +91,7 @@ const ProviderProfile = () => {
       });
       setEditedAreas(areas);
       setProviderProfileId(data.id);
+      setProviderStatus(data.status);
 
       // Fetch documents
       const { data: docs } = await supabase
@@ -113,6 +116,21 @@ const ProviderProfile = () => {
     if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
     else toast({ title: "Profile updated" });
     setSaving(false);
+  };
+
+  const handleResubmit = async () => {
+    setResubmitting(true);
+    const { error } = await supabase
+      .from("provider_profiles")
+      .update({ status: "pending_review" as any })
+      .eq("user_id", user!.id);
+    if (error) {
+      toast({ title: "Re-submit failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Application re-submitted", description: "Your updated application has been sent for admin review." });
+      setProviderStatus("pending_review");
+    }
+    setResubmitting(false);
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -288,6 +306,19 @@ const ProviderProfile = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      {providerStatus === "changes_requested" && (
+        <Card className="border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30">
+          <CardContent className="flex items-center justify-between gap-4 pt-6">
+            <div>
+              <p className="font-medium text-amber-800 dark:text-amber-200">Changes have been requested</p>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">Update your details and documents, then re-submit for review.</p>
+            </div>
+            <Button onClick={handleResubmit} disabled={resubmitting} className="shrink-0">
+              {resubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting…</> : "Re-submit for Review"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Business Information</CardTitle>
