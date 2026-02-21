@@ -7,12 +7,24 @@ import { Input } from "@/components/ui/input";
 import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
+import { cn } from "@/lib/utils";
+
+interface ConversationWithUnread {
+  id: string;
+  job_id: string;
+  provider_user_id: string;
+  customer_user_id: string;
+  jobs?: { title?: string; status?: string; id?: string };
+  unreadCount: number;
+  lastMessageBody: string | null;
+  lastMessageAt: string | null;
+}
 
 const CustomerMessages = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [selected, setSelected] = useState<any>(null);
+  const [conversations, setConversations] = useState<ConversationWithUnread[]>([]);
+  const [selected, setSelected] = useState<ConversationWithUnread | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [newMsg, setNewMsg] = useState("");
   const [loading, setLoading] = useState(true);
@@ -31,11 +43,40 @@ const CustomerMessages = () => {
       .select("*, jobs(title, status, id)")
       .eq("customer_user_id", user!.id)
       .order("created_at", { ascending: false });
-    setConversations(data ?? []);
+
+    if (!data) { setConversations([]); setLoading(false); return; }
+
+    // Fetch unread counts and last messages per conversation
+    const enriched: ConversationWithUnread[] = await Promise.all(
+      data.map(async (c: any) => {
+        const { count } = await supabase
+          .from("messages")
+          .select("id", { count: "exact", head: true })
+          .eq("conversation_id", c.id)
+          .neq("sender_user_id", user!.id)
+          .is("read_at", null);
+
+        const { data: lastMsg } = await supabase
+          .from("messages")
+          .select("body, created_at")
+          .eq("conversation_id", c.id)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+        return {
+          ...c,
+          unreadCount: count ?? 0,
+          lastMessageBody: lastMsg?.[0]?.body ?? null,
+          lastMessageAt: lastMsg?.[0]?.created_at ?? null,
+        };
+      })
+    );
+
+    setConversations(enriched);
     setLoading(false);
   };
 
-  const openConversation = async (conv: any) => {
+  const openConversation = async (conv: ConversationWithUnread) => {
     setSelected(conv);
     const { data } = await supabase
       .from("messages")
@@ -43,6 +84,20 @@ const CustomerMessages = () => {
       .eq("conversation_id", conv.id)
       .order("created_at");
     setMessages(data ?? []);
+
+    // Mark messages as read
+    await supabase
+      .from("messages")
+      .update({ read_at: new Date().toISOString() } as any)
+      .eq("conversation_id", conv.id)
+      .neq("sender_user_id", user!.id)
+      .is("read_at", null);
+
+    // Update local unread count
+    setConversations(prev =>
+      prev.map(c => c.id === conv.id ? { ...c, unreadCount: 0 } : c)
+    );
+
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
@@ -90,18 +145,18 @@ const CustomerMessages = () => {
       scheduled_start: proposal.start_date,
       scheduled_end: proposal.end_date || null,
       status: "accepted",
-      provider_id: selected.provider_user_id,
+      provider_id: selected!.provider_user_id,
     } as any).eq("id", jobId);
 
     await supabase.from("quotes").update({ status: "accepted" } as any)
       .eq("job_id", jobId)
-      .eq("provider_user_id", selected.provider_user_id);
+      .eq("provider_user_id", selected!.provider_user_id);
     await supabase.from("quotes").update({ status: "declined" } as any)
       .eq("job_id", jobId)
-      .neq("provider_user_id", selected.provider_user_id);
+      .neq("provider_user_id", selected!.provider_user_id);
 
     await supabase.from("messages").insert({
-      conversation_id: selected.id,
+      conversation_id: selected!.id,
       sender_user_id: user!.id,
       body: `✅ Terms confirmed! Price: £${Number(proposal.agreed_price).toFixed(2)}, starting ${new Date(proposal.start_date).toLocaleDateString()}, duration: ${proposal.duration}. Work has been scheduled.`,
       message_type: "system",
@@ -122,7 +177,7 @@ const CustomerMessages = () => {
     } as any).eq("id", message.id);
 
     await supabase.from("messages").insert({
-      conversation_id: selected.id,
+      conversation_id: selected!.id,
       sender_user_id: user!.id,
       body: "❌ The proposed terms were declined. Please discuss and submit a revised proposal.",
       message_type: "system",
@@ -134,12 +189,11 @@ const CustomerMessages = () => {
   };
 
   const handleCounterProposal = async (message: any) => {
-    // Get quote price range for this provider
     const { data: quotes } = await supabase
       .from("quotes")
       .select("price_min, price_max")
-      .eq("job_id", selected.job_id)
-      .eq("provider_user_id", selected.provider_user_id)
+      .eq("job_id", selected!.job_id)
+      .eq("provider_user_id", selected!.provider_user_id)
       .limit(1);
     const quote = quotes?.[0];
     setCounterDialog({
@@ -150,7 +204,6 @@ const CustomerMessages = () => {
 
   const sendCounterNegotiation = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
     if (!selected) return;
-    // Decline existing pending proposals
     for (const m of messages) {
       if ((m as any).message_type === "proposal" && (m as any).metadata?.status === "pending") {
         await supabase.from("messages").update({
@@ -195,11 +248,31 @@ const CustomerMessages = () => {
           conversations.map(c => (
             <div
               key={c.id}
-              className={`p-3 cursor-pointer hover:bg-accent/50 border-b text-sm ${selected?.id === c.id ? "bg-accent" : ""}`}
+              className={cn(
+                "p-3 cursor-pointer hover:bg-accent/50 border-b text-sm transition-colors",
+                selected?.id === c.id && "bg-accent",
+                c.unreadCount > 0 && selected?.id !== c.id && "bg-accent/20"
+              )}
               onClick={() => openConversation(c)}
             >
-              <p className="font-medium truncate">{(c as any).jobs?.title ?? "Job"}</p>
-              <p className="text-xs text-muted-foreground">Conversation</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className={cn("truncate", c.unreadCount > 0 ? "font-bold" : "font-medium")}>
+                  {c.jobs?.title ?? "Job"}
+                </p>
+                {c.unreadCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground shrink-0">
+                    {c.unreadCount > 9 ? "9+" : c.unreadCount}
+                  </span>
+                )}
+              </div>
+              {c.lastMessageBody && (
+                <p className={cn(
+                  "text-xs mt-0.5 truncate",
+                  c.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
+                )}>
+                  {c.lastMessageBody}
+                </p>
+              )}
             </div>
           ))
         )}
@@ -216,7 +289,7 @@ const CustomerMessages = () => {
         ) : (
           <>
             <div className="p-3 border-b">
-              <h3 className="font-semibold text-sm">{(selected as any).jobs?.title ?? "Chat"}</h3>
+              <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.map(m => {
