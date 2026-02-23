@@ -120,7 +120,8 @@ const PostJob = () => {
 
       setSubmitted(true);
     } catch (err: any) {
-      toast({ title: "Failed to post job", description: err.message, variant: "destructive" });
+      console.error("Job posting error:", err);
+      toast({ title: "Unable to post job right now", description: "Please try again. If this persists, contact support.", variant: "destructive" });
     }
     setLoading(false);
   };
