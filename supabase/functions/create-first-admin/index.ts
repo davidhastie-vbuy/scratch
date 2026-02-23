@@ -48,8 +48,9 @@ Deno.serve(async (req) => {
     });
 
     if (createError) {
+      console.error("First admin creation failed:", createError);
       return new Response(
-        JSON.stringify({ error: createError.message }),
+        JSON.stringify({ error: "Failed to create admin account" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -59,8 +60,9 @@ Deno.serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
+    console.error("create-first-admin error:", err);
     return new Response(
-      JSON.stringify({ error: err.message }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
