@@ -95,7 +95,24 @@ const ProviderJobDetail = () => {
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-  if (!job) return <p className="text-muted-foreground">Job not found.</p>;
+  
+  // If job is null, provider may have been declined — show minimal closed state
+  if (!job) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/provider/quotes")}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Quotes
+        </Button>
+        <Card>
+          <CardContent className="py-8 text-center">
+            <AlertTriangle className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
+            <h3 className="font-display text-lg font-semibold">Job no longer available</h3>
+            <p className="text-sm text-muted-foreground mt-1">This job has been awarded to another provider. Details are no longer accessible.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const catName = categories.find(c => c.slug === job.category)?.name ?? job.category;
   const hasConfirmedPayment = escrowPayments.some((p: any) => p.status === "held" || p.status === "released");
