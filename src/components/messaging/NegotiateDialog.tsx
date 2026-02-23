@@ -1,67 +1,49 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Loader2, Send } from "lucide-react";
-import { format, addDays, addHours } from "date-fns";
-import { cn } from "@/lib/utils";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Loader2, Send } from "lucide-react";
+
+const URGENCY_OPTIONS = [
+  { value: "asap", label: "ASAP" },
+  { value: "within_a_week", label: "Within a week" },
+  { value: "within_a_month", label: "Within a month" },
+  { value: "within_3_months", label: "Within 3 months" },
+  { value: "within_6_months", label: "Within 6 months" },
+  { value: "within_12_months", label: "Within 12 months" },
+];
 
 interface Props {
   open: boolean;
   onClose: () => void;
   priceMin: number;
   priceMax: number;
-  onSubmit: (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => Promise<void>;
+  onSubmit: (data: { agreed_price: number; urgency: string; urgency_label: string }) => Promise<void>;
 }
 
 const NegotiateDialog = ({ open, onClose, priceMin, priceMax, onSubmit }: Props) => {
   const [price, setPrice] = useState(String(priceMin));
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [startTime, setStartTime] = useState("09:00");
-  const [durationDays, setDurationDays] = useState("1");
-  const [durationHours, setDurationHours] = useState("0");
+  const [urgency, setUrgency] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const parsedPrice = parseFloat(price);
-  const parsedDays = parseInt(durationDays) || 0;
-  const parsedHours = parseInt(durationHours) || 0;
-
-  const endDate = useMemo(() => {
-    if (!startDate || (parsedDays === 0 && parsedHours === 0)) return null;
-    const [h, m] = startTime.split(":").map(Number);
-    const start = new Date(startDate);
-    start.setHours(h || 0, m || 0, 0, 0);
-    return addHours(addDays(start, parsedDays), parsedHours);
-  }, [startDate, startTime, parsedDays, parsedHours]);
-
   const priceValid = !isNaN(parsedPrice) && parsedPrice >= priceMin && parsedPrice <= priceMax;
-  const durationValid = parsedDays > 0 || parsedHours > 0;
-  const isValid = priceValid && startDate && durationValid;
-
-  const durationLabel = [
-    parsedDays > 0 ? `${parsedDays} day${parsedDays !== 1 ? "s" : ""}` : "",
-    parsedHours > 0 ? `${parsedHours} hour${parsedHours !== 1 ? "s" : ""}` : "",
-  ].filter(Boolean).join(", ");
+  const isValid = priceValid && urgency;
 
   const handleSubmit = async () => {
-    if (!isValid || !endDate) return;
+    if (!isValid) return;
+    const urgencyLabel = URGENCY_OPTIONS.find(o => o.value === urgency)?.label || urgency;
     setSubmitting(true);
     await onSubmit({
       agreed_price: parsedPrice,
-      start_date: startDate!.toISOString(),
-      start_time: startTime,
-      duration: durationLabel,
-      end_date: endDate.toISOString(),
+      urgency,
+      urgency_label: urgencyLabel,
     });
     setSubmitting(false);
     setPrice(String(priceMin));
-    setStartDate(undefined);
-    setStartTime("09:00");
-    setDurationDays("1");
-    setDurationHours("0");
+    setUrgency("");
     onClose();
   };
 
@@ -73,7 +55,7 @@ const NegotiateDialog = ({ open, onClose, priceMin, priceMax, onSubmit }: Props)
         </DialogHeader>
         <div className="space-y-4 py-2">
           <p className="text-sm text-muted-foreground">
-            Propose your terms to the provider. They can accept or counter with alternative terms.
+            Propose a price and how soon you'd like the work done. The provider can accept or counter with their own terms.
           </p>
 
           {/* Price */}
@@ -95,73 +77,18 @@ const NegotiateDialog = ({ open, onClose, priceMin, priceMax, onSubmit }: Props)
             )}
           </div>
 
-          {/* Start Date */}
-          <div className="space-y-2">
-            <Label>Proposed Start Date *</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !startDate && "text-muted-foreground")}>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? format(startDate, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={startDate}
-                  onSelect={setStartDate}
-                  disabled={(date) => date < new Date()}
-                  className="p-3 pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Start Time */}
-          <div className="space-y-2">
-            <Label>Start Time</Label>
-            <Input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
-          </div>
-
-          {/* Duration */}
-          <div className="space-y-2">
-            <Label>Estimated Duration *</Label>
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={durationDays}
-                    onChange={e => setDurationDays(e.target.value)}
-                    min="0"
-                    className="w-full"
-                  />
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">days</span>
+          {/* Urgency */}
+          <div className="space-y-3">
+            <Label>How soon do you need this done? *</Label>
+            <RadioGroup value={urgency} onValueChange={setUrgency} className="grid gap-2">
+              {URGENCY_OPTIONS.map(opt => (
+                <div key={opt.value} className="flex items-center space-x-2">
+                  <RadioGroupItem value={opt.value} id={`urgency-${opt.value}`} />
+                  <Label htmlFor={`urgency-${opt.value}`} className="font-normal cursor-pointer">{opt.label}</Label>
                 </div>
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={durationHours}
-                    onChange={e => setDurationHours(e.target.value)}
-                    min="0"
-                    max="23"
-                    className="w-full"
-                  />
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">hours</span>
-                </div>
-              </div>
-            </div>
+              ))}
+            </RadioGroup>
           </div>
-
-          {/* Calculated End Date */}
-          {endDate && (
-            <div className="rounded-md bg-muted/50 p-3 text-sm">
-              <span className="text-muted-foreground">Estimated end: </span>
-              <span className="font-medium">{format(endDate, "PPP 'at' h:mm a")}</span>
-            </div>
-          )}
 
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={onClose}>Cancel</Button>

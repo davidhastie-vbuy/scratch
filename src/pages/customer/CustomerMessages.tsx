@@ -232,7 +232,7 @@ const CustomerMessages = () => {
     });
   };
 
-  const sendCounterNegotiation = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
+  const sendCounterNegotiation = async (data: { agreed_price: number; urgency: string; urgency_label: string }) => {
     if (!selected) return;
     for (const m of messages) {
       if ((m as any).message_type === "proposal" && (m as any).metadata?.status === "pending") {
@@ -244,7 +244,7 @@ const CustomerMessages = () => {
     await supabase.from("messages").insert({
       conversation_id: selected.id,
       sender_user_id: user!.id,
-      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}, starting ${new Date(data.start_date).toLocaleDateString()}, duration: ${data.duration}`,
+      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}, needed: ${data.urgency_label}`,
       message_type: "proposal",
       metadata: { ...data, status: "pending" },
     } as any);
