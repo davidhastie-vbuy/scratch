@@ -507,7 +507,7 @@ const JobDetail = () => {
                     <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/providers/${q.provider_user_id}`)}>
                       View Provider
                     </Button>
-                    {!jobAwarded && (
+                    {(!jobAwarded || q.status === "accepted") && (
                       <Button variant="outline" size="sm" onClick={() => openChat(q.provider_user_id, q.id)}>
                         <MessageSquare className="mr-2 h-4 w-4" /> Message Provider
                       </Button>
