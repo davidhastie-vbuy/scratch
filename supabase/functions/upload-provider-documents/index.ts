@@ -27,16 +27,27 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Get the provider profile created by the trigger
-    const { data: profile, error: profileErr } = await supabase
-      .from("provider_profiles")
-      .select("id")
-      .eq("user_id", userId)
-      .single();
+    // Get the provider profile created by the trigger (with retry for race condition)
+    let profile: { id: string } | null = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const { data, error: profileErr } = await supabase
+        .from("provider_profiles")
+        .select("id")
+        .eq("user_id", userId)
+        .single();
 
-    if (profileErr || !profile) {
+      if (data) {
+        profile = data;
+        break;
+      }
+      console.log(`Profile not found yet, attempt ${attempt + 1}/5, waiting...`);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    if (!profile) {
+      console.error("Provider profile not found after 5 attempts for user:", userId);
       return new Response(
-        JSON.stringify({ error: "Provider profile not found. It may not have been created yet." }),
+        JSON.stringify({ error: "Provider profile not found after retries. It may not have been created yet." }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
