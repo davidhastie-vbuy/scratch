@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye, AlertTriangle, History, MessageSquare } from "lucide-react";
+import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye, AlertTriangle, History, MessageSquare, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -79,6 +80,8 @@ const AdminProviderList = () => {
   const [editDocs, setEditDocs] = useState<ProviderDocument[]>([]);
   const [editDocsLoading, setEditDocsLoading] = useState(false);
   const [newArea, setNewArea] = useState("");
+  const [deletingProvider, setDeletingProvider] = useState<ProviderWithEmail | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const { toast } = useToast();
   const { categories: tradeCategories } = useTradeCategories(false);
 
@@ -339,6 +342,25 @@ const AdminProviderList = () => {
 
   const tradeName = (cat: string) => tradeCategories.find((t) => t.slug === cat)?.name ?? cat;
 
+  const handleDeleteProvider = async () => {
+    if (!deletingProvider) return;
+    setDeleteLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-user", {
+        body: { user_id: deletingProvider.user_id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: "Account deleted", description: `${deletingProvider.business_name} has been removed.` });
+      setDeletingProvider(null);
+      fetchProviders();
+    } catch (err: any) {
+      toast({ title: "Error deleting account", description: err.message, variant: "destructive" });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -426,6 +448,9 @@ const AdminProviderList = () => {
                         </Button>
                         <Button variant="ghost" size="icon" onClick={() => openEdit(p)} title="Edit profile">
                           <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setDeletingProvider(p)} title="Delete account">
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -876,6 +901,24 @@ const AdminProviderList = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deletingProvider} onOpenChange={(o) => !o && setDeletingProvider(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Provider Account</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{deletingProvider?.business_name}</strong> ({deletingProvider?.email || "no email"}) and all associated data. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteProvider} disabled={deleteLoading} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleteLoading ? "Deleting…" : "Delete Account"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
