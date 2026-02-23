@@ -69,7 +69,7 @@ const MyJobs = () => {
                   <span>{categories.find(c => c.slug === job.category)?.name ?? job.category}</span>
                   <span>•</span>
                   <span>{job.postcode_district}</span>
-                  {job.budget && <><span>•</span><span>{job.budget}</span></>}
+                  
                   <span>•</span>
                   <span>{job.quote_count}/3 quotes</span>
                 </div>

@@ -33,7 +33,7 @@ const JobDetail = () => {
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ title: "", description: "", timeline: "", budget: "" });
+  const [editForm, setEditForm] = useState({ title: "", description: "", timeline: "" });
   const [saving, setSaving] = useState(false);
 
   // Negotiate dialog
@@ -90,7 +90,6 @@ const JobDetail = () => {
         title: jobRes.data.title,
         description: jobRes.data.description,
         timeline: jobRes.data.timeline ?? "",
-        budget: jobRes.data.budget ?? "",
       });
     }
     setQuotes(quotesRes.data ?? []);
@@ -105,7 +104,6 @@ const JobDetail = () => {
       title: editForm.title.trim(),
       description: editForm.description.trim(),
       timeline: editForm.timeline || null,
-      budget: editForm.budget || null,
     } as any).eq("id", jobId!);
     if (error) {
       toast({ title: "Save failed", description: error.message, variant: "destructive" });
@@ -411,10 +409,6 @@ const JobDetail = () => {
                   <Label>Timeline</Label>
                   <Input value={editForm.timeline} onChange={e => setEditForm(f => ({ ...f, timeline: e.target.value }))} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Budget</Label>
-                  <Input value={editForm.budget} onChange={e => setEditForm(f => ({ ...f, budget: e.target.value }))} />
-                </div>
               </div>
               <div className="flex gap-2">
                 <Button onClick={handleSave} disabled={saving}>
@@ -429,7 +423,6 @@ const JobDetail = () => {
                 <div className="flex justify-between"><span className="text-muted-foreground">Category</span><span>{catName}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.postcode_district}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Timeline</span><span>{job.timeline || "—"}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Budget</span><span>{job.budget || "—"}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Quotes</span><span>{job.quote_count}/3</span></div>
                 {job.agreed_price && (
                   <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number(job.agreed_price).toFixed(2)}</span></div>

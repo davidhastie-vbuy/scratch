@@ -100,7 +100,7 @@ const AvailableJobs = () => {
           <span>{categories.find(c => c.slug === job.category)?.name ?? job.category}</span>
           <span>•</span>
           <span>{job.postcode_district}</span>
-          {job.budget && <><span>•</span><span>{job.budget}</span></>}
+          
           {job.timeline && <><span>•</span><span>{job.timeline}</span></>}
         </div>
         <p className="text-xs text-muted-foreground mt-2">Posted {new Date(job.created_at).toLocaleDateString()}</p>
