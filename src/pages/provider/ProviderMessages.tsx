@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ProposeTermsDialog from "@/components/messaging/ProposeTermsDialog";
+import { AttachmentButton, StagedFilePreview, MessageAttachments, uploadAttachments, type StagedFile } from "@/components/messaging/ChatAttachments";
 import { cn } from "@/lib/utils";
 
 interface ConversationWithUnread {
@@ -26,7 +27,9 @@ const ProviderMessages = () => {
   const [conversations, setConversations] = useState<ConversationWithUnread[]>([]);
   const [selected, setSelected] = useState<ConversationWithUnread | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
+  const [attachmentMap, setAttachmentMap] = useState<Record<string, any[]>>({});
   const [newMsg, setNewMsg] = useState("");
+  const [stagedFiles, setStagedFiles] = useState<StagedFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [proposeOpen, setProposeOpen] = useState(false);
@@ -76,16 +79,34 @@ const ProviderMessages = () => {
     setLoading(false);
   };
 
+  const fetchAttachments = async (messageIds: string[]) => {
+    if (messageIds.length === 0) return;
+    const { data } = await supabase
+      .from("message_attachments")
+      .select("message_id, file_url, file_name, file_type")
+      .in("message_id", messageIds);
+    if (data) {
+      const map: Record<string, any[]> = {};
+      for (const a of data) {
+        if (!map[a.message_id]) map[a.message_id] = [];
+        map[a.message_id].push(a);
+      }
+      setAttachmentMap(map);
+    }
+  };
+
   const openConversation = async (conv: ConversationWithUnread) => {
     setSelected(conv);
+    setStagedFiles([]);
     const { data } = await supabase
       .from("messages")
       .select("*")
       .eq("conversation_id", conv.id)
       .order("created_at");
-    setMessages(data ?? []);
+    const msgs = data ?? [];
+    setMessages(msgs);
+    fetchAttachments(msgs.map((m: any) => m.id));
 
-    // Mark messages as read
     await supabase
       .from("messages")
       .update({ read_at: new Date().toISOString() } as any)
@@ -101,13 +122,22 @@ const ProviderMessages = () => {
   };
 
   const sendMessage = async () => {
-    if (!newMsg.trim() || !selected) return;
+    if ((!newMsg.trim() && stagedFiles.length === 0) || !selected) return;
     setSending(true);
-    await supabase.from("messages").insert({
+
+    const body = newMsg.trim() || (stagedFiles.length > 0 ? `📎 ${stagedFiles.length} attachment${stagedFiles.length > 1 ? "s" : ""}` : "");
+
+    const { data: inserted } = await supabase.from("messages").insert({
       conversation_id: selected.id,
       sender_user_id: user!.id,
-      body: newMsg.trim(),
-    } as any);
+      body,
+    } as any).select("id").single();
+
+    if (inserted && stagedFiles.length > 0) {
+      await uploadAttachments(stagedFiles, inserted.id, user!.id);
+      setStagedFiles([]);
+    }
+
     setNewMsg("");
     await refreshMessages();
     setSending(false);
@@ -120,7 +150,9 @@ const ProviderMessages = () => {
       .select("*")
       .eq("conversation_id", selected.id)
       .order("created_at");
-    setMessages(data ?? []);
+    const msgs = data ?? [];
+    setMessages(msgs);
+    fetchAttachments(msgs.map((m: any) => m.id));
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
@@ -312,6 +344,7 @@ const ProviderMessages = () => {
                   <div key={m.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[70%] rounded-lg px-3 py-2 text-sm ${isOwn ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                       <p>{m.body}</p>
+                      <MessageAttachments messageId={m.id} attachments={attachmentMap[m.id] || []} />
                       <p className={`text-[10px] mt-1 ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
                         {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </p>
@@ -321,9 +354,11 @@ const ProviderMessages = () => {
               })}
               <div ref={bottomRef} />
             </div>
+            <StagedFilePreview stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} />
             <div className="p-3 border-t flex gap-2">
+              <AttachmentButton stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} disabled={sending} />
               <Input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message…" onKeyDown={e => e.key === "Enter" && sendMessage()} />
-              <Button size="icon" onClick={sendMessage} disabled={sending || !newMsg.trim()}>
+              <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && stagedFiles.length === 0)}>
                 <Send className="h-4 w-4" />
               </Button>
             </div>
