@@ -379,6 +379,8 @@ const JobDetail = () => {
   const catName = categories.find(c => c.slug === job.category)?.name ?? job.category;
   const totalHeld = escrowPayments.filter(p => p.status === "held").reduce((s, p) => s + Number(p.amount), 0);
   const totalPending = escrowPayments.filter(p => p.status === "pending").reduce((s, p) => s + Number(p.amount), 0);
+  const hasConfirmedPayment = escrowPayments.some(p => p.status === "held" || p.status === "released");
+  const paymentRequired = ["accepted", "in_progress"].includes(job.status) && job.agreed_price && (job as any).milestones_confirmed && !hasConfirmedPayment;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -565,11 +567,28 @@ const JobDetail = () => {
         </Card>
       )}
 
-      {/* Work Tracker */}
-      <WorkTracker jobId={jobId!} job={job} role="customer" onRefresh={fetchAll} />
+      {/* Payment Required Warning */}
+      {paymentRequired && (
+        <Card className="border-destructive/50 bg-destructive/5">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3 text-sm">
+              <CreditCard className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium text-destructive">Payment must be completed before this job can proceed.</p>
+                <p className="text-muted-foreground">Please make the first milestone payment above to unlock scheduling, milestones, and work tracking.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Schedule */}
-      {["accepted", "in_progress"].includes(job.status) && (
+      {/* Work Tracker - gated behind payment */}
+      {hasConfirmedPayment && (
+        <WorkTracker jobId={jobId!} job={job} role="customer" onRefresh={fetchAll} />
+      )}
+
+      {/* Schedule - gated behind payment */}
+      {["accepted", "in_progress"].includes(job.status) && hasConfirmedPayment && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
