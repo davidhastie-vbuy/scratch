@@ -37,10 +37,10 @@ const JobDetail = () => {
   const [saving, setSaving] = useState(false);
 
   // Negotiate dialog
-  const [negotiateDialog, setNegotiateDialog] = useState<{ quoteId: string; providerUserId: string; priceMin: number; priceMax: number } | null>(null);
+  const [negotiateDialog, setNegotiateDialog] = useState<{ quoteId: string; providerUserId: string; quotedRange?: { min: number; max: number } } | null>(null);
 
   // Counter-propose from chat
-  const [counterDialog, setCounterDialog] = useState<{ priceMin: number; priceMax: number; defaults: any } | null>(null);
+  const [counterDialog, setCounterDialog] = useState<{ quotedRange?: { min: number; max: number }; defaults: any } | null>(null);
   const [chatAccepting, setChatAccepting] = useState(false);
 
   // Payment
@@ -121,8 +121,7 @@ const JobDetail = () => {
     setNegotiateDialog({
       quoteId: q.id,
       providerUserId: q.provider_user_id,
-      priceMin: Number(q.price_min),
-      priceMax: Number(q.price_max),
+      quotedRange: { min: Number(q.price_min), max: Number(q.price_max) },
     });
   };
 
@@ -323,8 +322,7 @@ const JobDetail = () => {
     // Find the quote to get price range
     const quote = quotes.find(q => q.provider_user_id === chatDialog?.providerUserId);
     setCounterDialog({
-      priceMin: quote ? Number(quote.price_min) : 1,
-      priceMax: quote ? Number(quote.price_max) : 999999,
+      quotedRange: quote ? { min: Number(quote.price_min), max: Number(quote.price_max) } : undefined,
       defaults: {
         agreed_price: meta.agreed_price,
         start_date: meta.start_date,
@@ -594,8 +592,7 @@ const JobDetail = () => {
         <NegotiateDialog
           open={!!negotiateDialog}
           onClose={() => setNegotiateDialog(null)}
-          priceMin={negotiateDialog.priceMin}
-          priceMax={negotiateDialog.priceMax}
+          quotedRange={negotiateDialog.quotedRange}
           onSubmit={sendNegotiation}
         />
       )}
@@ -680,8 +677,8 @@ const JobDetail = () => {
         <NegotiateDialog
           open={!!counterDialog}
           onClose={() => setCounterDialog(null)}
-          priceMin={counterDialog.priceMin}
-          priceMax={counterDialog.priceMax}
+          quotedRange={counterDialog.quotedRange}
+          defaults={counterDialog.defaults}
           onSubmit={sendCounterProposal}
         />
       )}
