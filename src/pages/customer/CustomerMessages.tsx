@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
+import { Loader2, MessageSquare, Send, Handshake, Lock } from "lucide-react";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import ChatImageUpload from "@/components/messaging/ChatImageUpload";
@@ -16,7 +16,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; id?: string };
+  jobs?: { title?: string; status?: string; id?: string; provider_id?: string | null };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
@@ -45,7 +45,7 @@ const CustomerMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title, status, id)")
+      .select("*, jobs(title, status, id, provider_id)")
       .eq("customer_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -284,6 +284,7 @@ const CustomerMessages = () => {
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
+  const isConversationClosed = jobAccepted && selected?.jobs?.provider_id != null && selected.provider_user_id !== selected.jobs.provider_id;
 
   return (
     <div className="flex gap-4 h-[calc(100vh-12rem)]">
@@ -379,24 +380,33 @@ const CustomerMessages = () => {
               })}
               <div ref={bottomRef} />
             </div>
-            <div className="p-3 border-t flex gap-2 items-center">
-              <ChatImageUpload
-                onFileSelected={setPendingFile}
-                uploading={uploading}
-                pendingFile={pendingFile}
-                onClear={() => setPendingFile(null)}
-              />
-              <Input
-                value={newMsg}
-                onChange={e => setNewMsg(e.target.value)}
-                placeholder="Type a message…"
-                onKeyDown={e => e.key === "Enter" && sendMessage()}
-                className="flex-1"
-              />
-              <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && !pendingFile)}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+            {isConversationClosed ? (
+              <div className="p-3 border-t">
+                <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
+                  <Lock className="h-4 w-4 shrink-0" />
+                  This conversation is closed because another provider was selected.
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 border-t flex gap-2 items-center">
+                <ChatImageUpload
+                  onFileSelected={setPendingFile}
+                  uploading={uploading}
+                  pendingFile={pendingFile}
+                  onClear={() => setPendingFile(null)}
+                />
+                <Input
+                  value={newMsg}
+                  onChange={e => setNewMsg(e.target.value)}
+                  placeholder="Type a message…"
+                  onKeyDown={e => e.key === "Enter" && sendMessage()}
+                  className="flex-1"
+                />
+                <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && !pendingFile)}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </>
         )}
       </div>
