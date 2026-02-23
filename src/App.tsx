@@ -25,6 +25,7 @@ import ProviderHome from "@/pages/provider/ProviderHome";
 import AvailableJobs from "@/pages/provider/AvailableJobs";
 import ProviderJobDetail from "@/pages/provider/ProviderJobDetail";
 import MyQuotes from "@/pages/provider/MyQuotes";
+import ProviderMyJobs from "@/pages/provider/ProviderMyJobs";
 import ProviderMessages from "@/pages/provider/ProviderMessages";
 import ProviderProfile from "@/pages/ProviderProfile";
 import ProviderPortfolio from "@/pages/provider/ProviderPortfolio";
@@ -88,6 +89,7 @@ const App = () => (
               <Route path="jobs" element={<AvailableJobs />} />
               <Route path="jobs/:jobId" element={<ProviderJobDetail />} />
               <Route path="quotes" element={<MyQuotes />} />
+              <Route path="my-jobs" element={<ProviderMyJobs />} />
               <Route path="calendar" element={<ProviderCalendar />} />
               <Route path="messages" element={<ProviderMessages />} />
               <Route path="portfolio" element={<ProviderPortfolio />} />
