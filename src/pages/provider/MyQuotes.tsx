@@ -52,21 +52,35 @@ const MyQuotes = () => {
         {quotes.map(q => {
           const st = STATUS_MAP[q.status] ?? { label: q.status, variant: "secondary" as const };
           const job = (q as any).jobs;
+          const isDeclined = q.status === "declined";
+
           return (
-            <Card key={q.id} className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate(`/provider/jobs/${q.job_id}`)}>
+            <Card
+              key={q.id}
+              className={`transition-colors ${isDeclined ? "opacity-70" : "cursor-pointer hover:bg-accent/30"}`}
+              onClick={() => { if (!isDeclined) navigate(`/provider/jobs/${q.job_id}`); }}
+            >
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <CardTitle className="text-base">{job?.title ?? "Job"}</CardTitle>
-                  <Badge variant={st.variant}>{st.label}</Badge>
+                  <Badge variant={isDeclined ? "destructive" : st.variant}>
+                    {isDeclined ? "Not Selected" : st.label}
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                  <span>£{Number(q.price_min).toFixed(0)} – £{Number(q.price_max).toFixed(0)}</span>
-                  <span>•</span>
-                  <span>{job?.postcode_district}</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">Quoted {new Date(q.created_at).toLocaleDateString()}</p>
+                {isDeclined ? (
+                  <p className="text-sm text-muted-foreground">This job was awarded to another provider.</p>
+                ) : (
+                  <>
+                    <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                      <span>£{Number(q.price_min).toFixed(0)} – £{Number(q.price_max).toFixed(0)}</span>
+                      <span>•</span>
+                      <span>{job?.postcode_district}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">Quoted {new Date(q.created_at).toLocaleDateString()}</p>
+                  </>
+                )}
               </CardContent>
             </Card>
           );
