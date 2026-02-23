@@ -97,6 +97,40 @@ const ProviderJobDetail = () => {
   const catName = categories.find(c => c.slug === job.category)?.name ?? job.category;
   const quotesMaxed = job.quote_count >= 3;
 
+  // If this provider's quote was declined and job is awarded, show restricted view
+  const isDeclined = existingQuote?.status === "declined";
+  const jobAwarded = ["accepted", "in_progress", "completed"].includes(job.status);
+
+  if (isDeclined && jobAwarded) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/provider/jobs")}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Jobs
+        </Button>
+        <Card>
+          <CardHeader>
+            <CardTitle>{job.title}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2 text-sm">
+              <div className="flex justify-between"><span className="text-muted-foreground">Category</span><span>{catName}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.postcode_district}</span></div>
+            </div>
+            <div className="rounded-lg border border-muted bg-muted/30 p-4 text-sm space-y-2">
+              <p className="font-medium">This job has been awarded to another provider</p>
+              <p className="text-muted-foreground">Unfortunately, your quote was not selected for this job. The customer chose a different provider.</p>
+              <p className="text-muted-foreground">Don't be discouraged — keep quoting on jobs that match your skills and area.</p>
+            </div>
+            <div className="text-sm">
+              <p className="text-muted-foreground">Your quote: £{Number(existingQuote.price_min).toFixed(0)} – £{Number(existingQuote.price_max).toFixed(0)}</p>
+              <p className="text-xs text-muted-foreground mt-1">Submitted {new Date(existingQuote.created_at).toLocaleDateString()}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <Button variant="ghost" size="sm" onClick={() => navigate("/provider/jobs")}>
@@ -215,9 +249,6 @@ const ProviderJobDetail = () => {
           onConfirmed={fetchAll}
         />
       )}
-
-
-
 
       {/* Work Tracker */}
       <WorkTracker jobId={jobId!} job={job} role="provider" onRefresh={fetchAll} />

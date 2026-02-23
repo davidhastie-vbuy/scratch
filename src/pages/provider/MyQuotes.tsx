@@ -52,20 +52,27 @@ const MyQuotes = () => {
         {quotes.map(q => {
           const st = STATUS_MAP[q.status] ?? { label: q.status, variant: "secondary" as const };
           const job = (q as any).jobs;
+          const isDeclinedAndAwarded = q.status === "declined" && job && ["accepted", "in_progress", "completed"].includes(job.status);
           return (
             <Card key={q.id} className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate(`/provider/jobs/${q.job_id}`)}>
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <CardTitle className="text-base">{job?.title ?? "Job"}</CardTitle>
-                  <Badge variant={st.variant}>{st.label}</Badge>
+                  <Badge variant={st.variant}>
+                    {isDeclinedAndAwarded ? "Not selected" : st.label}
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                  <span>£{Number(q.price_min).toFixed(0)} – £{Number(q.price_max).toFixed(0)}</span>
-                  <span>•</span>
-                  <span>{job?.postcode_district}</span>
-                </div>
+                {isDeclinedAndAwarded ? (
+                  <p className="text-sm text-muted-foreground">This job was awarded to another provider.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                    <span>£{Number(q.price_min).toFixed(0)} – £{Number(q.price_max).toFixed(0)}</span>
+                    <span>•</span>
+                    <span>{job?.postcode_district}</span>
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground mt-2">Quoted {new Date(q.created_at).toLocaleDateString()}</p>
               </CardContent>
             </Card>

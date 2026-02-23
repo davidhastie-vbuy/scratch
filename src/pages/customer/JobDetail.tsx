@@ -478,39 +478,49 @@ const JobDetail = () => {
 
       {/* Quotes */}
       <Card>
-        <CardHeader><CardTitle className="text-base">Quotes ({quotes.length}/3)</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">
+          {job.status === "accepted" || job.status === "in_progress" || job.status === "completed"
+            ? "Accepted Provider"
+            : `Quotes (${quotes.length}/3)`}
+        </CardTitle></CardHeader>
         <CardContent className="space-y-4">
           {quotes.length === 0 ? (
             <p className="text-sm text-muted-foreground">No quotes received yet.</p>
           ) : (
-            quotes.map(q => (
-              <div key={q.id} className="rounded-lg border p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm">£{Number(q.price_min).toFixed(0)} – £{Number(q.price_max).toFixed(0)}</span>
-                  <Badge variant={q.status === "accepted" ? "default" : q.status === "declined" ? "destructive" : "secondary"}>
-                    {q.status}
-                  </Badge>
-                </div>
-                {q.message && <p className="text-sm text-muted-foreground">{q.message}</p>}
-                <div className="flex gap-3 text-xs text-muted-foreground">
-                  {q.availability && <span>Available: {q.availability}</span>}
-                  {q.estimated_duration && <span>Duration: {q.estimated_duration}</span>}
-                </div>
-                <div className="flex gap-2 items-center flex-wrap">
-                  <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/providers/${q.provider_user_id}`)}>
-                    View Provider
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => openChat(q.provider_user_id, q.id)}>
-                    <MessageSquare className="mr-2 h-4 w-4" /> Message Provider
-                  </Button>
-                  {q.status === "pending" && job.status !== "cancelled" && (
-                    <Button size="sm" onClick={() => openNegotiateDialog(q)}>
-                      <Handshake className="mr-2 h-4 w-4" /> Negotiate
+            (() => {
+              const jobAwarded = ["accepted", "in_progress", "completed"].includes(job.status);
+              const visibleQuotes = jobAwarded ? quotes.filter(q => q.status === "accepted") : quotes;
+              return visibleQuotes.map(q => (
+                <div key={q.id} className="rounded-lg border p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-sm">£{Number(q.price_min).toFixed(0)} – £{Number(q.price_max).toFixed(0)}</span>
+                    <Badge variant={q.status === "accepted" ? "default" : q.status === "declined" ? "destructive" : "secondary"}>
+                      {q.status}
+                    </Badge>
+                  </div>
+                  {q.message && <p className="text-sm text-muted-foreground">{q.message}</p>}
+                  <div className="flex gap-3 text-xs text-muted-foreground">
+                    {q.availability && <span>Available: {q.availability}</span>}
+                    {q.estimated_duration && <span>Duration: {q.estimated_duration}</span>}
+                  </div>
+                  <div className="flex gap-2 items-center flex-wrap">
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/providers/${q.provider_user_id}`)}>
+                      View Provider
                     </Button>
-                  )}
+                    {!jobAwarded && (
+                      <Button variant="outline" size="sm" onClick={() => openChat(q.provider_user_id, q.id)}>
+                        <MessageSquare className="mr-2 h-4 w-4" /> Message Provider
+                      </Button>
+                    )}
+                    {q.status === "pending" && job.status !== "cancelled" && !jobAwarded && (
+                      <Button size="sm" onClick={() => openNegotiateDialog(q)}>
+                        <Handshake className="mr-2 h-4 w-4" /> Negotiate
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
+              ));
+            })()
           )}
         </CardContent>
       </Card>
