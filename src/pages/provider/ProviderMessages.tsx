@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
+import { Loader2, MessageSquare, Send, Handshake, Lock } from "lucide-react";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ProposeTermsDialog from "@/components/messaging/ProposeTermsDialog";
 import ChatImageUpload from "@/components/messaging/ChatImageUpload";
@@ -16,7 +16,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; agreed_price?: number };
+  jobs?: { title?: string; status?: string; agreed_price?: number; provider_id?: string | null };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
@@ -46,7 +46,7 @@ const ProviderMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title, status, agreed_price)")
+      .select("*, jobs(title, status, agreed_price, provider_id)")
       .eq("provider_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -259,6 +259,7 @@ const ProviderMessages = () => {
   };
 
   const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
+  const isConversationClosed = jobAccepted && selected?.jobs?.provider_id != null && selected.provider_user_id !== selected.jobs.provider_id;
 
   useEffect(() => {
     if (!selected) return;
@@ -325,7 +326,7 @@ const ProviderMessages = () => {
           <>
             <div className="p-3 border-b flex items-center justify-between">
               <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
-              {!jobAccepted && (
+              {!jobAccepted && !isConversationClosed && (
                 <Button size="sm" variant="outline" onClick={() => { setProposeDefaults(undefined); setProposeOpen(true); }}>
                   <Handshake className="mr-2 h-4 w-4" /> Propose Terms
                 </Button>
@@ -369,18 +370,27 @@ const ProviderMessages = () => {
               })}
               <div ref={bottomRef} />
             </div>
-            <div className="p-3 border-t flex gap-2 items-center">
-              <ChatImageUpload
-                onFileSelected={setPendingFile}
-                uploading={uploading}
-                pendingFile={pendingFile}
-                onClear={() => setPendingFile(null)}
-              />
-              <Input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message…" onKeyDown={e => e.key === "Enter" && sendMessage()} className="flex-1" />
-              <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && !pendingFile)}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+            {isConversationClosed ? (
+              <div className="p-3 border-t">
+                <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
+                  <Lock className="h-4 w-4 shrink-0" />
+                  This conversation is closed because another provider was selected.
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 border-t flex gap-2 items-center">
+                <ChatImageUpload
+                  onFileSelected={setPendingFile}
+                  uploading={uploading}
+                  pendingFile={pendingFile}
+                  onClear={() => setPendingFile(null)}
+                />
+                <Input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message…" onKeyDown={e => e.key === "Enter" && sendMessage()} className="flex-1" />
+                <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && !pendingFile)}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </>
         )}
       </div>
