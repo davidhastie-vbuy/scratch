@@ -119,7 +119,7 @@ const ProviderJobDetail = () => {
             <div className="flex justify-between"><span className="text-muted-foreground">Category</span><span>{catName}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.postcode_district}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Timeline</span><span>{job.timeline || "—"}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Budget</span><span>{job.budget || "—"}</span></div>
+            
             <div className="flex justify-between"><span className="text-muted-foreground">Quotes</span><span>{job.quote_count}/3</span></div>
             {(job as any).agreed_price && (
               <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number((job as any).agreed_price).toFixed(2)}</span></div>
