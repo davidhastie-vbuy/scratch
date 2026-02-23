@@ -145,35 +145,21 @@ const ProviderSignupStepper = () => {
     }
 
     const userId = signUpData.user?.id;
-    if (userId) {
-      // Fetch the provider profile ID created by the trigger
-      const { data: profileData } = await supabase
-        .from("provider_profiles")
-        .select("id")
-        .eq("user_id", userId)
-        .single();
+    if (userId && form.supportingDocuments.length > 0) {
+      // Use edge function to upload documents (bypasses RLS since user isn't authenticated yet)
+      const docFormData = new FormData();
+      docFormData.append("user_id", userId);
+      form.supportingDocuments.forEach((file) => docFormData.append("documents", file));
 
-      const profileId = profileData?.id;
-
-      // Upload supporting documents
-      if (profileId && form.supportingDocuments.length > 0) {
-        for (const file of form.supportingDocuments) {
-          const storagePath = `${userId}/${Date.now()}-${file.name}`;
-          const { error: uploadErr } = await supabase.storage
-            .from("provider-documents")
-            .upload(storagePath, file);
-
-          if (!uploadErr) {
-            await supabase.from("provider_documents").insert({
-              provider_profile_id: profileId,
-              user_id: userId,
-              file_url: storagePath,
-              file_name: file.name,
-              file_type: file.type,
-              file_size: file.size,
-            } as any);
-          }
+      try {
+        const { error: docError } = await supabase.functions.invoke("upload-provider-documents", {
+          body: docFormData,
+        });
+        if (docError) {
+          console.error("Document upload error:", docError);
         }
+      } catch (err) {
+        console.error("Failed to upload documents:", err);
       }
     }
 
