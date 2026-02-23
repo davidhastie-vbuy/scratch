@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,17 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailConfirmed, setEmailConfirmed] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const hash = location.hash;
+    if (hash.includes("type=signup") || hash.includes("type=email")) {
+      setEmailConfirmed(true);
+    }
+  }, [location]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,9 +53,19 @@ const Login = () => {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold text-foreground">TradeConnect</h1>
+          <h1 className="font-display text-3xl font-bold text-foreground">TradeTrust</h1>
           <p className="mt-2 text-muted-foreground">Sign in to your account</p>
         </div>
+
+        {emailConfirmed && (
+          <div className="mb-6 rounded-lg border border-primary/30 bg-primary/5 p-5 text-center">
+            <div className="mb-2 text-3xl">✅</div>
+            <h2 className="text-lg font-semibold text-foreground">Email confirmed — thank you!</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Your account has been verified. You can now sign in below.
+            </p>
+          </div>
+        )}
 
         <Card>
           <CardHeader>
