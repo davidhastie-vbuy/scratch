@@ -8,6 +8,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// UUID v4 regex
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -28,8 +31,28 @@ serve(async (req) => {
     if (userError || !userData.user) throw new Error("Unauthorized");
     const user = userData.user;
 
-    const { job_id, amount, milestone_id } = await req.json();
-    if (!job_id || !amount || amount <= 0) throw new Error("Invalid job_id or amount");
+    const body = await req.json();
+    const { job_id, amount, milestone_id } = body;
+
+    // Input validation
+    if (!job_id || typeof job_id !== "string" || !UUID_RE.test(job_id)) {
+      return new Response(JSON.stringify({ error: "Invalid job_id" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (typeof amount !== "number" || amount <= 0 || amount > 1000000) {
+      return new Response(JSON.stringify({ error: "Invalid amount" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (milestone_id && (typeof milestone_id !== "string" || !UUID_RE.test(milestone_id))) {
+      return new Response(JSON.stringify({ error: "Invalid milestone_id" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Fetch job details
     const { data: job, error: jobError } = await supabaseAdmin
@@ -106,7 +129,7 @@ serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
     console.error("create-escrow-payment error:", msg);
-    return new Response(JSON.stringify({ error: msg }), {
+    return new Response(JSON.stringify({ error: "Payment processing failed" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

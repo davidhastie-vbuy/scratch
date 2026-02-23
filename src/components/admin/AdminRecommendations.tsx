@@ -4,6 +4,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { MessageSquare, Image } from "lucide-react";
+import { useEffect, useState } from "react";
+
+const SignedImage = ({ path, index }: { path: string; index: number }) => {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getSignedUrl = async () => {
+      // If it's already a full URL (legacy data), use as-is
+      if (path.startsWith("http")) {
+        setUrl(path);
+        return;
+      }
+      const { data, error } = await supabase.storage
+        .from("recommendation-photos")
+        .createSignedUrl(path, 3600); // 1 hour
+      if (!error && data?.signedUrl) {
+        setUrl(data.signedUrl);
+      }
+    };
+    getSignedUrl();
+  }, [path]);
+
+  if (!url) return <div className="h-24 w-24 rounded-md bg-muted animate-pulse" />;
+
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer">
+      <img
+        src={url}
+        alt={`Recommendation photo ${index + 1}`}
+        className="h-24 w-24 rounded-md object-cover border hover:ring-2 hover:ring-primary transition-all"
+      />
+    </a>
+  );
+};
 
 const AdminRecommendations = () => {
   const { data: recommendations, isLoading } = useQuery({
@@ -66,14 +100,8 @@ const AdminRecommendations = () => {
                   <Image className="h-3 w-3" /> {rec.photo_urls.length} photo(s) attached
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {rec.photo_urls.map((url: string, i: number) => (
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                      <img
-                        src={url}
-                        alt={`Recommendation photo ${i + 1}`}
-                        className="h-24 w-24 rounded-md object-cover border hover:ring-2 hover:ring-primary transition-all"
-                      />
-                    </a>
+                  {rec.photo_urls.map((path: string, i: number) => (
+                    <SignedImage key={i} path={path} index={i} />
                   ))}
                 </div>
               </div>
