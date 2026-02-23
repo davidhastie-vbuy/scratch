@@ -6,8 +6,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -56,13 +54,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    const body = await req.json();
-    const { user_id } = body;
+    const { user_id } = await req.json();
 
-    // Input validation
-    if (!user_id || typeof user_id !== "string" || !UUID_RE.test(user_id)) {
+    if (!user_id) {
       return new Response(
-        JSON.stringify({ error: "Valid user_id is required" }),
+        JSON.stringify({ error: "user_id is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -97,9 +93,8 @@ Deno.serve(async (req) => {
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id);
 
     if (deleteError) {
-      console.error("Delete user error:", deleteError);
       return new Response(
-        JSON.stringify({ error: "Failed to delete account" }),
+        JSON.stringify({ error: deleteError.message }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -109,9 +104,8 @@ Deno.serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
-    console.error("Delete user error:", err);
     return new Response(
-      JSON.stringify({ error: "Internal server error" }),
+      JSON.stringify({ error: err.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

@@ -101,27 +101,18 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
                       size="sm"
                       variant="outline"
                       onClick={async () => {
-                        const { data, error } = await supabase.functions.invoke("confirm-escrow-payment", {
+                        const { error } = await supabase.functions.invoke("confirm-escrow-payment", {
                           body: { job_id: jobId },
                         });
-                        if (!error && data?.payment_status === "paid" && data?.confirmed > 0) {
+                        if (!error) {
                           toast({ title: "Payment confirmed!" });
                           onPaymentComplete();
                         } else {
-                          toast({ title: "Not yet confirmed", description: "Payment could not be verified. You can retry the payment.", variant: "destructive" });
+                          toast({ title: "Not yet confirmed", description: "Please try again shortly.", variant: "destructive" });
                         }
                       }}
                     >
                       <RefreshCw className="mr-1 h-3 w-3" /> Check Status
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={() => payMilestone(m.id, Number(m.payment_amount))}
-                      disabled={processingPayment}
-                    >
-                      {processingPayment ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <PoundSterling className="mr-1 h-3 w-3" />}
-                      Retry Payment
                     </Button>
                   </div>
                 )}

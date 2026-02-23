@@ -442,44 +442,6 @@ export type Database = {
         }
         Relationships: []
       }
-      message_attachments: {
-        Row: {
-          created_at: string
-          file_name: string
-          file_size: number
-          file_type: string
-          file_url: string
-          id: string
-          message_id: string
-        }
-        Insert: {
-          created_at?: string
-          file_name: string
-          file_size: number
-          file_type: string
-          file_url: string
-          id?: string
-          message_id: string
-        }
-        Update: {
-          created_at?: string
-          file_name?: string
-          file_size?: number
-          file_type?: string
-          file_url?: string
-          id?: string
-          message_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "message_attachments_message_id_fkey"
-            columns: ["message_id"]
-            isOneToOne: false
-            referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       messages: {
         Row: {
           body: string
@@ -1151,8 +1113,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_job_provider_id: { Args: { _job_id: string }; Returns: string }
-      get_job_status: { Args: { _job_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1161,30 +1121,6 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
-      is_job_customer: {
-        Args: { _job_id: string; _user_id: string }
-        Returns: boolean
-      }
-      is_job_participant: {
-        Args: { _job_id: string; _user_id: string }
-        Returns: boolean
-      }
-      is_job_provider: {
-        Args: { _job_id: string; _user_id: string }
-        Returns: boolean
-      }
-      provider_has_declined_quote: {
-        Args: { _job_id: string; _user_id: string }
-        Returns: boolean
-      }
-      provider_is_eligible: {
-        Args: { _category: string; _postcode: string; _user_id: string }
-        Returns: boolean
-      }
-      provider_is_invited: {
-        Args: { _job_id: string; _user_id: string }
-        Returns: boolean
-      }
     }
     Enums: {
       app_role: "customer" | "provider" | "admin"

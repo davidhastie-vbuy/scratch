@@ -26,7 +26,6 @@ const ProviderJobDetail = () => {
   const [job, setJob] = useState<any>(null);
   const [media, setMedia] = useState<any[]>([]);
   const [existingQuote, setExistingQuote] = useState<any>(null);
-  const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -43,16 +42,14 @@ const ProviderJobDetail = () => {
   }, [jobId, user]);
 
   const fetchAll = async () => {
-    const [jobRes, mediaRes, quoteRes, paymentsRes] = await Promise.all([
+    const [jobRes, mediaRes, quoteRes] = await Promise.all([
       supabase.from("jobs").select("*").eq("id", jobId!).single(),
       supabase.from("job_media").select("*").eq("job_id", jobId!),
       supabase.from("quotes").select("*").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
-      supabase.from("escrow_payments").select("*").eq("job_id", jobId!),
     ]);
     setJob(jobRes.data);
     setMedia(mediaRes.data ?? []);
     setExistingQuote(quoteRes.data);
-    setEscrowPayments(paymentsRes.data ?? []);
     setLoading(false);
   };
 
@@ -95,27 +92,9 @@ const ProviderJobDetail = () => {
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-  
-  // If job is null, provider may have been declined — show minimal closed state
-  if (!job) {
-    return (
-      <div className="max-w-2xl mx-auto space-y-6">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/provider/quotes")}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Quotes
-        </Button>
-        <Card>
-          <CardContent className="py-8 text-center">
-            <AlertTriangle className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
-            <h3 className="font-display text-lg font-semibold">Job no longer available</h3>
-            <p className="text-sm text-muted-foreground mt-1">This job has been awarded to another provider. Details are no longer accessible.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  if (!job) return <p className="text-muted-foreground">Job not found.</p>;
 
   const catName = categories.find(c => c.slug === job.category)?.name ?? job.category;
-  const hasConfirmedPayment = escrowPayments.some((p: any) => p.status === "held" || p.status === "released");
   const quotesMaxed = job.quote_count >= 3;
 
   return (
@@ -136,7 +115,7 @@ const ProviderJobDetail = () => {
             <div className="flex justify-between"><span className="text-muted-foreground">Category</span><span>{catName}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.postcode_district}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Timeline</span><span>{job.timeline || "—"}</span></div>
-            
+            <div className="flex justify-between"><span className="text-muted-foreground">Budget</span><span>{job.budget || "—"}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Quotes</span><span>{job.quote_count}/3</span></div>
             {(job as any).agreed_price && (
               <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number((job as any).agreed_price).toFixed(2)}</span></div>
@@ -239,28 +218,12 @@ const ProviderJobDetail = () => {
 
 
 
-      {/* Payment Required Warning - shown to provider when milestones confirmed but no payment yet */}
-      {existingQuote?.status === "accepted" && (job as any).milestones_confirmed && !hasConfirmedPayment && (
-        <Card className="border-yellow-500/50 bg-yellow-50/50 dark:bg-yellow-900/10">
-          <CardContent className="py-4">
-            <div className="flex items-start gap-3 text-sm">
-              <AlertTriangle className="h-5 w-5 text-yellow-600 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-medium text-yellow-800 dark:text-yellow-200">Awaiting customer payment</p>
-                <p className="text-muted-foreground">The customer must complete their first payment before work can begin. Scheduling, milestones, and work tracking are locked until payment is confirmed.</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Work Tracker - gated behind payment */}
-      {hasConfirmedPayment && (
-        <WorkTracker jobId={jobId!} job={job} role="provider" onRefresh={fetchAll} />
-      )}
+      {/* Work Tracker */}
+      <WorkTracker jobId={jobId!} job={job} role="provider" onRefresh={fetchAll} />
 
-      {/* Schedule - visible when provider's quote was accepted AND payment confirmed */}
-      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && hasConfirmedPayment && (
+      {/* Schedule - visible when provider's quote was accepted */}
+      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">

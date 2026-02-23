@@ -9,41 +9,20 @@ import { CalendarIcon, Loader2, Send } from "lucide-react";
 import { format, addDays, addHours } from "date-fns";
 import { cn } from "@/lib/utils";
 
-interface ProposalDefaults {
-  agreed_price?: number;
-  start_date?: string;
-  start_time?: string;
-  duration?: string;
-}
-
 interface Props {
   open: boolean;
   onClose: () => void;
+  priceMin: number;
+  priceMax: number;
   onSubmit: (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => Promise<void>;
-  /** Optional: show the provider's quoted range as guidance (not enforced) */
-  quotedRange?: { min: number; max: number };
-  defaults?: ProposalDefaults;
 }
 
-const parseDuration = (dur?: string): { days: number; hours: number } => {
-  if (!dur) return { days: 1, hours: 0 };
-  const dayMatch = dur.match(/(\d+)\s*day/i);
-  const hourMatch = dur.match(/(\d+)\s*hour/i);
-  return {
-    days: dayMatch ? parseInt(dayMatch[1]) : 0,
-    hours: hourMatch ? parseInt(hourMatch[1]) : 0,
-  };
-};
-
-const NegotiateDialog = ({ open, onClose, onSubmit, quotedRange, defaults }: Props) => {
-  const parsed = parseDuration(defaults?.duration);
-  const [price, setPrice] = useState(defaults?.agreed_price ? String(defaults.agreed_price) : "");
-  const [startDate, setStartDate] = useState<Date | undefined>(
-    defaults?.start_date ? new Date(defaults.start_date) : undefined
-  );
-  const [startTime, setStartTime] = useState(defaults?.start_time || "09:00");
-  const [durationDays, setDurationDays] = useState(String(parsed.days || 1));
-  const [durationHours, setDurationHours] = useState(String(parsed.hours || 0));
+const NegotiateDialog = ({ open, onClose, priceMin, priceMax, onSubmit }: Props) => {
+  const [price, setPrice] = useState(String(priceMin));
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [startTime, setStartTime] = useState("09:00");
+  const [durationDays, setDurationDays] = useState("1");
+  const [durationHours, setDurationHours] = useState("0");
   const [submitting, setSubmitting] = useState(false);
 
   const parsedPrice = parseFloat(price);
@@ -58,7 +37,7 @@ const NegotiateDialog = ({ open, onClose, onSubmit, quotedRange, defaults }: Pro
     return addHours(addDays(start, parsedDays), parsedHours);
   }, [startDate, startTime, parsedDays, parsedHours]);
 
-  const priceValid = !isNaN(parsedPrice) && parsedPrice > 0;
+  const priceValid = !isNaN(parsedPrice) && parsedPrice >= priceMin && parsedPrice <= priceMax;
   const durationValid = parsedDays > 0 || parsedHours > 0;
   const isValid = priceValid && startDate && durationValid;
 
@@ -78,7 +57,7 @@ const NegotiateDialog = ({ open, onClose, onSubmit, quotedRange, defaults }: Pro
       end_date: endDate.toISOString(),
     });
     setSubmitting(false);
-    setPrice("");
+    setPrice(String(priceMin));
     setStartDate(undefined);
     setStartTime("09:00");
     setDurationDays("1");
@@ -94,7 +73,7 @@ const NegotiateDialog = ({ open, onClose, onSubmit, quotedRange, defaults }: Pro
         </DialogHeader>
         <div className="space-y-4 py-2">
           <p className="text-sm text-muted-foreground">
-            Propose your terms. The other party can accept, decline, or counter with alternative terms.
+            Propose your terms to the provider. They can accept or counter with alternative terms.
           </p>
 
           {/* Price */}
@@ -104,17 +83,15 @@ const NegotiateDialog = ({ open, onClose, onSubmit, quotedRange, defaults }: Pro
               type="number"
               value={price}
               onChange={e => setPrice(e.target.value)}
-              min="1"
+              min={priceMin}
+              max={priceMax}
               step="0.01"
-              placeholder="e.g. 500"
             />
-            {quotedRange && (
-              <p className="text-xs text-muted-foreground">
-                Provider's quoted range: £{quotedRange.min.toFixed(0)} – £{quotedRange.max.toFixed(0)} (you can propose any amount)
-              </p>
-            )}
+            <p className="text-xs text-muted-foreground">
+              Must be between £{priceMin.toFixed(0)} and £{priceMax.toFixed(0)} (provider's quoted range)
+            </p>
             {price && !priceValid && (
-              <p className="text-xs text-destructive">Please enter a valid price greater than £0</p>
+              <p className="text-xs text-destructive">Price must be between £{priceMin.toFixed(0)} and £{priceMax.toFixed(0)}</p>
             )}
           </div>
 

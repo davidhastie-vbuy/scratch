@@ -4,11 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MessageSquare, Send, Handshake, Lock } from "lucide-react";
+import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ProposeTermsDialog from "@/components/messaging/ProposeTermsDialog";
-import ChatImageUpload from "@/components/messaging/ChatImageUpload";
-import MessageBubble from "@/components/messaging/MessageBubble";
 import { cn } from "@/lib/utils";
 
 interface ConversationWithUnread {
@@ -16,7 +14,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; agreed_price?: number; provider_id?: string | null };
+  jobs?: { title?: string; status?: string; agreed_price?: number };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
@@ -28,10 +26,7 @@ const ProviderMessages = () => {
   const [conversations, setConversations] = useState<ConversationWithUnread[]>([]);
   const [selected, setSelected] = useState<ConversationWithUnread | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
-  const [attachmentsMap, setAttachmentsMap] = useState<Record<string, any[]>>({});
   const [newMsg, setNewMsg] = useState("");
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [proposeOpen, setProposeOpen] = useState(false);
@@ -46,7 +41,7 @@ const ProviderMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title, status, agreed_price, provider_id)")
+      .select("*, jobs(title, status, agreed_price)")
       .eq("provider_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -81,20 +76,6 @@ const ProviderMessages = () => {
     setLoading(false);
   };
 
-  const fetchAttachments = async (messageIds: string[]) => {
-    if (messageIds.length === 0) { setAttachmentsMap({}); return; }
-    const { data } = await supabase
-      .from("message_attachments")
-      .select("*")
-      .in("message_id", messageIds);
-    const map: Record<string, any[]> = {};
-    for (const a of data ?? []) {
-      if (!map[a.message_id]) map[a.message_id] = [];
-      map[a.message_id].push(a);
-    }
-    setAttachmentsMap(map);
-  };
-
   const openConversation = async (conv: ConversationWithUnread) => {
     setSelected(conv);
     const { data } = await supabase
@@ -102,10 +83,9 @@ const ProviderMessages = () => {
       .select("*")
       .eq("conversation_id", conv.id)
       .order("created_at");
-    const msgs = data ?? [];
-    setMessages(msgs);
-    await fetchAttachments(msgs.map(m => m.id));
+    setMessages(data ?? []);
 
+    // Mark messages as read
     await supabase
       .from("messages")
       .update({ read_at: new Date().toISOString() } as any)
@@ -121,49 +101,16 @@ const ProviderMessages = () => {
   };
 
   const sendMessage = async () => {
-    if ((!newMsg.trim() && !pendingFile) || !selected) return;
+    if (!newMsg.trim() || !selected) return;
     setSending(true);
-    setUploading(!!pendingFile);
-
-    const { data: msg, error } = await supabase.from("messages").insert({
+    await supabase.from("messages").insert({
       conversation_id: selected.id,
       sender_user_id: user!.id,
-      body: newMsg.trim() || (pendingFile ? `📷 ${pendingFile.name}` : ""),
-    } as any).select("id").single();
-
-    if (error || !msg) {
-      const isBlocked = error?.message?.includes("row-level security") || error?.code === "42501";
-      toast({
-        title: isBlocked ? "This conversation is closed" : "Failed to send",
-        description: isBlocked ? "You can no longer send messages in this conversation." : error?.message,
-        variant: "destructive",
-      });
-      setSending(false);
-      setUploading(false);
-      return;
-    }
-
-    if (pendingFile) {
-      const path = `${user!.id}/${selected.id}/${Date.now()}-${pendingFile.name}`;
-      const { error: upErr } = await supabase.storage.from("chat-attachments").upload(path, pendingFile);
-      if (!upErr) {
-        await supabase.from("message_attachments").insert({
-          message_id: msg.id,
-          file_url: path,
-          file_name: pendingFile.name,
-          file_type: pendingFile.type,
-          file_size: pendingFile.size,
-        } as any);
-      } else {
-        toast({ title: "Image upload failed", description: upErr.message, variant: "destructive" });
-      }
-      setPendingFile(null);
-    }
-
+      body: newMsg.trim(),
+    } as any);
     setNewMsg("");
     await refreshMessages();
     setSending(false);
-    setUploading(false);
   };
 
   const refreshMessages = async () => {
@@ -173,9 +120,7 @@ const ProviderMessages = () => {
       .select("*")
       .eq("conversation_id", selected.id)
       .order("created_at");
-    const msgs = data ?? [];
-    setMessages(msgs);
-    await fetchAttachments(msgs.map(m => m.id));
+    setMessages(data ?? []);
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
@@ -264,14 +209,6 @@ const ProviderMessages = () => {
   };
 
   const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
-  const isConversationClosed = jobAccepted && selected?.jobs?.provider_id != null && selected.provider_user_id !== selected.jobs.provider_id;
-  const isJobFinished = selected?.jobs?.status && ["completed", "cancelled"].includes(selected.jobs.status);
-  const isChatReadOnly = isConversationClosed || isJobFinished;
-  const closedReason = isConversationClosed
-    ? "This conversation is closed because another provider was selected."
-    : isJobFinished
-    ? `This conversation is closed because the job has been ${selected?.jobs?.status === "cancelled" ? "cancelled" : "completed"}.`
-    : null;
 
   useEffect(() => {
     if (!selected) return;
@@ -338,7 +275,7 @@ const ProviderMessages = () => {
           <>
             <div className="p-3 border-b flex items-center justify-between">
               <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
-              {!jobAccepted && !isChatReadOnly && (
+              {!jobAccepted && (
                 <Button size="sm" variant="outline" onClick={() => { setProposeDefaults(undefined); setProposeOpen(true); }}>
                   <Handshake className="mr-2 h-4 w-4" /> Propose Terms
                 </Button>
@@ -372,37 +309,24 @@ const ProviderMessages = () => {
                   );
                 }
                 return (
-                  <MessageBubble
-                    key={m.id}
-                    message={m}
-                    isOwn={isOwn}
-                    attachments={attachmentsMap[m.id] ?? []}
-                  />
+                  <div key={m.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[70%] rounded-lg px-3 py-2 text-sm ${isOwn ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                      <p>{m.body}</p>
+                      <p className={`text-[10px] mt-1 ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                        {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  </div>
                 );
               })}
               <div ref={bottomRef} />
             </div>
-            {isChatReadOnly ? (
-              <div className="p-3 border-t">
-                <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
-                  <Lock className="h-4 w-4 shrink-0" />
-                  {closedReason}
-                </div>
-              </div>
-            ) : (
-              <div className="p-3 border-t flex gap-2 items-center">
-                <ChatImageUpload
-                  onFileSelected={setPendingFile}
-                  uploading={uploading}
-                  pendingFile={pendingFile}
-                  onClear={() => setPendingFile(null)}
-                />
-                <Input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message…" onKeyDown={e => e.key === "Enter" && sendMessage()} className="flex-1" />
-                <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && !pendingFile)}>
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
+            <div className="p-3 border-t flex gap-2">
+              <Input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message…" onKeyDown={e => e.key === "Enter" && sendMessage()} />
+              <Button size="icon" onClick={sendMessage} disabled={sending || !newMsg.trim()}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </>
         )}
       </div>

@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Shield, Users, Wrench, Tag, HelpCircle, UserPlus, Star, MessageSquareWarning, Banknote, ImageIcon } from "lucide-react";
+import { LogOut, Shield, Users, Wrench, Tag, HelpCircle, UserPlus, Star, MessageSquareWarning, Banknote } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import AdminCustomerList from "@/components/admin/AdminCustomerList";
 import AdminProviderList from "@/components/admin/AdminProviderList";
@@ -11,7 +11,6 @@ import AdminCreateAdmin from "@/components/admin/AdminCreateAdmin";
 import AdminRecommendations from "@/components/admin/AdminRecommendations";
 import AdminDisputes from "@/components/admin/AdminDisputes";
 import AdminPayouts from "@/components/admin/AdminPayouts";
-import AdminMessageAttachments from "@/components/admin/AdminMessageAttachments";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -77,10 +76,6 @@ const AdminDashboard = () => {
               <Banknote className="h-4 w-4" />
               Payouts
             </TabsTrigger>
-            <TabsTrigger value="attachments" className="gap-1.5">
-              <ImageIcon className="h-4 w-4" />
-              Attachments
-            </TabsTrigger>
           </TabsList>
           <TabsContent value="providers">
             <AdminProviderList />
@@ -105,9 +100,6 @@ const AdminDashboard = () => {
           </TabsContent>
           <TabsContent value="payouts">
             <AdminPayouts />
-          </TabsContent>
-          <TabsContent value="attachments">
-            <AdminMessageAttachments />
           </TabsContent>
         </Tabs>
       </main>
