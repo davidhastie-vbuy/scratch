@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Pencil, Briefcase, ArrowLeft, Eye } from "lucide-react";
+import { Search, Pencil, Briefcase, ArrowLeft, Eye, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 import type { Tables } from "@/integrations/supabase/types";
@@ -47,6 +48,8 @@ const AdminCustomerList = () => {
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [jobForm, setJobForm] = useState<Partial<Job>>({});
   const [jobSaving, setJobSaving] = useState(false);
+  const [deletingCustomer, setDeletingCustomer] = useState<Profile | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchCustomers = async () => {
     setLoading(true);
@@ -156,6 +159,25 @@ const AdminCustomerList = () => {
   };
 
   const tradeName = (cat: string) => tradeCategories.find((t) => t.slug === cat)?.name ?? cat;
+
+  const handleDeleteCustomer = async () => {
+    if (!deletingCustomer) return;
+    setDeleteLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-user", {
+        body: { user_id: deletingCustomer.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: "Account deleted", description: `${deletingCustomer.full_name || "Customer"} has been removed.` });
+      setDeletingCustomer(null);
+      fetchCustomers();
+    } catch (err: any) {
+      toast({ title: "Error deleting account", description: err.message, variant: "destructive" });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const cfg = JOB_STATUS_CONFIG[status] ?? { label: status, variant: "outline" as const };
@@ -349,6 +371,9 @@ const AdminCustomerList = () => {
                       <Button variant="ghost" size="icon" onClick={() => openEdit(c)} title="Edit profile">
                         <Pencil className="h-4 w-4" />
                       </Button>
+                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => setDeletingCustomer(c)} title="Delete account">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -387,6 +412,24 @@ const AdminCustomerList = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deletingCustomer} onOpenChange={(o) => !o && setDeletingCustomer(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Customer Account</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{deletingCustomer?.full_name || "this customer"}</strong> ({deletingCustomer?.email || "no email"}) and all associated data including jobs and messages. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteCustomer} disabled={deleteLoading} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleteLoading ? "Deleting…" : "Delete Account"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
