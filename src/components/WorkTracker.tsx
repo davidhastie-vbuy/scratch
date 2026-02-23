@@ -226,8 +226,48 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   };
 
   // Payment helpers
+  const [processingPayment, setProcessingPayment] = useState<string | null>(null);
+
   const getPaymentForMilestone = (milestoneId: string) => {
     return escrowPayments.find((p) => p.milestone_id === milestoneId);
+  };
+
+  const getPaymentStatus = (milestoneId: string): "unpaid" | "pending" | "complete" | "failed" => {
+    const payments = escrowPayments.filter((p) => p.milestone_id === milestoneId);
+    if (payments.length === 0) return "unpaid";
+    // Check for held/released (complete)
+    if (payments.some((p) => p.status === "held" || p.status === "released")) return "complete";
+    // Check for failed
+    if (payments.some((p) => p.status === "failed")) return "failed";
+    // Otherwise pending
+    if (payments.some((p) => p.status === "pending")) return "pending";
+    return "unpaid";
+  };
+
+  const payMilestone = async (milestoneId: string, amount: number) => {
+    setProcessingPayment(milestoneId);
+    const { data, error } = await supabase.functions.invoke("create-escrow-payment", {
+      body: { job_id: jobId, amount, milestone_id: milestoneId },
+    });
+    if (error) {
+      toast({ title: "Payment failed", description: error.message, variant: "destructive" });
+    } else if (data?.url) {
+      window.location.href = data.url;
+    }
+    setProcessingPayment(null);
+  };
+
+  const confirmPendingPayment = async () => {
+    const { error } = await supabase.functions.invoke("confirm-escrow-payment", {
+      body: { job_id: jobId },
+    });
+    if (!error) {
+      toast({ title: "Payment confirmed!" });
+      fetchMilestones();
+      onRefresh?.();
+    } else {
+      toast({ title: "Not yet confirmed", description: "Please try again shortly.", variant: "destructive" });
+    }
   };
 
   const totalMilestoneAmounts = milestones.reduce((sum, m) => sum + (m.payment_amount ?? 0), 0);
@@ -379,17 +419,93 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                       {m.flag_count > 0 && (
                         <span className="text-xs text-destructive">({m.flag_count}/5 flags)</span>
                       )}
-                      {payment && (
-                        <Badge variant={payment.status === "released" ? "default" : "outline"} className="text-xs">
-                          {payment.status === "released" ? "Paid" : payment.status === "held" ? "Held" : "Pending"}
-                        </Badge>
-                      )}
+                      {/* Payment status badge - role-specific */}
+                      {m.payment_amount && (() => {
+                        const pStatus = getPaymentStatus(m.id);
+                        const payment = getPaymentForMilestone(m.id);
+                        if (isProvider) {
+                          // Provider sees: pending or complete
+                          if (pStatus === "complete") {
+                            return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
+                          }
+                          return <Badge variant="outline" className="text-xs">Payment pending</Badge>;
+                        }
+                        // Customer sees: pay button, retry, pending confirmation, or complete
+                        if (pStatus === "complete") {
+                          return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
+                        }
+                        if (pStatus === "pending") {
+                          return <Badge variant="outline" className="text-xs">Confirming…</Badge>;
+                        }
+                        return null;
+                      })()}
                       {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </div>
                   </div>
 
                   {isExpanded && (
                     <div className="pl-6 space-y-3">
+                      {/* Customer payment actions */}
+                      {isCustomer && m.payment_amount && (() => {
+                        const pStatus = getPaymentStatus(m.id);
+                        if (pStatus === "unpaid") {
+                          return (
+                            <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+                              <p className="text-sm font-medium">Payment required for this milestone</p>
+                              <p className="text-xs text-muted-foreground">Pay before this stage of work begins. Funds are held securely and released when you accept the milestone.</p>
+                              <Button
+                                size="sm"
+                                onClick={() => payMilestone(m.id, Number(m.payment_amount))}
+                                disabled={processingPayment === m.id}
+                              >
+                                {processingPayment === m.id ? (
+                                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                ) : (
+                                  <PoundSterling className="mr-1 h-3 w-3" />
+                                )}
+                                Pay £{Number(m.payment_amount).toFixed(2)}
+                              </Button>
+                            </div>
+                          );
+                        }
+                        if (pStatus === "failed") {
+                          return (
+                            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
+                                <p className="text-sm font-medium text-destructive">Payment failed</p>
+                              </div>
+                              <p className="text-xs text-muted-foreground">Your previous payment attempt was unsuccessful. Please try again.</p>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => payMilestone(m.id, Number(m.payment_amount))}
+                                disabled={processingPayment === m.id}
+                              >
+                                {processingPayment === m.id ? (
+                                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                ) : (
+                                  <PoundSterling className="mr-1 h-3 w-3" />
+                                )}
+                                Retry £{Number(m.payment_amount).toFixed(2)}
+                              </Button>
+                            </div>
+                          );
+                        }
+                        if (pStatus === "pending") {
+                          return (
+                            <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+                              <p className="text-sm font-medium">Payment being confirmed…</p>
+                              <p className="text-xs text-muted-foreground">Your payment is being processed. If you've completed checkout, click below to check status.</p>
+                              <Button size="sm" variant="outline" onClick={confirmPendingPayment}>
+                                <CheckCircle2 className="mr-1 h-3 w-3" /> Check Status
+                              </Button>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+
                       {/* Comment history */}
                       {mComments.length > 0 && (
                         <div className="space-y-2">
