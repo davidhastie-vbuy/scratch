@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, ArrowRight, Upload, X, CheckCircle2, Loader2 } from "lucide-react";
 
 const TIMELINES = ["ASAP", "Within 1 week", "Within 2 weeks", "Within 1 month", "Flexible"];
-const BUDGETS = ["Under £100", "£100–£500", "£500–£1,000", "£1,000–£5,000", "£5,000+", "Not sure"];
+
 
 const PostJob = () => {
   const { user } = useAuth();
@@ -30,7 +30,6 @@ const PostJob = () => {
     postcodeDistrict: "",
     description: "",
     timeline: "",
-    budget: "",
     additionalNotes: "",
   });
 
@@ -95,7 +94,7 @@ const PostJob = () => {
           category: form.category,
           postcode_district: form.postcodeDistrict.trim().toUpperCase(),
           timeline: form.timeline || null,
-          budget: form.budget || null,
+          
         } as any)
         .select("id")
         .single();
@@ -141,7 +140,7 @@ const PostJob = () => {
             </p>
             <div className="flex gap-3 justify-center">
               <Button onClick={() => navigate("/dashboard/jobs")}>View My Jobs</Button>
-              <Button variant="outline" onClick={() => { setSubmitted(false); setStep(0); setForm({ title: "", category: "", postcodeDistrict: "", description: "", timeline: "", budget: "", additionalNotes: "" }); setFiles([]); }}>
+              <Button variant="outline" onClick={() => { setSubmitted(false); setStep(0); setForm({ title: "", category: "", postcodeDistrict: "", description: "", timeline: "", additionalNotes: "" }); setFiles([]); }}>
                 Post Another
               </Button>
             </div>
@@ -205,25 +204,14 @@ const PostJob = () => {
                 <Textarea value={form.description} onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} maxLength={2000} rows={4} placeholder="Describe the job in detail…" />
                 {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Timeline</Label>
-                  <Select value={form.timeline} onValueChange={(v) => setForm(f => ({ ...f, timeline: v }))}>
-                    <SelectTrigger><SelectValue placeholder="When?" /></SelectTrigger>
-                    <SelectContent>
-                      {TIMELINES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Budget</Label>
-                  <Select value={form.budget} onValueChange={(v) => setForm(f => ({ ...f, budget: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Budget?" /></SelectTrigger>
-                    <SelectContent>
-                      {BUDGETS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <Label>Timeline</Label>
+                <Select value={form.timeline} onValueChange={(v) => setForm(f => ({ ...f, timeline: v }))}>
+                  <SelectTrigger><SelectValue placeholder="When?" /></SelectTrigger>
+                  <SelectContent>
+                    {TIMELINES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
             </>
           )}
@@ -241,7 +229,7 @@ const PostJob = () => {
                   <p><strong>Category:</strong> {categories.find(c => c.slug === form.category)?.name}</p>
                   <p><strong>Location:</strong> {form.postcodeDistrict.toUpperCase()}</p>
                   <p><strong>Timeline:</strong> {form.timeline || "Not specified"}</p>
-                  <p><strong>Budget:</strong> {form.budget || "Not specified"}</p>
+                  
                 </div>
                 <p className="text-xs text-muted-foreground">You can go back to edit before submitting.</p>
               </div>
