@@ -30,14 +30,60 @@ serve(async (req) => {
     const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
     if (userError || !userData.user) throw new Error("Unauthorized");
 
-    const { job_id } = await req.json();
+    const { job_id, session_id } = await req.json();
     if (!job_id) throw new Error("job_id required");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Get pending escrow payments for this job
+    // If a specific session_id is provided, verify just that one
+    if (session_id) {
+      const { data: payment } = await supabaseAdmin
+        .from("escrow_payments")
+        .select("*")
+        .eq("job_id", job_id)
+        .eq("stripe_checkout_session_id", session_id)
+        .eq("status", "pending")
+        .maybeSingle();
+
+      if (!payment) {
+        return new Response(JSON.stringify({ confirmed: 0, payment_status: "not_found" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+
+      try {
+        const session = await stripe.checkout.sessions.retrieve(session_id);
+        if (session.payment_status === "paid") {
+          await supabaseAdmin
+            .from("escrow_payments")
+            .update({
+              status: "held",
+              stripe_payment_intent_id: session.payment_intent as string,
+            })
+            .eq("id", payment.id);
+          return new Response(JSON.stringify({ confirmed: 1, payment_status: "paid" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        } else {
+          return new Response(JSON.stringify({ confirmed: 0, payment_status: session.payment_status }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+      } catch (e) {
+        console.error(`Failed to verify session ${session_id}:`, e);
+        return new Response(JSON.stringify({ confirmed: 0, payment_status: "error" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+    }
+
+    // Fallback: check all pending payments for this job
     const { data: payments } = await supabaseAdmin
       .from("escrow_payments")
       .select("*")
@@ -64,7 +110,7 @@ serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ confirmed }), {
+    return new Response(JSON.stringify({ confirmed, payment_status: confirmed > 0 ? "paid" : "unpaid" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

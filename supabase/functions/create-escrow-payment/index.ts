@@ -84,7 +84,7 @@ serve(async (req) => {
           type: "escrow",
         },
       },
-      success_url: `${req.headers.get("origin")}/customer/jobs/${job_id}?payment=success`,
+      success_url: `${req.headers.get("origin")}/customer/jobs/${job_id}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/customer/jobs/${job_id}?payment=cancelled`,
     });
 

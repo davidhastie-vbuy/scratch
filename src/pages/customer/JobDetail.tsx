@@ -60,21 +60,31 @@ const JobDetail = () => {
     if (jobId) fetchAll();
   }, [jobId]);
 
-  // Check for payment confirmation on redirect
+  // Check for payment return on redirect
   useEffect(() => {
-    if (searchParams.get("payment") === "success" && jobId) {
-      confirmPayment();
+    const paymentParam = searchParams.get("payment");
+    const sessionId = searchParams.get("session_id");
+    if (paymentParam === "success" && jobId && sessionId) {
+      confirmPayment(sessionId);
+    } else if (paymentParam === "cancelled" && jobId) {
+      toast({ title: "Payment not completed", description: "You can try again when you're ready." });
+      // Clean the URL
+      navigate(`/customer/jobs/${jobId}`, { replace: true });
     }
   }, [searchParams, jobId]);
 
-  const confirmPayment = async () => {
-    const { error } = await supabase.functions.invoke("confirm-escrow-payment", {
-      body: { job_id: jobId },
+  const confirmPayment = async (sessionId: string) => {
+    const { data, error } = await supabase.functions.invoke("confirm-escrow-payment", {
+      body: { job_id: jobId, session_id: sessionId },
     });
-    if (!error) {
+    if (!error && data?.payment_status === "paid" && data?.confirmed > 0) {
       toast({ title: "Payment confirmed!", description: "Funds are now held in escrow." });
       fetchAll();
+    } else {
+      toast({ title: "Payment not confirmed", description: "The payment could not be verified. Please try again or check your payment method.", variant: "destructive" });
     }
+    // Clean the URL
+    navigate(`/customer/jobs/${jobId}`, { replace: true });
   };
 
   const fetchAll = async () => {
@@ -186,7 +196,7 @@ const JobDetail = () => {
     if (error) {
       toast({ title: "Payment failed", description: error.message, variant: "destructive" });
     } else if (data?.url) {
-      window.open(data.url, "_blank");
+      window.location.href = data.url;
     }
     setProcessingPayment(false);
   };
