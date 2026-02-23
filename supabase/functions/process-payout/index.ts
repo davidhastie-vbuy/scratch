@@ -5,6 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -29,10 +31,18 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { payout_request_id, provider_user_id, amount } = await req.json();
+    const body = await req.json();
+    const { payout_request_id, provider_user_id, amount } = body;
 
-    if (!payout_request_id || !provider_user_id || !amount) {
-      return new Response(JSON.stringify({ error: "Missing fields" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    // Input validation
+    if (!payout_request_id || typeof payout_request_id !== "string" || !UUID_RE.test(payout_request_id)) {
+      return new Response(JSON.stringify({ error: "Invalid payout_request_id" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    if (!provider_user_id || typeof provider_user_id !== "string" || !UUID_RE.test(provider_user_id)) {
+      return new Response(JSON.stringify({ error: "Invalid provider_user_id" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    if (typeof amount !== "number" || amount <= 0 || amount > 1000000) {
+      return new Response(JSON.stringify({ error: "Invalid amount" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Insert a negative payout transaction
@@ -45,11 +55,13 @@ Deno.serve(async (req) => {
     });
 
     if (txErr) {
-      return new Response(JSON.stringify({ error: txErr.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      console.error("Payout transaction error:", txErr);
+      return new Response(JSON.stringify({ error: "Failed to process payout" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    console.error("Process payout error:", e);
+    return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
