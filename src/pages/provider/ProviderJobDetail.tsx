@@ -54,10 +54,19 @@ const ProviderJobDetail = () => {
   };
 
   const submitQuote = async () => {
-    if (!quoteForm.priceMin || !quoteForm.priceMax) {
+    const min = parseFloat(quoteForm.priceMin);
+    const max = parseFloat(quoteForm.priceMax);
+
+    if (isNaN(min) || isNaN(max)) {
       toast({ title: "Price range required", variant: "destructive" });
       return;
     }
+
+    if (max < min) {
+      toast({ title: "Invalid price range", description: "Maximum price cannot be lower than minimum price.", variant: "destructive" });
+      return;
+    }
+
     setSubmitting(true);
     const { error } = await supabase.from("quotes").insert({
       job_id: jobId!,
@@ -209,16 +218,22 @@ const ProviderJobDetail = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Min price (£) *</Label>
-                  <Input type="number" value={quoteForm.priceMin} onChange={e => setQuoteForm(f => ({ ...f, priceMin: e.target.value }))} placeholder="100" />
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="priceMin">Min price (£) *</Label>
+                    <Input id="priceMin" type="number" value={quoteForm.priceMin} onChange={e => setQuoteForm(f => ({ ...f, priceMin: e.target.value }))} placeholder="100" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="priceMax">Max price (£) *</Label>
+                    <Input id="priceMax" type="number" value={quoteForm.priceMax} onChange={e => setQuoteForm(f => ({ ...f, priceMax: e.target.value }))} placeholder="500" />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Max price (£) *</Label>
-                  <Input type="number" value={quoteForm.priceMax} onChange={e => setQuoteForm(f => ({ ...f, priceMax: e.target.value }))} placeholder="500" />
-                </div>
+                {quoteForm.priceMin && quoteForm.priceMax && parseFloat(quoteForm.priceMax) < parseFloat(quoteForm.priceMin) && (
+                  <p className="text-xs text-destructive font-medium">Maximum price must be at least £{quoteForm.priceMin}</p>
+                )}
               </div>
+
               <div className="space-y-2">
                 <Label>Message to customer</Label>
                 <Textarea value={quoteForm.message} onChange={e => setQuoteForm(f => ({ ...f, message: e.target.value }))} maxLength={1000} rows={3} placeholder="Introduce yourself and explain your approach…" />
