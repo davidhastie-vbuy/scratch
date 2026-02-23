@@ -132,7 +132,12 @@ const ProviderMessages = () => {
     } as any).select("id").single();
 
     if (error || !msg) {
-      toast({ title: "Failed to send", description: error?.message, variant: "destructive" });
+      const isBlocked = error?.message?.includes("row-level security") || error?.code === "42501";
+      toast({
+        title: isBlocked ? "This conversation is closed" : "Failed to send",
+        description: isBlocked ? "You can no longer send messages in this conversation." : error?.message,
+        variant: "destructive",
+      });
       setSending(false);
       setUploading(false);
       return;
@@ -260,6 +265,13 @@ const ProviderMessages = () => {
 
   const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
   const isConversationClosed = jobAccepted && selected?.jobs?.provider_id != null && selected.provider_user_id !== selected.jobs.provider_id;
+  const isJobFinished = selected?.jobs?.status && ["completed", "cancelled"].includes(selected.jobs.status);
+  const isChatReadOnly = isConversationClosed || isJobFinished;
+  const closedReason = isConversationClosed
+    ? "This conversation is closed because another provider was selected."
+    : isJobFinished
+    ? `This conversation is closed because the job has been ${selected?.jobs?.status === "cancelled" ? "cancelled" : "completed"}.`
+    : null;
 
   useEffect(() => {
     if (!selected) return;
@@ -326,7 +338,7 @@ const ProviderMessages = () => {
           <>
             <div className="p-3 border-b flex items-center justify-between">
               <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
-              {!jobAccepted && !isConversationClosed && (
+              {!jobAccepted && !isChatReadOnly && (
                 <Button size="sm" variant="outline" onClick={() => { setProposeDefaults(undefined); setProposeOpen(true); }}>
                   <Handshake className="mr-2 h-4 w-4" /> Propose Terms
                 </Button>
@@ -370,11 +382,11 @@ const ProviderMessages = () => {
               })}
               <div ref={bottomRef} />
             </div>
-            {isConversationClosed ? (
+            {isChatReadOnly ? (
               <div className="p-3 border-t">
                 <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
                   <Lock className="h-4 w-4 shrink-0" />
-                  This conversation is closed because another provider was selected.
+                  {closedReason}
                 </div>
               </div>
             ) : (
