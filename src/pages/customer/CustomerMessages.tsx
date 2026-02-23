@@ -30,7 +30,7 @@ const CustomerMessages = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [accepting, setAccepting] = useState(false);
-  const [counterDialog, setCounterDialog] = useState<{ priceMin: number; priceMax: number } | null>(null);
+  const [counterDialog, setCounterDialog] = useState<{ quotedRange?: { min: number; max: number } } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -197,8 +197,7 @@ const CustomerMessages = () => {
       .limit(1);
     const quote = quotes?.[0];
     setCounterDialog({
-      priceMin: quote ? Number(quote.price_min) : 1,
-      priceMax: quote ? Number(quote.price_max) : 999999,
+      quotedRange: quote ? { min: Number(quote.price_min), max: Number(quote.price_max) } : undefined,
     });
   };
 
@@ -353,8 +352,7 @@ const CustomerMessages = () => {
         <NegotiateDialog
           open={!!counterDialog}
           onClose={() => setCounterDialog(null)}
-          priceMin={counterDialog.priceMin}
-          priceMax={counterDialog.priceMax}
+          quotedRange={counterDialog.quotedRange}
           onSubmit={sendCounterNegotiation}
         />
       )}
