@@ -126,7 +126,7 @@ const JobDetail = () => {
     });
   };
 
-  const sendNegotiation = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
+  const sendNegotiation = async (data: { agreed_price: number; urgency: string; urgency_label: string }) => {
     if (!negotiateDialog) return;
 
     // Find or create conversation
@@ -161,13 +161,12 @@ const JobDetail = () => {
     await supabase.from("messages").insert({
       conversation_id: convId,
       sender_user_id: user!.id,
-      body: `Proposal: £${data.agreed_price.toFixed(2)}, starting ${new Date(data.start_date).toLocaleDateString()}, duration: ${data.duration}`,
+      body: `Proposal: £${data.agreed_price.toFixed(2)}, needed: ${data.urgency_label}`,
       message_type: "proposal",
       metadata: {
         agreed_price: data.agreed_price,
-        start_date: data.start_date,
-        start_time: data.start_time,
-        duration: data.duration,
+        urgency: data.urgency,
+        urgency_label: data.urgency_label,
         status: "pending",
       },
     } as any);
@@ -334,7 +333,7 @@ const JobDetail = () => {
     });
   };
 
-  const sendCounterProposal = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
+  const sendCounterProposal = async (data: { agreed_price: number; urgency: string; urgency_label: string }) => {
     if (!chatConvId) return;
     // Decline existing pending proposals
     for (const m of chatMessages) {
@@ -347,7 +346,7 @@ const JobDetail = () => {
     await supabase.from("messages").insert({
       conversation_id: chatConvId,
       sender_user_id: user!.id,
-      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}, starting ${new Date(data.start_date).toLocaleDateString()}, duration: ${data.duration}`,
+      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}, needed: ${data.urgency_label}`,
       message_type: "proposal",
       metadata: { ...data, status: "pending" },
     } as any);

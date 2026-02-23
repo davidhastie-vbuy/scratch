@@ -6,9 +6,11 @@ import { format } from "date-fns";
 
 interface ProposalData {
   agreed_price: number;
-  start_date: string;
-  start_time: string;
-  duration: string;
+  start_date?: string;
+  start_time?: string;
+  duration?: string;
+  urgency?: string;
+  urgency_label?: string;
   status: "pending" | "accepted" | "declined";
 }
 
@@ -47,14 +49,24 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
             <PoundSterling className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="font-semibold">£{Number(proposal.agreed_price).toFixed(2)}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
-            <span>{format(new Date(proposal.start_date), "PPP")} at {proposal.start_time}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-            <span>{proposal.duration}</span>
-          </div>
+          {proposal.start_date && proposal.start_time && (
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>{format(new Date(proposal.start_date), "PPP")} at {proposal.start_time}</span>
+            </div>
+          )}
+          {proposal.duration && (
+            <div className="flex items-center gap-2">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>{proposal.duration}</span>
+            </div>
+          )}
+          {proposal.urgency_label && (
+            <div className="flex items-center gap-2">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>Needed: {proposal.urgency_label}</span>
+            </div>
+          )}
         </div>
 
         {canRespond && (
