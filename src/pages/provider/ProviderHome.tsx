@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Briefcase, FileText, MessageSquare, Clock, AlertTriangle, XCircle, MessageCircle } from "lucide-react";
+import { Briefcase, FileText, MessageSquare, Clock, AlertTriangle, XCircle, MessageCircle, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const ProviderHome = () => {
@@ -94,6 +94,15 @@ const ProviderHome = () => {
                 Available Jobs
               </CardTitle>
               <CardDescription>Browse and quote on matching jobs</CardDescription>
+            </CardHeader>
+          </Card>
+          <Card className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate("/provider/my-jobs")}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <ClipboardList className="h-5 w-5 text-primary" />
+                My Jobs
+              </CardTitle>
+              <CardDescription>Track your awarded and active jobs</CardDescription>
             </CardHeader>
           </Card>
           <Card className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate("/provider/quotes")}>
