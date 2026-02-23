@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye, AlertTriangle, History, MessageSquare, Trash2 } from "lucide-react";
+import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye, AlertTriangle, History, MessageSquare, Trash2, Bell } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
@@ -403,9 +404,29 @@ const AdminProviderList = () => {
               {filtered.map((p) => {
                 const cfg = getStatusConfig(p.status);
                 const Icon = cfg.icon;
+                const hasPendingChanges = !!(p.pending_trade_category || (p.pending_operating_areas && p.pending_operating_areas.length > 0) || (p.pending_additional_categories && p.pending_additional_categories.length > 0));
                 return (
                   <TableRow key={p.id}>
-                    <TableCell className="font-medium">{p.business_name}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-1.5">
+                        {p.business_name}
+                        {hasPendingChanges && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="relative flex h-5 w-5 items-center justify-center">
+                                  <Bell className="h-4 w-4 text-amber-500" />
+                                  <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-amber-500" />
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>This provider has pending profile changes awaiting review</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>{p.contact_first_name} {p.contact_last_name}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{p.email || "N/A"}</TableCell>
                     <TableCell>{tradeName(p.trade_category)}</TableCell>
