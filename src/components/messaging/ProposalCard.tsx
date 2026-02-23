@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, PoundSterling, CalendarDays, Clock, RefreshCw } from "lucide-react";
+import { Check, X, PoundSterling, CalendarDays, Clock, RefreshCw, ListChecks } from "lucide-react";
 import { format } from "date-fns";
 
 interface ProposalData {
@@ -21,10 +21,11 @@ interface Props {
   onAccept?: () => void;
   onDecline?: () => void;
   onCounter?: () => void;
+  onSetupMilestones?: () => void;
   accepting?: boolean;
 }
 
-const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCounter, accepting }: Props) => {
+const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCounter, onSetupMilestones, accepting }: Props) => {
   const isPending = proposal.status === "pending";
   const isAccepted = proposal.status === "accepted";
   const isDeclined = proposal.status === "declined";
@@ -86,7 +87,14 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
         )}
 
         {isAccepted && (
-          <p className="text-xs text-green-700 font-medium">✓ Terms confirmed — work has been scheduled</p>
+          <div className="space-y-2">
+            <p className="text-xs text-green-700 font-medium">✓ Terms confirmed — work has been scheduled</p>
+            {onSetupMilestones && (
+              <Button size="sm" onClick={onSetupMilestones} className="w-full">
+                <ListChecks className="mr-2 h-4 w-4" /> Set Up Milestones & Start Job
+              </Button>
+            )}
+          </div>
         )}
         {isDeclined && (
           <p className="text-xs text-destructive font-medium">Terms declined</p>

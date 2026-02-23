@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ interface ConversationWithUnread {
 
 const ProviderMessages = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [conversations, setConversations] = useState<ConversationWithUnread[]>([]);
   const [selected, setSelected] = useState<ConversationWithUnread | null>(null);
@@ -326,6 +328,11 @@ const ProviderMessages = () => {
                         onAccept={() => handleAcceptProposal(m)}
                         onDecline={() => handleDeclineProposal(m)}
                         onCounter={() => handleCounterProposal(m)}
+                        onSetupMilestones={
+                          (m as any).metadata?.status === "accepted" && selected
+                            ? () => navigate(`/provider/jobs/${selected.job_id}`)
+                            : undefined
+                        }
                         accepting={accepting}
                       />
                     </div>
