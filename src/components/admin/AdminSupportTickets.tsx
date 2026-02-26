@@ -39,7 +39,28 @@ const AdminSupportTickets = () => {
       .from("support_tickets")
       .select("*")
       .order("created_at", { ascending: false });
-    setTickets(data ?? []);
+    const tickets = data ?? [];
+    
+    // Fetch user profiles and roles for all ticket creators
+    const userIds = [...new Set(tickets.map(t => t.user_id))];
+    const [profilesRes, rolesRes] = await Promise.all([
+      userIds.length > 0
+        ? supabase.from("profiles").select("id, first_name, last_name, full_name, email").in("id", userIds)
+        : { data: [] },
+      userIds.length > 0
+        ? supabase.from("user_roles").select("user_id, role").in("user_id", userIds)
+        : { data: [] },
+    ]);
+    const profileMap: Record<string, any> = {};
+    (profilesRes.data ?? []).forEach(p => { profileMap[p.id] = p; });
+    const roleMap: Record<string, string> = {};
+    (rolesRes.data ?? []).forEach(r => { roleMap[r.user_id] = r.role; });
+    
+    setTickets(tickets.map(t => ({
+      ...t,
+      _profile: profileMap[t.user_id] || null,
+      _role: roleMap[t.user_id] || null,
+    })));
     setLoading(false);
   };
 
@@ -93,6 +114,8 @@ const AdminSupportTickets = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Subject</TableHead>
+                <TableHead>Submitted By</TableHead>
+                <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Actions</TableHead>
@@ -103,9 +126,18 @@ const AdminSupportTickets = () => {
                 const st = STATUS_MAP[t.status] ?? { label: t.status, variant: "secondary" as const };
                 return (
                   <TableRow key={t.id}>
-                    <TableCell className="font-medium">{t.subject}</TableCell>
-                    <TableCell><Badge variant={st.variant}>{st.label}</Badge></TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</TableCell>
+                     <TableCell className="font-medium">{t.subject}</TableCell>
+                     <TableCell>
+                       <div className="text-sm">
+                         {t._profile ? (t._profile.first_name || t._profile.last_name ? `${t._profile.first_name ?? ''} ${t._profile.last_name ?? ''}`.trim() : t._profile.full_name || '—') : '—'}
+                       </div>
+                       {t._profile?.email && <div className="text-xs text-muted-foreground">{t._profile.email}</div>}
+                     </TableCell>
+                     <TableCell>
+                       <Badge variant="outline" className="capitalize">{t._role ?? '—'}</Badge>
+                     </TableCell>
+                     <TableCell><Badge variant={st.variant}>{st.label}</Badge></TableCell>
+                     <TableCell className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" onClick={() => openTicket(t)}>
                         <Eye className="h-4 w-4" />
@@ -123,6 +155,13 @@ const AdminSupportTickets = () => {
         <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{viewing?.subject}</DialogTitle>
+            {viewing?._profile && (
+              <p className="text-xs text-muted-foreground">
+                Submitted by: {viewing._profile.first_name || viewing._profile.last_name ? `${viewing._profile.first_name ?? ''} ${viewing._profile.last_name ?? ''}`.trim() : viewing._profile.full_name || '—'}
+                {viewing._profile.email ? ` (${viewing._profile.email})` : ''}
+                {viewing._role ? ` · ${viewing._role}` : ''}
+              </p>
+            )}
           </DialogHeader>
           <p className="text-sm text-muted-foreground">{viewing?.description}</p>
 
