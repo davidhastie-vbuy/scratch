@@ -36,7 +36,7 @@ const LegalPage = () => {
           <Link to="/signup" className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <h1 className="font-display text-xl font-bold text-foreground">TradeTrust</h1>
+          <h1 className="font-display text-xl font-bold text-foreground">Book A Trade</h1>
         </div>
       </header>
       <main className="container max-w-3xl py-8">

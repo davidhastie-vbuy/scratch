@@ -178,7 +178,7 @@ const ProviderSignupStepper = () => {
             </div>
             <h2 className="font-display text-2xl font-bold text-foreground">Application Submitted!</h2>
             <p className="text-muted-foreground">
-              Thank you for applying to join TradeTrust. Your application is now under review.
+              Thank you for applying to join Book A Trade. Your application is now under review.
             </p>
             <div className="rounded-lg border border-border bg-muted/30 p-4 text-left space-y-2">
               <h3 className="font-semibold text-sm text-foreground">What happens next?</h3>
@@ -209,7 +209,7 @@ const ProviderSignupStepper = () => {
   return (
     <div className="w-full max-w-lg">
       <div className="mb-8 text-center">
-        <h1 className="font-display text-3xl font-bold text-foreground">TradeTrust</h1>
+        <h1 className="font-display text-3xl font-bold text-foreground">Book A Trade</h1>
         <p className="mt-2 text-muted-foreground">Provider Application</p>
       </div>
 
