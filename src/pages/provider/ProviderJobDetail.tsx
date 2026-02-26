@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays } from "lucide-react";
+import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, MessageSquare } from "lucide-react";
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
 import MilestoneSetup from "@/components/MilestoneSetup";
@@ -27,6 +27,7 @@ const ProviderJobDetail = () => {
   const [job, setJob] = useState<any>(null);
   const [media, setMedia] = useState<any[]>([]);
   const [existingQuote, setExistingQuote] = useState<any>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -44,14 +45,16 @@ const ProviderJobDetail = () => {
   }, [jobId, user]);
 
   const fetchAll = async () => {
-    const [jobRes, mediaRes, quoteRes] = await Promise.all([
+    const [jobRes, mediaRes, quoteRes, convRes] = await Promise.all([
       supabase.from("jobs").select("*").eq("id", jobId!).single(),
       supabase.from("job_media").select("*").eq("job_id", jobId!),
       supabase.from("quotes").select("*").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
+      supabase.from("conversations").select("id").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
     ]);
     setJob(jobRes.data);
     setMedia(mediaRes.data ?? []);
     setExistingQuote(quoteRes.data);
+    setConversationId(convRes.data?.id ?? null);
     setLoading(false);
   };
 
@@ -224,6 +227,11 @@ const ProviderJobDetail = () => {
               </div>
               {existingQuote.message && <p className="text-sm text-muted-foreground">{existingQuote.message}</p>}
               <p className="text-xs text-muted-foreground">Submitted {new Date(existingQuote.created_at).toLocaleDateString()}</p>
+              {conversationId && (
+                <Button variant="outline" size="sm" className="mt-3" onClick={() => navigate("/provider/messages", { state: { conversationId } })}>
+                  <MessageSquare className="mr-2 h-4 w-4" /> View Messages
+                </Button>
+              )}
             </div>
           ) : quotesMaxed ? (
             <div className="flex items-start gap-3 text-sm">
