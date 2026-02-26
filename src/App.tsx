@@ -41,6 +41,7 @@ import SupportPage from "@/pages/shared/SupportPage";
 
 // Admin
 import AdminDashboard from "@/pages/AdminDashboard";
+import LegalPage from "@/pages/LegalPage";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/legal/:slug" element={<LegalPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
