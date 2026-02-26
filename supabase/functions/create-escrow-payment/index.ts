@@ -8,6 +8,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -28,8 +30,25 @@ serve(async (req) => {
     if (userError || !userData.user) throw new Error("Unauthorized");
     const user = userData.user;
 
-    const { job_id, amount, milestone_id } = await req.json();
-    if (!job_id || !amount || amount <= 0) throw new Error("Invalid job_id or amount");
+    const body = await req.json();
+    const { job_id, amount, milestone_id } = body;
+
+    // Input validation
+    if (!job_id || typeof job_id !== "string" || !UUID_REGEX.test(job_id)) {
+      return new Response(JSON.stringify({ error: "Invalid job ID" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (typeof amount !== "number" || !isFinite(amount) || amount <= 0 || amount > 1000000) {
+      return new Response(JSON.stringify({ error: "Invalid amount" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (milestone_id && (typeof milestone_id !== "string" || !UUID_REGEX.test(milestone_id))) {
+      return new Response(JSON.stringify({ error: "Invalid milestone ID" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Fetch job details
     const { data: job, error: jobError } = await supabaseAdmin
@@ -106,9 +125,12 @@ serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
     console.error("create-escrow-payment error:", msg);
-    return new Response(JSON.stringify({ error: msg }), {
+    // Return generic message for non-validation errors
+    const safeMessages = ["Unauthorized", "Only the customer can make payments", "Job not found"];
+    const safeMsg = safeMessages.includes(msg) ? msg : "An error occurred. Please try again.";
+    return new Response(JSON.stringify({ error: safeMsg }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: msg === "Unauthorized" ? 401 : 500,
     });
   }
 });

@@ -8,10 +8,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-/**
- * Called after Stripe checkout redirect to confirm payment was successful.
- * Updates escrow_payments record from 'pending' to 'held'.
- */
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -30,8 +28,15 @@ serve(async (req) => {
     const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
     if (userError || !userData.user) throw new Error("Unauthorized");
 
-    const { job_id } = await req.json();
-    if (!job_id) throw new Error("job_id required");
+    const body = await req.json();
+    const { job_id } = body;
+
+    // Input validation
+    if (!job_id || typeof job_id !== "string" || !UUID_REGEX.test(job_id)) {
+      return new Response(JSON.stringify({ error: "Invalid job ID" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -71,7 +76,7 @@ serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
     console.error("confirm-escrow-payment error:", msg);
-    return new Response(JSON.stringify({ error: msg }), {
+    return new Response(JSON.stringify({ error: "An error occurred. Please try again." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
