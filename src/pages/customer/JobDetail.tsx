@@ -31,6 +31,7 @@ const JobDetail = () => {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [media, setMedia] = useState<any[]>([]);
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
+  const [providerName, setProviderName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: "", description: "", timeline: "", budget: "" });
@@ -96,6 +97,19 @@ const JobDetail = () => {
     setQuotes(quotesRes.data ?? []);
     setMedia(mediaRes.data ?? []);
     setEscrowPayments(paymentsRes.data ?? []);
+
+    // Fetch accepted provider's name
+    if (jobRes.data?.provider_id) {
+      const { data: pp } = await supabase
+        .from("provider_profiles")
+        .select("business_name, contact_first_name, contact_last_name")
+        .eq("user_id", jobRes.data.provider_id)
+        .maybeSingle();
+      setProviderName(pp ? (pp.business_name || `${pp.contact_first_name} ${pp.contact_last_name}`) : null);
+    } else {
+      setProviderName(null);
+    }
+
     setLoading(false);
   };
 
@@ -491,6 +505,9 @@ const JobDetail = () => {
               const visibleQuotes = jobAwarded ? quotes.filter(q => q.status === "accepted") : quotes;
               return visibleQuotes.map(q => (
                 <div key={q.id} className="rounded-lg border p-4 space-y-2">
+                  {jobAwarded && providerName && (
+                    <p className="text-sm font-medium">{providerName}</p>
+                  )}
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-sm">£{Number(q.price_min).toFixed(0)} – £{Number(q.price_max).toFixed(0)}</span>
                     <Badge variant={q.status === "accepted" ? "default" : q.status === "declined" ? "destructive" : "secondary"}>
