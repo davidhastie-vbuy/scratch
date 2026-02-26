@@ -299,9 +299,11 @@ const ProviderPortfolio = () => {
                 className="w-full h-32 rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/40 transition-colors">
                 {uploadingBanner ? <Loader2 className="h-6 w-6 animate-spin" /> : <Upload className="h-6 w-6" />}
                 <span className="text-sm">Upload banner (max 5MB)</span>
+                <span className="text-xs">Recommended: 1200 × 400px</span>
               </button>
             )}
             <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
+            <p className="text-xs text-muted-foreground mt-1">Recommended size: 1200 × 400px (3:1 ratio) for best results.</p>
           </div>
         </CardContent>
       </Card>
