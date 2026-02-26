@@ -7,15 +7,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-/**
- * Called when a customer accepts a milestone.
- * Marks the corresponding escrow payment as 'released' and calculates
- * platform fee vs provider payout.
- * 
- * Note: Actual Stripe transfers/payouts would require Stripe Connect.
- * For now we track the release in our DB. The platform operator would
- * process the actual bank transfer to the provider separately.
- */
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -34,8 +27,20 @@ serve(async (req) => {
     const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
     if (userError || !userData.user) throw new Error("Unauthorized");
 
-    const { milestone_id, job_id } = await req.json();
-    if (!milestone_id || !job_id) throw new Error("milestone_id and job_id required");
+    const body = await req.json();
+    const { milestone_id, job_id } = body;
+
+    // Input validation
+    if (!milestone_id || typeof milestone_id !== "string" || !UUID_REGEX.test(milestone_id)) {
+      return new Response(JSON.stringify({ error: "Invalid milestone ID" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!job_id || typeof job_id !== "string" || !UUID_REGEX.test(job_id)) {
+      return new Response(JSON.stringify({ error: "Invalid job ID" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Get the job to verify customer
     const { data: job } = await supabaseAdmin
@@ -45,6 +50,19 @@ serve(async (req) => {
       .single();
     if (!job) throw new Error("Job not found");
     if (job.customer_user_id !== userData.user.id) throw new Error("Only the customer can release payments");
+
+    // Verify milestone belongs to this job
+    const { data: milestoneCheck } = await supabaseAdmin
+      .from("job_milestones")
+      .select("id")
+      .eq("id", milestone_id)
+      .eq("job_id", job_id)
+      .single();
+    if (!milestoneCheck) {
+      return new Response(JSON.stringify({ error: "Milestone not found for this job" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Get provider's platform fee
     const { data: provider } = await supabaseAdmin
@@ -65,7 +83,6 @@ serve(async (req) => {
 
     if (!payment) {
       // No held payment for this milestone - might be pre-paid in bulk
-      // Check for a bulk payment without milestone_id
       const { data: bulkPayment } = await supabaseAdmin
         .from("escrow_payments")
         .select("*")
@@ -81,7 +98,6 @@ serve(async (req) => {
         });
       }
 
-      // For bulk payment, calculate the milestone portion
       const { data: milestone } = await supabaseAdmin
         .from("job_milestones")
         .select("payment_amount")
@@ -99,7 +115,6 @@ serve(async (req) => {
       const platformFee = Math.round(milestoneAmount * (feePercent / 100) * 100) / 100;
       const providerPayout = Math.round((milestoneAmount - platformFee) * 100) / 100;
 
-      // Create a release record for this milestone
       await supabaseAdmin.from("escrow_payments").insert({
         job_id,
         milestone_id,
@@ -111,7 +126,6 @@ serve(async (req) => {
         status: "released",
       });
 
-      // Update the bulk payment amount (reduce by milestone amount)
       const remaining = bulkPayment.amount - milestoneAmount;
       if (remaining <= 0) {
         await supabaseAdmin
@@ -160,7 +174,7 @@ serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
     console.error("release-escrow-payment error:", msg);
-    return new Response(JSON.stringify({ error: msg }), {
+    return new Response(JSON.stringify({ error: "An error occurred. Please try again." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

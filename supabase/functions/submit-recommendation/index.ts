@@ -5,37 +5,86 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_MESSAGE_LENGTH = 5000;
+const MAX_PHOTOS = 5;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    // Require authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const formData = await req.formData();
-    const userId = formData.get("user_id") as string | null;
-    const userEmail = formData.get("user_email") as string | null;
     const message = formData.get("message") as string | null;
     const customerName = formData.get("customer_name") as string | null;
     const customerPostcode = formData.get("customer_postcode") as string | null;
+    const photos = formData.getAll("photos");
 
-    if (!message && formData.getAll("photos").length === 0) {
+    if (!message && photos.length === 0) {
       return new Response(JSON.stringify({ error: "Nothing to submit" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
+    // Validate message length
+    if (message && message.length > MAX_MESSAGE_LENGTH) {
+      return new Response(JSON.stringify({ error: "Message is too long" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate photo count
+    if (photos.length > MAX_PHOTOS) {
+      return new Response(JSON.stringify({ error: `Maximum ${MAX_PHOTOS} photos allowed` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const photoUrls: string[] = [];
-    const photos = formData.getAll("photos");
 
     for (const photo of photos) {
       if (photo instanceof File && photo.size > 0) {
+        // Validate file size
+        if (photo.size > MAX_FILE_SIZE) {
+          console.error("File too large:", photo.name, photo.size);
+          continue;
+        }
+        // Validate file type
+        if (!ALLOWED_TYPES.includes(photo.type)) {
+          console.error("Invalid file type:", photo.name, photo.type);
+          continue;
+        }
+
         const ext = photo.name.split(".").pop() || "jpg";
-        const path = `${userId || "anon"}/${crypto.randomUUID()}.${ext}`;
+        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
         const { error: uploadError } = await supabase.storage
           .from("recommendation-photos")
           .upload(path, photo, { contentType: photo.type });
@@ -54,12 +103,12 @@ Deno.serve(async (req) => {
     const { error: insertError } = await supabase
       .from("customer_recommendations")
       .insert({
-        user_id: userId || null,
-        user_email: userEmail || null,
+        user_id: user.id,
+        user_email: user.email || null,
         message: message || null,
         photo_urls: photoUrls,
-        customer_name: customerName || null,
-        customer_postcode: customerPostcode || null,
+        customer_name: customerName?.slice(0, 200) || null,
+        customer_postcode: customerPostcode?.slice(0, 20) || null,
       });
 
     if (insertError) {
@@ -75,7 +124,7 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("Unexpected error:", err);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
+    return new Response(JSON.stringify({ error: "An error occurred. Please try again." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
