@@ -14,6 +14,7 @@ import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays } from "lucide-re
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
 import MilestoneSetup from "@/components/MilestoneSetup";
+import MediaLightbox from "@/components/MediaLightbox";
 import { format } from "date-fns";
 
 const ProviderJobDetail = () => {
@@ -28,6 +29,7 @@ const ProviderJobDetail = () => {
   const [existingQuote, setExistingQuote] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const [quoteForm, setQuoteForm] = useState({
     priceMin: "",
@@ -180,15 +182,30 @@ const ProviderJobDetail = () => {
           <CardHeader><CardTitle className="text-base">Photos & Videos</CardTitle></CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-2">
-              {media.map(m => {
+              {media.map((m, i) => {
                 const url = supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl;
                 return m.file_type.startsWith("image") ? (
-                  <img key={m.id} src={url} alt={m.file_name} className="rounded-md w-full h-24 object-cover" />
+                  <button key={m.id} onClick={() => setLightboxIndex(i)} className="rounded-md overflow-hidden hover:ring-2 hover:ring-primary transition-all">
+                    <img src={url} alt={m.file_name} className="w-full h-24 object-cover" />
+                  </button>
                 ) : (
-                  <video key={m.id} src={url} className="rounded-md w-full h-24 object-cover" controls />
+                  <button key={m.id} onClick={() => setLightboxIndex(i)} className="relative rounded-md overflow-hidden hover:ring-2 hover:ring-primary transition-all bg-muted h-24 flex items-center justify-center">
+                    <video src={url} className="w-full h-24 object-cover" />
+                    <span className="absolute bottom-1 right-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded">▶ Video</span>
+                  </button>
                 );
               })}
             </div>
+            <MediaLightbox
+              media={media.map(m => ({
+                url: supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl,
+                type: m.file_type,
+                name: m.file_name,
+              }))}
+              initialIndex={lightboxIndex ?? 0}
+              open={lightboxIndex !== null}
+              onOpenChange={(open) => { if (!open) setLightboxIndex(null); }}
+            />
           </CardContent>
         </Card>
       )}
