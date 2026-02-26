@@ -88,11 +88,15 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
 
         {isAccepted && (
           <div className="space-y-2">
-            <p className="text-xs text-green-700 font-medium">✓ Terms confirmed — work has been scheduled</p>
-            {onSetupMilestones && (
-              <Button size="sm" onClick={onSetupMilestones} className="w-full">
-                <ListChecks className="mr-2 h-4 w-4" /> Set Up Milestones & Start Job
-              </Button>
+            {onSetupMilestones ? (
+              <>
+                <p className="text-xs text-green-700 font-medium">✓ Terms confirmed — work has been scheduled</p>
+                <Button size="sm" onClick={onSetupMilestones} className="w-full">
+                  <ListChecks className="mr-2 h-4 w-4" /> Set Up Milestones & Start Job
+                </Button>
+              </>
+            ) : (
+              <p className="text-xs text-green-700 font-medium">✓ Terms accepted — awaiting customer confirmation</p>
             )}
           </div>
         )}

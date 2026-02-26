@@ -183,7 +183,29 @@ const ProviderMessages = () => {
     if (!selected) return;
     setAccepting(true);
     const metadata = (msg as any).metadata;
+    const isCustomerProposal = msg.sender_user_id !== user!.id;
 
+    if (isCustomerProposal) {
+      // Provider accepting a customer's proposal — send it back as a formal proposal for customer confirmation
+      // Decline the original customer proposal
+      await supabase.from("messages").update({
+        metadata: { ...metadata, status: "declined" },
+      } as any).eq("id", msg.id);
+
+      // Open the propose terms dialog pre-filled with the customer's agreed price
+      setProposeDefaults({
+        agreed_price: metadata.agreed_price,
+      });
+      setProposeOpen(true);
+
+      toast({ title: "Please confirm the details", description: "Fill in the start date and duration, then send the formal proposal for the customer to accept." });
+      setAccepting(false);
+      await refreshMessages();
+      return;
+    }
+
+    // Provider accepting their OWN proposal that was countered back — this shouldn't happen in normal flow
+    // But handle gracefully by finalizing
     await supabase.from("messages").update({
       metadata: { ...metadata, status: "accepted" },
     } as any).eq("id", msg.id);
@@ -329,7 +351,7 @@ const ProviderMessages = () => {
                         onDecline={() => handleDeclineProposal(m)}
                         onCounter={() => handleCounterProposal(m)}
                         onSetupMilestones={
-                          (m as any).metadata?.status === "accepted" && selected
+                          (m as any).metadata?.status === "accepted" && selected && jobAccepted
                             ? () => navigate(`/provider/jobs/${selected.job_id}`)
                             : undefined
                         }
