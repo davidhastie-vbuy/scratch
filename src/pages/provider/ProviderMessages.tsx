@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ProposeTermsDialog from "@/components/messaging/ProposeTermsDialog";
+import QuoteBanner from "@/components/messaging/QuoteBanner";
 import { AttachmentButton, StagedFilePreview, MessageAttachments, uploadAttachments, type StagedFile } from "@/components/messaging/ChatAttachments";
 import { cn } from "@/lib/utils";
 
@@ -337,6 +338,7 @@ const ProviderMessages = () => {
                 </Button>
               )}
             </div>
+            <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} />
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.map(m => {
                 const isOwn = m.sender_user_id === user!.id;
