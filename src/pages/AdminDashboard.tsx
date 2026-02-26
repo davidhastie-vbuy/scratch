@@ -22,7 +22,7 @@ const AdminDashboard = () => {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-sidebar-primary" />
-            <h1 className="font-display text-xl font-bold">BookATrade Admin</h1>
+            <h1 className="font-display text-xl font-bold">Book A Trade Admin</h1>
           </div>
           <div className="flex items-center gap-4">
             <NotificationBell />

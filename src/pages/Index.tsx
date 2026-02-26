@@ -12,7 +12,7 @@ const Index = () => {
       {/* Header */}
       <header className="border-b bg-card sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between">
-          <h1 className="font-display text-xl font-bold text-foreground">BookATrade</h1>
+          <h1 className="font-display text-xl font-bold text-foreground">Book A Trade</h1>
           <div className="flex items-center gap-3">
             <Button variant="ghost" asChild>
               <Link to="/login">Sign in</Link>
@@ -72,7 +72,7 @@ const Index = () => {
       <section className="bg-accent/30 py-16 md:py-24">
         <div className="container">
           <div className="text-center mb-12">
-            <h3 className="font-display text-3xl font-bold text-foreground">How BookATrade works</h3>
+            <h3 className="font-display text-3xl font-bold text-foreground">How Book A Trade works</h3>
             <p className="mt-2 text-muted-foreground max-w-lg mx-auto">Simple, transparent, and built around your peace of mind.</p>
           </div>
           <div className="grid gap-8 md:grid-cols-3 max-w-4xl mx-auto">
@@ -115,7 +115,7 @@ const Index = () => {
                 Every tradesperson is vetted before they join
               </h3>
               <p className="mt-3 text-muted-foreground leading-relaxed">
-                No cowboys, no time wasters. Every professional on BookATrade goes through our approval process — verified qualifications, experience, and documentation — so you only deal with the best.
+                No cowboys, no time wasters. Every professional on Book A Trade goes through our approval process — verified qualifications, experience, and documentation — so you only deal with the best.
               </p>
               <ul className="mt-4 space-y-2">
                 {["ID & qualification checks", "Admin-reviewed applications", "Ongoing quality monitoring"].map((item) => (
@@ -206,7 +206,7 @@ const Index = () => {
             Ready to find your perfect tradesperson?
           </h3>
           <p className="mt-3 text-primary-foreground/80 max-w-md mx-auto">
-            Join thousands of homeowners who trust BookATrade to connect them with reliable, vetted professionals.
+            Join thousands of homeowners who trust Book A Trade to connect them with reliable, vetted professionals.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button size="lg" variant="secondary" asChild className="text-base">
@@ -225,8 +225,8 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t bg-card py-8">
         <div className="container flex flex-col items-center gap-2 text-center text-sm text-muted-foreground">
-          <span className="font-display font-semibold text-foreground">BookATrade</span>
-          <span>© {new Date().getFullYear()} BookATrade. All rights reserved. bookatrade.io</span>
+          <span className="font-display font-semibold text-foreground">Book A Trade</span>
+          <span>© {new Date().getFullYear()} Book A Trade. All rights reserved. bookatrade.io</span>
         </div>
       </footer>
     </div>
