@@ -105,7 +105,10 @@ const StepReviewSubmit = ({ form, tradeCategories, agreements, onAgreementsChang
             onCheckedChange={(checked) => onAgreementsChange({ ...agreements, terms: !!checked })}
           />
           <Label htmlFor="agree-terms" className="text-xs font-normal leading-tight cursor-pointer">
-            I agree to the Terms of Service and Privacy Policy, including the commission structure.
+            I agree to the{" "}
+            <a href="/legal/terms-of-service?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Terms of Service</a>{" "}
+            and{" "}
+            <a href="/legal/privacy-policy?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Privacy Policy</a>, including the commission structure.
           </Label>
         </div>
 
