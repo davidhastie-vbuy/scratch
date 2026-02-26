@@ -158,17 +158,17 @@ const AdminProviderList = () => {
         await supabase.functions.invoke("send-provider-email", {
           body: {
             to: p.email,
-            subject: "TradeTrust — Your application has been approved! 🎉",
+            subject: "Book A Trade — Your application has been approved! 🎉",
             html: `
               <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2 style="color: #1a1a1a;">Congratulations, ${providerName}!</h2>
-                <p>Great news — your TradeTrust provider application has been <strong>approved</strong>.</p>
-                <p>You can now log in and start viewing jobs available in your local area, submit quotes, and grow your business through TradeTrust.</p>
+                <p>Great news — your Book A Trade provider application has been <strong>approved</strong>.</p>
+                <p>You can now log in and start viewing jobs available in your local area, submit quotes, and grow your business through Book A Trade.</p>
                 <p style="margin: 24px 0;">
                   <a href="${dashboardLink}" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">View Available Jobs</a>
                 </p>
                 <p style="color: #6b7280; font-size: 14px;">If you have any questions, please contact our support team.</p>
-                <p style="color: #6b7280; font-size: 14px;">— The TradeTrust Team</p>
+                <p style="color: #6b7280; font-size: 14px;">— The Book A Trade Team</p>
               </div>
             `,
           },
@@ -200,18 +200,18 @@ const AdminProviderList = () => {
         await supabase.functions.invoke("send-provider-email", {
           body: {
             to: actionDialog.provider.email,
-            subject: "TradeTrust — Changes requested on your application",
+            subject: "Book A Trade — Changes requested on your application",
             html: `
               <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2 style="color: #1a1a1a;">Hi ${providerName},</h2>
-                <p>The TradeTrust team has reviewed your provider application and requested some changes before approval.</p>
+                <p>The Book A Trade team has reviewed your provider application and requested some changes before approval.</p>
                 ${adminNote.trim() ? `<div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 16px 0; border-radius: 4px;"><strong>Admin feedback:</strong><br/>${adminNote.trim()}</div>` : ""}
                 <p>Please log in to your dashboard to review the feedback and update your application:</p>
                 <p style="margin: 24px 0;">
                   <a href="${profileLink}" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Go to My Profile</a>
                 </p>
                 <p style="color: #6b7280; font-size: 14px;">If you have any questions, please contact our support team.</p>
-                <p style="color: #6b7280; font-size: 14px;">— The TradeTrust Team</p>
+                <p style="color: #6b7280; font-size: 14px;">— The Book A Trade Team</p>
               </div>
             `,
           },
