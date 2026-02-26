@@ -32,6 +32,7 @@ const JobDetail = () => {
   const [media, setMedia] = useState<any[]>([]);
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [providerName, setProviderName] = useState<string | null>(null);
+  const [providerNames, setProviderNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: "", description: "", timeline: "", budget: "" });
@@ -94,18 +95,31 @@ const JobDetail = () => {
         budget: jobRes.data.budget ?? "",
       });
     }
-    setQuotes(quotesRes.data ?? []);
+    const allQuotes = quotesRes.data ?? [];
+    setQuotes(allQuotes);
     setMedia(mediaRes.data ?? []);
     setEscrowPayments(paymentsRes.data ?? []);
 
+    // Fetch provider names for all quotes
+    const providerUserIds = [...new Set(allQuotes.map(q => q.provider_user_id))];
+    if (providerUserIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from("provider_profiles")
+        .select("user_id, business_name, contact_first_name, contact_last_name")
+        .in("user_id", providerUserIds);
+      const nameMap: Record<string, string> = {};
+      (profiles ?? []).forEach(pp => {
+        nameMap[pp.user_id] = pp.business_name || `${pp.contact_first_name} ${pp.contact_last_name}`;
+      });
+      setProviderNames(nameMap);
+    } else {
+      setProviderNames({});
+    }
+
     // Fetch accepted provider's name
     if (jobRes.data?.provider_id) {
-      const { data: pp } = await supabase
-        .from("provider_profiles")
-        .select("business_name, contact_first_name, contact_last_name")
-        .eq("user_id", jobRes.data.provider_id)
-        .maybeSingle();
-      setProviderName(pp ? (pp.business_name || `${pp.contact_first_name} ${pp.contact_last_name}`) : null);
+      const existing = providerUserIds.length > 0 ? null : null; // already fetched above
+      setProviderName(null); // will use providerNames map instead
     } else {
       setProviderName(null);
     }
@@ -505,8 +519,8 @@ const JobDetail = () => {
               const visibleQuotes = jobAwarded ? quotes.filter(q => q.status === "accepted") : quotes;
               return visibleQuotes.map(q => (
                 <div key={q.id} className="rounded-lg border p-4 space-y-2">
-                  {jobAwarded && providerName && (
-                    <p className="text-sm font-medium">{providerName}</p>
+                  {providerNames[q.provider_user_id] && (
+                    <p className="text-sm font-medium">{providerNames[q.provider_user_id]}</p>
                   )}
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-sm">£{Number(q.price_min).toFixed(0)} – £{Number(q.price_max).toFixed(0)}</span>
