@@ -92,12 +92,28 @@ const ProviderJobDetail = () => {
         toast({ title: "Failed to submit quote", description: error.message, variant: "destructive" });
       }
     } else {
-      // Create conversation
-      await supabase.from("conversations").upsert({
+      // Create conversation and send quote as first message
+      const { data: convData } = await supabase.from("conversations").upsert({
         job_id: jobId!,
         customer_user_id: job.customer_user_id,
         provider_user_id: user!.id,
-      } as any, { onConflict: "job_id,customer_user_id,provider_user_id" });
+      } as any, { onConflict: "job_id,customer_user_id,provider_user_id" }).select("id").single();
+
+      if (convData?.id) {
+        const minPrice = parseFloat(quoteForm.priceMin);
+        const maxPrice = parseFloat(quoteForm.priceMax);
+        const parts = [`Hi, I'd like to quote on this job.`, `💷 Estimate: £${minPrice.toFixed(0)}–£${maxPrice.toFixed(0)}`];
+        if (quoteForm.availability) parts.push(`📅 Availability: ${quoteForm.availability}`);
+        if (quoteForm.estimatedDuration) parts.push(`⏱️ Estimated duration: ${quoteForm.estimatedDuration}`);
+        if (quoteForm.message) parts.push(`\n${quoteForm.message}`);
+
+        await supabase.from("messages").insert({
+          conversation_id: convData.id,
+          sender_user_id: user!.id,
+          body: parts.join("\n"),
+          message_type: "text",
+        } as any);
+      }
 
       toast({ title: "Quote submitted!" });
       fetchAll();
