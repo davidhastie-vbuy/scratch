@@ -58,7 +58,7 @@ const QuoteBanner = ({ jobId, providerUserId }: QuoteBannerProps) => {
         <p className="font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Original Quote</p>
         {quote.businessName && quote.providerProfileId && (
           <button
-            onClick={() => navigate(`/dashboard/provider/${quote.providerProfileId}`)}
+            onClick={() => navigate(`/dashboard/providers/${quote.providerProfileId}`)}
             className="flex items-center gap-1 text-primary hover:underline text-xs font-medium"
           >
             <Building2 className="h-3.5 w-3.5" />
