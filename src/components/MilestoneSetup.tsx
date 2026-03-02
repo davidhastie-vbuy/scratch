@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Plus, Trash2, Loader2, CheckCircle2, PoundSterling, AlertTriangle,
 } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+
 
 interface MilestoneSetupProps {
   jobId: string;
@@ -29,17 +29,22 @@ interface MilestoneItem {
 let tempId = 0;
 const nextId = () => `temp-${++tempId}`;
 
+const getDepositInfo = (price: number) => {
+  if (price < 200) return { depositPercent: 100, depositAmount: price, noMilestonesRequired: true };
+  if (price < 2000) return { depositPercent: 20, depositAmount: Math.round(price * 0.2 * 100) / 100, noMilestonesRequired: false };
+  return { depositPercent: 10, depositAmount: Math.round(price * 0.1 * 100) / 100, noMilestonesRequired: false };
+};
+
 const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  const depositInfo = getDepositInfo(agreedPrice);
   const [milestones, setMilestones] = useState<MilestoneItem[]>([]);
-  const [noMilestones, setNoMilestones] = useState(false);
+  const [noMilestones, setNoMilestones] = useState(depositInfo.noMilestonesRequired);
   const [confirming, setConfirming] = useState(false);
 
-  const canSkipMilestones = agreedPrice < 500;
-
-  const totalAllocated = milestones.reduce((sum, m) => sum + (parseFloat(m.amount) || 0), 0);
+  const totalAllocated = depositInfo.depositAmount + milestones.reduce((sum, m) => sum + (parseFloat(m.amount) || 0), 0);
   const remaining = agreedPrice - totalAllocated;
 
   const addMilestone = () => {
@@ -60,13 +65,8 @@ const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps
   };
 
   const handleConfirm = async () => {
-    if (!noMilestones && milestones.length === 0) {
-      toast({ title: "Add at least one milestone", variant: "destructive" });
-      return;
-    }
-
-    if (!noMilestones) {
-      // Validate all milestones have title and amount
+    if (!depositInfo.noMilestonesRequired && !noMilestones) {
+      // Validate additional milestones have title and amount
       for (const m of milestones) {
         if (!m.title.trim()) {
           toast({ title: "All milestones need a title", variant: "destructive" });
@@ -92,8 +92,8 @@ const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps
       // Remove any previously saved (non-auto) milestones to prevent duplicates
       await supabase.from("job_milestones").delete().eq("job_id", jobId).eq("is_auto", false);
 
-      if (noMilestones) {
-        // Single full-payment milestone
+      if (depositInfo.noMilestonesRequired) {
+        // Under £200: single full payment
         const { error } = await supabase.from("job_milestones").insert({
           job_id: jobId,
           title: "Full Payment",
@@ -104,22 +104,34 @@ const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps
         } as any);
         if (error) throw error;
       } else {
-        // Insert each milestone
-        const inserts = milestones.map((m, i) => ({
+        // First milestone is the mandatory deposit
+        const inserts: any[] = [{
           job_id: jobId,
-          title: m.title.trim(),
-          sort_order: i + 1,
+          title: "Deposit",
+          sort_order: 0,
           created_by: user!.id,
-          payment_amount: parseFloat(m.amount),
+          payment_amount: depositInfo.depositAmount,
           is_auto: false,
-        }));
+        }];
+
+        // Add provider's additional milestones
+        milestones.forEach((m, i) => {
+          inserts.push({
+            job_id: jobId,
+            title: m.title.trim(),
+            sort_order: i + 1,
+            created_by: user!.id,
+            payment_amount: parseFloat(m.amount),
+            is_auto: false,
+          });
+        });
 
         // If there's remaining balance, add a final milestone
         if (remaining > 0.01) {
           inserts.push({
             job_id: jobId,
             title: "Final Payment",
-            sort_order: milestones.length + 1,
+            sort_order: inserts.length,
             created_by: user!.id,
             payment_amount: Math.round(remaining * 100) / 100,
             is_auto: false,
@@ -159,10 +171,16 @@ const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps
             <span className="text-muted-foreground">Agreed Price</span>
             <span className="font-semibold">£{agreedPrice.toFixed(2)}</span>
           </div>
-          {milestones.length > 0 && (
+          {!depositInfo.noMilestonesRequired && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Mandatory Deposit ({depositInfo.depositPercent}%)</span>
+              <span className="font-semibold">£{depositInfo.depositAmount.toFixed(2)}</span>
+            </div>
+          )}
+          {(milestones.length > 0 || !depositInfo.noMilestonesRequired) && (
             <>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Allocated to Milestones</span>
+                <span className="text-muted-foreground">Total Allocated</span>
                 <span className={totalAllocated > agreedPrice ? "text-destructive font-semibold" : ""}>
                   £{totalAllocated.toFixed(2)}
                 </span>
@@ -184,35 +202,19 @@ const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps
           </div>
         )}
 
-        <p className="text-sm text-muted-foreground">
-          Define the milestones for this job. Each milestone should describe what will be completed and the payment due at that point.
-          The final payment will automatically cover any remaining balance.
-        </p>
-
-        {/* Skip milestones for jobs under £500 */}
-        {canSkipMilestones && (
-          <div className="flex items-start gap-3 rounded-lg border p-3">
-            <Checkbox
-              id="no-milestones"
-              checked={noMilestones}
-              onCheckedChange={(c) => {
-                setNoMilestones(!!c);
-                if (c) setMilestones([]);
-              }}
-            />
-            <div>
-              <Label htmlFor="no-milestones" className="text-sm font-medium cursor-pointer">
-                No additional milestones — full payment upfront
-              </Label>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                For jobs under £500, you can request full payment before starting.
-              </p>
-            </div>
-          </div>
+        {depositInfo.noMilestonesRequired ? (
+          <p className="text-sm text-muted-foreground">
+            This job is under £200, so the customer will pay the full amount upfront. No milestones are needed.
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            A {depositInfo.depositPercent}% deposit (£{depositInfo.depositAmount.toFixed(2)}) will be collected as the first milestone.
+            You can add additional milestones below. The final payment will automatically cover any remaining balance.
+          </p>
         )}
 
-        {/* Milestone list */}
-        {!noMilestones && (
+        {/* Additional milestones for jobs £200+ */}
+        {!depositInfo.noMilestonesRequired && (
           <div className="space-y-3">
             {milestones.map((m, i) => (
               <div key={m.id} className="rounded-lg border p-3 space-y-2">
@@ -261,7 +263,7 @@ const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps
 
         <Button
           onClick={handleConfirm}
-          disabled={confirming || (!noMilestones && milestones.length === 0) || totalAllocated > agreedPrice}
+          disabled={confirming || totalAllocated > agreedPrice}
           className="w-full"
         >
           {confirming ? (
