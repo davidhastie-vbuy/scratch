@@ -538,13 +538,8 @@ const JobDetail = () => {
                       View Provider
                     </Button>
                     {(!jobAwarded || q.status === "accepted") && (
-                      <Button variant="outline" size="sm" onClick={() => openChat(q.provider_user_id, q.id)}>
-                        <MessageSquare className="mr-2 h-4 w-4" /> Message Provider
-                      </Button>
-                    )}
-                    {q.status === "pending" && job.status !== "cancelled" && !jobAwarded && (
-                      <Button size="sm" onClick={() => openNegotiateDialog(q)}>
-                        <Handshake className="mr-2 h-4 w-4" /> Negotiate
+                      <Button size="sm" onClick={() => navigate("/dashboard/messages", { state: { selectConversation: { jobId: jobId!, providerUserId: q.provider_user_id } } })}>
+                        <MessageSquare className="mr-2 h-4 w-4" /> Discuss Job
                       </Button>
                     )}
                   </div>
