@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ interface ConversationWithUnread {
 const CustomerMessages = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const location = useLocation();
   const [conversations, setConversations] = useState<ConversationWithUnread[]>([]);
   const [selected, setSelected] = useState<ConversationWithUnread | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -35,7 +37,9 @@ const CustomerMessages = () => {
   const [sending, setSending] = useState(false);
   const [accepting, setAccepting] = useState(false);
   const [counterDialog, setCounterDialog] = useState<{ priceMin: number; priceMax: number } | null>(null);
+  const [negotiateDialog, setNegotiateDialog] = useState<{ priceMin: number; priceMax: number } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const autoSelectRef = useRef(false);
 
   useEffect(() => {
     if (user) fetchConversations();
@@ -77,6 +81,20 @@ const CustomerMessages = () => {
 
     setConversations(enriched);
     setLoading(false);
+
+    // Auto-select conversation from navigation state
+    if (!autoSelectRef.current) {
+      autoSelectRef.current = true;
+      const navState = location.state as { selectConversation?: { jobId: string; providerUserId: string } } | null;
+      if (navState?.selectConversation) {
+        const match = enriched.find(
+          c => c.job_id === navState.selectConversation!.jobId && c.provider_user_id === navState.selectConversation!.providerUserId
+        );
+        if (match) {
+          openConversation(match);
+        }
+      }
+    }
   };
 
   const fetchAttachments = async (messageIds: string[]) => {
@@ -254,6 +272,43 @@ const CustomerMessages = () => {
     await refreshMessages();
   };
 
+  const openNegotiateFromChat = async () => {
+    if (!selected) return;
+    const { data: quotes } = await supabase
+      .from("quotes")
+      .select("price_min, price_max")
+      .eq("job_id", selected.job_id)
+      .eq("provider_user_id", selected.provider_user_id)
+      .limit(1);
+    const quote = quotes?.[0];
+    setNegotiateDialog({
+      priceMin: quote ? Number(quote.price_min) : 1,
+      priceMax: quote ? Number(quote.price_max) : 999999,
+    });
+  };
+
+  const sendNegotiation = async (data: { agreed_price: number; urgency: string; urgency_label: string }) => {
+    if (!selected) return;
+    // Decline existing pending proposals
+    for (const m of messages) {
+      if ((m as any).message_type === "proposal" && (m as any).metadata?.status === "pending") {
+        await supabase.from("messages").update({
+          metadata: { ...(m as any).metadata, status: "declined" },
+        } as any).eq("id", m.id);
+      }
+    }
+    await supabase.from("messages").insert({
+      conversation_id: selected.id,
+      sender_user_id: user!.id,
+      body: `Proposal: £${data.agreed_price.toFixed(2)}, needed: ${data.urgency_label}`,
+      message_type: "proposal",
+      metadata: { ...data, status: "pending" },
+    } as any);
+    toast({ title: "Proposal sent to provider" });
+    setNegotiateDialog(null);
+    await refreshMessages();
+  };
+
   useEffect(() => {
     if (!selected) return;
     const channel = supabase
@@ -368,17 +423,24 @@ const CustomerMessages = () => {
               <div ref={bottomRef} />
             </div>
             <StagedFilePreview stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} />
-            <div className="p-3 border-t flex gap-2">
-              <AttachmentButton stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} disabled={sending} />
-              <Input
-                value={newMsg}
-                onChange={e => setNewMsg(e.target.value)}
-                placeholder="Type a message…"
-                onKeyDown={e => e.key === "Enter" && sendMessage()}
-              />
-              <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && stagedFiles.length === 0)}>
-                <Send className="h-4 w-4" />
-              </Button>
+            <div className="p-3 border-t space-y-2">
+              {!jobAccepted && (
+                <Button variant="outline" size="sm" className="w-full" onClick={openNegotiateFromChat}>
+                  <Handshake className="mr-2 h-4 w-4" /> Negotiate
+                </Button>
+              )}
+              <div className="flex gap-2">
+                <AttachmentButton stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} disabled={sending} />
+                <Input
+                  value={newMsg}
+                  onChange={e => setNewMsg(e.target.value)}
+                  placeholder="Type a message…"
+                  onKeyDown={e => e.key === "Enter" && sendMessage()}
+                />
+                <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && stagedFiles.length === 0)}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </>
         )}
@@ -391,6 +453,16 @@ const CustomerMessages = () => {
           priceMin={counterDialog.priceMin}
           priceMax={counterDialog.priceMax}
           onSubmit={sendCounterNegotiation}
+        />
+      )}
+
+      {negotiateDialog && (
+        <NegotiateDialog
+          open={!!negotiateDialog}
+          onClose={() => setNegotiateDialog(null)}
+          priceMin={negotiateDialog.priceMin}
+          priceMax={negotiateDialog.priceMax}
+          onSubmit={sendNegotiation}
         />
       )}
     </div>
