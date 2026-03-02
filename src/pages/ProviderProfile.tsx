@@ -478,8 +478,8 @@ const ProviderProfile = () => {
                         {available.map(c => <SelectItem key={c.id} value={c.slug}>{c.name}</SelectItem>)}
                       </SelectContent>
                     </Select>
-                    <Button onClick={submitAdditionalCategory} disabled={!selectedAdditional || savingAdditional} variant="outline">
-                      {savingAdditional ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                    <Button onClick={submitAdditionalCategory} disabled={!selectedAdditional || savingAdditional} size="sm">
+                      {savingAdditional ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
                     </Button>
                   </div>
                 </div>
