@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake } from "lucide-react";
+import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake, AlertTriangle } from "lucide-react";
 import MilestonePaymentSection from "@/components/MilestonePaymentSection";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import ProposalCard from "@/components/messaging/ProposalCard";
@@ -48,6 +48,10 @@ const JobDetail = () => {
   // Payment
   const [payingAmount, setPayingAmount] = useState("");
   const [processingPayment, setProcessingPayment] = useState(false);
+
+  // Revise milestones
+  const [showReviseDialog, setShowReviseDialog] = useState(false);
+  const [reviseComment, setReviseComment] = useState("");
 
   // Inline messaging
   const [chatDialog, setChatDialog] = useState<{ providerUserId: string; quoteId: string } | null>(null);
@@ -318,11 +322,11 @@ const JobDetail = () => {
     await supabase.from("messages").insert({
       conversation_id: chatConvId,
       sender_user_id: user!.id,
-      body: `Terms accepted! Job scheduled for £${Number(metadata.agreed_price).toFixed(2)}.`,
+      body: `✅ Terms accepted in principle! Price: £${Number(metadata.agreed_price).toFixed(2)}.\n\n⏳ Next steps:\n1. The provider will now set up milestone payments.\n2. Pay the first milestone deposit before work can begin.\n3. You can review milestones and request changes if needed.\n\n💡 The job is fully confirmed once you make the first milestone payment.`,
       message_type: "system",
     } as any);
 
-    toast({ title: "Terms accepted!", description: "The job has been scheduled." });
+    toast({ title: "Terms accepted in principle!", description: "The provider will now set up milestone payments." });
     setChatAccepting(false);
     const { data: msgs } = await supabase.from("messages").select("*").eq("conversation_id", chatConvId).order("created_at");
     setChatMessages(msgs ?? []);
@@ -558,7 +562,8 @@ const JobDetail = () => {
               <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium">Awaiting milestone setup</p>
-                <p className="text-muted-foreground">Your provider is setting up the milestones and payment schedule for this job. You'll be asked to make payment once this is confirmed.</p>
+                <p className="text-muted-foreground">Your provider is setting up the milestones and payment schedule. Once ready, you'll need to pay the first milestone deposit to fully confirm the job.</p>
+                <p className="text-muted-foreground mt-1">If you don't make payment before the scheduled start date, the job will be reopened for other providers to quote on.</p>
               </div>
             </div>
           </CardContent>
@@ -574,6 +579,18 @@ const JobDetail = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Show info banner for accepted jobs without any payments yet */}
+            {job.status === "accepted" && escrowPayments.filter(p => p.status === "held" || p.status === "released").length === 0 && (
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 text-sm space-y-1">
+                <p className="font-medium flex items-center gap-1.5 text-amber-800 dark:text-amber-200">
+                  <AlertTriangle className="h-4 w-4" /> Payment required to confirm job
+                </p>
+                <p className="text-amber-700 dark:text-amber-300">
+                  Pay the first milestone deposit below to fully confirm this job. If payment isn't made before the scheduled start date, the job will be reopened for other providers.
+                </p>
+              </div>
+            )}
+
             <div className="grid gap-2 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number(job.agreed_price).toFixed(2)}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Held in Escrow</span><span>£{totalHeld.toFixed(2)}</span></div>
@@ -598,6 +615,18 @@ const JobDetail = () => {
 
             {/* Make payment for next milestone */}
             <MilestonePaymentSection jobId={jobId!} agreedPrice={Number(job.agreed_price)} escrowPayments={escrowPayments} onPaymentComplete={fetchAll} />
+
+            {/* Revise Milestones button - only before first payment */}
+            {job.status === "accepted" && escrowPayments.filter(p => p.status === "held" || p.status === "released").length === 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => setShowReviseDialog(true)}
+              >
+                <AlertTriangle className="mr-2 h-4 w-4" /> Revise Milestones
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
@@ -720,6 +749,70 @@ const JobDetail = () => {
           onSubmit={sendCounterProposal}
         />
       )}
+
+      {/* Revise Milestones Dialog */}
+      <Dialog open={showReviseDialog} onOpenChange={setShowReviseDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Revise Milestones</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Send a message to the provider explaining what changes you'd like to the milestone breakdown. They will revise and resubmit.
+            </p>
+            <Textarea
+              value={reviseComment}
+              onChange={e => setReviseComment(e.target.value)}
+              placeholder="e.g. I'd prefer the deposit to be smaller, or I'd like more milestones for the different stages…"
+              rows={4}
+            />
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => { setShowReviseDialog(false); setReviseComment(""); }}>
+                Cancel
+              </Button>
+              <Button
+                disabled={!reviseComment.trim()}
+                onClick={async () => {
+                  // Find conversation with provider
+                  const { data: conv } = await supabase
+                    .from("conversations")
+                    .select("id")
+                    .eq("job_id", jobId!)
+                    .eq("customer_user_id", user!.id)
+                    .eq("provider_user_id", job.provider_id)
+                    .maybeSingle();
+
+                  if (conv?.id) {
+                    // Reset milestones_confirmed so provider can redo
+                    await supabase.from("jobs").update({ milestones_confirmed: false } as any).eq("id", jobId!);
+
+                    // Delete existing milestones
+                    await supabase.from("job_milestones").delete().eq("job_id", jobId!);
+
+                    // Send message
+                    await supabase.from("messages").insert({
+                      conversation_id: conv.id,
+                      sender_user_id: user!.id,
+                      body: `🔄 Milestone revision requested:\n\n"${reviseComment.trim()}"\n\nPlease revise the milestone breakdown and resubmit.`,
+                      message_type: "system",
+                    } as any);
+
+                    toast({ title: "Revision requested", description: "The provider will update the milestones." });
+                  } else {
+                    toast({ title: "Could not find conversation", variant: "destructive" });
+                  }
+
+                  setShowReviseDialog(false);
+                  setReviseComment("");
+                  fetchAll();
+                }}
+              >
+                Send Revision Request
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

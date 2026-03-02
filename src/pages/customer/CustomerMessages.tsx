@@ -207,11 +207,11 @@ const CustomerMessages = () => {
     await supabase.from("messages").insert({
       conversation_id: selected!.id,
       sender_user_id: user!.id,
-      body: `✅ Terms confirmed! Price: £${Number(proposal.agreed_price).toFixed(2)}, starting ${new Date(proposal.start_date).toLocaleDateString()}, duration: ${proposal.duration}. Work has been scheduled.`,
+      body: `✅ Terms accepted in principle! Price: £${Number(proposal.agreed_price).toFixed(2)}, starting ${new Date(proposal.start_date).toLocaleDateString()}, duration: ${proposal.duration}.\n\n⏳ Next steps:\n1. The provider will now set up milestone payments for this job.\n2. You'll need to pay the first milestone deposit before work can begin.\n3. You can review the milestones and request changes if needed.\n\n💡 The job is fully confirmed once you make the first milestone payment.`,
       message_type: "system",
     } as any);
 
-    toast({ title: "Terms confirmed!", description: "Work has been scheduled." });
+    toast({ title: "Terms accepted in principle!", description: "The provider will now set up milestone payments." });
     setAccepting(false);
     await refreshMessages();
     fetchConversations();
