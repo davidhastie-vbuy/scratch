@@ -6,6 +6,7 @@ import { PoundSterling, Clock, CalendarDays, Building2 } from "lucide-react";
 interface QuoteBannerProps {
   jobId: string;
   providerUserId: string;
+  showProviderLink?: boolean;
 }
 
 interface QuoteData {
@@ -18,7 +19,7 @@ interface QuoteData {
   providerProfileId: string | null;
 }
 
-const QuoteBanner = ({ jobId, providerUserId }: QuoteBannerProps) => {
+const QuoteBanner = ({ jobId, providerUserId, showProviderLink = true }: QuoteBannerProps) => {
   const [quote, setQuote] = useState<QuoteData | null>(null);
   const navigate = useNavigate();
 
@@ -56,7 +57,7 @@ const QuoteBanner = ({ jobId, providerUserId }: QuoteBannerProps) => {
     <div className="px-4 py-2.5 bg-muted/40 border-b text-xs space-y-1">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Original Quote</p>
-        {quote.businessName && quote.providerProfileId && (
+        {showProviderLink && quote.businessName && quote.providerProfileId && (
           <button
             onClick={() => navigate(`/dashboard/providers/${quote.providerProfileId}`)}
             className="flex items-center gap-1 text-primary hover:underline text-xs font-medium"

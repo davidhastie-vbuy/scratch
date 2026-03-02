@@ -338,7 +338,7 @@ const ProviderMessages = () => {
                 </Button>
               )}
             </div>
-            <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} />
+            <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} showProviderLink={false} />
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.map(m => {
                 const isOwn = m.sender_user_id === user!.id;
