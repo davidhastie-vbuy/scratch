@@ -16,7 +16,7 @@ interface QuoteData {
   estimated_duration: string | null;
   message: string | null;
   businessName: string | null;
-  providerProfileId: string | null;
+  providerUserId: string | null;
 }
 
 const QuoteBanner = ({ jobId, providerUserId, showProviderLink = true }: QuoteBannerProps) => {
@@ -44,7 +44,7 @@ const QuoteBanner = ({ jobId, providerUserId, showProviderLink = true }: QuoteBa
         setQuote({
           ...q,
           businessName: p?.business_name ?? null,
-          providerProfileId: p?.id ?? null,
+          providerUserId: p ? providerUserId : null,
         });
       }
     };
@@ -57,13 +57,13 @@ const QuoteBanner = ({ jobId, providerUserId, showProviderLink = true }: QuoteBa
     <div className="px-4 py-2.5 bg-muted/40 border-b text-xs space-y-1">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Original Quote</p>
-        {showProviderLink && quote.businessName && quote.providerProfileId && (
+        {showProviderLink && quote.businessName && quote.providerUserId && (
           <button
-            onClick={() => navigate(`/dashboard/providers/${quote.providerProfileId}`)}
-            className="flex items-center gap-1 text-primary hover:underline text-xs font-medium"
+            onClick={() => navigate(`/dashboard/providers/${quote.providerUserId}`)}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-xs font-semibold"
           >
             <Building2 className="h-3.5 w-3.5" />
-            {quote.businessName}
+            View {quote.businessName}
           </button>
         )}
       </div>
