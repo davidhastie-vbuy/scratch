@@ -10,11 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, MessageSquare } from "lucide-react";
+import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, MessageSquare, Star } from "lucide-react";
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
 import MilestoneSetup from "@/components/MilestoneSetup";
 import MediaLightbox from "@/components/MediaLightbox";
+import ReviewDialog from "@/components/reviews/ReviewDialog";
 import { format } from "date-fns";
 
 const ProviderJobDetail = () => {
@@ -31,6 +32,9 @@ const ProviderJobDetail = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
+  const [customerName, setCustomerName] = useState("the customer");
 
   const [quoteForm, setQuoteForm] = useState({
     priceMin: "",
@@ -55,6 +59,27 @@ const ProviderJobDetail = () => {
     setMedia(mediaRes.data ?? []);
     setExistingQuote(quoteRes.data);
     setConversationId(convRes.data?.id ?? null);
+
+    // Check review status and get customer name
+    if (jobRes.data && user) {
+      const { data: existingReview } = await supabase
+        .from("reviews")
+        .select("id")
+        .eq("job_id", jobId!)
+        .eq("reviewer_user_id", user.id)
+        .maybeSingle();
+      setHasReviewed(!!existingReview);
+
+      const { data: custProfile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, full_name")
+        .eq("id", jobRes.data.customer_user_id)
+        .single();
+      if (custProfile) {
+        setCustomerName(`${custProfile.first_name || ""} ${custProfile.last_name || ""}`.trim() || custProfile.full_name || "the customer");
+      }
+    }
+
     setLoading(false);
   };
 
@@ -327,6 +352,41 @@ const ProviderJobDetail = () => {
           </CardContent>
         </Card>
       )}
+      {/* Review section for completed jobs */}
+      {job.status === "completed" && job.provider_id === user?.id && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Star className="h-4 w-4" /> Leave a Review
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {hasReviewed ? (
+              <p className="text-sm text-muted-foreground">✅ You've already reviewed this customer. Thank you!</p>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">This job is complete. Rate your experience with the customer.</p>
+                <Button onClick={() => setReviewOpen(true)}>
+                  <Star className="mr-2 h-4 w-4" /> Leave Review
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Review Dialog */}
+      <ReviewDialog
+        open={reviewOpen}
+        onOpenChange={setReviewOpen}
+        jobId={jobId!}
+        jobTitle={job.title}
+        reviewerUserId={user!.id}
+        revieweeUserId={job.customer_user_id}
+        reviewerRole="provider"
+        revieweeName={customerName}
+        onReviewSubmitted={fetchAll}
+      />
     </div>
   );
 };

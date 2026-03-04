@@ -9,8 +9,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send } from "lucide-react";
+import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import ScoreBadge from "@/components/reviews/ScoreBadge";
+import ReviewsList from "@/components/reviews/ReviewsList";
 
 interface ProviderData {
   id: string;
@@ -48,6 +50,7 @@ const ProviderPublicPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   // Invite to job state
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -87,6 +90,24 @@ const ProviderPublicPage = () => {
       withImages.push({ ...p, images: imgs ?? [] });
     }
     setProjects(withImages);
+
+    // Fetch reviews for this provider
+    const { data: revs } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("reviewee_user_id", providerId!)
+      .eq("reviewer_role", "customer")
+      .order("created_at", { ascending: false });
+
+    const enrichedRevs = [];
+    for (const r of (revs as any[]) ?? []) {
+      const { data: jb } = await supabase.from("jobs").select("title").eq("id", r.job_id).single();
+      const { data: prof } = await supabase.from("profiles").select("first_name, last_name, full_name").eq("id", r.reviewer_user_id).single();
+      const name = prof ? (`${prof.first_name || ""} ${prof.last_name || ""}`.trim() || prof.full_name || "Customer") : "Customer";
+      enrichedRevs.push({ ...r, job_title: jb?.title ?? "Job", reviewer_name: name });
+    }
+    setReviews(enrichedRevs);
+
     setLoading(false);
   };
 
@@ -165,7 +186,10 @@ const ProviderPublicPage = () => {
               <AvatarFallback className="text-lg">{initials}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h1 className="font-display text-2xl font-bold">{provider.business_name}</h1>
+              <h1 className="font-display text-2xl font-bold flex items-center gap-2">
+                {provider.business_name}
+                <ScoreBadge userId={providerId!} role="provider" />
+              </h1>
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge>{catName}</Badge>
                 {provider.additional_categories && provider.additional_categories.length > 0 && (
@@ -256,6 +280,18 @@ const ProviderPublicPage = () => {
           ))}
         </>
       )}
+
+      {/* Customer Reviews */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> Customer Reviews
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ReviewsList reviews={reviews} showReviewerName={true} showJobTitle={true} />
+        </CardContent>
+      </Card>
 
       {/* Lightbox */}
       <Dialog open={!!lightboxImg} onOpenChange={() => setLightboxImg(null)}>

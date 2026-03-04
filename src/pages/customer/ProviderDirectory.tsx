@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Search, MapPin } from "lucide-react";
+import ScoreBadge from "@/components/reviews/ScoreBadge";
 
 interface ProviderListItem {
   id: string;
@@ -121,7 +122,10 @@ const ProviderDirectory = () => {
                     <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold truncate">{p.business_name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold truncate">{p.business_name}</h3>
+                      <ScoreBadge userId={p.user_id} role="provider" showPopup={false} />
+                    </div>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       <Badge variant="secondary" className="text-xs">{catName}</Badge>
                       {p.years_experience && <Badge variant="outline" className="text-xs">{p.years_experience} yrs</Badge>}
