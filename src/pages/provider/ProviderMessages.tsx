@@ -281,7 +281,7 @@ const ProviderMessages = () => {
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-12rem)]">
+    <div className="flex gap-4 h-[calc(100vh-12rem)] overflow-hidden">
       <div className="w-72 shrink-0 border rounded-lg overflow-y-auto">
         <div className="p-3 border-b"><h3 className="font-semibold text-sm">Conversations</h3></div>
         {conversations.length === 0 ? (
@@ -320,7 +320,7 @@ const ProviderMessages = () => {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col border rounded-lg">
+      <div className="flex-1 flex flex-col border rounded-lg min-w-0">
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
             <div className="text-center">
@@ -339,7 +339,7 @@ const ProviderMessages = () => {
               )}
             </div>
             <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} showProviderLink={false} />
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3">
               {messages.map(m => {
                 const isOwn = m.sender_user_id === user!.id;
                 if ((m as any).message_type === "proposal") {

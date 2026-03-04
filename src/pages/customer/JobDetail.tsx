@@ -678,7 +678,7 @@ const JobDetail = () => {
             </div>
           ) : (
             <>
-              <div className="flex-1 overflow-y-auto space-y-3 min-h-[200px] max-h-[400px] py-2">
+              <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-3 min-h-[200px] max-h-[400px] py-2">
                 {chatMessages.length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-8">
                     No messages yet. Start the conversation to discuss job details with the provider.
