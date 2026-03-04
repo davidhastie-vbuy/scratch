@@ -161,6 +161,7 @@ const ProviderMessages = () => {
 
   const sendProposal = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
     if (!selected) return;
+    // Decline all pending proposals (including the customer one we're responding to)
     for (const m of messages) {
       if ((m as any).message_type === "proposal" && (m as any).metadata?.status === "pending") {
         await supabase.from("messages").update({
@@ -187,21 +188,16 @@ const ProviderMessages = () => {
     const isCustomerProposal = msg.sender_user_id !== user!.id;
 
     if (isCustomerProposal) {
-      // Provider accepting a customer's proposal — send it back as a formal proposal for customer confirmation
-      // Decline the original customer proposal
-      await supabase.from("messages").update({
-        metadata: { ...metadata, status: "declined" },
-      } as any).eq("id", msg.id);
-
-      // Open the propose terms dialog pre-filled with the customer's agreed price
+      // Provider accepting a customer's proposal — open propose terms dialog pre-filled
+      // Do NOT decline the customer's proposal yet; only decline when provider sends their formal proposal
       setProposeDefaults({
         agreed_price: metadata.agreed_price,
+        _customerProposalMsgId: msg.id,
       });
       setProposeOpen(true);
 
       toast({ title: "Please confirm the details", description: "Fill in the start date and duration, then send the formal proposal for the customer to accept." });
       setAccepting(false);
-      await refreshMessages();
       return;
     }
 
