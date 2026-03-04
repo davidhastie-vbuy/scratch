@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,15 +34,24 @@ const parseDuration = (dur?: string): { days: number; hours: number } => {
 };
 
 const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults }: Props) => {
-  const parsed = parseDuration(defaults?.duration);
-  const [price, setPrice] = useState(defaults?.agreed_price ? String(defaults.agreed_price) : "");
-  const [startDate, setStartDate] = useState<Date | undefined>(
-    defaults?.start_date ? new Date(defaults.start_date) : undefined
-  );
-  const [startTime, setStartTime] = useState(defaults?.start_time || "09:00");
-  const [durationDays, setDurationDays] = useState(String(parsed.days || 1));
-  const [durationHours, setDurationHours] = useState(String(parsed.hours || 0));
+  const [price, setPrice] = useState("");
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [startTime, setStartTime] = useState("09:00");
+  const [durationDays, setDurationDays] = useState("1");
+  const [durationHours, setDurationHours] = useState("0");
   const [submitting, setSubmitting] = useState(false);
+
+  // Re-sync form state when defaults change or dialog opens
+  useEffect(() => {
+    if (open) {
+      const parsed = parseDuration(defaults?.duration);
+      setPrice(defaults?.agreed_price ? String(defaults.agreed_price) : "");
+      setStartDate(defaults?.start_date ? new Date(defaults.start_date) : undefined);
+      setStartTime(defaults?.start_time || "09:00");
+      setDurationDays(String(parsed.days || 1));
+      setDurationHours(String(parsed.hours || 0));
+    }
+  }, [open, defaults]);
 
   const parsedPrice = parseFloat(price);
   const parsedDays = parseInt(durationDays) || 0;
