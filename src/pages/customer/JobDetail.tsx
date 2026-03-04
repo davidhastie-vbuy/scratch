@@ -11,12 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake, AlertTriangle } from "lucide-react";
+import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake, AlertTriangle, Star } from "lucide-react";
 import MilestonePaymentSection from "@/components/MilestonePaymentSection";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import JobScheduleForm from "@/components/JobScheduleForm";
 import WorkTracker from "@/components/WorkTracker";
+import ReviewDialog from "@/components/reviews/ReviewDialog";
 import { format } from "date-fns";
 
 const JobDetail = () => {
@@ -52,6 +53,10 @@ const JobDetail = () => {
   // Revise milestones
   const [showReviseDialog, setShowReviseDialog] = useState(false);
   const [reviseComment, setReviseComment] = useState("");
+
+  // Review
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
 
   // Inline messaging
   const [chatDialog, setChatDialog] = useState<{ providerUserId: string; quoteId: string } | null>(null);
@@ -126,6 +131,17 @@ const JobDetail = () => {
       setProviderName(null); // will use providerNames map instead
     } else {
       setProviderName(null);
+    }
+
+    // Check if already reviewed
+    if (user) {
+      const { data: existingReview } = await supabase
+        .from("reviews")
+        .select("id")
+        .eq("job_id", jobId!)
+        .eq("reviewer_user_id", user.id)
+        .maybeSingle();
+      setHasReviewed(!!existingReview);
     }
 
     setLoading(false);
@@ -634,6 +650,43 @@ const JobDetail = () => {
       {/* Work Tracker */}
       <WorkTracker jobId={jobId!} job={job} role="customer" onRefresh={fetchAll} />
 
+      {/* Review section for completed jobs */}
+      {job.status === "completed" && job.provider_id && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Star className="h-4 w-4" /> Leave a Review
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {hasReviewed ? (
+              <p className="text-sm text-muted-foreground">✅ You've already reviewed this job. Thank you!</p>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">This job is complete. Rate your experience with the provider.</p>
+                <Button onClick={() => setReviewOpen(true)}>
+                  <Star className="mr-2 h-4 w-4" /> Leave Review
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Review Dialog */}
+      {job.provider_id && (
+        <ReviewDialog
+          open={reviewOpen}
+          onOpenChange={setReviewOpen}
+          jobId={jobId!}
+          jobTitle={job.title}
+          reviewerUserId={user!.id}
+          revieweeUserId={job.provider_id}
+          reviewerRole="customer"
+          revieweeName={providerNames[job.provider_id] || "the provider"}
+          onReviewSubmitted={fetchAll}
+        />
+      )}
       {/* Schedule */}
       {["accepted", "in_progress"].includes(job.status) && (
         <Card>

@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
+import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import QuoteBanner from "@/components/messaging/QuoteBanner";
@@ -375,7 +376,10 @@ const CustomerMessages = () => {
         ) : (
           <>
             <div className="p-3 border-b">
-              <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
+                <ScoreBadge userId={selected.provider_user_id} role="provider" />
+              </div>
             </div>
             <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} />
             <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3">

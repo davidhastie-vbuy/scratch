@@ -1063,6 +1063,59 @@ export type Database = {
           },
         ]
       }
+      reviews: {
+        Row: {
+          comment: string | null
+          communication_rating: number
+          created_at: string
+          id: string
+          job_id: string
+          overall_rating: number | null
+          quality_rating: number
+          reliability_rating: number
+          reviewee_user_id: string
+          reviewer_role: string
+          reviewer_user_id: string
+          value_rating: number
+        }
+        Insert: {
+          comment?: string | null
+          communication_rating: number
+          created_at?: string
+          id?: string
+          job_id: string
+          overall_rating?: number | null
+          quality_rating: number
+          reliability_rating: number
+          reviewee_user_id: string
+          reviewer_role: string
+          reviewer_user_id: string
+          value_rating: number
+        }
+        Update: {
+          comment?: string | null
+          communication_rating?: number
+          created_at?: string
+          id?: string
+          job_id?: string
+          overall_rating?: number | null
+          quality_rating?: number
+          reliability_rating?: number
+          reviewee_user_id?: string
+          reviewer_role?: string
+          reviewer_user_id?: string
+          value_rating?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_ticket_messages: {
         Row: {
           body: string

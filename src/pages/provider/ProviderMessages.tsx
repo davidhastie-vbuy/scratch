@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
+import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ProposeTermsDialog from "@/components/messaging/ProposeTermsDialog";
 import QuoteBanner from "@/components/messaging/QuoteBanner";
@@ -327,7 +328,10 @@ const ProviderMessages = () => {
         ) : (
           <>
             <div className="p-3 border-b flex items-center justify-between">
-              <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
+                <ScoreBadge userId={selected.customer_user_id} role="customer" />
+              </div>
               {!jobAccepted && (
                 <Button size="sm" variant="outline" onClick={() => { setProposeDefaults(undefined); setProposeOpen(true); }}>
                   <Handshake className="mr-2 h-4 w-4" /> Propose Terms
