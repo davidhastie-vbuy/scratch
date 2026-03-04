@@ -115,7 +115,7 @@ const NotificationBell = () => {
             </Button>
           )}
         </div>
-        <ScrollArea className="max-h-80">
+        <ScrollArea className="h-80 overflow-auto">
           {notifications.length === 0 ? (
             <p className="p-4 text-center text-sm text-muted-foreground">No notifications yet</p>
           ) : (
