@@ -15,7 +15,7 @@ import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCa
 import MilestonePaymentSection from "@/components/MilestonePaymentSection";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import ProposalCard from "@/components/messaging/ProposalCard";
-import JobScheduleForm from "@/components/JobScheduleForm";
+import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
 import ReviewDialog from "@/components/reviews/ReviewDialog";
 import { format } from "date-fns";
