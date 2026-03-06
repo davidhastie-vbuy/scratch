@@ -1116,6 +1116,47 @@ export type Database = {
           },
         ]
       }
+      schedule_change_requests: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          proposed_end: string
+          proposed_start: string
+          requested_by: string
+          resolved_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          proposed_end: string
+          proposed_start: string
+          requested_by: string
+          resolved_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          proposed_end?: string
+          proposed_start?: string
+          requested_by?: string
+          resolved_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_change_requests_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_ticket_messages: {
         Row: {
           body: string
