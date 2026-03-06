@@ -687,21 +687,30 @@ const JobDetail = () => {
           onReviewSubmitted={fetchAll}
         />
       )}
-      {/* Schedule */}
-      {["accepted", "in_progress"].includes(job.status) && (
+      {/* Schedule - read only for customer */}
+      {["accepted", "in_progress"].includes(job.status) && (job.scheduled_start || job.scheduled_end) && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <CalendarDays className="h-4 w-4" /> Job Schedule
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <JobScheduleForm
-              jobId={jobId!}
-              currentStart={job.scheduled_start}
-              currentEnd={job.scheduled_end}
-              onSaved={fetchAll}
-            />
+          <CardContent className="space-y-4">
+            <div className="grid gap-2 text-sm">
+              {job.scheduled_start && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Starts</span>
+                  <span>{format(new Date(job.scheduled_start), "PPP 'at' h:mm a")}</span>
+                </div>
+              )}
+              {job.scheduled_end && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Ends</span>
+                  <span>{format(new Date(job.scheduled_end), "PPP 'at' h:mm a")}</span>
+                </div>
+              )}
+            </div>
+            <ScheduleChangeRequest jobId={jobId!} role="customer" onResolved={fetchAll} />
           </CardContent>
         </Card>
       )}
