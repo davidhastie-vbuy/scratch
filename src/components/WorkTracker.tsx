@@ -448,7 +448,21 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                       {/* Customer payment actions */}
                       {isCustomer && m.payment_amount && (() => {
                         const pStatus = getPaymentStatus(m.id);
+                        // Find the first milestone that hasn't been paid (held/released) to enforce sequential payment
+                        const nextUnpaidMilestone = milestones.find(ms => {
+                          if (!ms.payment_amount) return false;
+                          const msPayment = escrowPayments.find(p => p.milestone_id === ms.id && (p.status === "held" || p.status === "released"));
+                          return !msPayment;
+                        });
+                        const isNextToPay = nextUnpaidMilestone?.id === m.id;
                         if (pStatus === "unpaid") {
+                          if (!isNextToPay) {
+                            return (
+                              <div className="rounded-lg border bg-muted/30 p-3">
+                                <p className="text-sm text-muted-foreground">Pay earlier milestones first before this one becomes available.</p>
+                              </div>
+                            );
+                          }
                           return (
                             <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
                               <p className="text-sm font-medium">Payment required for this milestone</p>
