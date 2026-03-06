@@ -272,6 +272,11 @@ const MilestoneSetup = ({ jobId, agreedPrice, scheduledStart, scheduledEnd, onCo
         {/* Additional milestones for jobs £200+ */}
         {!depositInfo.noMilestonesRequired && (
           <div className="space-y-3">
+            {milestones.length > 0 && (
+              <p className="text-xs text-muted-foreground italic">
+                These milestones have been suggested based on the job duration and cost. You can edit, remove, or add more as needed.
+              </p>
+            )}
             {milestones.map((m, i) => (
               <div key={m.id} className="rounded-lg border p-3 space-y-2">
                 <div className="flex items-center justify-between">
