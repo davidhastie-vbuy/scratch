@@ -46,8 +46,8 @@ const generateSuggestedMilestones = (
   const remaining = agreedPrice - depositAmount;
   if (remaining <= 0) return [];
 
-  // Calculate duration in weeks
-  let durationWeeks = 2; // default
+  // Calculate duration in weeks (minimum 1)
+  let durationWeeks = 1;
   if (scheduledStart && scheduledEnd) {
     const start = new Date(scheduledStart);
     const end = new Date(scheduledEnd);
@@ -55,31 +55,31 @@ const generateSuggestedMilestones = (
     durationWeeks = Math.max(1, Math.round(diffMs / (7 * 24 * 60 * 60 * 1000)));
   }
 
-  // Determine number of intermediate milestones based on duration
-  let midCount: number;
-  if (durationWeeks <= 1) midCount = 0;
-  else if (durationWeeks <= 3) midCount = 1;
-  else if (durationWeeks <= 6) midCount = 2;
-  else midCount = 3;
+  // For a job of N weeks: deposit + N intermediate milestones + completion = N+2 total
+  // The intermediate milestones = durationWeeks (one per week)
+  // But the last one is the "Completion" milestone, so intermediate = durationWeeks - 1
+  // Total pattern: Deposit, (durationWeeks - 1) mid milestones, Completion
+  // e.g. 1 week = deposit + midway + completion = 3 milestones
+  // e.g. 2 weeks = deposit + milestone + milestone + completion = 4 milestones
+  const midCount = durationWeeks; // one per week (includes the midway for 1-week jobs)
 
-  if (midCount === 0) return [];
-
-  // Split remaining into mid milestones + final payment
-  // Mid milestones get equal shares of ~60% of remaining, final gets the rest
-  const midTotal = Math.round(remaining * 0.6 * 100) / 100;
-  const perMilestone = Math.round((midTotal / midCount) * 100) / 100;
-
-  const milestoneNames = [
-    "Mid-project checkpoint",
-    "Progress review",
-    "Pre-completion check",
-  ];
+  // Split remaining evenly across mid milestones + completion
+  // Mid milestones share the remaining equally with the completion payment
+  const totalMilestoneCount = midCount; // mid milestones (completion is added automatically as "Final Payment")
+  const perMilestone = Math.round((remaining / (totalMilestoneCount + 1)) * 100) / 100;
 
   const suggestions: MilestoneItem[] = [];
   for (let i = 0; i < midCount; i++) {
+    const weekNum = i + 1;
+    let title: string;
+    if (midCount === 1) {
+      title = "Midway checkpoint";
+    } else {
+      title = `Week ${weekNum} checkpoint`;
+    }
     suggestions.push({
       id: nextId(),
-      title: milestoneNames[i] || `Milestone ${i + 1}`,
+      title,
       description: "",
       amount: String(perMilestone),
     });
