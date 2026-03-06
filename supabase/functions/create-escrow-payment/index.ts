@@ -80,7 +80,7 @@ serve(async (req) => {
 
         // Find the first unpaid milestone with a payment amount
         const firstUnpaid = allMilestones.find(ms =>
-          ms.payment_amount && ms.payment_amount > 0 && !paidMilestoneIds.has(ms.id)
+          ms.payment_amount && ms.payment_amount > 0 && !paidOrPendingMilestoneIds.has(ms.id)
         );
 
         if (firstUnpaid && firstUnpaid.id !== milestone_id) {
