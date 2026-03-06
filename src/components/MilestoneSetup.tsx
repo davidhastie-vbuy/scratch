@@ -16,6 +16,8 @@ import {
 interface MilestoneSetupProps {
   jobId: string;
   agreedPrice: number;
+  scheduledStart?: string | null;
+  scheduledEnd?: string | null;
   onConfirmed: () => void;
 }
 
@@ -35,12 +37,66 @@ const getDepositInfo = (price: number) => {
   return { depositPercent: 10, depositAmount: Math.round(price * 0.1 * 100) / 100, noMilestonesRequired: false };
 };
 
-const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps) => {
+const generateSuggestedMilestones = (
+  agreedPrice: number,
+  depositAmount: number,
+  scheduledStart?: string | null,
+  scheduledEnd?: string | null,
+): MilestoneItem[] => {
+  const remaining = agreedPrice - depositAmount;
+  if (remaining <= 0) return [];
+
+  // Calculate duration in weeks
+  let durationWeeks = 2; // default
+  if (scheduledStart && scheduledEnd) {
+    const start = new Date(scheduledStart);
+    const end = new Date(scheduledEnd);
+    const diffMs = end.getTime() - start.getTime();
+    durationWeeks = Math.max(1, Math.round(diffMs / (7 * 24 * 60 * 60 * 1000)));
+  }
+
+  // Determine number of intermediate milestones based on duration
+  let midCount: number;
+  if (durationWeeks <= 1) midCount = 0;
+  else if (durationWeeks <= 3) midCount = 1;
+  else if (durationWeeks <= 6) midCount = 2;
+  else midCount = 3;
+
+  if (midCount === 0) return [];
+
+  // Split remaining into mid milestones + final payment
+  // Mid milestones get equal shares of ~60% of remaining, final gets the rest
+  const midTotal = Math.round(remaining * 0.6 * 100) / 100;
+  const perMilestone = Math.round((midTotal / midCount) * 100) / 100;
+
+  const milestoneNames = [
+    "Mid-project checkpoint",
+    "Progress review",
+    "Pre-completion check",
+  ];
+
+  const suggestions: MilestoneItem[] = [];
+  for (let i = 0; i < midCount; i++) {
+    suggestions.push({
+      id: nextId(),
+      title: milestoneNames[i] || `Milestone ${i + 1}`,
+      description: "",
+      amount: String(perMilestone),
+    });
+  }
+
+  return suggestions;
+};
+
+const MilestoneSetup = ({ jobId, agreedPrice, scheduledStart, scheduledEnd, onConfirmed }: MilestoneSetupProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
 
   const depositInfo = getDepositInfo(agreedPrice);
-  const [milestones, setMilestones] = useState<MilestoneItem[]>([]);
+  const [milestones, setMilestones] = useState<MilestoneItem[]>(() => {
+    if (depositInfo.noMilestonesRequired) return [];
+    return generateSuggestedMilestones(agreedPrice, depositInfo.depositAmount, scheduledStart, scheduledEnd);
+  });
   const [noMilestones, setNoMilestones] = useState(depositInfo.noMilestonesRequired);
   const [confirming, setConfirming] = useState(false);
 
@@ -216,6 +272,11 @@ const MilestoneSetup = ({ jobId, agreedPrice, onConfirmed }: MilestoneSetupProps
         {/* Additional milestones for jobs £200+ */}
         {!depositInfo.noMilestonesRequired && (
           <div className="space-y-3">
+            {milestones.length > 0 && (
+              <p className="text-xs text-muted-foreground italic">
+                These milestones have been suggested based on the job duration and cost. You can edit, remove, or add more as needed.
+              </p>
+            )}
             {milestones.map((m, i) => (
               <div key={m.id} className="rounded-lg border p-3 space-y-2">
                 <div className="flex items-center justify-between">
