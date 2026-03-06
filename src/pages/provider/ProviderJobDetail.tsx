@@ -327,6 +327,8 @@ const ProviderJobDetail = () => {
         <MilestoneSetup
           jobId={jobId!}
           agreedPrice={Number(job.agreed_price)}
+          scheduledStart={job.scheduled_start}
+          scheduledEnd={job.scheduled_end}
           onConfirmed={fetchAll}
         />
       )}
