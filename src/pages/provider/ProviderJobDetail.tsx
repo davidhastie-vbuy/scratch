@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, MessageSquare, Star } from "lucide-react";
-import JobScheduleForm from "@/components/JobScheduleForm";
+import ProviderScheduleForm from "@/components/ProviderScheduleForm";
+import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
 import MilestoneSetup from "@/components/MilestoneSetup";
 import MediaLightbox from "@/components/MediaLightbox";
@@ -344,12 +345,29 @@ const ProviderJobDetail = () => {
               <CalendarDays className="h-4 w-4" /> Job Schedule
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <JobScheduleForm
+          <CardContent className="space-y-4">
+            {(job.scheduled_start || job.scheduled_end) && (
+              <div className="grid gap-2 text-sm">
+                {job.scheduled_start && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Current Start</span>
+                    <span>{format(new Date(job.scheduled_start), "PPP 'at' h:mm a")}</span>
+                  </div>
+                )}
+                {job.scheduled_end && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Current End</span>
+                    <span>{format(new Date(job.scheduled_end), "PPP 'at' h:mm a")}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            <ScheduleChangeRequest jobId={jobId!} role="provider" onResolved={fetchAll} />
+            <ProviderScheduleForm
               jobId={jobId!}
-              currentStart={(job as any).scheduled_start}
-              currentEnd={(job as any).scheduled_end}
-              onSaved={fetchAll}
+              currentStart={job.scheduled_start}
+              currentEnd={job.scheduled_end}
+              onRequested={fetchAll}
             />
           </CardContent>
         </Card>
