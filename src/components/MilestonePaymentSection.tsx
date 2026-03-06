@@ -60,7 +60,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
   }
 
   // Find the next unpaid milestone
-  const nextUnpaid = milestones.find(m => !getPaymentForMilestone(m.id));
+  const nextUnpaid = milestones.find(m => !getPaymentForMilestone(m.id) && !getPendingPaymentForMilestone(m.id));
 
   return (
     <div className="space-y-3">

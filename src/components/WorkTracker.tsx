@@ -451,7 +451,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                         // Find the first milestone that hasn't been paid (held/released) to enforce sequential payment
                         const nextUnpaidMilestone = milestones.find(ms => {
                           if (!ms.payment_amount) return false;
-                          const msPayment = escrowPayments.find(p => p.milestone_id === ms.id && (p.status === "held" || p.status === "released"));
+                          const msPayment = escrowPayments.find(p => p.milestone_id === ms.id && (p.status === "held" || p.status === "released" || p.status === "pending"));
                           return !msPayment;
                         });
                         const isNextToPay = nextUnpaidMilestone?.id === m.id;
