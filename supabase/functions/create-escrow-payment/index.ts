@@ -59,6 +59,38 @@ serve(async (req) => {
     if (jobError || !job) throw new Error("Job not found");
     if (job.customer_user_id !== user.id) throw new Error("Only the customer can make payments");
 
+    // Enforce sequential milestone payment order
+    if (milestone_id) {
+      // Get all milestones for this job ordered by sort_order
+      const { data: allMilestones } = await supabaseAdmin
+        .from("job_milestones")
+        .select("id, sort_order, payment_amount")
+        .eq("job_id", job_id)
+        .order("sort_order");
+
+      if (allMilestones && allMilestones.length > 0) {
+        // Get all confirmed payments for this job
+        const { data: confirmedPayments } = await supabaseAdmin
+          .from("escrow_payments")
+          .select("milestone_id")
+          .eq("job_id", job_id)
+          .in("status", ["held", "released"]);
+
+        const paidMilestoneIds = new Set((confirmedPayments ?? []).map(p => p.milestone_id));
+
+        // Find the first unpaid milestone with a payment amount
+        const firstUnpaid = allMilestones.find(ms =>
+          ms.payment_amount && ms.payment_amount > 0 && !paidMilestoneIds.has(ms.id)
+        );
+
+        if (firstUnpaid && firstUnpaid.id !== milestone_id) {
+          return new Response(JSON.stringify({ error: "Please pay milestones in order. You must pay earlier milestones first." }), {
+            status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+    }
+
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
