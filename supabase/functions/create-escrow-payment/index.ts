@@ -69,14 +69,14 @@ serve(async (req) => {
         .order("sort_order");
 
       if (allMilestones && allMilestones.length > 0) {
-        // Get all confirmed payments for this job
-        const { data: confirmedPayments } = await supabaseAdmin
+        // Get all payments (held, released, or pending) for this job
+        const { data: existingPayments } = await supabaseAdmin
           .from("escrow_payments")
-          .select("milestone_id")
+          .select("milestone_id, status")
           .eq("job_id", job_id)
-          .in("status", ["held", "released"]);
+          .in("status", ["held", "released", "pending"]);
 
-        const paidMilestoneIds = new Set((confirmedPayments ?? []).map(p => p.milestone_id));
+        const paidOrPendingMilestoneIds = new Set((existingPayments ?? []).map(p => p.milestone_id));
 
         // Find the first unpaid milestone with a payment amount
         const firstUnpaid = allMilestones.find(ms =>
