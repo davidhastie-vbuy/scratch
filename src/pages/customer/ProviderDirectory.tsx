@@ -130,6 +130,14 @@ const ProviderDirectory = () => {
                     </div>
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       <Badge variant="secondary" className="text-xs">{catName}</Badge>
+                      {(p.additional_categories ?? []).map(slug => {
+                        const addCatName = categories.find(c => c.slug === slug)?.name ?? slug;
+                        return (
+                          <Badge key={slug} variant="outline" className="text-xs bg-muted/50">
+                            {addCatName}
+                          </Badge>
+                        );
+                      })}
                       {p.years_experience && <Badge variant="outline" className="text-xs">{p.years_experience} yrs</Badge>}
                     </div>
                     {p.business_description && (
