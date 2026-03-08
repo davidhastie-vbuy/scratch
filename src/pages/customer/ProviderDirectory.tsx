@@ -18,6 +18,7 @@ interface ProviderListItem {
   contact_first_name: string;
   contact_last_name: string;
   trade_category: string;
+  additional_categories: string[] | null;
   business_description: string | null;
   logo_url: string | null;
   postcode: string;
