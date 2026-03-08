@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Briefcase } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -40,21 +41,23 @@ const MyJobs = () => {
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
-  if (jobs.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <Briefcase className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="font-display text-lg font-semibold">No jobs yet</h3>
-        <p className="text-muted-foreground text-sm mt-1">Post your first job to get started.</p>
-      </div>
-    );
-  }
+  const openJobs = jobs.filter(j => ["open", "quoted", "quotes_closed"].includes(j.status));
+  const inProgressJobs = jobs.filter(j => ["accepted", "in_progress"].includes(j.status));
+  const pastJobs = jobs.filter(j => ["completed", "cancelled"].includes(j.status));
 
-  return (
-    <div className="space-y-4">
-      <h2 className="font-display text-xl font-bold">My Jobs</h2>
+  const renderJobList = (list: any[], emptyMsg: string) => {
+    if (list.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <Briefcase className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+          <p className="text-muted-foreground text-sm">{emptyMsg}</p>
+        </div>
+      );
+    }
+
+    return (
       <div className="grid gap-4">
-        {jobs.map((job) => {
+        {list.map((job) => {
           const st = STATUS_LABELS[job.status] ?? { label: job.status, variant: "secondary" as const };
           return (
             <Card key={job.id} className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate(`/dashboard/jobs/${job.id}`)}>
@@ -79,6 +82,51 @@ const MyJobs = () => {
           );
         })}
       </div>
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      <h2 className="font-display text-xl font-bold">My Jobs</h2>
+
+      <Tabs defaultValue="open" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="open" className="gap-1.5">
+            Open
+            {openJobs.length > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                {openJobs.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="in_progress" className="gap-1.5">
+            In Progress
+            {inProgressJobs.length > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                {inProgressJobs.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="past" className="gap-1.5">
+            Past Jobs
+            {pastJobs.length > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                {pastJobs.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="open">
+          {renderJobList(openJobs, "No open jobs. Post a job to get started.")}
+        </TabsContent>
+        <TabsContent value="in_progress">
+          {renderJobList(inProgressJobs, "No jobs currently in progress.")}
+        </TabsContent>
+        <TabsContent value="past">
+          {renderJobList(pastJobs, "No completed or cancelled jobs yet.")}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
