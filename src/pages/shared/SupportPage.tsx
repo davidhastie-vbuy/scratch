@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, Plus, MessageSquare, Send } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, Plus, MessageSquare, Send, HelpCircle } from "lucide-react";
 
 const STATUS_MAP: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   open: { label: "Open", variant: "default" },
@@ -97,19 +98,23 @@ const SupportPage = () => {
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
-  return (
-    <div className="max-w-2xl mx-auto space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-xl font-bold">Support</h2>
-        <Button size="sm" onClick={() => setShowNew(true)}>
-          <Plus className="mr-2 h-4 w-4" /> New Ticket
-        </Button>
-      </div>
+  const openTickets = tickets.filter(t => t.status === "open");
+  const inProgressTickets = tickets.filter(t => t.status === "in_progress");
+  const closedTickets = tickets.filter(t => t.status === "resolved" || t.status === "closed");
 
-      {tickets.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No support tickets. Create one if you need help.</p>
-      ) : (
-        tickets.map(t => {
+  const renderTicketList = (list: any[], emptyMsg: string) => {
+    if (list.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <HelpCircle className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+          <p className="text-muted-foreground text-sm">{emptyMsg}</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid gap-4">
+        {list.map(t => {
           const st = STATUS_MAP[t.status] ?? { label: t.status, variant: "secondary" as const };
           return (
             <Card key={t.id} className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => openTicket(t)}>
@@ -125,8 +130,58 @@ const SupportPage = () => {
               </CardContent>
             </Card>
           );
-        })
-      )}
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-xl font-bold">Support</h2>
+        <Button size="sm" onClick={() => setShowNew(true)}>
+          <Plus className="mr-2 h-4 w-4" /> New Ticket
+        </Button>
+      </div>
+
+      <Tabs defaultValue="open" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="open" className="gap-1.5">
+            Open
+            {openTickets.length > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                {openTickets.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="in_progress" className="gap-1.5">
+            In Progress
+            {inProgressTickets.length > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                {inProgressTickets.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="closed" className="gap-1.5">
+            Closed
+            {closedTickets.length > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                {closedTickets.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="open">
+          {renderTicketList(openTickets, "No open tickets. Create one if you need help.")}
+        </TabsContent>
+        <TabsContent value="in_progress">
+          {renderTicketList(inProgressTickets, "No tickets currently being reviewed.")}
+        </TabsContent>
+        <TabsContent value="closed">
+          {renderTicketList(closedTickets, "No resolved or closed tickets yet.")}
+        </TabsContent>
+      </Tabs>
 
       {/* New ticket dialog */}
       <Dialog open={showNew} onOpenChange={setShowNew}>
