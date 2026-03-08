@@ -76,7 +76,8 @@ const ProviderDirectory = () => {
   };
 
   const filtered = providers.filter(p => {
-    return catFilter === "all" || p.trade_category === catFilter;
+    if (catFilter === "all") return true;
+    return p.trade_category === catFilter || (p.additional_categories ?? []).includes(catFilter);
   });
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
