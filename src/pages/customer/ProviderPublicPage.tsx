@@ -113,13 +113,21 @@ const ProviderPublicPage = () => {
 
   const openInviteDialog = async () => {
     if (!user || !providerId) return;
+    // Only show jobs whose category matches the provider's primary or additional categories
+    const providerCategories = [
+      provider?.trade_category,
+      ...(provider?.additional_categories ?? []),
+    ].filter(Boolean);
+
     const { data: jobs } = await supabase
       .from("jobs")
       .select("id, title, status, category")
       .eq("customer_user_id", user.id)
       .in("status", ["open", "quoted"] as any)
       .order("created_at", { ascending: false });
-    setCustomerJobs(jobs ?? []);
+
+    const eligible = (jobs ?? []).filter((j: any) => providerCategories.includes(j.category));
+    setCustomerJobs(eligible);
 
     const { data: existing } = await supabase
       .from("job_invitations")
