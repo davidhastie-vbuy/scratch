@@ -65,7 +65,7 @@ const ProviderDirectory = () => {
       // Filter to providers whose operating_areas contain the customer's postcode district
       const { data } = await supabase
         .from("provider_profiles")
-        .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, business_description, logo_url, postcode, years_experience, operating_areas")
+        .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, additional_categories, business_description, logo_url, postcode, years_experience, operating_areas")
         .eq("status", "active" as any)
         .contains("operating_areas", [district])
         .order("business_name");
