@@ -18,6 +18,7 @@ interface ProviderListItem {
   contact_first_name: string;
   contact_last_name: string;
   trade_category: string;
+  additional_categories: string[] | null;
   business_description: string | null;
   logo_url: string | null;
   postcode: string;
@@ -56,7 +57,7 @@ const ProviderDirectory = () => {
       // No postcode set — show all active providers
       const { data } = await supabase
         .from("provider_profiles")
-        .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, business_description, logo_url, postcode, years_experience, operating_areas")
+        .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, additional_categories, business_description, logo_url, postcode, years_experience, operating_areas")
         .eq("status", "active" as any)
         .order("business_name");
       setProviders((data as any[]) ?? []);
@@ -64,7 +65,7 @@ const ProviderDirectory = () => {
       // Filter to providers whose operating_areas contain the customer's postcode district
       const { data } = await supabase
         .from("provider_profiles")
-        .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, business_description, logo_url, postcode, years_experience, operating_areas")
+        .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, additional_categories, business_description, logo_url, postcode, years_experience, operating_areas")
         .eq("status", "active" as any)
         .contains("operating_areas", [district])
         .order("business_name");
@@ -75,7 +76,8 @@ const ProviderDirectory = () => {
   };
 
   const filtered = providers.filter(p => {
-    return catFilter === "all" || p.trade_category === catFilter;
+    if (catFilter === "all") return true;
+    return p.trade_category === catFilter || (p.additional_categories ?? []).includes(catFilter);
   });
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
