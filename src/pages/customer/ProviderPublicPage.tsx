@@ -112,6 +112,27 @@ const ProviderPublicPage = () => {
     setReviews(enrichedRevs);
 
     setLoading(false);
+
+    // Check favourite status
+    if (user && role === "customer") {
+      const [favRes, jobRes] = await Promise.all([
+        supabase
+          .from("customer_favourites")
+          .select("id")
+          .eq("customer_user_id", user.id)
+          .eq("provider_user_id", providerId!)
+          .maybeSingle(),
+        supabase
+          .from("jobs")
+          .select("id")
+          .eq("customer_user_id", user.id)
+          .eq("provider_id", providerId!)
+          .eq("status", "completed" as any)
+          .limit(1),
+      ]);
+      setIsFavourite(!!favRes.data);
+      setCanFavourite((jobRes.data ?? []).length > 0);
+    }
   };
 
   const openInviteDialog = async () => {
