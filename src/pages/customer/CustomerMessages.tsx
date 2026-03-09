@@ -325,6 +325,19 @@ const CustomerMessages = () => {
 
   const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
 
+  const graceInfo = useMemo(() => {
+    if (!selected?.jobs?.status || !["completed", "cancelled"].includes(selected.jobs.status)) return null;
+    const updatedAt = selected.jobs.updated_at ? new Date(selected.jobs.updated_at) : null;
+    if (!updatedAt) return { expired: true };
+    const expiresAt = new Date(updatedAt.getTime() + 72 * 60 * 60 * 1000);
+    const now = new Date();
+    if (now >= expiresAt) return { expired: true };
+    const hoursLeft = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60));
+    return { expired: false, hoursLeft };
+  }, [selected?.jobs?.status, selected?.jobs?.updated_at]);
+
+  const isReadOnly = graceInfo?.expired === true;
+
   return (
     <div className="flex gap-4 h-[calc(100vh-12rem)] overflow-hidden">
       <div className="w-72 shrink-0 border rounded-lg overflow-y-auto">
