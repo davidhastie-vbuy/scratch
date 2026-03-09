@@ -114,6 +114,9 @@ const AdminDashboard = () => {
           <TabsContent value="legal">
             <AdminLegalPages />
           </TabsContent>
+          <TabsContent value="slots">
+            <AdminProviderSlots />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
