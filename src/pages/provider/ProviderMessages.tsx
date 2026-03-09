@@ -398,14 +398,28 @@ const ProviderMessages = () => {
               })}
               <div ref={bottomRef} />
             </div>
-            <StagedFilePreview stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} />
-            <div className="p-3 border-t flex gap-2">
-              <AttachmentButton stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} disabled={sending} />
-              <Input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message…" onKeyDown={e => e.key === "Enter" && sendMessage()} />
-              <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && stagedFiles.length === 0)}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+            {graceInfo && !graceInfo.expired && (
+              <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/30 border-t border-amber-200 dark:border-amber-800 flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
+                <Clock className="h-3.5 w-3.5 shrink-0" />
+                <span>This job is {selected?.jobs?.status}. You can still message for {graceInfo.hoursLeft} more hour{graceInfo.hoursLeft !== 1 ? "s" : ""}.</span>
+              </div>
+            )}
+            {isReadOnly ? (
+              <div className="p-3 border-t text-center text-sm text-muted-foreground">
+                This conversation is now read-only. The 72-hour messaging window has ended.
+              </div>
+            ) : (
+              <>
+                <StagedFilePreview stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} />
+                <div className="p-3 border-t flex gap-2">
+                  <AttachmentButton stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} disabled={sending} />
+                  <Input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message…" onKeyDown={e => e.key === "Enter" && sendMessage()} />
+                  <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && stagedFiles.length === 0)}>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>
