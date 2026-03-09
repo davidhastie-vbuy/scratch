@@ -18,6 +18,7 @@ import MyJobs from "@/pages/customer/MyJobs";
 import JobDetail from "@/pages/customer/JobDetail";
 import CustomerMessages from "@/pages/customer/CustomerMessages";
 import CustomerProfile from "@/pages/CustomerProfile";
+import Favourites from "@/pages/customer/Favourites";
 
 // Provider
 import ProviderDashboard from "@/pages/ProviderDashboard";
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="providers" element={<ProviderDirectory />} />
               <Route path="providers/:providerId" element={<ProviderPublicPage />} />
               <Route path="support" element={<SupportPage />} />
+              <Route path="favourites" element={<Favourites />} />
               <Route path="profile" element={<CustomerProfile />} />
             </Route>
 

@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Outlet } from "react-router-dom";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { Home, PlusCircle, Briefcase, MessageSquare, HelpCircle, User, Users } from "lucide-react";
+import { Home, PlusCircle, Briefcase, MessageSquare, HelpCircle, User, Users, Heart } from "lucide-react";
 
 const allNavItems = [
   { label: "Dashboard", path: "/dashboard", icon: <Home className="h-4 w-4" /> },
@@ -11,6 +11,7 @@ const allNavItems = [
   { label: "My Jobs", path: "/dashboard/jobs", icon: <Briefcase className="h-4 w-4" /> },
   { label: "Messages", path: "/dashboard/messages", icon: <MessageSquare className="h-4 w-4" /> },
   { label: "Local Trades", path: "/dashboard/providers", icon: <Users className="h-4 w-4" /> },
+  { label: "Favourites", path: "/dashboard/favourites", icon: <Heart className="h-4 w-4" /> },
   { label: "Support", path: "/dashboard/support", icon: <HelpCircle className="h-4 w-4" /> },
   { label: "Profile", path: "/dashboard/profile", icon: <User className="h-4 w-4" /> },
 ];

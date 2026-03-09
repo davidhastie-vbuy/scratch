@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star } from "lucide-react";
+import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star, Heart } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ReviewsList from "@/components/reviews/ReviewsList";
@@ -51,6 +51,9 @@ const ProviderPublicPage = () => {
   const [loading, setLoading] = useState(true);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [isFavourite, setIsFavourite] = useState(false);
+  const [canFavourite, setCanFavourite] = useState(false);
+  const [favouriteLoading, setFavouriteLoading] = useState(false);
 
   // Invite to job state
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -109,6 +112,51 @@ const ProviderPublicPage = () => {
     setReviews(enrichedRevs);
 
     setLoading(false);
+
+    // Check favourite status
+    if (user && role === "customer") {
+      const [favRes, jobRes] = await Promise.all([
+        supabase
+          .from("customer_favourites")
+          .select("id")
+          .eq("customer_user_id", user.id)
+          .eq("provider_user_id", providerId!)
+          .maybeSingle(),
+        supabase
+          .from("jobs")
+          .select("id")
+          .eq("customer_user_id", user.id)
+          .eq("provider_id", providerId!)
+          .eq("status", "completed" as any)
+          .limit(1),
+      ]);
+      setIsFavourite(!!favRes.data);
+      setCanFavourite((jobRes.data ?? []).length > 0);
+    }
+  };
+
+  const toggleFavourite = async () => {
+    if (!user || !providerId) return;
+    setFavouriteLoading(true);
+    if (isFavourite) {
+      await supabase.from("customer_favourites").delete()
+        .eq("customer_user_id", user.id)
+        .eq("provider_user_id", providerId);
+      setIsFavourite(false);
+      toast({ title: "Removed from favourites" });
+    } else {
+      const { error } = await supabase.from("customer_favourites").insert({
+        customer_user_id: user.id,
+        provider_user_id: providerId,
+      } as any);
+      if (error) {
+        toast({ title: "Could not add to favourites", description: "You can only favourite providers you've completed a job with.", variant: "destructive" });
+      } else {
+        setIsFavourite(true);
+        toast({ title: "Added to favourites!" });
+      }
+    }
+    setFavouriteLoading(false);
   };
 
   const openInviteDialog = async () => {
@@ -224,9 +272,21 @@ const ProviderPublicPage = () => {
             </div>
           </div>
           {role === "customer" && (
-            <Button className="mt-4" onClick={openInviteDialog}>
-              <Send className="mr-2 h-4 w-4" /> Invite to Job
-            </Button>
+            <div className="mt-4 flex gap-2">
+              <Button onClick={openInviteDialog}>
+                <Send className="mr-2 h-4 w-4" /> Invite to Job
+              </Button>
+              {canFavourite && (
+                <Button
+                  variant={isFavourite ? "secondary" : "outline"}
+                  onClick={toggleFavourite}
+                  disabled={favouriteLoading}
+                >
+                  <Heart className={`mr-2 h-4 w-4 ${isFavourite ? "fill-current text-destructive" : ""}`} />
+                  {isFavourite ? "Favourited" : "Add to Favourites"}
+                </Button>
+              )}
+            </div>
           )}
         </CardContent>
       </Card>
