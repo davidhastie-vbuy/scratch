@@ -82,6 +82,10 @@ const AdminDashboard = () => {
               <FileText className="h-4 w-4" />
               Legal Pages
             </TabsTrigger>
+            <TabsTrigger value="slots" className="gap-1.5">
+              <LayoutGrid className="h-4 w-4" />
+              Provider Slots
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="providers">
             <AdminProviderList />
