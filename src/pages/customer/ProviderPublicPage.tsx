@@ -51,6 +51,9 @@ const ProviderPublicPage = () => {
   const [loading, setLoading] = useState(true);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [isFavourite, setIsFavourite] = useState(false);
+  const [canFavourite, setCanFavourite] = useState(false);
+  const [favouriteLoading, setFavouriteLoading] = useState(false);
 
   // Invite to job state
   const [inviteOpen, setInviteOpen] = useState(false);
