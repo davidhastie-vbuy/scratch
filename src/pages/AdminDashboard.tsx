@@ -12,6 +12,7 @@ import AdminRecommendations from "@/components/admin/AdminRecommendations";
 import AdminDisputes from "@/components/admin/AdminDisputes";
 import AdminPayouts from "@/components/admin/AdminPayouts";
 import AdminLegalPages from "@/components/admin/AdminLegalPages";
+import AdminProviderSlots from "@/components/admin/AdminProviderSlots";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
