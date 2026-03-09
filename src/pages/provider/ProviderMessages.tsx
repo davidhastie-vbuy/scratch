@@ -18,7 +18,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; agreed_price?: number };
+  jobs?: { title?: string; status?: string; agreed_price?: number; updated_at?: string };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
