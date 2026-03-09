@@ -18,6 +18,7 @@ import MyJobs from "@/pages/customer/MyJobs";
 import JobDetail from "@/pages/customer/JobDetail";
 import CustomerMessages from "@/pages/customer/CustomerMessages";
 import CustomerProfile from "@/pages/CustomerProfile";
+import Favourites from "@/pages/customer/Favourites";
 
 // Provider
 import ProviderDashboard from "@/pages/ProviderDashboard";
