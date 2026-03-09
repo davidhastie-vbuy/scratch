@@ -1296,6 +1296,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_providers_in_slot: {
+        Args: { _category: string; _postcode: string }
+        Returns: number
+      }
       get_job_provider_id: { Args: { _job_id: string }; Returns: string }
       get_job_status: { Args: { _job_id: string }; Returns: string }
       has_role: {
