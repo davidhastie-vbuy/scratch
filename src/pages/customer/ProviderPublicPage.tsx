@@ -135,6 +135,30 @@ const ProviderPublicPage = () => {
     }
   };
 
+  const toggleFavourite = async () => {
+    if (!user || !providerId) return;
+    setFavouriteLoading(true);
+    if (isFavourite) {
+      await supabase.from("customer_favourites").delete()
+        .eq("customer_user_id", user.id)
+        .eq("provider_user_id", providerId);
+      setIsFavourite(false);
+      toast({ title: "Removed from favourites" });
+    } else {
+      const { error } = await supabase.from("customer_favourites").insert({
+        customer_user_id: user.id,
+        provider_user_id: providerId,
+      } as any);
+      if (error) {
+        toast({ title: "Could not add to favourites", description: "You can only favourite providers you've completed a job with.", variant: "destructive" });
+      } else {
+        setIsFavourite(true);
+        toast({ title: "Added to favourites!" });
+      }
+    }
+    setFavouriteLoading(false);
+  };
+
   const openInviteDialog = async () => {
     if (!user || !providerId) return;
     // Only show jobs whose category matches the provider's primary or additional categories
