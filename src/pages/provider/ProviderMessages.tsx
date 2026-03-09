@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MessageSquare, Send, Handshake } from "lucide-react";
+import { Loader2, MessageSquare, Send, Handshake, Clock } from "lucide-react";
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ProposeTermsDialog from "@/components/messaging/ProposeTermsDialog";
@@ -18,7 +18,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; agreed_price?: number };
+  jobs?: { title?: string; status?: string; agreed_price?: number; updated_at?: string };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
@@ -48,7 +48,7 @@ const ProviderMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title, status, agreed_price)")
+      .select("*, jobs(title,, updated_at status, agreed_price)")
       .eq("provider_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -264,6 +264,19 @@ const ProviderMessages = () => {
 
   const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
 
+  const graceInfo = useMemo(() => {
+    if (!selected?.jobs?.status || !["completed", "cancelled"].includes(selected.jobs.status)) return null;
+    const updatedAt = selected.jobs.updated_at ? new Date(selected.jobs.updated_at) : null;
+    if (!updatedAt) return { expired: true };
+    const expiresAt = new Date(updatedAt.getTime() + 72 * 60 * 60 * 1000);
+    const now = new Date();
+    if (now >= expiresAt) return { expired: true };
+    const hoursLeft = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60));
+    return { expired: false, hoursLeft };
+  }, [selected?.jobs?.status, selected?.jobs?.updated_at]);
+
+  const isReadOnly = graceInfo?.expired === true;
+
   useEffect(() => {
     if (!selected) return;
     const channel = supabase
@@ -385,14 +398,28 @@ const ProviderMessages = () => {
               })}
               <div ref={bottomRef} />
             </div>
-            <StagedFilePreview stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} />
-            <div className="p-3 border-t flex gap-2">
-              <AttachmentButton stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} disabled={sending} />
-              <Input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message…" onKeyDown={e => e.key === "Enter" && sendMessage()} />
-              <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && stagedFiles.length === 0)}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+            {graceInfo && !graceInfo.expired && (
+              <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/30 border-t border-amber-200 dark:border-amber-800 flex items-center gap-2 text-xs text-amber-700 dark:text-amber-400">
+                <Clock className="h-3.5 w-3.5 shrink-0" />
+                <span>This job is {selected?.jobs?.status}. You can still message for {graceInfo.hoursLeft} more hour{graceInfo.hoursLeft !== 1 ? "s" : ""}.</span>
+              </div>
+            )}
+            {isReadOnly ? (
+              <div className="p-3 border-t text-center text-sm text-muted-foreground">
+                This conversation is now read-only. The 72-hour messaging window has ended.
+              </div>
+            ) : (
+              <>
+                <StagedFilePreview stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} />
+                <div className="p-3 border-t flex gap-2">
+                  <AttachmentButton stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} disabled={sending} />
+                  <Input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message…" onKeyDown={e => e.key === "Enter" && sendMessage()} />
+                  <Button size="icon" onClick={sendMessage} disabled={sending || (!newMsg.trim() && stagedFiles.length === 0)}>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>

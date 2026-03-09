@@ -1297,6 +1297,10 @@ export type Database = {
         Args: { _job_id: string; _user_id: string }
         Returns: boolean
       }
+      is_job_within_message_window: {
+        Args: { _job_id: string }
+        Returns: boolean
+      }
       provider_has_declined_quote: {
         Args: { _job_id: string; _user_id: string }
         Returns: boolean
