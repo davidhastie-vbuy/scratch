@@ -18,7 +18,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; agreed_price?: number; updated_at?: string };
+  jobs?: { title?: string; status?: string; agreed_price?: number; updated_at?: string; updated_at?: string };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
@@ -48,7 +48,7 @@ const ProviderMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title, status, agreed_price)")
+      .select("*, jobs(title,, updated_at status, agreed_price)")
       .eq("provider_user_id", user!.id)
       .order("created_at", { ascending: false });
 
