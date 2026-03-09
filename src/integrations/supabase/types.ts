@@ -84,6 +84,27 @@ export type Database = {
           },
         ]
       }
+      customer_favourites: {
+        Row: {
+          created_at: string
+          customer_user_id: string
+          id: string
+          provider_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_user_id: string
+          id?: string
+          provider_user_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_user_id?: string
+          id?: string
+          provider_user_id?: string
+        }
+        Relationships: []
+      }
       customer_recommendations: {
         Row: {
           created_at: string
