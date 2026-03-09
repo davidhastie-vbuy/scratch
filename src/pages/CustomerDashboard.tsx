@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Outlet } from "react-router-dom";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { Home, PlusCircle, Briefcase, MessageSquare, HelpCircle, User, Users } from "lucide-react";
+import { Home, PlusCircle, Briefcase, MessageSquare, HelpCircle, User, Users, Heart } from "lucide-react";
 
 const allNavItems = [
   { label: "Dashboard", path: "/dashboard", icon: <Home className="h-4 w-4" /> },
