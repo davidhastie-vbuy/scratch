@@ -321,8 +321,6 @@ const CustomerMessages = () => {
     return () => { supabase.removeChannel(channel); };
   }, [selected]);
 
-  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
-
   const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
 
   const graceInfo = useMemo(() => {
@@ -337,6 +335,8 @@ const CustomerMessages = () => {
   }, [selected?.jobs?.status, selected?.jobs?.updated_at]);
 
   const isReadOnly = graceInfo?.expired === true;
+
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
     <div className="flex gap-4 h-[calc(100vh-12rem)] overflow-hidden">
