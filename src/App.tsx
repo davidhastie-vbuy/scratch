@@ -75,6 +75,7 @@ const App = () => (
               <Route path="providers" element={<ProviderDirectory />} />
               <Route path="providers/:providerId" element={<ProviderPublicPage />} />
               <Route path="support" element={<SupportPage />} />
+              <Route path="favourites" element={<Favourites />} />
               <Route path="profile" element={<CustomerProfile />} />
             </Route>
 
