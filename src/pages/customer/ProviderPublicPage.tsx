@@ -272,9 +272,21 @@ const ProviderPublicPage = () => {
             </div>
           </div>
           {role === "customer" && (
-            <Button className="mt-4" onClick={openInviteDialog}>
-              <Send className="mr-2 h-4 w-4" /> Invite to Job
-            </Button>
+            <div className="mt-4 flex gap-2">
+              <Button onClick={openInviteDialog}>
+                <Send className="mr-2 h-4 w-4" /> Invite to Job
+              </Button>
+              {canFavourite && (
+                <Button
+                  variant={isFavourite ? "secondary" : "outline"}
+                  onClick={toggleFavourite}
+                  disabled={favouriteLoading}
+                >
+                  <Heart className={`mr-2 h-4 w-4 ${isFavourite ? "fill-current text-destructive" : ""}`} />
+                  {isFavourite ? "Favourited" : "Add to Favourites"}
+                </Button>
+              )}
+            </div>
           )}
         </CardContent>
       </Card>
