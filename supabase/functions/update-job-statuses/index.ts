@@ -89,24 +89,17 @@ Deno.serve(async (req) => {
     .lte("scheduled_start", now)
     .select("id");
 
-  // 3. Move in_progress → completed when scheduled_end has passed
-  const { data: completedJobs, error: endErr } = await supabase
-    .from("jobs")
-    .update({ status: "completed" })
-    .eq("status", "in_progress")
-    .lte("scheduled_end", now)
-    .select("id");
+  // 3. Jobs remain in_progress until all milestones are completed and accepted
+  // (handled by auto_complete_job_on_all_released trigger)
 
   console.log("Status update run:", {
     reopened: reopenedCount,
     started: startedJobs?.length ?? 0,
-    completed: completedJobs?.length ?? 0,
-    errors: { startErr, endErr },
+    errors: { startErr },
   });
 
   return new Response(JSON.stringify({
     reopened: reopenedCount,
     started: startedJobs?.length ?? 0,
-    completed: completedJobs?.length ?? 0,
   }), { headers: { "Content-Type": "application/json" } });
 });
