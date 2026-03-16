@@ -16,6 +16,7 @@ const AvailableJobs = () => {
   const [allJobs, setAllJobs] = useState<any[]>([]);
   const [invitedJobs, setInvitedJobs] = useState<any[]>([]);
   const [jobMedia, setJobMedia] = useState<Record<string, any[]>>({});
+  const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<{ jobId: string; index: number } | null>(null);
 
