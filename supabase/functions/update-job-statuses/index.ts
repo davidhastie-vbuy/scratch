@@ -1,15 +1,52 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
 Deno.serve(async (req) => {
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+  // Verify caller is admin
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const { data: { user }, error: userErr } = await supabase.auth.getUser(
+    authHeader.replace("Bearer ", "")
   );
+  if (userErr || !user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const { data: isAdmin } = await supabase.rpc("has_role", {
+    _user_id: user.id,
+    _role: "admin",
+  });
+  if (!isAdmin) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   const now = new Date().toISOString();
 
   // 1. Reopen accepted jobs where start date has passed but NO payment was made
-  // These go back to "open" so other providers can quote
   const { data: acceptedJobs } = await supabase
     .from("jobs")
     .select("id, provider_id, title")
@@ -19,7 +56,6 @@ Deno.serve(async (req) => {
   let reopenedCount = 0;
   if (acceptedJobs && acceptedJobs.length > 0) {
     for (const job of acceptedJobs) {
-      // Check if any escrow payment is held or released (i.e. customer paid)
       const { count } = await supabase
         .from("escrow_payments")
         .select("id", { count: "exact", head: true })
@@ -27,7 +63,6 @@ Deno.serve(async (req) => {
         .in("status", ["held", "released"]);
 
       if ((count ?? 0) === 0) {
-        // No payment made - reopen the job
         await supabase.from("jobs").update({
           status: "open",
           provider_id: null,
@@ -37,20 +72,16 @@ Deno.serve(async (req) => {
           milestones_confirmed: false,
         }).eq("id", job.id);
 
-        // Reset quotes back to pending so the slot opens up
         await supabase.from("quotes").update({ status: "withdrawn" })
           .eq("job_id", job.id)
           .eq("provider_user_id", job.provider_id);
 
-        // Un-decline other quotes
         await supabase.from("quotes").update({ status: "pending" })
           .eq("job_id", job.id)
           .eq("status", "declined");
 
-        // Delete milestones
         await supabase.from("job_milestones").delete().eq("job_id", job.id);
 
-        // Notify customer
         await supabase.from("notifications").insert({
           user_id: job.provider_id,
           type: "job_reopened",
@@ -59,7 +90,6 @@ Deno.serve(async (req) => {
           link: "/provider/jobs",
         });
 
-        // Send system message to conversation
         const { data: conv } = await supabase
           .from("conversations")
           .select("id, customer_user_id")
@@ -90,10 +120,8 @@ Deno.serve(async (req) => {
     .select("id");
 
   // 3. Jobs remain in_progress until all milestones are completed and accepted
-  // (handled by auto_complete_job_on_all_released trigger)
 
   // 4. Auto-cancel ONLY unaccepted jobs inactive for 14+ days
-  // Accepted and in_progress jobs are NEVER auto-cancelled
   const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
   let cancelledCount = 0;
 
@@ -105,7 +133,6 @@ Deno.serve(async (req) => {
 
   if (staleUnaccepted && staleUnaccepted.length > 0) {
     for (const job of staleUnaccepted) {
-      // Check if there's been any messaging activity in the last 14 days
       const { data: convs } = await supabase
         .from("conversations")
         .select("id")
@@ -152,5 +179,5 @@ Deno.serve(async (req) => {
     reopened: reopenedCount,
     started: startedJobs?.length ?? 0,
     cancelled: cancelledCount,
-  }), { headers: { "Content-Type": "application/json" } });
+  }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 });
