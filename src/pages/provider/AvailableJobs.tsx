@@ -76,11 +76,22 @@ const AvailableJobs = () => {
         .in("job_id", allJobIds);
       
       const mediaMap: Record<string, any[]> = {};
+      const allPaths: string[] = [];
       for (const m of mediaData ?? []) {
         if (!mediaMap[m.job_id]) mediaMap[m.job_id] = [];
         mediaMap[m.job_id].push(m);
+        allPaths.push(m.file_url);
       }
       setJobMedia(mediaMap);
+      // Generate signed URLs for all media
+      if (allPaths.length > 0) {
+        const { data: signedData } = await supabase.storage.from("job-media").createSignedUrls(allPaths, 3600);
+        if (signedData) {
+          const urlMap: Record<string, string> = {};
+          signedData.forEach((item: any) => { if (item.signedUrl && item.path) urlMap[item.path] = item.signedUrl; });
+          setMediaUrls(urlMap);
+        }
+      }
     }
 
     setLoading(false);
