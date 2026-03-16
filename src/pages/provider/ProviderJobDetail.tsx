@@ -64,7 +64,17 @@ const ProviderJobDetail = () => {
       supabase.from("conversations").select("id").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
     ]);
     setJob(jobRes.data);
-    setMedia(mediaRes.data ?? []);
+    const mediaData = mediaRes.data ?? [];
+    setMedia(mediaData);
+    if (mediaData.length > 0) {
+      const paths = mediaData.map((m: any) => m.file_url);
+      const { data: signedData } = await supabase.storage.from("job-media").createSignedUrls(paths, 3600);
+      if (signedData) {
+        const urlMap: Record<string, string> = {};
+        signedData.forEach((item: any) => { if (item.signedUrl && item.path) urlMap[item.path] = item.signedUrl; });
+        setMediaUrls(urlMap);
+      }
+    }
     setExistingQuote(quoteRes.data);
     setConversationId(convRes.data?.id ?? null);
 
