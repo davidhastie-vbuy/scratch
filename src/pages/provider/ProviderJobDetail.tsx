@@ -325,9 +325,47 @@ const ProviderJobDetail = () => {
                   <Input value={quoteForm.estimatedDuration} onChange={e => setQuoteForm(f => ({ ...f, estimatedDuration: e.target.value }))} placeholder="e.g. 2 days" />
                 </div>
               </div>
-              <Button onClick={submitQuote} disabled={submitting} className="w-full">
+              <Button onClick={handleQuoteClick} disabled={submitting} className="w-full">
                 {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting…</> : <><Send className="mr-2 h-4 w-4" /> Submit Quote</>}
               </Button>
+
+              <AlertDialog open={showQuoteConfirm} onOpenChange={setShowQuoteConfirm}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2">
+                      <ShieldAlert className="h-5 w-5 text-destructive" />
+                      Confirm Quote Submission
+                    </AlertDialogTitle>
+                    <AlertDialogDescription asChild>
+                      <div className="space-y-3">
+                        <p>
+                          By submitting this quote, you acknowledge that if the customer accepts your quote, <strong className="text-foreground">it becomes a legally binding agreement</strong> and you are committed to completing the job as described.
+                        </p>
+                        <p>
+                          Failure to honour an accepted quote may result in disputes, negative reviews, and potential removal from the platform.
+                        </p>
+                        <div className="flex items-start gap-2 pt-2">
+                          <Checkbox
+                            id="quote-confirm"
+                            checked={confirmChecked}
+                            onCheckedChange={(checked) => setConfirmChecked(checked === true)}
+                            className="mt-0.5"
+                          />
+                          <label htmlFor="quote-confirm" className="text-sm leading-snug cursor-pointer select-none">
+                            I understand that this quote is a commitment and will be legally binding if accepted by the customer.
+                          </label>
+                        </div>
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={submitQuote} disabled={!confirmChecked}>
+                      <Send className="mr-2 h-4 w-4" /> Confirm &amp; Submit Quote
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           )}
         </CardContent>
