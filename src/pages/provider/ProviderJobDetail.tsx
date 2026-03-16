@@ -88,7 +88,7 @@ const ProviderJobDetail = () => {
     setLoading(false);
   };
 
-  const submitQuote = async () => {
+  const handleQuoteClick = () => {
     const min = parseFloat(quoteForm.priceMin);
     const max = parseFloat(quoteForm.priceMax);
 
@@ -102,6 +102,12 @@ const ProviderJobDetail = () => {
       return;
     }
 
+    setConfirmChecked(false);
+    setShowQuoteConfirm(true);
+  };
+
+  const submitQuote = async () => {
+    setShowQuoteConfirm(false);
     setSubmitting(true);
     const { error } = await supabase.from("quotes").insert({
       job_id: jobId!,
