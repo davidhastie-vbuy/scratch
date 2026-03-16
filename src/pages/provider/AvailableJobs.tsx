@@ -139,7 +139,8 @@ const AvailableJobs = () => {
           {media.length > 0 && (
             <div className="flex gap-2 overflow-x-auto py-2" onClick={e => e.stopPropagation()}>
               {media.map((m, i) => {
-                const url = supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl;
+                const url = mediaUrls[m.file_url];
+                if (!url) return null;
                 return (
                   <button
                     key={m.id}
