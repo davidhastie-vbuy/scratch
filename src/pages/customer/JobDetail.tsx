@@ -32,6 +32,7 @@ const JobDetail = () => {
   const [job, setJob] = useState<any>(null);
   const [quotes, setQuotes] = useState<any[]>([]);
   const [media, setMedia] = useState<any[]>([]);
+  const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [providerName, setProviderName] = useState<string | null>(null);
   const [providerNames, setProviderNames] = useState<Record<string, string>>({});
