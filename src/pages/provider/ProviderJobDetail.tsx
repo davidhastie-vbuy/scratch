@@ -18,6 +18,7 @@ import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
 import MilestoneSetup from "@/components/MilestoneSetup";
 import MediaLightbox from "@/components/MediaLightbox";
+import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import ReviewDialog from "@/components/reviews/ReviewDialog";
 import { format } from "date-fns";
 
@@ -228,6 +229,7 @@ const ProviderJobDetail = () => {
             )}
           </div>
           <p className="text-sm whitespace-pre-wrap">{job.description}</p>
+          <QuestionnaireAnswers category={job.category} answers={(job as any).questionnaire_answers} />
         </CardContent>
       </Card>
 

@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake, AlertTriangle, Star } from "lucide-react";
+import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import MilestonePaymentSection from "@/components/MilestonePaymentSection";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import ProposalCard from "@/components/messaging/ProposalCard";
@@ -489,6 +490,7 @@ const JobDetail = () => {
                 )}
               </div>
               <p className="text-sm whitespace-pre-wrap">{job.description}</p>
+              <QuestionnaireAnswers category={job.category} answers={(job as any).questionnaire_answers} />
               <div className="flex gap-2">
                 {job.status === "open" && job.quote_count === 0 && (
                   <Button variant="outline" size="sm" onClick={() => setEditing(true)}>

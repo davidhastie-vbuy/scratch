@@ -10,10 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, Upload, X, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Upload, X, CheckCircle2, Loader2, Info } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { categoryQuestionnaires } from "@/lib/category-questionnaires";
 
 const TIMELINES = ["ASAP", "Within 1 week", "Within 2 weeks", "Within 1 month", "Flexible"];
-
 
 const PostJob = () => {
   const { user } = useAuth();
@@ -33,6 +34,13 @@ const PostJob = () => {
     additionalNotes: "",
   });
 
+  const [questionnaireAnswers, setQuestionnaireAnswers] = useState<Record<string, string>>({});
+
+  // Reset questionnaire answers when category changes
+  useEffect(() => {
+    setQuestionnaireAnswers({});
+  }, [form.category]);
+
   useEffect(() => {
     if (user) {
       supabase.from("profiles").select("postcode").eq("id", user.id).single().then(({ data }) => {
@@ -45,6 +53,8 @@ const PostJob = () => {
   }, [user]);
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const questionnaireFields = form.category ? (categoryQuestionnaires[form.category] || []) : [];
 
   const validate = (s: number) => {
     const errs: Record<string, string> = {};
@@ -84,6 +94,11 @@ const PostJob = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // Filter out empty questionnaire answers
+      const filteredAnswers = Object.fromEntries(
+        Object.entries(questionnaireAnswers).filter(([_, v]) => v && v.trim())
+      );
+
       // Create job
       const { data: job, error: jobErr } = await supabase
         .from("jobs")
@@ -94,7 +109,7 @@ const PostJob = () => {
           category: form.category,
           postcode_district: form.postcodeDistrict.trim().toUpperCase(),
           timeline: form.timeline || null,
-          
+          questionnaire_answers: Object.keys(filteredAnswers).length > 0 ? filteredAnswers : null,
         } as any)
         .select("id")
         .single();
@@ -140,7 +155,7 @@ const PostJob = () => {
             </p>
             <div className="flex gap-3 justify-center">
               <Button onClick={() => navigate("/dashboard/jobs")}>View My Jobs</Button>
-              <Button variant="outline" onClick={() => { setSubmitted(false); setStep(0); setForm({ title: "", category: "", postcodeDistrict: "", description: "", timeline: "", additionalNotes: "" }); setFiles([]); }}>
+              <Button variant="outline" onClick={() => { setSubmitted(false); setStep(0); setForm({ title: "", category: "", postcodeDistrict: "", description: "", timeline: "", additionalNotes: "" }); setQuestionnaireAnswers({}); setFiles([]); }}>
                 Post Another
               </Button>
             </div>
@@ -150,11 +165,26 @@ const PostJob = () => {
     );
   }
 
+  const stepLabels = questionnaireFields.length > 0
+    ? ["Job Details", "Category Questions", "Extra Details", "Photos & Submit"]
+    : ["Job Details", "Extra Details", "Photos & Submit"];
+  const totalSteps = stepLabels.length;
+  const hasQuestionnaire = questionnaireFields.length > 0;
+
+  // Map visual step to content step
+  const getContentStep = () => {
+    if (!hasQuestionnaire) return step; // 0, 1, 2 → details, extra, photos
+    // With questionnaire: 0=details, 1=questionnaire, 2=extra, 3=photos
+    return step;
+  };
+
+  const contentStep = getContentStep();
+
   return (
     <div className="max-w-lg mx-auto">
       {/* Step indicator */}
       <div className="mb-6 flex items-center justify-between">
-        {["Job Details", "Extra Details", "Photos & Submit"].map((label, i) => (
+        {stepLabels.map((label, i) => (
           <div key={label} className="flex flex-1 items-center">
             <div className="flex flex-col items-center gap-1">
               <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${i < step ? "bg-primary text-primary-foreground" : i === step ? "border-2 border-primary text-primary" : "border-2 border-muted text-muted-foreground"}`}>
@@ -162,22 +192,24 @@ const PostJob = () => {
               </div>
               <span className="hidden sm:block text-[10px] text-muted-foreground">{label}</span>
             </div>
-            {i < 2 && <div className={`mx-1 h-0.5 flex-1 ${i < step ? "bg-primary" : "bg-muted"}`} />}
+            {i < totalSteps - 1 && <div className={`mx-1 h-0.5 flex-1 ${i < step ? "bg-primary" : "bg-muted"}`} />}
           </div>
         ))}
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{["Job Details", "Extra Details", "Photos & Submit"][step]}</CardTitle>
+          <CardTitle>{stepLabels[step]}</CardTitle>
           <CardDescription>
-            {step === 0 && "Tell us what you need done"}
-            {step === 1 && "Any additional details or preferences"}
-            {step === 2 && "Add photos or videos and submit"}
+            {contentStep === 0 && "Tell us what you need done"}
+            {hasQuestionnaire && contentStep === 1 && "Help providers give you a more accurate quote"}
+            {(hasQuestionnaire ? contentStep === 2 : contentStep === 1) && "Any additional details or preferences"}
+            {(hasQuestionnaire ? contentStep === 3 : contentStep === 2) && "Add photos or videos and submit"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {step === 0 && (
+          {/* Step 0: Job Details */}
+          {contentStep === 0 && (
             <>
               <div className="space-y-2">
                 <Label>Job title *</Label>
@@ -216,7 +248,48 @@ const PostJob = () => {
             </>
           )}
 
-          {step === 1 && (
+          {/* Step 1 (with questionnaire): Category-specific questions */}
+          {hasQuestionnaire && contentStep === 1 && (
+            <>
+              <Alert className="border-primary/20 bg-primary/5">
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  All fields below are optional, but the more information you provide, the more accurate your quotes will be.
+                </AlertDescription>
+              </Alert>
+
+              {questionnaireFields.map((field) => (
+                <div key={field.id} className="space-y-2">
+                  <Label>{field.label}</Label>
+                  {field.type === "select" ? (
+                    <Select
+                      value={questionnaireAnswers[field.id] || ""}
+                      onValueChange={(v) => setQuestionnaireAnswers(a => ({ ...a, [field.id]: v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {field.options!.map(opt => (
+                          <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      value={questionnaireAnswers[field.id] || ""}
+                      onChange={(e) => setQuestionnaireAnswers(a => ({ ...a, [field.id]: e.target.value }))}
+                      placeholder={field.placeholder}
+                      maxLength={500}
+                    />
+                  )}
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Extra Details step */}
+          {(hasQuestionnaire ? contentStep === 2 : contentStep === 1) && (
             <>
               <div className="space-y-2">
                 <Label>Additional notes (optional)</Label>
@@ -229,14 +302,17 @@ const PostJob = () => {
                   <p><strong>Category:</strong> {categories.find(c => c.slug === form.category)?.name}</p>
                   <p><strong>Location:</strong> {form.postcodeDistrict.toUpperCase()}</p>
                   <p><strong>Timeline:</strong> {form.timeline || "Not specified"}</p>
-                  
+                  {hasQuestionnaire && Object.entries(questionnaireAnswers).filter(([_, v]) => v?.trim()).length > 0 && (
+                    <p><strong>Questionnaire:</strong> {Object.entries(questionnaireAnswers).filter(([_, v]) => v?.trim()).length} question{Object.entries(questionnaireAnswers).filter(([_, v]) => v?.trim()).length !== 1 ? "s" : ""} answered</p>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground">You can go back to edit before submitting.</p>
               </div>
             </>
           )}
 
-          {step === 2 && (
+          {/* Photos & Submit step */}
+          {(hasQuestionnaire ? contentStep === 3 : contentStep === 2) && (
             <>
               <div className="space-y-2">
                 <Label>Upload photos/videos <span className="text-muted-foreground text-xs">(PNG, JPG, MP4 — max 10MB each, up to 10 files)</span></Label>
@@ -271,9 +347,9 @@ const PostJob = () => {
               <ArrowLeft className="mr-2 h-4 w-4" /> Back
             </Button>
           ) : <div />}
-          {step < 2 ? (
-            <Button onClick={() => { if (validate(step)) setStep(s => s + 1); }}>
-              Next <ArrowRight className="ml-2 h-4 w-4" />
+          {step < totalSteps - 1 ? (
+            <Button onClick={() => { if (validate(contentStep)) setStep(s => s + 1); }}>
+              {hasQuestionnaire && contentStep === 0 ? "Next" : "Next"} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
             <Button onClick={handleSubmit} disabled={loading}>

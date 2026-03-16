@@ -415,6 +415,7 @@ export type Database = {
           milestones_confirmed: boolean
           postcode_district: string
           provider_id: string | null
+          questionnaire_answers: Json | null
           quote_count: number
           scheduled_end: string | null
           scheduled_start: string | null
@@ -434,6 +435,7 @@ export type Database = {
           milestones_confirmed?: boolean
           postcode_district: string
           provider_id?: string | null
+          questionnaire_answers?: Json | null
           quote_count?: number
           scheduled_end?: string | null
           scheduled_start?: string | null
@@ -453,6 +455,7 @@ export type Database = {
           milestones_confirmed?: boolean
           postcode_district?: string
           provider_id?: string | null
+          questionnaire_answers?: Json | null
           quote_count?: number
           scheduled_end?: string | null
           scheduled_start?: string | null
