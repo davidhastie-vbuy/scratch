@@ -252,7 +252,8 @@ const ProviderJobDetail = () => {
           <CardContent>
             <div className="grid grid-cols-3 gap-2">
               {media.map((m, i) => {
-                const url = supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl;
+                const url = mediaUrls[m.file_url];
+                if (!url) return null;
                 return m.file_type.startsWith("image") ? (
                   <button key={m.id} onClick={() => setLightboxIndex(i)} className="rounded-md overflow-hidden hover:ring-2 hover:ring-primary transition-all">
                     <img src={url} alt={m.file_name} className="w-full h-24 object-cover" />
@@ -266,8 +267,8 @@ const ProviderJobDetail = () => {
               })}
             </div>
             <MediaLightbox
-              media={media.map(m => ({
-                url: supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl,
+              media={media.filter(m => mediaUrls[m.file_url]).map(m => ({
+                url: mediaUrls[m.file_url],
                 type: m.file_type,
                 name: m.file_name,
               }))}
