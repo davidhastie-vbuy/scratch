@@ -34,6 +34,8 @@ const ProviderJobDetail = () => {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showQuoteConfirm, setShowQuoteConfirm] = useState(false);
+  const [confirmChecked, setConfirmChecked] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [hasReviewed, setHasReviewed] = useState(false);
