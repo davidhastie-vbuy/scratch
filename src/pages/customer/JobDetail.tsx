@@ -108,7 +108,18 @@ const JobDetail = () => {
     }
     const allQuotes = quotesRes.data ?? [];
     setQuotes(allQuotes);
-    setMedia(mediaRes.data ?? []);
+    const mediaData = mediaRes.data ?? [];
+    setMedia(mediaData);
+    // Generate signed URLs for job media
+    if (mediaData.length > 0) {
+      const paths = mediaData.map((m: any) => m.file_url);
+      const { data: signedData } = await supabase.storage.from("job-media").createSignedUrls(paths, 3600);
+      if (signedData) {
+        const urlMap: Record<string, string> = {};
+        signedData.forEach((item: any) => { if (item.signedUrl && item.path) urlMap[item.path] = item.signedUrl; });
+        setMediaUrls(urlMap);
+      }
+    }
     setEscrowPayments(paymentsRes.data ?? []);
 
     // Fetch provider names for all quotes
