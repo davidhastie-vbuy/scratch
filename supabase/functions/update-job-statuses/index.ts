@@ -92,79 +92,42 @@ Deno.serve(async (req) => {
   // 3. Jobs remain in_progress until all milestones are completed and accepted
   // (handled by auto_complete_job_on_all_released trigger)
 
-  // 4. Auto-cancel jobs inactive for 14+ days
+  // 4. Auto-cancel ONLY unaccepted jobs inactive for 14+ days
+  // Accepted and in_progress jobs are NEVER auto-cancelled
   const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
   let cancelledCount = 0;
 
-  // 4a. Cancel unaccepted jobs (open, quoted, quotes_closed) with no activity for 14 days
   const { data: staleUnaccepted } = await supabase
     .from("jobs")
-    .select("id, title, customer_user_id, provider_id")
+    .select("id, title, customer_user_id")
     .in("status", ["open", "quoted", "quotes_closed"])
     .lte("updated_at", fourteenDaysAgo);
 
   if (staleUnaccepted && staleUnaccepted.length > 0) {
     for (const job of staleUnaccepted) {
-      await supabase.from("jobs").update({ status: "cancelled" }).eq("id", job.id);
-
-      // Notify customer
-      await supabase.from("notifications").insert({
-        user_id: job.customer_user_id,
-        type: "job_auto_cancelled",
-        title: "Job auto-cancelled",
-        body: `"${job.title}" was automatically cancelled due to 14 days of inactivity.`,
-        link: "/dashboard/jobs/" + job.id,
-      });
-
-      cancelledCount++;
-    }
-  }
-
-  // 4b. Cancel accepted/in_progress jobs with no messages for 14 days
-  const { data: activeJobs } = await supabase
-    .from("jobs")
-    .select("id, title, customer_user_id, provider_id")
-    .in("status", ["accepted", "in_progress"]);
-
-  if (activeJobs && activeJobs.length > 0) {
-    for (const job of activeJobs) {
-      // Find conversations for this job
+      // Check if there's been any messaging activity in the last 14 days
       const { data: convs } = await supabase
         .from("conversations")
         .select("id")
         .eq("job_id", job.id);
 
       const convIds = convs?.map((c: any) => c.id) ?? [];
-
-      let lastActivity = job.provider_id ? null : fourteenDaysAgo; // if no provider somehow, use threshold
+      let hasRecentActivity = false;
 
       if (convIds.length > 0) {
-        const { data: lastMsg } = await supabase
+        const { data: recentMsg } = await supabase
           .from("messages")
-          .select("created_at")
+          .select("id")
           .in("conversation_id", convIds)
-          .order("created_at", { ascending: false })
+          .gte("created_at", fourteenDaysAgo)
           .limit(1);
 
-        lastActivity = lastMsg?.[0]?.created_at ?? null;
+        hasRecentActivity = (recentMsg?.length ?? 0) > 0;
       }
 
-      // Also check job updated_at as fallback
-      const { data: jobData } = await supabase
-        .from("jobs")
-        .select("updated_at")
-        .eq("id", job.id)
-        .single();
-
-      const latestDate = [lastActivity, jobData?.updated_at]
-        .filter(Boolean)
-        .sort()
-        .pop();
-
-      if (latestDate && latestDate <= fourteenDaysAgo) {
+      if (!hasRecentActivity) {
         await supabase.from("jobs").update({ status: "cancelled" }).eq("id", job.id);
 
-        // Notify customer
         await supabase.from("notifications").insert({
           user_id: job.customer_user_id,
           type: "job_auto_cancelled",
@@ -172,17 +135,6 @@ Deno.serve(async (req) => {
           body: `"${job.title}" was automatically cancelled due to 14 days of inactivity.`,
           link: "/dashboard/jobs/" + job.id,
         });
-
-        // Notify provider
-        if (job.provider_id) {
-          await supabase.from("notifications").insert({
-            user_id: job.provider_id,
-            type: "job_auto_cancelled",
-            title: "Job auto-cancelled",
-            body: `"${job.title}" was automatically cancelled due to 14 days of inactivity.`,
-            link: "/provider/jobs/" + job.id,
-          });
-        }
 
         cancelledCount++;
       }
