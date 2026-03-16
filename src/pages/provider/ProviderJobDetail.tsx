@@ -18,6 +18,7 @@ import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
 import MilestoneSetup from "@/components/MilestoneSetup";
 import MediaLightbox from "@/components/MediaLightbox";
+import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import ReviewDialog from "@/components/reviews/ReviewDialog";
 import { format } from "date-fns";
 
