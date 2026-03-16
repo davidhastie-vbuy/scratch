@@ -490,7 +490,7 @@ const JobDetail = () => {
               </div>
               <p className="text-sm whitespace-pre-wrap">{job.description}</p>
               <div className="flex gap-2">
-                {["open", "quoted", "quotes_closed"].includes(job.status) && (
+                {job.status === "open" && job.quote_count === 0 && (
                   <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
                     <Pencil className="mr-2 h-4 w-4" /> Edit
                   </Button>
