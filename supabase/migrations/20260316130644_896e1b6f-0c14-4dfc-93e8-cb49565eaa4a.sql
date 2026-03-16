@@ -1,0 +1,1 @@
+ALTER TABLE public.jobs ADD COLUMN questionnaire_answers jsonb DEFAULT NULL;
