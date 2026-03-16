@@ -490,6 +490,7 @@ const JobDetail = () => {
                 )}
               </div>
               <p className="text-sm whitespace-pre-wrap">{job.description}</p>
+              <QuestionnaireAnswers category={job.category} answers={(job as any).questionnaire_answers} />
               <div className="flex gap-2">
                 {job.status === "open" && job.quote_count === 0 && (
                   <Button variant="outline" size="sm" onClick={() => setEditing(true)}>

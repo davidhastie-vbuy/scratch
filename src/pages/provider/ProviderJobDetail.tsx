@@ -228,6 +228,7 @@ const ProviderJobDetail = () => {
             )}
           </div>
           <p className="text-sm whitespace-pre-wrap">{job.description}</p>
+          <QuestionnaireAnswers category={job.category} answers={(job as any).questionnaire_answers} />
         </CardContent>
       </Card>
 
