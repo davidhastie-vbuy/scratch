@@ -16,6 +16,7 @@ const AvailableJobs = () => {
   const [allJobs, setAllJobs] = useState<any[]>([]);
   const [invitedJobs, setInvitedJobs] = useState<any[]>([]);
   const [jobMedia, setJobMedia] = useState<Record<string, any[]>>({});
+  const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<{ jobId: string; index: number } | null>(null);
 
@@ -75,11 +76,22 @@ const AvailableJobs = () => {
         .in("job_id", allJobIds);
       
       const mediaMap: Record<string, any[]> = {};
+      const allPaths: string[] = [];
       for (const m of mediaData ?? []) {
         if (!mediaMap[m.job_id]) mediaMap[m.job_id] = [];
         mediaMap[m.job_id].push(m);
+        allPaths.push(m.file_url);
       }
       setJobMedia(mediaMap);
+      // Generate signed URLs for all media
+      if (allPaths.length > 0) {
+        const { data: signedData } = await supabase.storage.from("job-media").createSignedUrls(allPaths, 3600);
+        if (signedData) {
+          const urlMap: Record<string, string> = {};
+          signedData.forEach((item: any) => { if (item.signedUrl && item.path) urlMap[item.path] = item.signedUrl; });
+          setMediaUrls(urlMap);
+        }
+      }
     }
 
     setLoading(false);
@@ -90,8 +102,8 @@ const AvailableJobs = () => {
   };
 
   const getMediaItems = (jobId: string) => {
-    return (jobMedia[jobId] ?? []).map(m => ({
-      url: supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl,
+    return (jobMedia[jobId] ?? []).filter(m => mediaUrls[m.file_url]).map(m => ({
+      url: mediaUrls[m.file_url],
       type: m.file_type,
       name: m.file_name,
     }));
@@ -127,7 +139,8 @@ const AvailableJobs = () => {
           {media.length > 0 && (
             <div className="flex gap-2 overflow-x-auto py-2" onClick={e => e.stopPropagation()}>
               {media.map((m, i) => {
-                const url = supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl;
+                const url = mediaUrls[m.file_url];
+                if (!url) return null;
                 return (
                   <button
                     key={m.id}

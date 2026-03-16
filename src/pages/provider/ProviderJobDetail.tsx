@@ -18,6 +18,7 @@ import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
 import MilestoneSetup from "@/components/MilestoneSetup";
 import MediaLightbox from "@/components/MediaLightbox";
+
 import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import ReviewDialog from "@/components/reviews/ReviewDialog";
 import { format } from "date-fns";
@@ -31,6 +32,7 @@ const ProviderJobDetail = () => {
 
   const [job, setJob] = useState<any>(null);
   const [media, setMedia] = useState<any[]>([]);
+  const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
   const [existingQuote, setExistingQuote] = useState<any>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +64,17 @@ const ProviderJobDetail = () => {
       supabase.from("conversations").select("id").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
     ]);
     setJob(jobRes.data);
-    setMedia(mediaRes.data ?? []);
+    const mediaData = mediaRes.data ?? [];
+    setMedia(mediaData);
+    if (mediaData.length > 0) {
+      const paths = mediaData.map((m: any) => m.file_url);
+      const { data: signedData } = await supabase.storage.from("job-media").createSignedUrls(paths, 3600);
+      if (signedData) {
+        const urlMap: Record<string, string> = {};
+        signedData.forEach((item: any) => { if (item.signedUrl && item.path) urlMap[item.path] = item.signedUrl; });
+        setMediaUrls(urlMap);
+      }
+    }
     setExistingQuote(quoteRes.data);
     setConversationId(convRes.data?.id ?? null);
 
@@ -240,7 +252,8 @@ const ProviderJobDetail = () => {
           <CardContent>
             <div className="grid grid-cols-3 gap-2">
               {media.map((m, i) => {
-                const url = supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl;
+                const url = mediaUrls[m.file_url];
+                if (!url) return null;
                 return m.file_type.startsWith("image") ? (
                   <button key={m.id} onClick={() => setLightboxIndex(i)} className="rounded-md overflow-hidden hover:ring-2 hover:ring-primary transition-all">
                     <img src={url} alt={m.file_name} className="w-full h-24 object-cover" />
@@ -254,8 +267,8 @@ const ProviderJobDetail = () => {
               })}
             </div>
             <MediaLightbox
-              media={media.map(m => ({
-                url: supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl,
+              media={media.filter(m => mediaUrls[m.file_url]).map(m => ({
+                url: mediaUrls[m.file_url],
                 type: m.file_type,
                 name: m.file_name,
               }))}

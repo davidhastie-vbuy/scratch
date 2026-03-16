@@ -3,9 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { MessageSquare, Image } from "lucide-react";
+import { MessageSquare, Image, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const AdminRecommendations = () => {
+  const [photoUrls, setPhotoUrls] = useState<Record<string, string>>({});
+
   const { data: recommendations, isLoading } = useQuery({
     queryKey: ["admin-recommendations"],
     queryFn: async () => {
@@ -17,6 +20,40 @@ const AdminRecommendations = () => {
       return data;
     },
   });
+
+  // Generate signed URLs for all recommendation photos
+  useEffect(() => {
+    if (!recommendations) return;
+    const allPaths: string[] = [];
+    for (const rec of recommendations) {
+      if (rec.photo_urls) {
+        for (const p of rec.photo_urls) {
+          // Only process storage paths (not full URLs from before migration)
+          if (!p.startsWith("http")) allPaths.push(p);
+        }
+      }
+    }
+    if (allPaths.length === 0) return;
+
+    supabase.storage
+      .from("recommendation-photos")
+      .createSignedUrls(allPaths, 3600)
+      .then(({ data }) => {
+        if (data) {
+          const urlMap: Record<string, string> = {};
+          data.forEach((item: any) => {
+            if (item.signedUrl && item.path) urlMap[item.path] = item.signedUrl;
+          });
+          setPhotoUrls(urlMap);
+        }
+      });
+  }, [recommendations]);
+
+  const getPhotoUrl = (path: string) => {
+    // Support both old public URLs and new storage paths
+    if (path.startsWith("http")) return path;
+    return photoUrls[path] || null;
+  };
 
   if (isLoading) return <p className="text-muted-foreground">Loading recommendations...</p>;
 
@@ -66,15 +103,25 @@ const AdminRecommendations = () => {
                   <Image className="h-3 w-3" /> {rec.photo_urls.length} photo(s) attached
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {rec.photo_urls.map((url: string, i: number) => (
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                      <img
-                        src={url}
-                        alt={`Recommendation photo ${i + 1}`}
-                        className="h-24 w-24 rounded-md object-cover border hover:ring-2 hover:ring-primary transition-all"
-                      />
-                    </a>
-                  ))}
+                  {rec.photo_urls.map((path: string, i: number) => {
+                    const url = getPhotoUrl(path);
+                    if (!url) {
+                      return (
+                        <div key={i} className="h-24 w-24 rounded-md border bg-muted flex items-center justify-center">
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        </div>
+                      );
+                    }
+                    return (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={url}
+                          alt={`Recommendation photo ${i + 1}`}
+                          className="h-24 w-24 rounded-md object-cover border hover:ring-2 hover:ring-primary transition-all"
+                        />
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             )}

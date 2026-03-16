@@ -90,10 +90,8 @@ Deno.serve(async (req) => {
           .upload(path, photo, { contentType: photo.type });
 
         if (!uploadError) {
-          const { data: urlData } = supabase.storage
-            .from("recommendation-photos")
-            .getPublicUrl(path);
-          photoUrls.push(urlData.publicUrl);
+          // Store the path, not public URL (bucket is private)
+          photoUrls.push(path);
         } else {
           console.error("Upload error:", uploadError);
         }

@@ -32,6 +32,7 @@ const JobDetail = () => {
   const [job, setJob] = useState<any>(null);
   const [quotes, setQuotes] = useState<any[]>([]);
   const [media, setMedia] = useState<any[]>([]);
+  const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [providerName, setProviderName] = useState<string | null>(null);
   const [providerNames, setProviderNames] = useState<Record<string, string>>({});
@@ -107,7 +108,18 @@ const JobDetail = () => {
     }
     const allQuotes = quotesRes.data ?? [];
     setQuotes(allQuotes);
-    setMedia(mediaRes.data ?? []);
+    const mediaData = mediaRes.data ?? [];
+    setMedia(mediaData);
+    // Generate signed URLs for job media
+    if (mediaData.length > 0) {
+      const paths = mediaData.map((m: any) => m.file_url);
+      const { data: signedData } = await supabase.storage.from("job-media").createSignedUrls(paths, 3600);
+      if (signedData) {
+        const urlMap: Record<string, string> = {};
+        signedData.forEach((item: any) => { if (item.signedUrl && item.path) urlMap[item.path] = item.signedUrl; });
+        setMediaUrls(urlMap);
+      }
+    }
     setEscrowPayments(paymentsRes.data ?? []);
 
     // Fetch provider names for all quotes
@@ -513,7 +525,8 @@ const JobDetail = () => {
           <CardContent>
             <div className="grid grid-cols-3 gap-2">
               {media.map(m => {
-                const url = supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl;
+                const url = mediaUrls[m.file_url];
+                if (!url) return null;
                 return m.file_type.startsWith("image") ? (
                   <img key={m.id} src={url} alt={m.file_name} className="rounded-md w-full h-24 object-cover" />
                 ) : (
