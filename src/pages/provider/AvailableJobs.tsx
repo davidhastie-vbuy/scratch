@@ -102,8 +102,8 @@ const AvailableJobs = () => {
   };
 
   const getMediaItems = (jobId: string) => {
-    return (jobMedia[jobId] ?? []).map(m => ({
-      url: supabase.storage.from("job-media").getPublicUrl(m.file_url).data.publicUrl,
+    return (jobMedia[jobId] ?? []).filter(m => mediaUrls[m.file_url]).map(m => ({
+      url: mediaUrls[m.file_url],
       type: m.file_type,
       name: m.file_name,
     }));
