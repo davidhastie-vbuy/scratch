@@ -32,6 +32,7 @@ const ProviderJobDetail = () => {
 
   const [job, setJob] = useState<any>(null);
   const [media, setMedia] = useState<any[]>([]);
+  const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
   const [existingQuote, setExistingQuote] = useState<any>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
