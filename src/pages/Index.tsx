@@ -6,9 +6,6 @@ import trustImage from "@/assets/trust-handshake.jpg";
 import qualityImage from "@/assets/quality-work.jpg";
 import peaceImage from "@/assets/peace-of-mind.jpg";
 import logo from "@/assets/bookatrade-logo.png";
-import trustImage from "@/assets/trust-handshake.jpg";
-import qualityImage from "@/assets/quality-work.jpg";
-import peaceImage from "@/assets/peace-of-mind.jpg";
 
 const Index = () => {
   return (
