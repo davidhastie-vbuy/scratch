@@ -332,7 +332,7 @@ const Index = () => {
         <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="BookATrade logo" className="h-10 w-10" />
+              <img src={logo} alt="BookATrade logo" className="h-10 w-10 rounded-full" />
               <div>
                 <span className="font-display text-lg font-extrabold">
                   Book<span className="text-primary">A</span>Trade
