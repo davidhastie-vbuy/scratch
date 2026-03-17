@@ -55,13 +55,13 @@ const Index = () => {
               Find vetted, reliable tradespeople for any job — big or small. Get up to 3 competitive quotes, compare with confidence, and enjoy peace of mind from start to finish.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row animate-fade-in stagger-3 opacity-0">
-              <Button size="lg" asChild className="text-base font-bold shadow-xl shadow-primary/40 hover:shadow-2xl hover:shadow-primary/50 border-2 border-primary-foreground/20 transition-all duration-300 hover:scale-105 h-13 px-10 rounded-xl">
+              <Button size="lg" asChild className="text-lg font-extrabold shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 transition-all duration-300 hover:scale-110 h-16 px-12 rounded-2xl">
                 <Link to="/signup">
                   Post a job free
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-3 h-6 w-6" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="text-base font-bold bg-primary-foreground/10 border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/20 hover:border-primary-foreground/60 backdrop-blur-sm h-13 px-10 rounded-xl shadow-lg transition-all duration-300 hover:scale-105">
+              <Button size="lg" variant="outline" asChild className="text-lg font-extrabold bg-primary-foreground/10 border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/20 hover:border-primary-foreground/60 backdrop-blur-sm h-16 px-12 rounded-2xl shadow-xl transition-all duration-300 hover:scale-110">
                 <Link to="/signup">Join as a tradesperson</Link>
               </Button>
             </div>
