@@ -16,7 +16,10 @@ const Index = () => {
       {/* Header */}
       <header className="border-b bg-card sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between">
-          <h1 className="font-display text-xl font-bold text-foreground">Book A Trade</h1>
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="BookATrade logo" className="h-10 w-10" />
+            <span className="font-display text-xl font-bold text-foreground">BookATrade</span>
+          </div>
           <div className="flex items-center gap-3">
             <Button variant="ghost" asChild>
               <Link to="/login">Sign in</Link>
