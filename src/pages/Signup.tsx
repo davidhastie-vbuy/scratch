@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Mail, Lock, User, Phone, MapPin, Camera, X } from "lucide-react";
 import { formatPostcode } from "@/lib/format-postcode";
 import ProviderSignupStepper from "@/components/provider-signup/ProviderSignupStepper";
+import logo from "@/assets/bookatrade-logo.png";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
