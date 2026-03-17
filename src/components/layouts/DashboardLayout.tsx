@@ -30,16 +30,10 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 flex-col border-r bg-card">
-        <div className="flex h-16 items-center gap-2 border-b px-4">
-          {roleBadge === "Admin" ? (
-            <Shield className="h-5 w-5 text-primary" />
-          ) : roleBadge === "Provider" ? (
-            <Wrench className="h-5 w-5 text-primary" />
-          ) : (
-            <Home className="h-5 w-5 text-primary" />
-          )}
-          <span className="font-display text-lg font-bold">Book A Trade</span>
-        </div>
+         <div className="flex h-16 items-center gap-2 border-b px-4">
+           <img src={logo} alt="BookATrade logo" className="h-8 w-8" />
+           <span className="font-display text-lg font-bold">BookATrade</span>
+         </div>
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => (
             <NavLink

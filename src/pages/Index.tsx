@@ -232,8 +232,11 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t bg-card py-8">
         <div className="container flex flex-col items-center gap-2 text-center text-sm text-muted-foreground">
-          <span className="font-display font-semibold text-foreground">Book A Trade</span>
-          <span>© {new Date().getFullYear()} Book A Trade. All rights reserved. bookatrade.io</span>
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="BookATrade logo" className="h-8 w-8" />
+            <span className="font-display font-semibold text-foreground">BookATrade</span>
+          </div>
+          <span>© {new Date().getFullYear()} BookATrade. All rights reserved.</span>
         </div>
       </footer>
     </div>
