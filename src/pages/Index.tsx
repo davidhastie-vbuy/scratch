@@ -213,7 +213,7 @@ const Index = () => {
             Ready to find your perfect tradesperson?
           </h3>
           <p className="mt-3 text-primary-foreground/80 max-w-md mx-auto">
-            Join thousands of homeowners who trust Book A Trade to connect them with reliable, vetted professionals.
+            Join thousands of homeowners who trust BookATrade to connect them with reliable, vetted professionals.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button size="lg" variant="secondary" asChild className="text-base">
