@@ -14,7 +14,7 @@ const Index = () => {
       <header className="border-b bg-card/90 backdrop-blur-md sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
-            <img src={logo} alt="BookATrade logo" className="h-10 w-10 transition-transform duration-300 group-hover:rotate-6" />
+            <img src={logo} alt="BookATrade logo" className="h-10 w-10 rounded-full bg-card transition-transform duration-300 group-hover:rotate-6" />
             <span className="font-display text-xl font-extrabold text-foreground">
               Book<span className="text-primary">A</span>Trade
             </span>
