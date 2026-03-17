@@ -282,7 +282,7 @@ const Index = () => {
                 <p className="mt-4 text-primary-foreground/70 text-lg leading-relaxed">
                   Join our platform, get matched with local jobs, and build your reputation. We handle the vetting so customers trust you from day one.
                 </p>
-                <Button size="lg" asChild className="mt-8 font-bold h-13 px-10 shadow-xl shadow-primary/40 hover:shadow-2xl hover:shadow-primary/50 border-2 border-primary-foreground/20 rounded-xl transition-all duration-300 hover:scale-105">
+                <Button size="lg" asChild className="mt-8 text-lg font-extrabold h-16 px-12 shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-110">
                   <Link to="/signup">
                     Apply to join
                     <ArrowRight className="ml-2 h-5 w-5" />
