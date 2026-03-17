@@ -29,11 +29,13 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className="hidden md:flex w-60 flex-col border-r bg-card">
-         <div className="flex h-16 items-center gap-2 border-b px-4">
-           <img src={logo} alt="BookATrade logo" className="h-8 w-8" />
-           <span className="font-display text-lg font-bold">BookATrade</span>
-         </div>
+      <aside className="hidden md:flex w-60 flex-col bg-foreground text-primary-foreground">
+        <div className="flex h-16 items-center gap-2.5 border-b border-primary-foreground/10 px-4">
+          <img src={logo} alt="BookATrade logo" className="h-9 w-9" />
+          <span className="font-display text-lg font-extrabold">
+            Book<span className="text-primary">A</span>Trade
+          </span>
+        </div>
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => (
             <NavLink
@@ -42,10 +44,10 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
               end
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-primary-foreground/60 hover:bg-primary-foreground/10 hover:text-primary-foreground"
                 )
               }
             >
@@ -59,8 +61,8 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
             </NavLink>
           ))}
         </nav>
-        <div className="border-t p-3">
-          <Button variant="ghost" size="sm" className="w-full justify-start" onClick={signOut}>
+        <div className="border-t border-primary-foreground/10 p-3">
+          <Button variant="ghost" size="sm" className="w-full justify-start text-primary-foreground/60 hover:text-primary-foreground hover:bg-primary-foreground/10" onClick={signOut}>
             <LogOut className="mr-2 h-4 w-4" />
             Sign out
           </Button>
@@ -69,20 +71,25 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
 
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="border-b bg-card">
+        <header className="border-b bg-card shadow-sm">
           <div className="flex h-16 items-center justify-between px-4 md:px-6">
-            <h1 className="font-display text-xl font-bold truncate">{title}</h1>
+            <div className="flex items-center gap-3">
+              <div className="md:hidden flex items-center gap-2 mr-2">
+                <img src={logo} alt="BookATrade logo" className="h-7 w-7" />
+              </div>
+              <h1 className="font-display text-xl font-extrabold truncate">{title}</h1>
+            </div>
             <div className="flex items-center gap-2">
               <NotificationBell />
               {statusBadge}
-              <Badge variant="secondary">{roleBadge}</Badge>
+              <Badge variant="secondary" className="font-bold">{roleBadge}</Badge>
               <Button variant="ghost" size="sm" className="md:hidden" onClick={signOut}>
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
           </div>
           {/* Mobile nav */}
-          <div className="flex md:hidden overflow-x-auto border-t px-2 gap-1">
+          <div className="flex md:hidden overflow-x-auto border-t px-2 gap-1 bg-card">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
@@ -90,7 +97,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
                 end
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-1.5 whitespace-nowrap px-3 py-2 text-xs font-medium border-b-2 transition-colors",
+                    "flex items-center gap-1.5 whitespace-nowrap px-3 py-2.5 text-xs font-semibold border-b-2 transition-colors",
                     isActive
                       ? "border-primary text-primary"
                       : "border-transparent text-muted-foreground"

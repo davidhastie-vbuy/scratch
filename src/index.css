@@ -96,3 +96,42 @@
     font-family: 'Manrope', system-ui, sans-serif;
   }
 }
+
+@layer utilities {
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px -8px hsl(228 18% 14% / 0.12);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(25 95% 53%), hsl(25 95% 40%));
+  }
+
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-sm border shadow-sm;
+  }
+
+  .section-divider {
+    @apply relative;
+  }
+
+  .section-divider::before {
+    content: '';
+    @apply absolute left-1/2 -translate-x-1/2 -top-px w-24 h-0.5 rounded-full;
+    background: linear-gradient(90deg, transparent, hsl(25 95% 53%), transparent);
+  }
+
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+}
