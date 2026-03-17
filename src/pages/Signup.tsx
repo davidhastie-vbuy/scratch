@@ -114,7 +114,7 @@ const Signup = () => {
       <div className="hidden lg:flex lg:w-5/12 bg-foreground text-primary-foreground relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(25 95% 53% / 0.15) 20px, hsl(25 95% 53% / 0.15) 21px)' }} />
         <div className="relative z-10 text-center p-12 max-w-md">
-          <img src={logo} alt="BookATrade logo" className="mx-auto h-28 w-28 mb-8 animate-float" />
+          <img src={logo} alt="BookATrade logo" className="mx-auto h-28 w-28 mb-8 animate-float rounded-full" />
           <h2 className="font-display text-3xl font-extrabold mb-4">
             Join Book<span className="text-primary">A</span>Trade
           </h2>
