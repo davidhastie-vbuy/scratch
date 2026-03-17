@@ -79,7 +79,7 @@ const Index = () => {
       <section className="bg-accent/30 py-16 md:py-24">
         <div className="container">
           <div className="text-center mb-12">
-            <h3 className="font-display text-3xl font-bold text-foreground">How Book A Trade works</h3>
+            <h3 className="font-display text-3xl font-bold text-foreground">How BookATrade works</h3>
             <p className="mt-2 text-muted-foreground max-w-lg mx-auto">Simple, transparent, and built around your peace of mind.</p>
           </div>
           <div className="grid gap-8 md:grid-cols-3 max-w-4xl mx-auto">
