@@ -55,13 +55,13 @@ const Index = () => {
               Find vetted, reliable tradespeople for any job — big or small. Get up to 3 competitive quotes, compare with confidence, and enjoy peace of mind from start to finish.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row animate-fade-in stagger-3 opacity-0">
-              <Button size="lg" asChild className="text-base font-bold shadow-xl shadow-primary/40 hover:shadow-2xl hover:shadow-primary/50 border-2 border-primary-foreground/20 transition-all duration-300 hover:scale-105 h-13 px-10 rounded-xl">
+              <Button size="lg" asChild className="text-lg font-extrabold shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 transition-all duration-300 hover:scale-110 h-16 px-12 rounded-2xl">
                 <Link to="/signup">
                   Post a job free
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-3 h-6 w-6" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="text-base font-bold bg-primary-foreground/10 border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/20 hover:border-primary-foreground/60 backdrop-blur-sm h-13 px-10 rounded-xl shadow-lg transition-all duration-300 hover:scale-105">
+              <Button size="lg" variant="outline" asChild className="text-lg font-extrabold bg-primary-foreground/10 border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/20 hover:border-primary-foreground/60 backdrop-blur-sm h-16 px-12 rounded-2xl shadow-xl transition-all duration-300 hover:scale-110">
                 <Link to="/signup">Join as a tradesperson</Link>
               </Button>
             </div>
@@ -282,7 +282,7 @@ const Index = () => {
                 <p className="mt-4 text-primary-foreground/70 text-lg leading-relaxed">
                   Join our platform, get matched with local jobs, and build your reputation. We handle the vetting so customers trust you from day one.
                 </p>
-                <Button size="lg" asChild className="mt-8 font-bold h-13 px-10 shadow-xl shadow-primary/40 hover:shadow-2xl hover:shadow-primary/50 border-2 border-primary-foreground/20 rounded-xl transition-all duration-300 hover:scale-105">
+                <Button size="lg" asChild className="mt-8 text-lg font-extrabold h-16 px-12 shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-110">
                   <Link to="/signup">
                     Apply to join
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -326,7 +326,7 @@ const Index = () => {
                   <p className="mt-2 text-primary-foreground/80 text-sm md:text-base">
                     Every tradesperson on BookATrade is vetted, qualified, and ready to deliver quality work.
                   </p>
-                  <Button size="lg" asChild className="mt-6 font-bold shadow-xl shadow-primary/40 border-2 border-primary-foreground/20 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/50">
+                  <Button size="lg" asChild className="mt-6 text-lg font-extrabold h-16 px-12 shadow-2xl shadow-primary/50 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-primary/60">
                     <Link to="/signup">
                       Find a tradesperson
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -351,7 +351,7 @@ const Index = () => {
             Join thousands of homeowners who trust BookATrade to connect them with reliable, vetted professionals.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button size="lg" variant="secondary" asChild className="text-base font-bold h-13 px-10 shadow-xl hover:shadow-2xl transition-all hover:scale-105 rounded-xl border-2 border-foreground/10">
+            <Button size="lg" variant="secondary" asChild className="text-lg font-extrabold h-16 px-12 shadow-2xl hover:shadow-2xl transition-all hover:scale-110 rounded-2xl border-2 border-foreground/10">
               <Link to="/signup">
                 Get started free
                 <ArrowRight className="ml-2 h-5 w-5" />
