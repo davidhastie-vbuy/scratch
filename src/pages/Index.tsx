@@ -122,7 +122,7 @@ const Index = () => {
                 Every tradesperson is vetted before they join
               </h3>
               <p className="mt-3 text-muted-foreground leading-relaxed">
-                No cowboys, no time wasters. Every professional on Book A Trade goes through our approval process — verified qualifications, experience, and documentation — so you only deal with the best.
+                No cowboys, no time wasters. Every professional on BookATrade goes through our approval process — verified qualifications, experience, and documentation — so you only deal with the best.
               </p>
               <ul className="mt-4 space-y-2">
                 {["ID & qualification checks", "Admin-reviewed applications", "Ongoing quality monitoring"].map((item) => (
