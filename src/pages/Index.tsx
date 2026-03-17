@@ -326,7 +326,7 @@ const Index = () => {
                   <p className="mt-2 text-primary-foreground/80 text-sm md:text-base">
                     Every tradesperson on BookATrade is vetted, qualified, and ready to deliver quality work.
                   </p>
-                  <Button size="lg" asChild className="mt-6 font-bold shadow-xl shadow-primary/40 border-2 border-primary-foreground/20 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/50">
+                  <Button size="lg" asChild className="mt-6 text-lg font-extrabold h-16 px-12 shadow-2xl shadow-primary/50 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-primary/60">
                     <Link to="/signup">
                       Find a tradesperson
                       <ArrowRight className="ml-2 h-5 w-5" />
