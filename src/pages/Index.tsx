@@ -5,25 +5,26 @@ import heroImage from "@/assets/hero-trades.jpg";
 import trustImage from "@/assets/trust-handshake.jpg";
 import qualityImage from "@/assets/quality-work.jpg";
 import peaceImage from "@/assets/peace-of-mind.jpg";
+import electricianImage from "@/assets/kitchen-electrics.jpg";
 import logo from "@/assets/bookatrade-logo.png";
 
 const Index = () => {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
-      <header className="border-b bg-card/90 backdrop-blur-md sticky top-0 z-50">
+      <header className="border-b border-border/60 bg-card/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
-            <img src={logo} alt="BookATrade logo" className="h-10 w-10 rounded-full bg-card transition-transform duration-300 group-hover:rotate-6" />
+            <img src={logo} alt="BookATrade logo" className="h-10 w-10 rounded-full bg-card shadow-md ring-2 ring-primary/20 transition-transform duration-300 group-hover:rotate-6 group-hover:ring-primary/40" />
             <span className="font-display text-xl font-extrabold text-foreground">
               Book<span className="text-primary">A</span>Trade
             </span>
           </Link>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" asChild className="font-semibold">
+            <Button variant="ghost" asChild className="font-semibold border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all">
               <Link to="/login">Sign in</Link>
             </Button>
-            <Button asChild className="font-semibold shadow-md hover:shadow-lg transition-shadow">
+            <Button asChild className="font-semibold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 border-2 border-primary hover:border-primary/80 transition-all duration-300 hover:scale-105">
               <Link to="/signup">Get started</Link>
             </Button>
           </div>
@@ -42,38 +43,38 @@ const Index = () => {
         </div>
         <div className="container relative z-10 py-20 md:py-32">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary-foreground mb-6 animate-fade-in backdrop-blur-sm">
-              <Award className="h-4 w-4" />
+            <div className="inline-flex items-center gap-2 rounded-full border-2 border-primary/40 bg-primary/15 px-4 py-1.5 text-sm font-semibold text-primary-foreground mb-6 animate-fade-in backdrop-blur-sm shadow-lg shadow-primary/10">
+              <Award className="h-4 w-4 text-primary" />
               Vetted &bull; Trusted &bull; Guaranteed
             </div>
             <h2 className="font-display text-4xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl xl:text-7xl animate-fade-in">
               Your home deserves
-              <span className="block text-primary drop-shadow-sm">trusted hands.</span>
+              <span className="block text-primary drop-shadow-lg">trusted hands.</span>
             </h2>
             <p className="mt-6 text-lg text-primary-foreground/80 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0">
               Find vetted, reliable tradespeople for any job — big or small. Get up to 3 competitive quotes, compare with confidence, and enjoy peace of mind from start to finish.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row animate-fade-in stagger-3 opacity-0">
-              <Button size="lg" asChild className="text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 h-12 px-8">
+              <Button size="lg" asChild className="text-base font-bold shadow-xl shadow-primary/40 hover:shadow-2xl hover:shadow-primary/50 border-2 border-primary-foreground/20 transition-all duration-300 hover:scale-105 h-13 px-10 rounded-xl">
                 <Link to="/signup">
                   Post a job free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="text-base font-bold bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20 backdrop-blur-sm h-12 px-8">
+              <Button size="lg" variant="outline" asChild className="text-base font-bold bg-primary-foreground/10 border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/20 hover:border-primary-foreground/60 backdrop-blur-sm h-13 px-10 rounded-xl shadow-lg transition-all duration-300 hover:scale-105">
                 <Link to="/signup">Join as a tradesperson</Link>
               </Button>
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-6 text-sm font-medium text-primary-foreground/70 animate-fade-in stagger-4 opacity-0">
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-4 py-2 border border-primary-foreground/10">
                 <CheckCircle className="h-5 w-5 text-primary" />
                 Vetted professionals
               </span>
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-4 py-2 border border-primary-foreground/10">
                 <CheckCircle className="h-5 w-5 text-primary" />
                 Up to 3 free quotes
               </span>
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-4 py-2 border border-primary-foreground/10">
                 <CheckCircle className="h-5 w-5 text-primary" />
                 Guaranteed payments
               </span>
@@ -83,7 +84,7 @@ const Index = () => {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-foreground text-primary-foreground py-6 relative overflow-hidden">
+      <section className="bg-foreground text-primary-foreground py-8 relative overflow-hidden border-y-4 border-primary/30">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(25 95% 53% / 0.1) 20px, hsl(25 95% 53% / 0.1) 21px)' }} />
         </div>
@@ -94,8 +95,8 @@ const Index = () => {
             { value: "100%", label: "Vetted tradespeople" },
             { value: "24/7", label: "Support available" },
           ].map((stat) => (
-            <div key={stat.label}>
-              <div className="font-display text-3xl md:text-4xl font-extrabold text-primary">{stat.value}</div>
+            <div key={stat.label} className="group">
+              <div className="font-display text-3xl md:text-4xl font-extrabold text-primary drop-shadow-md group-hover:scale-110 transition-transform duration-300">{stat.value}</div>
               <div className="mt-1 text-sm text-primary-foreground/70 font-medium">{stat.label}</div>
             </div>
           ))}
@@ -106,7 +107,7 @@ const Index = () => {
       <section className="py-20 md:py-28 section-divider">
         <div className="container">
           <div className="text-center mb-16">
-            <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3">Simple process</span>
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5">Simple process</span>
             <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
               How BookATrade works
             </h3>
@@ -134,17 +135,17 @@ const Index = () => {
                 title: "Hire with confidence",
                 desc: "Choose your preferred tradesperson and enjoy quality work backed by real reviews and our support team.",
               },
-            ].map((item, i) => (
+            ].map((item) => (
               <div
                 key={item.step}
-                className="group relative rounded-2xl border bg-card p-8 text-center transition-all duration-300 hover-lift"
+                className="group relative rounded-2xl border-2 border-border/80 bg-card p-8 text-center transition-all duration-300 hover-lift hover:border-primary/40 shadow-md hover:shadow-xl hover:shadow-primary/10"
               >
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-display text-lg font-extrabold shadow-md group-hover:animate-pulse-glow transition-shadow">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-display text-lg font-extrabold shadow-lg shadow-primary/40 group-hover:animate-pulse-glow transition-shadow ring-4 ring-card">
                     {item.step}
                   </div>
                 </div>
-                <div className="mt-4 mb-4 mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+                <div className="mt-4 mb-4 mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-primary border-2 border-primary/20 transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary group-hover:shadow-lg group-hover:shadow-primary/30">
                   {item.icon}
                 </div>
                 <h4 className="font-display text-lg font-bold text-foreground">{item.title}</h4>
@@ -158,10 +159,10 @@ const Index = () => {
       {/* Trust Features with Images */}
       <section className="py-16 md:py-24 bg-muted/50">
         <div className="container space-y-20 md:space-y-32">
-          {/* Feature 1 */}
+          {/* Feature 1 - Vetting: Customer & electrician in hallway */}
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border-2 border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5 shadow-sm">
                 <Shield className="h-3.5 w-3.5" />
                 Vetted &amp; Approved
               </div>
@@ -174,7 +175,7 @@ const Index = () => {
               <ul className="mt-6 space-y-3">
                 {["ID & qualification checks", "Admin-reviewed applications", "Ongoing quality monitoring"].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 border border-primary/30 shadow-sm">
                       <CheckCircle className="h-4 w-4 text-primary" />
                     </span>
                     {item}
@@ -183,27 +184,29 @@ const Index = () => {
               </ul>
             </div>
             <div className="order-1 md:order-2 relative group">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-primary/25 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-1 rounded-2xl border-2 border-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <img
                 src={trustImage}
                 alt="Customer greeting a trusted tradesperson"
-                className="relative rounded-2xl shadow-xl w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                className="relative rounded-2xl shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-center transition-transform duration-500 group-hover:scale-[1.02] border-2 border-border/50"
               />
             </div>
           </div>
 
-          {/* Feature 2 */}
+          {/* Feature 2 - Quality: Roofer at work */}
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
             <div className="relative group">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-bl from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-3 rounded-3xl bg-gradient-to-bl from-primary/25 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-1 rounded-2xl border-2 border-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <img
                 src={qualityImage}
-                alt="Professional tradesperson performing quality work"
-                className="relative rounded-2xl shadow-xl w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                alt="Professional roofer performing quality work on a residential roof"
+                className="relative rounded-2xl shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-top transition-transform duration-500 group-hover:scale-[1.02] border-2 border-border/50"
               />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border-2 border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5 shadow-sm">
                 <Star className="h-3.5 w-3.5" />
                 Quality Guaranteed
               </div>
@@ -216,7 +219,7 @@ const Index = () => {
               <ul className="mt-6 space-y-3">
                 {["13+ trade categories covered", "Experienced, qualified professionals", "Customer reviews after every job"].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 border border-primary/30 shadow-sm">
                       <CheckCircle className="h-4 w-4 text-primary" />
                     </span>
                     {item}
@@ -226,10 +229,10 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Feature 3 */}
+          {/* Feature 3 - Peace of mind: Plasterer talking to customer */}
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border-2 border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5 shadow-sm">
                 <ClipboardList className="h-3.5 w-3.5" />
                 Peace of Mind
               </div>
@@ -242,7 +245,7 @@ const Index = () => {
               <ul className="mt-6 space-y-3">
                 {["Up to 3 competitive quotes per job", "Direct messaging with tradespeople", "Dedicated support team"].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 border border-primary/30 shadow-sm">
                       <CheckCircle className="h-4 w-4 text-primary" />
                     </span>
                     {item}
@@ -251,11 +254,12 @@ const Index = () => {
               </ul>
             </div>
             <div className="order-1 md:order-2 relative group">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-primary/25 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-1 rounded-2xl border-2 border-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <img
                 src={peaceImage}
-                alt="Homeowners reviewing a quote with their tradesperson"
-                className="relative rounded-2xl shadow-xl w-full aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                alt="Tradesperson discussing work with a happy homeowner"
+                className="relative rounded-2xl shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-center transition-transform duration-500 group-hover:scale-[1.02] border-2 border-border/50"
               />
             </div>
           </div>
@@ -265,19 +269,20 @@ const Index = () => {
       {/* For Tradespeople CTA */}
       <section className="py-20 md:py-28 section-divider">
         <div className="container">
-          <div className="rounded-3xl bg-foreground text-primary-foreground p-10 md:p-16 relative overflow-hidden">
+          <div className="rounded-3xl bg-foreground text-primary-foreground p-10 md:p-16 relative overflow-hidden border-2 border-primary/20 shadow-2xl">
             <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary/10 -translate-y-1/2 translate-x-1/3" />
             <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-primary/5 translate-y-1/3 -translate-x-1/4" />
+            <div className="absolute top-1/2 right-1/4 w-32 h-32 rounded-full bg-primary/5 -translate-y-1/2" />
             <div className="relative z-10 grid md:grid-cols-2 gap-10 items-center">
               <div>
-                <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-4">For tradespeople</span>
+                <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-4 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5">For tradespeople</span>
                 <h3 className="font-display text-3xl md:text-4xl font-extrabold leading-tight">
-                  Grow your business with <span className="text-primary">guaranteed work</span>
+                  Grow your business with <span className="text-primary drop-shadow-md">guaranteed work</span>
                 </h3>
                 <p className="mt-4 text-primary-foreground/70 text-lg leading-relaxed">
                   Join our platform, get matched with local jobs, and build your reputation. We handle the vetting so customers trust you from day one.
                 </p>
-                <Button size="lg" asChild className="mt-8 font-bold h-12 px-8 shadow-lg">
+                <Button size="lg" asChild className="mt-8 font-bold h-13 px-10 shadow-xl shadow-primary/40 hover:shadow-2xl hover:shadow-primary/50 border-2 border-primary-foreground/20 rounded-xl transition-all duration-300 hover:scale-105">
                   <Link to="/signup">
                     Apply to join
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -291,11 +296,43 @@ const Index = () => {
                   { icon: <Star className="h-6 w-6" />, label: "Build reviews" },
                   { icon: <Zap className="h-6 w-6" />, label: "Guaranteed payment" },
                 ].map((item) => (
-                  <div key={item.label} className="flex flex-col items-center gap-3 rounded-2xl bg-primary-foreground/5 border border-primary-foreground/10 p-6 text-center transition-colors hover:bg-primary-foreground/10">
-                    <div className="text-primary">{item.icon}</div>
+                  <div key={item.label} className="flex flex-col items-center gap-3 rounded-2xl bg-primary-foreground/5 border-2 border-primary-foreground/15 p-6 text-center transition-all duration-300 hover:bg-primary-foreground/10 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
+                    <div className="text-primary p-3 rounded-xl bg-primary/10 border border-primary/20">{item.icon}</div>
                     <span className="text-sm font-semibold">{item.label}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Electrician Feature Image Section */}
+      <section className="py-16 md:py-20 bg-muted/30">
+        <div className="container">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-border/50">
+            <img
+              src={electricianImage}
+              alt="Professional electrician working with customer supervision"
+              className="w-full h-64 md:h-80 object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/40 to-transparent" />
+            <div className="absolute inset-0 flex items-center">
+              <div className="container">
+                <div className="max-w-md">
+                  <h3 className="font-display text-2xl md:text-3xl font-extrabold text-primary-foreground leading-tight">
+                    Real professionals, <span className="text-primary">real results.</span>
+                  </h3>
+                  <p className="mt-2 text-primary-foreground/80 text-sm md:text-base">
+                    Every tradesperson on BookATrade is vetted, qualified, and ready to deliver quality work.
+                  </p>
+                  <Button size="lg" asChild className="mt-6 font-bold shadow-xl shadow-primary/40 border-2 border-primary-foreground/20 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/50">
+                    <Link to="/signup">
+                      Find a tradesperson
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -314,13 +351,13 @@ const Index = () => {
             Join thousands of homeowners who trust BookATrade to connect them with reliable, vetted professionals.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button size="lg" variant="secondary" asChild className="text-base font-bold h-12 px-8 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+            <Button size="lg" variant="secondary" asChild className="text-base font-bold h-13 px-10 shadow-xl hover:shadow-2xl transition-all hover:scale-105 rounded-xl border-2 border-foreground/10">
               <Link to="/signup">
                 Get started free
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="text-base font-bold bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/15 h-12 px-8">
+            <Button size="lg" variant="outline" asChild className="text-base font-bold bg-transparent border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/15 hover:border-primary-foreground/60 h-13 px-10 rounded-xl shadow-lg transition-all duration-300 hover:scale-105">
               <Link to="/login">Sign in</Link>
             </Button>
           </div>
@@ -328,11 +365,11 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-foreground text-primary-foreground py-12">
+      <footer className="border-t-2 border-primary/20 bg-foreground text-primary-foreground py-12">
         <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="BookATrade logo" className="h-10 w-10 rounded-full" />
+              <img src={logo} alt="BookATrade logo" className="h-10 w-10 rounded-full shadow-md ring-2 ring-primary/30" />
               <div>
                 <span className="font-display text-lg font-extrabold">
                   Book<span className="text-primary">A</span>Trade
