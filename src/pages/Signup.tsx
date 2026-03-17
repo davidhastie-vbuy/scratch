@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Mail, Lock, User, Phone, MapPin, Camera, X } from "lucide-react";
 import { formatPostcode } from "@/lib/format-postcode";
 import ProviderSignupStepper from "@/components/provider-signup/ProviderSignupStepper";
+import logo from "@/assets/bookatrade-logo.png";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -112,8 +113,9 @@ const Signup = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
       <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold text-foreground">Book A Trade</h1>
+         <div className="mb-8 text-center">
+           <img src={logo} alt="BookATrade logo" className="mx-auto h-16 w-16 mb-3" />
+           <h1 className="font-display text-3xl font-bold text-foreground">BookATrade</h1>
           <p className="mt-2 text-muted-foreground">Create your account</p>
         </div>
 

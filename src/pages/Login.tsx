@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Mail, Lock } from "lucide-react";
+import logo from "@/assets/bookatrade-logo.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -53,7 +54,8 @@ const Login = () => {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold text-foreground">Book A Trade</h1>
+          <img src={logo} alt="BookATrade logo" className="mx-auto h-16 w-16 mb-3" />
+          <h1 className="font-display text-3xl font-bold text-foreground">BookATrade</h1>
           <p className="mt-2 text-muted-foreground">Sign in to your account</p>
         </div>
 
