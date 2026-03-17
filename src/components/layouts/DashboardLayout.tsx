@@ -6,6 +6,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/bookatrade-logo.png";
 
 interface NavItem {
   label: string;
