@@ -351,7 +351,7 @@ const Index = () => {
             Join thousands of homeowners who trust BookATrade to connect them with reliable, vetted professionals.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button size="lg" variant="secondary" asChild className="text-base font-bold h-13 px-10 shadow-xl hover:shadow-2xl transition-all hover:scale-105 rounded-xl border-2 border-foreground/10">
+            <Button size="lg" variant="secondary" asChild className="text-lg font-extrabold h-16 px-12 shadow-2xl hover:shadow-2xl transition-all hover:scale-110 rounded-2xl border-2 border-foreground/10">
               <Link to="/signup">
                 Get started free
                 <ArrowRight className="ml-2 h-5 w-5" />
