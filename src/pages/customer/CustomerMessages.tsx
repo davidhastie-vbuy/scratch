@@ -40,11 +40,11 @@ const CustomerMessages = () => {
   const [counterDialog, setCounterDialog] = useState<{ priceMin: number; priceMax: number } | null>(null);
   const [negotiateDialog, setNegotiateDialog] = useState<{ priceMin: number; priceMax: number } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const autoSelectRef = useRef(false);
+  const processedLocationKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (user) fetchConversations();
-  }, [user]);
+  }, [user, location.key]);
 
   const fetchConversations = async () => {
     const { data } = await supabase
