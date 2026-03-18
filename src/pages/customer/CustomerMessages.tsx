@@ -49,7 +49,7 @@ const CustomerMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, j, updated_atobs(title, status, id)")
+      .select("*, jobs(title, status, id, updated_at)")
       .eq("customer_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -88,9 +88,25 @@ const CustomerMessages = () => {
       autoSelectRef.current = true;
       const navState = location.state as { selectConversation?: { jobId: string; providerUserId: string } } | null;
       if (navState?.selectConversation) {
-        const match = enriched.find(
+        let match = enriched.find(
           c => c.job_id === navState.selectConversation!.jobId && c.provider_user_id === navState.selectConversation!.providerUserId
         );
+        // If no conversation exists yet, create one
+        if (!match) {
+          const { data: created } = await supabase
+            .from("conversations")
+            .upsert({
+              job_id: navState.selectConversation.jobId,
+              customer_user_id: user!.id,
+              provider_user_id: navState.selectConversation.providerUserId,
+            } as any, { onConflict: "job_id,customer_user_id,provider_user_id" })
+            .select("*, jobs(title, status, id, updated_at)")
+            .single();
+          if (created) {
+            match = { ...created, unreadCount: 0, lastMessageBody: null, lastMessageAt: null } as ConversationWithUnread;
+            setConversations(prev => [match!, ...prev]);
+          }
+        }
         if (match) {
           openConversation(match);
         }

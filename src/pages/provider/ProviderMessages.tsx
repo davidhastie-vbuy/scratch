@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,8 @@ const ProviderMessages = () => {
   const [proposeDefaults, setProposeDefaults] = useState<any>(undefined);
   const [accepting, setAccepting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const autoSelectRef = useRef(false);
 
   useEffect(() => {
     if (user) fetchConversations();
@@ -48,7 +50,7 @@ const ProviderMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title,, updated_at status, agreed_price)")
+      .select("*, jobs(title, status, updated_at, agreed_price)")
       .eq("provider_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -81,6 +83,18 @@ const ProviderMessages = () => {
 
     setConversations(enriched);
     setLoading(false);
+
+    // Auto-select conversation from navigation state
+    if (!autoSelectRef.current) {
+      autoSelectRef.current = true;
+      const navState = location.state as { conversationId?: string } | null;
+      if (navState?.conversationId) {
+        const match = enriched.find(c => c.id === navState.conversationId);
+        if (match) {
+          openConversation(match);
+        }
+      }
+    }
   };
 
   const fetchAttachments = async (messageIds: string[]) => {
