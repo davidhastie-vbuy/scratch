@@ -40,6 +40,8 @@ const ProviderMessages = () => {
   const [proposeDefaults, setProposeDefaults] = useState<any>(undefined);
   const [accepting, setAccepting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const autoSelectRef = useRef(false);
 
   useEffect(() => {
     if (user) fetchConversations();
