@@ -84,15 +84,13 @@ const ProviderMessages = () => {
     setConversations(enriched);
     setLoading(false);
 
-    // Auto-select conversation from navigation state
-    if (!autoSelectRef.current) {
-      autoSelectRef.current = true;
-      const navState = location.state as { conversationId?: string } | null;
-      if (navState?.conversationId) {
-        const match = enriched.find(c => c.id === navState.conversationId);
-        if (match) {
-          openConversation(match);
-        }
+    // Auto-select conversation from navigation state (only once per navigation)
+    const navState = location.state as { conversationId?: string } | null;
+    if (navState?.conversationId && processedLocationKeyRef.current !== location.key) {
+      processedLocationKeyRef.current = location.key;
+      const match = enriched.find(c => c.id === navState.conversationId);
+      if (match) {
+        openConversation(match);
       }
     }
   };
