@@ -96,8 +96,10 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
                   <ListChecks className="mr-2 h-4 w-4" /> Set Up Milestones & Start Job
                 </Button>
               </>
+            ) : role === "customer" ? (
+              <p className="text-xs text-green-700 font-medium">✓ Terms accepted — the provider will set up milestones shortly</p>
             ) : (
-              <p className="text-xs text-green-700 font-medium">✓ Terms accepted — awaiting customer confirmation</p>
+              <p className="text-xs text-green-700 font-medium">✓ Terms accepted — awaiting milestone setup</p>
             )}
           </div>
         )}
