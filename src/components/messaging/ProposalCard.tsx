@@ -23,15 +23,16 @@ interface Props {
   onCounter?: () => void;
   onSetupMilestones?: () => void;
   accepting?: boolean;
+  hasAcceptedProposal?: boolean;
 }
 
-const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCounter, onSetupMilestones, accepting }: Props) => {
+const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCounter, onSetupMilestones, accepting, hasAcceptedProposal }: Props) => {
   const isPending = proposal.status === "pending";
   const isAccepted = proposal.status === "accepted";
   const isDeclined = proposal.status === "declined";
 
-  // Both sides can accept or counter proposals sent TO them (i.e. not their own)
-  const canRespond = isPending && !isOwnMessage;
+  // Both sides can accept or counter proposals sent TO them, but NOT if any proposal is already accepted
+  const canRespond = isPending && !isOwnMessage && !hasAcceptedProposal;
 
   return (
     <Card className={`max-w-[85%] border-2 ${isAccepted ? "border-green-500/30 bg-green-50/50" : isDeclined ? "border-destructive/30 bg-destructive/5" : "border-primary/30 bg-primary/5"}`}>
