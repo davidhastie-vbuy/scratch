@@ -455,7 +455,8 @@ const CustomerMessages = () => {
                     </div>
                   </div>
                 );
-              })}
+              });
+              })()}
               <div ref={bottomRef} />
             </div>
             {graceInfo && !graceInfo.expired && (
