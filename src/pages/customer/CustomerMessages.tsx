@@ -335,7 +335,18 @@ const CustomerMessages = () => {
     return () => { supabase.removeChannel(channel); };
   }, [selected]);
 
-  const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
+  const jobAccepted = !!selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
+
+  const conversationAcceptedInPrinciple = useMemo(() => {
+    const hasAcceptedProposal = messages.some(
+      (m: any) => m.message_type === "proposal" && m.metadata?.status === "accepted"
+    );
+    const hasAcceptedSystemMessage = messages.some(
+      (m: any) => m.message_type === "system" && typeof m.body === "string" && m.body.includes("Terms accepted in principle")
+    );
+
+    return jobAccepted || hasAcceptedProposal || hasAcceptedSystemMessage;
+  }, [jobAccepted, messages]);
 
   const graceInfo = useMemo(() => {
     if (!selected?.jobs?.status || !["completed", "cancelled"].includes(selected.jobs.status)) return null;
@@ -410,11 +421,7 @@ const CustomerMessages = () => {
             </div>
             <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} />
             <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3">
-              {(() => {
-                const hasAcceptedProposal = messages.some(
-                  (m: any) => m.message_type === "proposal" && m.metadata?.status === "accepted"
-                );
-                return messages.map(m => {
+              {messages.map(m => {
                 const isOwn = m.sender_user_id === user!.id;
 
                 if ((m as any).message_type === "proposal") {
@@ -427,7 +434,7 @@ const CustomerMessages = () => {
                         onAccept={() => handleAcceptProposal(m)}
                         onDecline={() => handleDeclineProposal(m)}
                         onCounter={() => handleCounterProposal(m)}
-                        hasAcceptedProposal={hasAcceptedProposal}
+                        hasAcceptedProposal={conversationAcceptedInPrinciple}
                         accepting={accepting}
                       />
                     </div>
@@ -455,8 +462,7 @@ const CustomerMessages = () => {
                     </div>
                   </div>
                 );
-              });
-              })()}
+              })}
               <div ref={bottomRef} />
             </div>
             {graceInfo && !graceInfo.expired && (
@@ -473,7 +479,7 @@ const CustomerMessages = () => {
               <>
                 <StagedFilePreview stagedFiles={stagedFiles} setStagedFiles={setStagedFiles} />
                 <div className="p-3 border-t space-y-2">
-                  {!jobAccepted && (
+                  {!conversationAcceptedInPrinciple && (
                     <Button variant="outline" size="sm" className="w-full" onClick={openNegotiateFromChat}>
                       <Handshake className="mr-2 h-4 w-4" /> Negotiate
                     </Button>

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MessageSquare, Send, Handshake, Clock } from "lucide-react";
+import { Loader2, MessageSquare, Send, Handshake, Clock, ListChecks } from "lucide-react";
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ProposeTermsDialog from "@/components/messaging/ProposeTermsDialog";
@@ -18,7 +18,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; agreed_price?: number; updated_at?: string };
+  jobs?: { title?: string; status?: string; agreed_price?: number; updated_at?: string; milestones_confirmed?: boolean };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
@@ -50,7 +50,7 @@ const ProviderMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title, status, updated_at, agreed_price)")
+      .select("*, jobs(title, status, updated_at, agreed_price, milestones_confirmed)")
       .eq("provider_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -274,7 +274,22 @@ const ProviderMessages = () => {
     setProposeOpen(true);
   };
 
-  const jobAccepted = selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
+  const jobAccepted = !!selected?.jobs?.status && ["accepted", "in_progress", "completed"].includes(selected.jobs.status);
+
+  const conversationAcceptedInPrinciple = useMemo(() => {
+    const hasAcceptedProposal = messages.some(
+      (m: any) => m.message_type === "proposal" && m.metadata?.status === "accepted"
+    );
+    const hasAcceptedSystemMessage = messages.some(
+      (m: any) => m.message_type === "system" && typeof m.body === "string" && m.body.includes("Terms accepted in principle")
+    );
+
+    return jobAccepted || hasAcceptedProposal || hasAcceptedSystemMessage;
+  }, [jobAccepted, messages]);
+
+  const canSetupMilestones = conversationAcceptedInPrinciple
+    && selected?.jobs?.milestones_confirmed !== true
+    && !["in_progress", "completed", "cancelled"].includes(selected?.jobs?.status ?? "");
 
   const graceInfo = useMemo(() => {
     if (!selected?.jobs?.status || !["completed", "cancelled"].includes(selected.jobs.status)) return null;
@@ -352,24 +367,24 @@ const ProviderMessages = () => {
           </div>
         ) : (
           <>
-            <div className="p-3 border-b flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
+            <div className="p-3 border-b flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <h3 className="font-semibold text-sm truncate">{selected.jobs?.title ?? "Chat"}</h3>
                 <ScoreBadge userId={selected.customer_user_id} role="customer" />
               </div>
-              {!jobAccepted && (
+              {canSetupMilestones ? (
+                <Button size="sm" onClick={() => navigate(`/provider/jobs/${selected.job_id}`)}>
+                  <ListChecks className="mr-2 h-4 w-4" /> Set Up Milestones
+                </Button>
+              ) : !conversationAcceptedInPrinciple ? (
                 <Button size="sm" variant="outline" onClick={() => { setProposeDefaults(undefined); setProposeOpen(true); }}>
                   <Handshake className="mr-2 h-4 w-4" /> Propose Terms
                 </Button>
-              )}
+              ) : null}
             </div>
             <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} showProviderLink={false} />
             <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3">
-              {(() => {
-                const hasAcceptedProposal = messages.some(
-                  (m: any) => m.message_type === "proposal" && m.metadata?.status === "accepted"
-                );
-                return messages.map(m => {
+              {messages.map(m => {
                 const isOwn = m.sender_user_id === user!.id;
                 if ((m as any).message_type === "proposal") {
                   return (
@@ -381,9 +396,9 @@ const ProviderMessages = () => {
                         onAccept={() => handleAcceptProposal(m)}
                         onDecline={() => handleDeclineProposal(m)}
                         onCounter={() => handleCounterProposal(m)}
-                        hasAcceptedProposal={hasAcceptedProposal}
+                        hasAcceptedProposal={conversationAcceptedInPrinciple}
                         onSetupMilestones={
-                          (m as any).metadata?.status === "accepted" && selected
+                          (m as any).metadata?.status === "accepted" && canSetupMilestones && selected
                             ? () => navigate(`/provider/jobs/${selected.job_id}`)
                             : undefined
                         }
@@ -412,8 +427,7 @@ const ProviderMessages = () => {
                     </div>
                   </div>
                 );
-              });
-              })()}
+              })}
               <div ref={bottomRef} />
             </div>
             {graceInfo && !graceInfo.expired && (

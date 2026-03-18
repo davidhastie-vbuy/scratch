@@ -31,8 +31,8 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
   const isAccepted = proposal.status === "accepted";
   const isDeclined = proposal.status === "declined";
 
-  // Both sides can accept or counter proposals sent TO them, but NOT if any proposal is already accepted
-  const canRespond = isPending && !isOwnMessage && !hasAcceptedProposal;
+  const showActions = isPending && !isOwnMessage;
+  const actionsLocked = !!hasAcceptedProposal;
 
   return (
     <Card className={`max-w-[85%] border-2 ${isAccepted ? "border-green-500/30 bg-green-50/50" : isDeclined ? "border-destructive/30 bg-destructive/5" : "border-primary/30 bg-primary/5"}`}>
@@ -71,19 +71,26 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
           )}
         </div>
 
-        {canRespond && (
-          <div className="flex gap-2 pt-1">
-            <Button size="sm" onClick={onAccept} disabled={accepting} className="flex-1">
-              <Check className="mr-1 h-3.5 w-3.5" /> Accept
-            </Button>
-            {onCounter && (
-              <Button size="sm" variant="secondary" onClick={onCounter} disabled={accepting} className="flex-1">
-                <RefreshCw className="mr-1 h-3.5 w-3.5" /> Counter
+        {showActions && (
+          <div className="space-y-2 pt-1">
+            <div className="flex gap-2">
+              <Button size="sm" onClick={onAccept} disabled={accepting || actionsLocked} className="flex-1">
+                <Check className="mr-1 h-3.5 w-3.5" /> Accept
               </Button>
+              {onCounter && (
+                <Button size="sm" variant="secondary" onClick={onCounter} disabled={accepting || actionsLocked} className="flex-1">
+                  <RefreshCw className="mr-1 h-3.5 w-3.5" /> Counter
+                </Button>
+              )}
+              <Button size="sm" variant="outline" onClick={onDecline} disabled={accepting || actionsLocked} className="flex-1">
+                <X className="mr-1 h-3.5 w-3.5" /> Decline
+              </Button>
+            </div>
+            {actionsLocked && (
+              <p className="text-xs text-muted-foreground">
+                Actions are locked because the job has already been accepted in principle.
+              </p>
             )}
-            <Button size="sm" variant="outline" onClick={onDecline} disabled={accepting} className="flex-1">
-              <X className="mr-1 h-3.5 w-3.5" /> Decline
-            </Button>
           </div>
         )}
 
