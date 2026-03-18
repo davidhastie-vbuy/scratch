@@ -49,7 +49,7 @@ const CustomerMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, j, updated_atobs(title, status, id)")
+      .select("*, jobs(title, status, id, updated_at)")
       .eq("customer_user_id", user!.id)
       .order("created_at", { ascending: false });
 
