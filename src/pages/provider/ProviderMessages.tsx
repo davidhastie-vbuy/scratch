@@ -365,7 +365,11 @@ const ProviderMessages = () => {
             </div>
             <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} showProviderLink={false} />
             <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3">
-              {messages.map(m => {
+              {(() => {
+                const hasAcceptedProposal = messages.some(
+                  (m: any) => m.message_type === "proposal" && m.metadata?.status === "accepted"
+                );
+                return messages.map(m => {
                 const isOwn = m.sender_user_id === user!.id;
                 if ((m as any).message_type === "proposal") {
                   return (
@@ -377,6 +381,7 @@ const ProviderMessages = () => {
                         onAccept={() => handleAcceptProposal(m)}
                         onDecline={() => handleDeclineProposal(m)}
                         onCounter={() => handleCounterProposal(m)}
+                        hasAcceptedProposal={hasAcceptedProposal}
                         onSetupMilestones={
                           (m as any).metadata?.status === "accepted" && selected
                             ? () => navigate(`/provider/jobs/${selected.job_id}`)
@@ -407,7 +412,8 @@ const ProviderMessages = () => {
                     </div>
                   </div>
                 );
-              })}
+              });
+              })()}
               <div ref={bottomRef} />
             </div>
             {graceInfo && !graceInfo.expired && (
