@@ -378,7 +378,7 @@ const ProviderMessages = () => {
                         onDecline={() => handleDeclineProposal(m)}
                         onCounter={() => handleCounterProposal(m)}
                         onSetupMilestones={
-                          (m as any).metadata?.status === "accepted" && selected && jobAccepted
+                          (m as any).metadata?.status === "accepted" && selected
                             ? () => navigate(`/provider/jobs/${selected.job_id}`)
                             : undefined
                         }
