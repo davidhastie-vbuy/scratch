@@ -48,7 +48,7 @@ const ProviderMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title,, updated_at status, agreed_price)")
+      .select("*, jobs(title, status, updated_at, agreed_price)")
       .eq("provider_user_id", user!.id)
       .order("created_at", { ascending: false });
 
