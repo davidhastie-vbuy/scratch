@@ -41,11 +41,11 @@ const ProviderMessages = () => {
   const [accepting, setAccepting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const autoSelectRef = useRef(false);
+  const processedLocationKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (user) fetchConversations();
-  }, [user]);
+  }, [user, location.key]);
 
   const fetchConversations = async () => {
     const { data } = await supabase
