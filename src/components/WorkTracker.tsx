@@ -539,6 +539,8 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
               const isProvider = role === "provider";
               const isCustomer = role === "customer";
               const payment = getPaymentForMilestone(m.id);
+              const canEditDelete = isProvider && !m.is_auto && !milestonesLocked;
+              const isEditing = editingId === m.id;
 
               const canComplete = isProvider && m.status === "pending" && !m.is_auto;
               const canReconfirm = isProvider && m.status === "flagged";
