@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle2, Circle, Flag, Plus, Send, Loader2, AlertTriangle, MessageSquareWarning,
-  ChevronDown, ChevronUp, PoundSterling,
+  ChevronDown, ChevronUp, PoundSterling, Trash2, Pencil, Lock,
 } from "lucide-react";
 import { format } from "date-fns";
 
