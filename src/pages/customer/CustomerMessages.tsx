@@ -443,19 +443,55 @@ const CustomerMessages = () => {
 
                 if ((m as any).message_type === "cancellation_request") {
                   const meta = (m as any).metadata;
+                  const isProviderInitiated = meta?.initiated_by === "provider";
+                  const isPending = meta?.status === "pending";
                   return (
                     <div key={m.id} className="flex justify-center">
                       <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm max-w-[85%] space-y-2">
                         <p className="text-center font-medium text-destructive">🚫 Cancellation Request</p>
                         <p className="text-center text-muted-foreground text-xs">{m.body}</p>
-                        {meta?.status === "pending" && (
+                        {isPending && isProviderInitiated && (
+                          <div className="flex gap-2 justify-center pt-1">
+                            <Button size="sm" variant="destructive" onClick={async () => {
+                              await supabase.from("messages").update({ metadata: { ...meta, status: "accepted" } } as any).eq("id", m.id);
+                              await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", selected!.job_id);
+                              await supabase.from("messages").insert({
+                                conversation_id: selected!.id,
+                                sender_user_id: user!.id,
+                                body: "✅ Cancellation confirmed by the customer. The job has been cancelled.",
+                                message_type: "system",
+                              } as any);
+                              toast({ title: "Job cancelled", description: "Both parties agreed to cancel." });
+                              const { data: updatedMsgs } = await supabase.from("messages").select("*").eq("conversation_id", selected!.id).order("created_at");
+                              setMessages(updatedMsgs ?? []);
+                              fetchConversations();
+                            }}>
+                              Confirm Cancel
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={async () => {
+                              await supabase.from("messages").update({ metadata: { ...meta, status: "rejected" } } as any).eq("id", m.id);
+                              await supabase.from("messages").insert({
+                                conversation_id: selected!.id,
+                                sender_user_id: user!.id,
+                                body: "❌ The customer has declined the cancellation request. The job will continue as planned.",
+                                message_type: "system",
+                              } as any);
+                              toast({ title: "Cancellation declined" });
+                              const { data: updatedMsgs2 } = await supabase.from("messages").select("*").eq("conversation_id", selected!.id).order("created_at");
+                              setMessages(updatedMsgs2 ?? []);
+                            }}>
+                              Decline
+                            </Button>
+                          </div>
+                        )}
+                        {isPending && !isProviderInitiated && (
                           <p className="text-center text-xs text-muted-foreground">Awaiting provider confirmation…</p>
                         )}
                         {meta?.status === "accepted" && (
                           <p className="text-center text-xs text-destructive font-medium">✅ Cancellation confirmed</p>
                         )}
                         {meta?.status === "rejected" && (
-                          <p className="text-center text-xs text-muted-foreground font-medium">❌ Cancellation declined by provider</p>
+                          <p className="text-center text-xs text-muted-foreground font-medium">❌ Cancellation declined{isProviderInitiated ? " by customer" : " by provider"}</p>
                         )}
                       </div>
                     </div>

@@ -450,6 +450,15 @@ const ProviderJobDetail = () => {
         </Card>
       )}
 
+      {/* Cancel Job Button - visible when provider's quote is accepted and job is active */}
+      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && (
+        <div className="flex justify-end">
+          <Button variant="destructive" size="sm" onClick={() => setCancelDialogOpen(true)}>
+            <XCircle className="mr-2 h-4 w-4" /> Cancel Job
+          </Button>
+        </div>
+      )}
+
       {/* Review Dialog */}
       <ReviewDialog
         open={reviewOpen}
@@ -462,6 +471,31 @@ const ProviderJobDetail = () => {
         revieweeName={customerName}
         onReviewSubmitted={fetchAll}
       />
+
+      {/* Cancel Job Confirmation Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel this job?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>Once you cancel this job, all details will be permanently deleted and it will no longer be available.</p>
+              {hasConfirmedPayment && (
+                <p className="font-medium text-foreground">
+                  Because a payment has been made on this job, the customer must also confirm the cancellation before it takes effect. A cancellation request will be sent to the customer.
+                </p>
+              )}
+              <p>Are you sure you want to proceed?</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancellingJob}>Go Back</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelJob} disabled={cancellingJob} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {cancellingJob ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {hasConfirmedPayment ? "Request Cancellation" : "Confirm Cancel"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

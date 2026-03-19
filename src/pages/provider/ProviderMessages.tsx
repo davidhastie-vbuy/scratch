@@ -409,13 +409,14 @@ const ProviderMessages = () => {
                 }
                 if ((m as any).message_type === "cancellation_request") {
                   const meta = (m as any).metadata;
+                  const isProviderInitiated = meta?.initiated_by === "provider";
                   const isPending = meta?.status === "pending";
                   return (
                     <div key={m.id} className="flex justify-center">
                       <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm max-w-[85%] space-y-2">
                         <p className="text-center font-medium text-destructive">🚫 Cancellation Request</p>
                         <p className="text-center text-muted-foreground text-xs">{m.body}</p>
-                        {isPending && (
+                        {isPending && !isProviderInitiated && (
                           <div className="flex gap-2 justify-center pt-1">
                             <Button size="sm" variant="destructive" onClick={async () => {
                               await supabase.from("messages").update({ metadata: { ...meta, status: "accepted" } } as any).eq("id", m.id);
@@ -449,11 +450,14 @@ const ProviderMessages = () => {
                             </Button>
                           </div>
                         )}
+                        {isPending && isProviderInitiated && (
+                          <p className="text-center text-xs text-muted-foreground">Awaiting customer confirmation…</p>
+                        )}
                         {meta?.status === "accepted" && (
                           <p className="text-center text-xs text-destructive font-medium">✅ Cancellation confirmed</p>
                         )}
                         {meta?.status === "rejected" && (
-                          <p className="text-center text-xs text-muted-foreground font-medium">❌ Cancellation declined</p>
+                          <p className="text-center text-xs text-muted-foreground font-medium">❌ Cancellation declined{isProviderInitiated ? " by customer" : ""}</p>
                         )}
                       </div>
                     </div>
