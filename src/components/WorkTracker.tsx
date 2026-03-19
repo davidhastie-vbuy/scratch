@@ -408,7 +408,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
             <CheckCircle2 className="h-4 w-4" /> Work Tracker
           </CardTitle>
           <div className="flex gap-2">
-            {role === "provider" && (
+            {role === "provider" && !milestonesLocked && (
               <Button
                 variant="outline"
                 size="sm"
