@@ -259,6 +259,77 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   const canProviderCancel = role === "provider" && milestones.some((m) => m.flag_count >= 5);
 
+  // Hard lock: once any payment has been confirmed (held or released), no add/edit/delete
+  const hasAnyConfirmedPayment = escrowPayments.some((p) => p.status === "held" || p.status === "released");
+
+  const deleteMilestone = async (milestoneId: string) => {
+    if (hasAnyConfirmedPayment) {
+      toast({ title: "Milestones locked", description: "Milestones cannot be modified after payment has been made.", variant: "destructive" });
+      return;
+    }
+    const milestone = milestones.find((m) => m.id === milestoneId);
+    if (milestone?.is_auto) return;
+    setDeleting(milestoneId);
+    const { error } = await supabase.from("job_milestones").delete().eq("id", milestoneId);
+    if (error) {
+      toast({ title: "Failed to delete milestone", description: error.message, variant: "destructive" });
+    } else {
+      fetchMilestones();
+    }
+    setDeleting(null);
+  };
+
+  const startEdit = (m: any) => {
+    setEditingId(m.id);
+    setEditTitle(m.title);
+    setEditAmount(m.payment_amount != null ? String(m.payment_amount) : "");
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditTitle("");
+    setEditAmount("");
+  };
+
+  const saveEdit = async (milestoneId: string) => {
+    if (hasAnyConfirmedPayment) {
+      toast({ title: "Milestones locked", description: "Milestones cannot be modified after payment has been made.", variant: "destructive" });
+      return;
+    }
+    if (!editTitle.trim()) {
+      toast({ title: "Title required", variant: "destructive" });
+      return;
+    }
+    const parsedAmt = editAmount ? parseFloat(editAmount) : null;
+    if (parsedAmt !== null && (!Number.isFinite(parsedAmt) || parsedAmt <= 0)) {
+      toast({ title: "Enter a valid amount", variant: "destructive" });
+      return;
+    }
+    // Check budget cap
+    if (parsedAmt !== null && agreedPrice > 0) {
+      const currentMilestone = milestones.find((m) => m.id === milestoneId);
+      const currentAmt = Number(currentMilestone?.payment_amount) || 0;
+      const otherAllocated = totalMilestoneAmounts - currentAmt;
+      const maxAllowed = Math.round((agreedPrice - otherAllocated) * 100) / 100;
+      if (parsedAmt > maxAllowed) {
+        toast({ title: "Exceeds agreed price", description: `Maximum allowed: £${maxAllowed.toFixed(2)}`, variant: "destructive" });
+        return;
+      }
+    }
+    setSaving(true);
+    const { error } = await supabase.from("job_milestones").update({
+      title: editTitle.trim(),
+      payment_amount: parsedAmt,
+    } as any).eq("id", milestoneId);
+    if (error) {
+      toast({ title: "Failed to update", description: error.message, variant: "destructive" });
+    } else {
+      cancelEdit();
+      fetchMilestones();
+    }
+    setSaving(false);
+  };
+
   const cancelJobDueToFlags = async () => {
     await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId);
     toast({ title: "Job cancelled due to unresolved flags." });
