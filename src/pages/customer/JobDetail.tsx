@@ -252,10 +252,46 @@ const JobDetail = () => {
     setProcessingPayment(false);
   };
 
-  const cancelJob = async () => {
-    await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId!);
-    toast({ title: "Job cancelled" });
-    fetchAll();
+  // Cancel job state
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancellingJob, setCancellingJob] = useState(false);
+
+  const hasConfirmedPayment = escrowPayments.some(p => p.status === "held" || p.status === "released");
+
+  const handleCancelJob = async () => {
+    setCancellingJob(true);
+    if (!hasConfirmedPayment) {
+      // Pre-payment: customer can cancel freely
+      await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId!);
+      toast({ title: "Job cancelled", description: "The job has been removed." });
+      setCancelDialogOpen(false);
+      fetchAll();
+    } else {
+      // Post-payment: send cancellation request to provider via messaging
+      // Find conversation with accepted provider
+      const { data: conv } = await supabase
+        .from("conversations")
+        .select("id")
+        .eq("job_id", jobId!)
+        .eq("customer_user_id", user!.id)
+        .eq("provider_user_id", job.provider_id)
+        .maybeSingle();
+
+      if (conv?.id) {
+        await supabase.from("messages").insert({
+          conversation_id: conv.id,
+          sender_user_id: user!.id,
+          body: "🚫 The customer has requested to cancel this job. Provider confirmation is required before the job can be cancelled.",
+          message_type: "cancellation_request",
+          metadata: { status: "pending", requested_by: user!.id },
+        } as any);
+        toast({ title: "Cancellation requested", description: "The provider has been notified. Both parties must agree to cancel the job." });
+      } else {
+        toast({ title: "Could not find conversation", description: "Please contact support.", variant: "destructive" });
+      }
+      setCancelDialogOpen(false);
+    }
+    setCancellingJob(false);
   };
 
   // --- Inline chat functions ---
