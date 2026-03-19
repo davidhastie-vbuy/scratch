@@ -44,6 +44,13 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const [newAmount, setNewAmount] = useState("");
   const [adding, setAdding] = useState(false);
 
+  // Edit milestone state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editAmount, setEditAmount] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
   // Comment/action forms
   const [actionComment, setActionComment] = useState<Record<string, string>>({});
   const [acting, setActing] = useState<string | null>(null);
