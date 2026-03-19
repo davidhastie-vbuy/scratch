@@ -441,6 +441,27 @@ const CustomerMessages = () => {
                   );
                 }
 
+                if ((m as any).message_type === "cancellation_request") {
+                  const meta = (m as any).metadata;
+                  return (
+                    <div key={m.id} className="flex justify-center">
+                      <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm max-w-[85%] space-y-2">
+                        <p className="text-center font-medium text-destructive">🚫 Cancellation Request</p>
+                        <p className="text-center text-muted-foreground text-xs">{m.body}</p>
+                        {meta?.status === "pending" && (
+                          <p className="text-center text-xs text-muted-foreground">Awaiting provider confirmation…</p>
+                        )}
+                        {meta?.status === "accepted" && (
+                          <p className="text-center text-xs text-destructive font-medium">✅ Cancellation confirmed</p>
+                        )}
+                        {meta?.status === "rejected" && (
+                          <p className="text-center text-xs text-muted-foreground font-medium">❌ Cancellation declined by provider</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
                 if ((m as any).message_type === "system") {
                   return (
                     <div key={m.id} className="flex justify-center">

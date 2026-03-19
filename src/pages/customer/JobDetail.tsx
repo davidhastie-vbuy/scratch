@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake, AlertTriangle, Star } from "lucide-react";
 import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import MilestonePaymentSection from "@/components/MilestonePaymentSection";
@@ -251,10 +252,46 @@ const JobDetail = () => {
     setProcessingPayment(false);
   };
 
-  const cancelJob = async () => {
-    await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId!);
-    toast({ title: "Job cancelled" });
-    fetchAll();
+  // Cancel job state
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancellingJob, setCancellingJob] = useState(false);
+
+  const hasConfirmedPayment = escrowPayments.some(p => p.status === "held" || p.status === "released");
+
+  const handleCancelJob = async () => {
+    setCancellingJob(true);
+    if (!hasConfirmedPayment) {
+      // Pre-payment: customer can cancel freely
+      await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId!);
+      toast({ title: "Job cancelled", description: "The job has been removed." });
+      setCancelDialogOpen(false);
+      fetchAll();
+    } else {
+      // Post-payment: send cancellation request to provider via messaging
+      // Find conversation with accepted provider
+      const { data: conv } = await supabase
+        .from("conversations")
+        .select("id")
+        .eq("job_id", jobId!)
+        .eq("customer_user_id", user!.id)
+        .eq("provider_user_id", job.provider_id)
+        .maybeSingle();
+
+      if (conv?.id) {
+        await supabase.from("messages").insert({
+          conversation_id: conv.id,
+          sender_user_id: user!.id,
+          body: "🚫 The customer has requested to cancel this job. Provider confirmation is required before the job can be cancelled.",
+          message_type: "cancellation_request",
+          metadata: { status: "pending", requested_by: user!.id },
+        } as any);
+        toast({ title: "Cancellation requested", description: "The provider has been notified. Both parties must agree to cancel the job." });
+      } else {
+        toast({ title: "Could not find conversation", description: "Please contact support.", variant: "destructive" });
+      }
+      setCancelDialogOpen(false);
+    }
+    setCancellingJob(false);
   };
 
   // --- Inline chat functions ---
@@ -507,7 +544,7 @@ const JobDetail = () => {
                   </Button>
                 )}
                 {job.status !== "cancelled" && job.status !== "completed" && (
-                  <Button variant="destructive" size="sm" onClick={cancelJob}>Cancel Job</Button>
+                  <Button variant="destructive" size="sm" onClick={() => setCancelDialogOpen(true)}>Cancel Job</Button>
                 )}
               </div>
             </>
@@ -812,6 +849,31 @@ const JobDetail = () => {
           onSubmit={sendCounterProposal}
         />
       )}
+
+      {/* Cancel Job Confirmation Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel this job?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>Once you cancel this job, all details will be permanently deleted and it will no longer be available.</p>
+              {hasConfirmedPayment && (
+                <p className="font-medium text-foreground">
+                  Because a payment has been made on this job, the provider must also confirm the cancellation before it takes effect. A cancellation request will be sent to the provider.
+                </p>
+              )}
+              <p>Are you sure you want to proceed?</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancellingJob}>Go Back</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelJob} disabled={cancellingJob} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {cancellingJob ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {hasConfirmedPayment ? "Request Cancellation" : "Confirm Cancel"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   );
