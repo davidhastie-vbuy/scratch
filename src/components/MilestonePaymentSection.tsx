@@ -74,8 +74,8 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
     return <p className="text-sm text-muted-foreground">No milestones set up yet.</p>;
   }
 
-  // Find the next unpaid milestone
-  const nextUnpaid = milestones.find(m => !getPaymentForMilestone(m.id) && !getPendingPaymentForMilestone(m.id));
+  // Find the next unpaid milestone — pending (abandoned) payments should NOT block retry
+  const nextUnpaid = milestones.find(m => !getPaymentForMilestone(m.id));
 
   return (
     <div className="space-y-3">
