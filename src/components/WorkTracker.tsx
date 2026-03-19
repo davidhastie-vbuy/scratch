@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle2, Circle, Flag, Plus, Send, Loader2, AlertTriangle, MessageSquareWarning,
-  ChevronDown, ChevronUp, PoundSterling, Trash2, Pencil, Lock,
+  ChevronDown, ChevronUp, PoundSterling,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -43,13 +43,6 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const [newTitle, setNewTitle] = useState("");
   const [newAmount, setNewAmount] = useState("");
   const [adding, setAdding] = useState(false);
-
-  // Edit milestone state
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editAmount, setEditAmount] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState<string | null>(null);
 
   // Comment/action forms
   const [actionComment, setActionComment] = useState<Record<string, string>>({});
@@ -259,77 +252,6 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   const canProviderCancel = role === "provider" && milestones.some((m) => m.flag_count >= 5);
 
-  // Hard lock: once any payment has been confirmed (held or released), no add/edit/delete
-  const hasAnyConfirmedPayment = escrowPayments.some((p) => p.status === "held" || p.status === "released");
-
-  const deleteMilestone = async (milestoneId: string) => {
-    if (hasAnyConfirmedPayment) {
-      toast({ title: "Milestones locked", description: "Milestones cannot be modified after payment has been made.", variant: "destructive" });
-      return;
-    }
-    const milestone = milestones.find((m) => m.id === milestoneId);
-    if (milestone?.is_auto) return;
-    setDeleting(milestoneId);
-    const { error } = await supabase.from("job_milestones").delete().eq("id", milestoneId);
-    if (error) {
-      toast({ title: "Failed to delete milestone", description: error.message, variant: "destructive" });
-    } else {
-      fetchMilestones();
-    }
-    setDeleting(null);
-  };
-
-  const startEdit = (m: any) => {
-    setEditingId(m.id);
-    setEditTitle(m.title);
-    setEditAmount(m.payment_amount != null ? String(m.payment_amount) : "");
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditTitle("");
-    setEditAmount("");
-  };
-
-  const saveEdit = async (milestoneId: string) => {
-    if (hasAnyConfirmedPayment) {
-      toast({ title: "Milestones locked", description: "Milestones cannot be modified after payment has been made.", variant: "destructive" });
-      return;
-    }
-    if (!editTitle.trim()) {
-      toast({ title: "Title required", variant: "destructive" });
-      return;
-    }
-    const parsedAmt = editAmount ? parseFloat(editAmount) : null;
-    if (parsedAmt !== null && (!Number.isFinite(parsedAmt) || parsedAmt <= 0)) {
-      toast({ title: "Enter a valid amount", variant: "destructive" });
-      return;
-    }
-    // Check budget cap
-    if (parsedAmt !== null && agreedPrice > 0) {
-      const currentMilestone = milestones.find((m) => m.id === milestoneId);
-      const currentAmt = Number(currentMilestone?.payment_amount) || 0;
-      const otherAllocated = totalMilestoneAmounts - currentAmt;
-      const maxAllowed = Math.round((agreedPrice - otherAllocated) * 100) / 100;
-      if (parsedAmt > maxAllowed) {
-        toast({ title: "Exceeds agreed price", description: `Maximum allowed: £${maxAllowed.toFixed(2)}`, variant: "destructive" });
-        return;
-      }
-    }
-    setSaving(true);
-    const { error } = await supabase.from("job_milestones").update({
-      title: editTitle.trim(),
-      payment_amount: parsedAmt,
-    } as any).eq("id", milestoneId);
-    if (error) {
-      toast({ title: "Failed to update", description: error.message, variant: "destructive" });
-    } else {
-      cancelEdit();
-      fetchMilestones();
-    }
-    setSaving(false);
-  };
-
   const cancelJobDueToFlags = async () => {
     await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId);
     toast({ title: "Job cancelled due to unresolved flags." });
@@ -387,7 +309,6 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     ? Math.max(0, Math.round((agreedPrice - totalMilestoneAmounts) * 100) / 100)
     : 0;
   const milestoneBudgetFullyAllocated = agreedPrice > 0 && totalMilestoneAmounts >= agreedPrice - 0.01;
-  const milestonesLocked = hasAnyConfirmedPayment;
   const totalPaid = escrowPayments
     .filter((p) => p.status === "held" || p.status === "released")
     .reduce((sum, p) => sum + p.amount, 0);
@@ -408,7 +329,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
             <CheckCircle2 className="h-4 w-4" /> Work Tracker
           </CardTitle>
           <div className="flex gap-2">
-            {role === "provider" && !milestonesLocked && (
+            {role === "provider" && (
               <Button
                 variant="outline"
                 size="sm"
@@ -434,21 +355,14 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
           </div>
         )}
 
-        {role === "provider" && milestonesLocked && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground rounded-lg border bg-muted/30 p-3">
-            <Lock className="h-4 w-4 shrink-0" />
-            <p>Milestones are locked because a payment has been made. No further changes can be made to milestones.</p>
-          </div>
-        )}
-
-        {role === "provider" && !milestonesLocked && milestoneBudgetFullyAllocated && (
+        {role === "provider" && milestoneBudgetFullyAllocated && (
           <p className="text-xs text-muted-foreground">
             Deposit, milestones, and final payment already equal the agreed price, so no more paid milestones can be added.
           </p>
         )}
 
         {/* Add milestone form */}
-        {showAdd && role === "provider" && !milestonesLocked && !milestoneBudgetFullyAllocated && (
+        {showAdd && role === "provider" && !milestoneBudgetFullyAllocated && (
           <div className="space-y-2">
             <div className="flex gap-2">
               <Input
@@ -539,8 +453,6 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
               const isProvider = role === "provider";
               const isCustomer = role === "customer";
               const payment = getPaymentForMilestone(m.id);
-              const canEditDelete = isProvider && !m.is_auto && !milestonesLocked;
-              const isEditing = editingId === m.id;
 
               const canComplete = isProvider && m.status === "pending" && !m.is_auto;
               const canReconfirm = isProvider && m.status === "flagged";
@@ -550,104 +462,57 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
               return (
                 <div key={m.id} className="rounded-lg border p-3 space-y-2">
-                  {/* Inline edit form */}
-                  {isEditing ? (
-                    <div className="space-y-2">
-                      <Input
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        placeholder="Milestone title"
-                      />
-                      <div className="flex items-center gap-2">
-                        <PoundSterling className="h-4 w-4 text-muted-foreground" />
-                        <Input
-                          type="number"
-                          value={editAmount}
-                          onChange={(e) => setEditAmount(e.target.value)}
-                          placeholder="Amount"
-                          className="w-32"
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" onClick={() => saveEdit(m.id)} disabled={saving}>
-                          {saving ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <CheckCircle2 className="mr-1 h-3 w-3" />}
-                          Save
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={cancelEdit}>Cancel</Button>
-                      </div>
+                  <div
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => setExpandedId(isExpanded ? null : m.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      {m.status === "accepted" ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      ) : m.status === "flagged" ? (
+                        <Flag className="h-4 w-4 text-destructive" />
+                      ) : m.status === "completed" ? (
+                        <CheckCircle2 className="h-4 w-4 text-yellow-600" />
+                      ) : (
+                        <Circle className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <span className="text-sm font-medium">{m.title}</span>
+                      {m.is_auto && <Badge variant="outline" className="text-xs">Auto</Badge>}
+                      {m.payment_amount && (
+                        <Badge variant="secondary" className="text-xs gap-1">
+                          <PoundSterling className="h-3 w-3" />
+                          {Number(m.payment_amount).toFixed(2)}
+                        </Badge>
+                      )}
                     </div>
-                  ) : (
-                    <div
-                      className="flex items-center justify-between cursor-pointer"
-                      onClick={() => setExpandedId(isExpanded ? null : m.id)}
-                    >
-                      <div className="flex items-center gap-2">
-                        {m.status === "accepted" ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        ) : m.status === "flagged" ? (
-                          <Flag className="h-4 w-4 text-destructive" />
-                        ) : m.status === "completed" ? (
-                          <CheckCircle2 className="h-4 w-4 text-yellow-600" />
-                        ) : (
-                          <Circle className="h-4 w-4 text-muted-foreground" />
-                        )}
-                        <span className="text-sm font-medium">{m.title}</span>
-                        {m.is_auto && <Badge variant="outline" className="text-xs">Auto</Badge>}
-                        {m.payment_amount && (
-                          <Badge variant="secondary" className="text-xs gap-1">
-                            <PoundSterling className="h-3 w-3" />
-                            {Number(m.payment_amount).toFixed(2)}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {canEditDelete && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={(e) => { e.stopPropagation(); startEdit(m); }}
-                            >
-                              <Pencil className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 text-destructive hover:text-destructive"
-                              onClick={(e) => { e.stopPropagation(); deleteMilestone(m.id); }}
-                              disabled={deleting === m.id}
-                            >
-                              {deleting === m.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
-                            </Button>
-                          </>
-                        )}
-                        <Badge className={STATUS_COLORS[m.status] || ""}>{m.status}</Badge>
-                        {m.flag_count > 0 && (
-                          <span className="text-xs text-destructive">({m.flag_count}/5 flags)</span>
-                        )}
-                        {/* Payment status badge - role-specific */}
-                        {m.payment_amount && (() => {
-                          const pStatus = getPaymentStatus(m.id);
-                          const payment = getPaymentForMilestone(m.id);
-                          if (isProvider) {
-                            if (pStatus === "complete") {
-                              return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
-                            }
-                            return <Badge variant="outline" className="text-xs">Payment pending</Badge>;
-                          }
+                    <div className="flex items-center gap-2">
+                      <Badge className={STATUS_COLORS[m.status] || ""}>{m.status}</Badge>
+                      {m.flag_count > 0 && (
+                        <span className="text-xs text-destructive">({m.flag_count}/5 flags)</span>
+                      )}
+                      {/* Payment status badge - role-specific */}
+                      {m.payment_amount && (() => {
+                        const pStatus = getPaymentStatus(m.id);
+                        const payment = getPaymentForMilestone(m.id);
+                        if (isProvider) {
+                          // Provider sees: pending or complete
                           if (pStatus === "complete") {
                             return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
                           }
-                          if (pStatus === "pending") {
-                            return <Badge variant="outline" className="text-xs">Confirming…</Badge>;
-                          }
-                          return null;
-                        })()}
-                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                      </div>
+                          return <Badge variant="outline" className="text-xs">Payment pending</Badge>;
+                        }
+                        // Customer sees: pay button, retry, pending confirmation, or complete
+                        if (pStatus === "complete") {
+                          return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
+                        }
+                        if (pStatus === "pending") {
+                          return <Badge variant="outline" className="text-xs">Confirming…</Badge>;
+                        }
+                        return null;
+                      })()}
+                      {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </div>
-                  )}
+                  </div>
 
                   {isExpanded && (
                     <div className="pl-6 space-y-3">
