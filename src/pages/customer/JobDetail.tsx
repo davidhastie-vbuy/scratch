@@ -52,9 +52,6 @@ const JobDetail = () => {
   const [payingAmount, setPayingAmount] = useState("");
   const [processingPayment, setProcessingPayment] = useState(false);
 
-  // Revise milestones
-  const [showReviseDialog, setShowReviseDialog] = useState(false);
-  const [reviseComment, setReviseComment] = useState("");
 
   // Review
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -647,17 +644,6 @@ const JobDetail = () => {
             {/* Make payment for next milestone */}
             <MilestonePaymentSection jobId={jobId!} agreedPrice={Number(job.agreed_price)} escrowPayments={escrowPayments} onPaymentComplete={fetchAll} />
 
-            {/* Revise Milestones button - only before first payment */}
-            {job.status === "accepted" && escrowPayments.filter(p => p.status === "held" || p.status === "released").length === 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                onClick={() => setShowReviseDialog(true)}
-              >
-                <AlertTriangle className="mr-2 h-4 w-4" /> Revise Milestones
-              </Button>
-            )}
           </CardContent>
         </Card>
       )}
@@ -827,69 +813,6 @@ const JobDetail = () => {
         />
       )}
 
-      {/* Revise Milestones Dialog */}
-      <Dialog open={showReviseDialog} onOpenChange={setShowReviseDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Revise Milestones</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Send a message to the provider explaining what changes you'd like to the milestone breakdown. They will revise and resubmit.
-            </p>
-            <Textarea
-              value={reviseComment}
-              onChange={e => setReviseComment(e.target.value)}
-              placeholder="e.g. I'd prefer the deposit to be smaller, or I'd like more milestones for the different stages…"
-              rows={4}
-            />
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => { setShowReviseDialog(false); setReviseComment(""); }}>
-                Cancel
-              </Button>
-              <Button
-                disabled={!reviseComment.trim()}
-                onClick={async () => {
-                  // Find conversation with provider
-                  const { data: conv } = await supabase
-                    .from("conversations")
-                    .select("id")
-                    .eq("job_id", jobId!)
-                    .eq("customer_user_id", user!.id)
-                    .eq("provider_user_id", job.provider_id)
-                    .maybeSingle();
-
-                  if (conv?.id) {
-                    // Reset milestones_confirmed so provider can redo
-                    await supabase.from("jobs").update({ milestones_confirmed: false } as any).eq("id", jobId!);
-
-                    // Delete existing milestones
-                    await supabase.from("job_milestones").delete().eq("job_id", jobId!);
-
-                    // Send message
-                    await supabase.from("messages").insert({
-                      conversation_id: conv.id,
-                      sender_user_id: user!.id,
-                      body: `🔄 Milestone revision requested:\n\n"${reviseComment.trim()}"\n\nPlease revise the milestone breakdown and resubmit.`,
-                      message_type: "system",
-                    } as any);
-
-                    toast({ title: "Revision requested", description: "The provider will update the milestones." });
-                  } else {
-                    toast({ title: "Could not find conversation", variant: "destructive" });
-                  }
-
-                  setShowReviseDialog(false);
-                  setReviseComment("");
-                  fetchAll();
-                }}
-              >
-                Send Revision Request
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
