@@ -387,6 +387,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     ? Math.max(0, Math.round((agreedPrice - totalMilestoneAmounts) * 100) / 100)
     : 0;
   const milestoneBudgetFullyAllocated = agreedPrice > 0 && totalMilestoneAmounts >= agreedPrice - 0.01;
+  const milestonesLocked = hasAnyConfirmedPayment;
   const totalPaid = escrowPayments
     .filter((p) => p.status === "held" || p.status === "released")
     .reduce((sum, p) => sum + p.amount, 0);
