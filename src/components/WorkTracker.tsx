@@ -758,6 +758,15 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                         </div>
                       )}
 
+                      {/* Payment not yet confirmed message for provider */}
+                      {isProvider && m.payment_amount && !milestonePaymentConfirmed && m.status === "pending" && !m.is_auto && (
+                        <div className="rounded-lg border bg-muted/30 p-3">
+                          <p className="text-sm text-muted-foreground">
+                            ⏳ Payment for this milestone has not been confirmed yet. You can mark it complete once the customer's payment is confirmed.
+                          </p>
+                        </div>
+                      )}
+
                       {/* Actions */}
                       {(canComplete || canCompleteFinish) && (
                         <div className="space-y-2">
