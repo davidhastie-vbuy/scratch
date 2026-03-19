@@ -63,12 +63,6 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
               <span>{proposal.duration}</span>
             </div>
           )}
-          {proposal.urgency_label && (
-            <div className="flex items-center gap-2">
-              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              <span>Needed: {proposal.urgency_label}</span>
-            </div>
-          )}
         </div>
 
         {showActions && (

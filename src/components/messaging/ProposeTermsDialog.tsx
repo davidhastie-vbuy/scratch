@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Loader2, Send } from "lucide-react";
-import { format, addDays, addHours } from "date-fns";
+import { format, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface ProposalDefaults {
@@ -23,14 +23,10 @@ interface Props {
   defaults?: ProposalDefaults;
 }
 
-const parseDuration = (dur?: string): { days: number; hours: number } => {
-  if (!dur) return { days: 1, hours: 0 };
+const parseDurationDays = (dur?: string): number => {
+  if (!dur) return 1;
   const dayMatch = dur.match(/(\d+)\s*day/i);
-  const hourMatch = dur.match(/(\d+)\s*hour/i);
-  return {
-    days: dayMatch ? parseInt(dayMatch[1]) : 0,
-    hours: hourMatch ? parseInt(hourMatch[1]) : 0,
-  };
+  return dayMatch ? parseInt(dayMatch[1]) : 1;
 };
 
 const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults }: Props) => {
@@ -38,40 +34,31 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults }: Props) => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState("09:00");
   const [durationDays, setDurationDays] = useState("1");
-  const [durationHours, setDurationHours] = useState("0");
   const [submitting, setSubmitting] = useState(false);
 
-  // Re-sync form state when defaults change or dialog opens
   useEffect(() => {
     if (open) {
-      const parsed = parseDuration(defaults?.duration);
       setPrice(defaults?.agreed_price ? String(defaults.agreed_price) : "");
       setStartDate(defaults?.start_date ? new Date(defaults.start_date) : undefined);
       setStartTime(defaults?.start_time || "09:00");
-      setDurationDays(String(parsed.days || 1));
-      setDurationHours(String(parsed.hours || 0));
+      setDurationDays(String(parseDurationDays(defaults?.duration)));
     }
   }, [open, defaults]);
 
   const parsedPrice = parseFloat(price);
   const parsedDays = parseInt(durationDays) || 0;
-  const parsedHours = parseInt(durationHours) || 0;
 
   const endDate = useMemo(() => {
-    if (!startDate || (parsedDays === 0 && parsedHours === 0)) return null;
+    if (!startDate || parsedDays === 0) return null;
     const [h, m] = startTime.split(":").map(Number);
     const start = new Date(startDate);
     start.setHours(h || 0, m || 0, 0, 0);
-    return addHours(addDays(start, parsedDays), parsedHours);
-  }, [startDate, startTime, parsedDays, parsedHours]);
+    return addDays(start, parsedDays);
+  }, [startDate, startTime, parsedDays]);
 
-  const durationValid = parsedDays > 0 || parsedHours > 0;
-  const isValid = !isNaN(parsedPrice) && parsedPrice > 0 && startDate && durationValid;
+  const isValid = !isNaN(parsedPrice) && parsedPrice > 0 && startDate && parsedDays > 0;
 
-  const durationLabel = [
-    parsedDays > 0 ? `${parsedDays} day${parsedDays !== 1 ? "s" : ""}` : "",
-    parsedHours > 0 ? `${parsedHours} hour${parsedHours !== 1 ? "s" : ""}` : "",
-  ].filter(Boolean).join(", ");
+  const durationLabel = `${parsedDays} day${parsedDays !== 1 ? "s" : ""}`;
 
   const handleSubmit = async () => {
     if (!isValid || !endDate) return;
@@ -98,13 +85,11 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults }: Props) => {
             Propose the agreed price, start date and estimated duration. The customer will be asked to confirm these terms.
           </p>
 
-          {/* Price */}
           <div className="space-y-2">
             <Label>Agreed Price (£) *</Label>
             <Input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 500" min="1" step="0.01" />
           </div>
 
-          {/* Start Date */}
           <div className="space-y-2">
             <Label>Start Date *</Label>
             <Popover>
@@ -126,36 +111,20 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults }: Props) => {
             </Popover>
           </div>
 
-          {/* Start Time */}
           <div className="space-y-2">
             <Label>Start Time</Label>
             <Input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
           </div>
 
-          {/* Duration */}
           <div className="space-y-2">
-            <Label>Estimated Duration *</Label>
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <Input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} min="0" className="w-full" />
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">days</span>
-                </div>
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <Input type="number" value={durationHours} onChange={e => setDurationHours(e.target.value)} min="0" max="23" className="w-full" />
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">hours</span>
-                </div>
-              </div>
-            </div>
+            <Label>Estimated Duration (days) *</Label>
+            <Input type="number" value={durationDays} onChange={e => setDurationDays(e.target.value)} min="1" className="w-full" />
           </div>
 
-          {/* Calculated End Date */}
           {endDate && (
             <div className="rounded-md bg-muted/50 p-3 text-sm">
               <span className="text-muted-foreground">Estimated end: </span>
-              <span className="font-medium">{format(endDate, "PPP 'at' h:mm a")}</span>
+              <span className="font-medium">{format(endDate, "PPP")}</span>
             </div>
           )}
 
