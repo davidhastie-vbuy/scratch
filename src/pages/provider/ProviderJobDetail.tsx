@@ -115,8 +115,7 @@ const ProviderJobDetail = () => {
       return;
     }
 
-    setConfirmChecked(false);
-    setShowQuoteConfirm(true);
+    submitQuote();
   };
 
   const submitQuote = async () => {
