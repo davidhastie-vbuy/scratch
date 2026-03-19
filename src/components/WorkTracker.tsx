@@ -95,6 +95,39 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   const addMilestone = async () => {
     if (!newTitle.trim()) return;
+
+    const agreedPrice = Number(job.agreed_price ?? 0);
+    const currentlyAllocated = milestones.reduce((sum, milestone) => sum + (Number(milestone.payment_amount) || 0), 0);
+    const remainingBudget = Math.round((agreedPrice - currentlyAllocated) * 100) / 100;
+    const parsedAmount = newAmount ? parseFloat(newAmount) : null;
+
+    if (agreedPrice > 0 && remainingBudget <= 0.01) {
+      toast({
+        title: "No payment amount remaining",
+        description: "Deposit, milestones, and final payment already equal the agreed price for this job.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (parsedAmount !== null && (!Number.isFinite(parsedAmount) || parsedAmount <= 0)) {
+      toast({
+        title: "Enter a valid amount",
+        description: "Milestone payments must be greater than £0.00.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (parsedAmount !== null && agreedPrice > 0 && parsedAmount > remainingBudget) {
+      toast({
+        title: "Milestone exceeds agreed price",
+        description: `You only have £${remainingBudget.toFixed(2)} left to allocate.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setAdding(true);
     const maxOrder = milestones
       .filter((m) => !m.is_auto || m.title !== "Work Complete")
@@ -104,7 +137,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       title: newTitle.trim(),
       sort_order: maxOrder + 1,
       created_by: user!.id,
-      payment_amount: newAmount ? parseFloat(newAmount) : null,
+      payment_amount: parsedAmount,
     } as any);
     if (error) {
       toast({ title: "Failed to add milestone", description: error.message, variant: "destructive" });
