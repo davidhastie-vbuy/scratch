@@ -391,6 +391,11 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     }
     setDeletingId(null);
   };
+
+  const totalPaid = escrowPayments
+    .filter((p) => p.status === "held" || p.status === "released")
+    .reduce((sum, p) => sum + p.amount, 0);
+  const totalReleased = escrowPayments
     .filter((p) => p.status === "released")
     .reduce((sum, p) => sum + p.provider_payout, 0);
 
