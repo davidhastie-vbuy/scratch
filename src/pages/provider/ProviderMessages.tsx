@@ -442,7 +442,8 @@ const ProviderMessages = () => {
                                 message_type: "system",
                               } as any);
                               toast({ title: "Cancellation declined" });
-                              fetchMessages(selected!.id);
+                              const { data: updatedMsgs2 } = await supabase.from("messages").select("*").eq("conversation_id", selected!.id).order("created_at");
+                              setMessages(updatedMsgs2 ?? []);
                             }}>
                               Decline
                             </Button>
