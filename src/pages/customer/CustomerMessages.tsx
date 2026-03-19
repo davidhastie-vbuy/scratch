@@ -266,7 +266,7 @@ const CustomerMessages = () => {
     });
   };
 
-  const sendCounterNegotiation = async (data: { agreed_price: number; urgency: string; urgency_label: string }) => {
+  const sendCounterNegotiation = async (data: { agreed_price: number }) => {
     if (!selected) return;
     for (const m of messages) {
       if ((m as any).message_type === "proposal" && (m as any).metadata?.status === "pending") {
@@ -278,9 +278,9 @@ const CustomerMessages = () => {
     await supabase.from("messages").insert({
       conversation_id: selected.id,
       sender_user_id: user!.id,
-      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}, needed: ${data.urgency_label}`,
+      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}`,
       message_type: "proposal",
-      metadata: { ...data, status: "pending" },
+      metadata: { agreed_price: data.agreed_price, status: "pending" },
     } as any);
     toast({ title: "Counter-proposal sent" });
     setCounterDialog(null);
@@ -302,7 +302,7 @@ const CustomerMessages = () => {
     });
   };
 
-  const sendNegotiation = async (data: { agreed_price: number; urgency: string; urgency_label: string }) => {
+  const sendNegotiation = async (data: { agreed_price: number }) => {
     if (!selected) return;
     // Decline existing pending proposals
     for (const m of messages) {
@@ -315,9 +315,9 @@ const CustomerMessages = () => {
     await supabase.from("messages").insert({
       conversation_id: selected.id,
       sender_user_id: user!.id,
-      body: `Proposal: £${data.agreed_price.toFixed(2)}, needed: ${data.urgency_label}`,
+      body: `Proposal: £${data.agreed_price.toFixed(2)}`,
       message_type: "proposal",
-      metadata: { ...data, status: "pending" },
+      metadata: { agreed_price: data.agreed_price, status: "pending" },
     } as any);
     toast({ title: "Proposal sent to provider" });
     setNegotiateDialog(null);
