@@ -550,57 +550,104 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
               return (
                 <div key={m.id} className="rounded-lg border p-3 space-y-2">
-                  <div
-                    className="flex items-center justify-between cursor-pointer"
-                    onClick={() => setExpandedId(isExpanded ? null : m.id)}
-                  >
-                    <div className="flex items-center gap-2">
-                      {m.status === "accepted" ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      ) : m.status === "flagged" ? (
-                        <Flag className="h-4 w-4 text-destructive" />
-                      ) : m.status === "completed" ? (
-                        <CheckCircle2 className="h-4 w-4 text-yellow-600" />
-                      ) : (
-                        <Circle className="h-4 w-4 text-muted-foreground" />
-                      )}
-                      <span className="text-sm font-medium">{m.title}</span>
-                      {m.is_auto && <Badge variant="outline" className="text-xs">Auto</Badge>}
-                      {m.payment_amount && (
-                        <Badge variant="secondary" className="text-xs gap-1">
-                          <PoundSterling className="h-3 w-3" />
-                          {Number(m.payment_amount).toFixed(2)}
-                        </Badge>
-                      )}
+                  {/* Inline edit form */}
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <Input
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        placeholder="Milestone title"
+                      />
+                      <div className="flex items-center gap-2">
+                        <PoundSterling className="h-4 w-4 text-muted-foreground" />
+                        <Input
+                          type="number"
+                          value={editAmount}
+                          onChange={(e) => setEditAmount(e.target.value)}
+                          placeholder="Amount"
+                          className="w-32"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={() => saveEdit(m.id)} disabled={saving}>
+                          {saving ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <CheckCircle2 className="mr-1 h-3 w-3" />}
+                          Save
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={cancelEdit}>Cancel</Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className={STATUS_COLORS[m.status] || ""}>{m.status}</Badge>
-                      {m.flag_count > 0 && (
-                        <span className="text-xs text-destructive">({m.flag_count}/5 flags)</span>
-                      )}
-                      {/* Payment status badge - role-specific */}
-                      {m.payment_amount && (() => {
-                        const pStatus = getPaymentStatus(m.id);
-                        const payment = getPaymentForMilestone(m.id);
-                        if (isProvider) {
-                          // Provider sees: pending or complete
+                  ) : (
+                    <div
+                      className="flex items-center justify-between cursor-pointer"
+                      onClick={() => setExpandedId(isExpanded ? null : m.id)}
+                    >
+                      <div className="flex items-center gap-2">
+                        {m.status === "accepted" ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        ) : m.status === "flagged" ? (
+                          <Flag className="h-4 w-4 text-destructive" />
+                        ) : m.status === "completed" ? (
+                          <CheckCircle2 className="h-4 w-4 text-yellow-600" />
+                        ) : (
+                          <Circle className="h-4 w-4 text-muted-foreground" />
+                        )}
+                        <span className="text-sm font-medium">{m.title}</span>
+                        {m.is_auto && <Badge variant="outline" className="text-xs">Auto</Badge>}
+                        {m.payment_amount && (
+                          <Badge variant="secondary" className="text-xs gap-1">
+                            <PoundSterling className="h-3 w-3" />
+                            {Number(m.payment_amount).toFixed(2)}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {canEditDelete && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={(e) => { e.stopPropagation(); startEdit(m); }}
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-destructive hover:text-destructive"
+                              onClick={(e) => { e.stopPropagation(); deleteMilestone(m.id); }}
+                              disabled={deleting === m.id}
+                            >
+                              {deleting === m.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+                            </Button>
+                          </>
+                        )}
+                        <Badge className={STATUS_COLORS[m.status] || ""}>{m.status}</Badge>
+                        {m.flag_count > 0 && (
+                          <span className="text-xs text-destructive">({m.flag_count}/5 flags)</span>
+                        )}
+                        {/* Payment status badge - role-specific */}
+                        {m.payment_amount && (() => {
+                          const pStatus = getPaymentStatus(m.id);
+                          const payment = getPaymentForMilestone(m.id);
+                          if (isProvider) {
+                            if (pStatus === "complete") {
+                              return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
+                            }
+                            return <Badge variant="outline" className="text-xs">Payment pending</Badge>;
+                          }
                           if (pStatus === "complete") {
                             return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
                           }
-                          return <Badge variant="outline" className="text-xs">Payment pending</Badge>;
-                        }
-                        // Customer sees: pay button, retry, pending confirmation, or complete
-                        if (pStatus === "complete") {
-                          return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
-                        }
-                        if (pStatus === "pending") {
-                          return <Badge variant="outline" className="text-xs">Confirming…</Badge>;
-                        }
-                        return null;
-                      })()}
-                      {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                          if (pStatus === "pending") {
+                            return <Badge variant="outline" className="text-xs">Confirming…</Badge>;
+                          }
+                          return null;
+                        })()}
+                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {isExpanded && (
                     <div className="pl-6 space-y-3">
