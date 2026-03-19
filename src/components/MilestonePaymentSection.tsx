@@ -42,13 +42,28 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
 
   const payMilestone = async (milestoneId: string, amount: number) => {
     setProcessingPayment(true);
-    const { data, error } = await supabase.functions.invoke("create-escrow-payment", {
-      body: { job_id: jobId, amount, milestone_id: milestoneId },
-    });
-    if (error) {
-      toast({ title: "Payment failed", description: error.message, variant: "destructive" });
-    } else if (data?.url) {
-      window.location.href = data.url;
+    try {
+      const { data, error } = await supabase.functions.invoke("create-escrow-payment", {
+        body: { job_id: jobId, amount, milestone_id: milestoneId },
+      });
+      if (error) {
+        // Try to extract the actual error message from the response
+        let errorMsg = error.message;
+        try {
+          if (error.context) {
+            const body = await error.context.json();
+            if (body?.error) errorMsg = body.error;
+          }
+        } catch {}
+        toast({ title: "Payment failed", description: errorMsg, variant: "destructive" });
+      } else if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        toast({ title: "Payment failed", description: "No checkout URL returned. Please try again.", variant: "destructive" });
+      }
+    } catch (err: any) {
+      console.error("Payment error:", err);
+      toast({ title: "Payment failed", description: "An unexpected error occurred. Please try again.", variant: "destructive" });
     }
     setProcessingPayment(false);
   };
