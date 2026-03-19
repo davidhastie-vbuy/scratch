@@ -74,8 +74,8 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
     return <p className="text-sm text-muted-foreground">No milestones set up yet.</p>;
   }
 
-  // Find the next unpaid milestone
-  const nextUnpaid = milestones.find(m => !getPaymentForMilestone(m.id) && !getPendingPaymentForMilestone(m.id));
+  // Find the next unpaid milestone — pending (abandoned) payments should NOT block retry
+  const nextUnpaid = milestones.find(m => !getPaymentForMilestone(m.id));
 
   return (
     <div className="space-y-3">
@@ -116,12 +116,17 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
                       size="sm"
                       variant="outline"
                       onClick={async () => {
-                        const { error } = await supabase.functions.invoke("confirm-escrow-payment", {
+                        const { data, error } = await supabase.functions.invoke("confirm-escrow-payment", {
                           body: { job_id: jobId },
                         });
-                        if (!error) {
+                        if (!error && data?.confirmed > 0) {
                           toast({ title: "Payment confirmed!" });
                           onPaymentComplete();
+                        } else if (!error && data?.expired > 0) {
+                          toast({ title: "Payment not completed", description: "The checkout session expired. Please try paying again." });
+                          onPaymentComplete(); // refresh to show Pay button again
+                        } else if (!error) {
+                          toast({ title: "Still processing", description: "Payment not yet confirmed. Please try again shortly." });
                         } else {
                           toast({ title: "Not yet confirmed", description: "Please try again shortly.", variant: "destructive" });
                         }
@@ -131,7 +136,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
                     </Button>
                   </div>
                 )}
-                {isNext && !pending && !paid && m.payment_amount && (
+                {isNext && !paid && m.payment_amount && (
                   <Button
                     size="sm"
                     onClick={() => payMilestone(m.id, Number(m.payment_amount))}

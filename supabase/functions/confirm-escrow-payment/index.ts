@@ -51,6 +51,7 @@ serve(async (req) => {
       .not("stripe_checkout_session_id", "is", null);
 
     let confirmed = 0;
+    let expired = 0;
     for (const payment of (payments ?? [])) {
       try {
         const session = await stripe.checkout.sessions.retrieve(payment.stripe_checkout_session_id!);
@@ -63,13 +64,20 @@ serve(async (req) => {
             })
             .eq("id", payment.id);
           confirmed++;
+        } else if (session.status === "expired" || session.status === "complete") {
+          // Session expired or completed without payment — mark as failed so customer can retry
+          await supabaseAdmin
+            .from("escrow_payments")
+            .update({ status: "failed" })
+            .eq("id", payment.id);
+          expired++;
         }
       } catch (e) {
         console.error(`Failed to verify session ${payment.stripe_checkout_session_id}:`, e);
       }
     }
 
-    return new Response(JSON.stringify({ confirmed }), {
+    return new Response(JSON.stringify({ confirmed, expired }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

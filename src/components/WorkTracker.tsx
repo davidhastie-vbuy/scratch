@@ -298,13 +298,18 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   };
 
   const confirmPendingPayment = async () => {
-    const { error } = await supabase.functions.invoke("confirm-escrow-payment", {
+    const { data, error } = await supabase.functions.invoke("confirm-escrow-payment", {
       body: { job_id: jobId },
     });
-    if (!error) {
+    if (!error && data?.confirmed > 0) {
       toast({ title: "Payment confirmed!" });
       fetchMilestones();
       onRefresh?.();
+    } else if (!error && data?.expired > 0) {
+      toast({ title: "Payment not completed", description: "The checkout session expired. Please try paying again." });
+      fetchMilestones();
+    } else if (!error) {
+      toast({ title: "Still processing", description: "Payment not yet confirmed. Please try again shortly." });
     } else {
       toast({ title: "Not yet confirmed", description: "Please try again shortly.", variant: "destructive" });
     }
@@ -546,11 +551,15 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
               const isEditable = canEditMilestones && !isDeposit && !m.is_auto && m.status === "pending";
               const isEditing = editingId === m.id;
 
-              const canComplete = isProvider && m.status === "pending" && !m.is_auto;
+              // Provider can only complete milestone if payment for it is confirmed (held/released)
+              const milestonePaymentStatus = getPaymentStatus(m.id);
+              const milestonePaymentConfirmed = !m.payment_amount || milestonePaymentStatus === "complete";
+
+              const canComplete = isProvider && m.status === "pending" && !m.is_auto && milestonePaymentConfirmed;
               const canReconfirm = isProvider && m.status === "flagged";
               const canAcceptOrFlag = isCustomer && m.status === "completed";
               const isFinishMilestone = m.is_auto && m.title === "Work Complete";
-              const canCompleteFinish = isProvider && isFinishMilestone && m.status === "pending";
+              const canCompleteFinish = isProvider && isFinishMilestone && m.status === "pending" && milestonePaymentConfirmed;
 
               return (
                 <div key={m.id} className="rounded-lg border p-3 space-y-2">
@@ -659,10 +668,11 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                       {/* Customer payment actions */}
                       {isCustomer && m.payment_amount && (() => {
                         const pStatus = getPaymentStatus(m.id);
-                        // Find the first milestone that hasn't been paid (held/released) to enforce sequential payment
+                        // Find the first milestone that hasn't been confirmed paid (held/released) to enforce sequential payment
+                        // Pending (abandoned) payments should NOT block retry
                         const nextUnpaidMilestone = milestones.find(ms => {
                           if (!ms.payment_amount) return false;
-                          const msPayment = escrowPayments.find(p => p.milestone_id === ms.id && (p.status === "held" || p.status === "released" || p.status === "pending"));
+                          const msPayment = escrowPayments.find(p => p.milestone_id === ms.id && (p.status === "held" || p.status === "released"));
                           return !msPayment;
                         });
                         const isNextToPay = nextUnpaidMilestone?.id === m.id;
@@ -745,6 +755,15 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                               {c.body && <p className="text-foreground">{c.body}</p>}
                             </div>
                           ))}
+                        </div>
+                      )}
+
+                      {/* Payment not yet confirmed message for provider */}
+                      {isProvider && m.payment_amount && !milestonePaymentConfirmed && m.status === "pending" && !m.is_auto && (
+                        <div className="rounded-lg border bg-muted/30 p-3">
+                          <p className="text-sm text-muted-foreground">
+                            ⏳ Payment for this milestone has not been confirmed yet. You can mark it complete once the customer's payment is confirmed.
+                          </p>
                         </div>
                       )}
 

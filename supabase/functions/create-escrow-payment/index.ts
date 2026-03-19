@@ -69,18 +69,18 @@ serve(async (req) => {
         .order("sort_order");
 
       if (allMilestones && allMilestones.length > 0) {
-        // Get all payments (held, released, or pending) for this job
+        // Get only confirmed payments (held, released) for this job — NOT pending
         const { data: existingPayments } = await supabaseAdmin
           .from("escrow_payments")
           .select("milestone_id, status")
           .eq("job_id", job_id)
-          .in("status", ["held", "released", "pending"]);
+          .in("status", ["held", "released"]);
 
-        const paidOrPendingMilestoneIds = new Set((existingPayments ?? []).map(p => p.milestone_id));
+        const confirmedMilestoneIds = new Set((existingPayments ?? []).map(p => p.milestone_id));
 
         // Find the first unpaid milestone with a payment amount
         const firstUnpaid = allMilestones.find(ms =>
-          ms.payment_amount && ms.payment_amount > 0 && !paidOrPendingMilestoneIds.has(ms.id)
+          ms.payment_amount && ms.payment_amount > 0 && !confirmedMilestoneIds.has(ms.id)
         );
 
         if (firstUnpaid && firstUnpaid.id !== milestone_id) {
@@ -88,6 +88,14 @@ serve(async (req) => {
             status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
+
+        // Expire any existing pending payments for this same milestone before creating a new one
+        await supabaseAdmin
+          .from("escrow_payments")
+          .update({ status: "failed" })
+          .eq("job_id", job_id)
+          .eq("milestone_id", milestone_id)
+          .eq("status", "pending");
       }
     }
 
