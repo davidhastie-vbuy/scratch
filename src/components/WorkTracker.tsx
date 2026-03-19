@@ -668,10 +668,11 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                       {/* Customer payment actions */}
                       {isCustomer && m.payment_amount && (() => {
                         const pStatus = getPaymentStatus(m.id);
-                        // Find the first milestone that hasn't been paid (held/released) to enforce sequential payment
+                        // Find the first milestone that hasn't been confirmed paid (held/released) to enforce sequential payment
+                        // Pending (abandoned) payments should NOT block retry
                         const nextUnpaidMilestone = milestones.find(ms => {
                           if (!ms.payment_amount) return false;
-                          const msPayment = escrowPayments.find(p => p.milestone_id === ms.id && (p.status === "held" || p.status === "released" || p.status === "pending"));
+                          const msPayment = escrowPayments.find(p => p.milestone_id === ms.id && (p.status === "held" || p.status === "released"));
                           return !msPayment;
                         });
                         const isNextToPay = nextUnpaidMilestone?.id === m.id;
