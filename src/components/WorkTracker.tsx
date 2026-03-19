@@ -434,7 +434,14 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
           </div>
         )}
 
-        {role === "provider" && milestoneBudgetFullyAllocated && (
+        {role === "provider" && milestonesLocked && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground rounded-lg border bg-muted/30 p-3">
+            <Lock className="h-4 w-4 shrink-0" />
+            <p>Milestones are locked because a payment has been made. No further changes can be made to milestones.</p>
+          </div>
+        )}
+
+        {role === "provider" && !milestonesLocked && milestoneBudgetFullyAllocated && (
           <p className="text-xs text-muted-foreground">
             Deposit, milestones, and final payment already equal the agreed price, so no more paid milestones can be added.
           </p>
