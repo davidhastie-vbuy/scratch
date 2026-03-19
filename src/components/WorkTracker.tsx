@@ -298,13 +298,18 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   };
 
   const confirmPendingPayment = async () => {
-    const { error } = await supabase.functions.invoke("confirm-escrow-payment", {
+    const { data, error } = await supabase.functions.invoke("confirm-escrow-payment", {
       body: { job_id: jobId },
     });
-    if (!error) {
+    if (!error && data?.confirmed > 0) {
       toast({ title: "Payment confirmed!" });
       fetchMilestones();
       onRefresh?.();
+    } else if (!error && data?.expired > 0) {
+      toast({ title: "Payment not completed", description: "The checkout session expired. Please try paying again." });
+      fetchMilestones();
+    } else if (!error) {
+      toast({ title: "Still processing", description: "Payment not yet confirmed. Please try again shortly." });
     } else {
       toast({ title: "Not yet confirmed", description: "Please try again shortly.", variant: "destructive" });
     }
