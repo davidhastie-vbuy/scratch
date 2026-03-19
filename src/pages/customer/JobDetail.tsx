@@ -647,17 +647,6 @@ const JobDetail = () => {
             {/* Make payment for next milestone */}
             <MilestonePaymentSection jobId={jobId!} agreedPrice={Number(job.agreed_price)} escrowPayments={escrowPayments} onPaymentComplete={fetchAll} />
 
-            {/* Revise Milestones button - only before first payment */}
-            {job.status === "accepted" && escrowPayments.filter(p => p.status === "held" || p.status === "released").length === 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                onClick={() => setShowReviseDialog(true)}
-              >
-                <AlertTriangle className="mr-2 h-4 w-4" /> Revise Milestones
-              </Button>
-            )}
           </CardContent>
         </Card>
       )}
