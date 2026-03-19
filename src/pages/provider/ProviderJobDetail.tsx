@@ -57,11 +57,12 @@ const ProviderJobDetail = () => {
   }, [jobId, user]);
 
   const fetchAll = async () => {
-    const [jobRes, mediaRes, quoteRes, convRes] = await Promise.all([
+    const [jobRes, mediaRes, quoteRes, convRes, escrowRes] = await Promise.all([
       supabase.from("jobs").select("*").eq("id", jobId!).single(),
       supabase.from("job_media").select("*").eq("job_id", jobId!),
       supabase.from("quotes").select("*").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
       supabase.from("conversations").select("id").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
+      supabase.from("escrow_payments").select("*").eq("job_id", jobId!).eq("provider_user_id", user!.id),
     ]);
     setJob(jobRes.data);
     const mediaData = mediaRes.data ?? [];
