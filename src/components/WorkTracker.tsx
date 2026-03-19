@@ -542,6 +542,9 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
               const isProvider = role === "provider";
               const isCustomer = role === "customer";
               const payment = getPaymentForMilestone(m.id);
+              const isDeposit = m.title === "Deposit" || m.title === "Full Payment";
+              const isEditable = canEditMilestones && !isDeposit && !m.is_auto && m.status === "pending";
+              const isEditing = editingId === m.id;
 
               const canComplete = isProvider && m.status === "pending" && !m.is_auto;
               const canReconfirm = isProvider && m.status === "flagged";
@@ -551,7 +554,34 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
               return (
                 <div key={m.id} className="rounded-lg border p-3 space-y-2">
-                  <div
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          placeholder="Milestone title"
+                          className="flex-1"
+                        />
+                        <Input
+                          type="number"
+                          value={editAmount}
+                          onChange={(e) => setEditAmount(e.target.value)}
+                          placeholder="£ Amount"
+                          className="w-28"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={() => saveEditMilestone(m.id)} disabled={savingEdit}>
+                          {savingEdit ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Check className="mr-1 h-3 w-3" />}
+                          Save
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                          <X className="mr-1 h-3 w-3" /> Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
                     className="flex items-center justify-between cursor-pointer"
                     onClick={() => setExpandedId(isExpanded ? null : m.id)}
                   >
