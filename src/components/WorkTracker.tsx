@@ -551,11 +551,15 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
               const isEditable = canEditMilestones && !isDeposit && !m.is_auto && m.status === "pending";
               const isEditing = editingId === m.id;
 
-              const canComplete = isProvider && m.status === "pending" && !m.is_auto;
+              // Provider can only complete milestone if payment for it is confirmed (held/released)
+              const milestonePaymentStatus = getPaymentStatus(m.id);
+              const milestonePaymentConfirmed = !m.payment_amount || milestonePaymentStatus === "complete";
+
+              const canComplete = isProvider && m.status === "pending" && !m.is_auto && milestonePaymentConfirmed;
               const canReconfirm = isProvider && m.status === "flagged";
               const canAcceptOrFlag = isCustomer && m.status === "completed";
               const isFinishMilestone = m.is_auto && m.title === "Work Complete";
-              const canCompleteFinish = isProvider && isFinishMilestone && m.status === "pending";
+              const canCompleteFinish = isProvider && isFinishMilestone && m.status === "pending" && milestonePaymentConfirmed;
 
               return (
                 <div key={m.id} className="rounded-lg border p-3 space-y-2">
