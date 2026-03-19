@@ -119,7 +119,6 @@ const ProviderJobDetail = () => {
   };
 
   const submitQuote = async () => {
-    setShowQuoteConfirm(false);
     setSubmitting(true);
     const { error } = await supabase.from("quotes").insert({
       job_id: jobId!,
