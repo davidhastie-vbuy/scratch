@@ -78,6 +78,7 @@ const ProviderJobDetail = () => {
     }
     setExistingQuote(quoteRes.data);
     setConversationId(convRes.data?.id ?? null);
+    setEscrowPayments(escrowRes.data ?? []);
 
     // Check review status and get customer name
     if (jobRes.data && user) {
