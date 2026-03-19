@@ -136,7 +136,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
                     </Button>
                   </div>
                 )}
-                {isNext && !pending && !paid && m.payment_amount && (
+                {isNext && !paid && m.payment_amount && (
                   <Button
                     size="sm"
                     onClick={() => payMilestone(m.id, Number(m.payment_amount))}
