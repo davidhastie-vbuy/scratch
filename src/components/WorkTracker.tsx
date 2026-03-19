@@ -417,7 +417,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowAdd(!showAdd)}
-                disabled={milestoneBudgetFullyAllocated}
+                disabled={milestoneBudgetFullyAllocated || hasAnyConfirmedPayment}
               >
                 <Plus className="mr-1 h-3 w-3" /> Add Milestone
               </Button>
