@@ -316,10 +316,81 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     ? Math.max(0, Math.round((agreedPrice - totalMilestoneAmounts) * 100) / 100)
     : 0;
   const milestoneBudgetFullyAllocated = agreedPrice > 0 && totalMilestoneAmounts >= agreedPrice - 0.01;
-  const totalPaid = escrowPayments
-    .filter((p) => p.status === "held" || p.status === "released")
-    .reduce((sum, p) => sum + p.amount, 0);
-  const totalReleased = escrowPayments
+  // Has any milestone payment been successfully paid? If so, lock editing
+  const hasAnyConfirmedPayment = escrowPayments.some(
+    (p) => p.status === "held" || p.status === "released"
+  );
+  // Can provider edit/delete milestones? Only before any payment is confirmed
+  const canEditMilestones = role === "provider" && !hasAnyConfirmedPayment;
+
+  const startEditMilestone = (m: any) => {
+    setEditingId(m.id);
+    setEditTitle(m.title);
+    setEditAmount(m.payment_amount ? String(m.payment_amount) : "");
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditTitle("");
+    setEditAmount("");
+  };
+
+  const saveEditMilestone = async (milestoneId: string) => {
+    if (!editTitle.trim()) {
+      toast({ title: "Title required", variant: "destructive" });
+      return;
+    }
+    const parsedAmount = editAmount ? parseFloat(editAmount) : null;
+    if (parsedAmount !== null && (!Number.isFinite(parsedAmount) || parsedAmount <= 0)) {
+      toast({ title: "Enter a valid amount", variant: "destructive" });
+      return;
+    }
+    // Budget validation
+    if (parsedAmount !== null && agreedPrice > 0) {
+      const otherTotal = milestones
+        .filter((m) => m.id !== milestoneId)
+        .reduce((sum, m) => sum + (Number(m.payment_amount) || 0), 0);
+      if (otherTotal + parsedAmount > agreedPrice + 0.01) {
+        toast({
+          title: "Exceeds agreed price",
+          description: `Only £${Math.max(0, agreedPrice - otherTotal).toFixed(2)} available.`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    setSavingEdit(true);
+    const { error } = await supabase
+      .from("job_milestones")
+      .update({
+        title: editTitle.trim(),
+        payment_amount: parsedAmount,
+      } as any)
+      .eq("id", milestoneId);
+    if (error) {
+      toast({ title: "Failed to update", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Milestone updated" });
+      cancelEdit();
+      fetchMilestones();
+    }
+    setSavingEdit(false);
+  };
+
+  const deleteMilestone = async (milestoneId: string) => {
+    setDeletingId(milestoneId);
+    const { error } = await supabase
+      .from("job_milestones")
+      .delete()
+      .eq("id", milestoneId);
+    if (error) {
+      toast({ title: "Failed to delete", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Milestone deleted" });
+      fetchMilestones();
+    }
+    setDeletingId(null);
+  };
     .filter((p) => p.status === "released")
     .reduce((sum, p) => sum + p.provider_payout, 0);
 
