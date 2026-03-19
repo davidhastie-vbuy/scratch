@@ -328,9 +328,14 @@ const MilestoneSetup = ({ jobId, agreedPrice, scheduledStart, scheduledEnd, onCo
               </div>
             ))}
 
-            <Button variant="outline" size="sm" onClick={addMilestone}>
+            <Button variant="outline" size="sm" onClick={addMilestone} disabled={remaining <= 0}>
               <Plus className="mr-1 h-3 w-3" /> Add Milestone
             </Button>
+            {remaining <= 0 && milestones.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                The full agreed price has been allocated. Remove or reduce existing milestones to add more.
+              </p>
+            )}
           </div>
         )}
 
