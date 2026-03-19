@@ -427,7 +427,9 @@ const ProviderMessages = () => {
                                 message_type: "system",
                               } as any);
                               toast({ title: "Job cancelled", description: "Both parties agreed to cancel." });
-                              fetchMessages(selected!.id);
+                              const { data: updatedMsgs } = await supabase.from("messages").select("*").eq("conversation_id", selected!.id).order("created_at");
+                              setMessages(updatedMsgs ?? []);
+                              fetchConversations();
                             }}>
                               Confirm Cancel
                             </Button>
