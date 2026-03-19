@@ -52,9 +52,6 @@ const JobDetail = () => {
   const [payingAmount, setPayingAmount] = useState("");
   const [processingPayment, setProcessingPayment] = useState(false);
 
-  // Revise milestones
-  const [showReviseDialog, setShowReviseDialog] = useState(false);
-  const [reviseComment, setReviseComment] = useState("");
 
   // Review
   const [reviewOpen, setReviewOpen] = useState(false);
