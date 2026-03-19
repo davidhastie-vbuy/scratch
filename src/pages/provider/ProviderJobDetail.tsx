@@ -40,6 +40,9 @@ const ProviderJobDetail = () => {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [hasReviewed, setHasReviewed] = useState(false);
   const [customerName, setCustomerName] = useState("the customer");
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancellingJob, setCancellingJob] = useState(false);
+  const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
 
   const [quoteForm, setQuoteForm] = useState({
     priceMin: "",
