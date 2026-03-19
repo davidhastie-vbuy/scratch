@@ -104,6 +104,7 @@ const MilestoneSetup = ({ jobId, agreedPrice, scheduledStart, scheduledEnd, onCo
   const remaining = agreedPrice - totalAllocated;
 
   const addMilestone = () => {
+    if (remaining <= 0) return;
     setMilestones(prev => [
       ...prev,
       { id: nextId(), title: "", description: "", amount: "" },
@@ -115,6 +116,17 @@ const MilestoneSetup = ({ jobId, agreedPrice, scheduledStart, scheduledEnd, onCo
   };
 
   const updateMilestone = (id: string, field: keyof MilestoneItem, value: string) => {
+    if (field === "amount") {
+      const numVal = parseFloat(value);
+      if (!isNaN(numVal)) {
+        // Calculate max allowed for this milestone: current remaining + this milestone's current value
+        const currentMilestoneAmount = parseFloat(milestones.find(m => m.id === id)?.amount || "0") || 0;
+        const maxAllowed = remaining + currentMilestoneAmount;
+        if (numVal > maxAllowed) {
+          value = String(Math.round(maxAllowed * 100) / 100);
+        }
+      }
+    }
     setMilestones(prev =>
       prev.map(m => (m.id === id ? { ...m, [field]: value } : m))
     );
@@ -316,9 +328,14 @@ const MilestoneSetup = ({ jobId, agreedPrice, scheduledStart, scheduledEnd, onCo
               </div>
             ))}
 
-            <Button variant="outline" size="sm" onClick={addMilestone}>
+            <Button variant="outline" size="sm" onClick={addMilestone} disabled={remaining <= 0}>
               <Plus className="mr-1 h-3 w-3" /> Add Milestone
             </Button>
+            {remaining <= 0 && milestones.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                The full agreed price has been allocated. Remove or reduce existing milestones to add more.
+              </p>
+            )}
           </div>
         )}
 
