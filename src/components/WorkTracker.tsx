@@ -303,7 +303,12 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     }
   };
 
-  const totalMilestoneAmounts = milestones.reduce((sum, m) => sum + (m.payment_amount ?? 0), 0);
+  const agreedPrice = Number(job.agreed_price ?? 0);
+  const totalMilestoneAmounts = milestones.reduce((sum, m) => sum + (Number(m.payment_amount) || 0), 0);
+  const remainingMilestoneBudget = agreedPrice > 0
+    ? Math.max(0, Math.round((agreedPrice - totalMilestoneAmounts) * 100) / 100)
+    : 0;
+  const milestoneBudgetFullyAllocated = agreedPrice > 0 && totalMilestoneAmounts >= agreedPrice - 0.01;
   const totalPaid = escrowPayments
     .filter((p) => p.status === "held" || p.status === "released")
     .reduce((sum, p) => sum + p.amount, 0);
@@ -325,7 +330,12 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
           </CardTitle>
           <div className="flex gap-2">
             {role === "provider" && (
-              <Button variant="outline" size="sm" onClick={() => setShowAdd(!showAdd)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdd(!showAdd)}
+                disabled={milestoneBudgetFullyAllocated}
+              >
                 <Plus className="mr-1 h-3 w-3" /> Add Milestone
               </Button>
             )}
@@ -345,8 +355,14 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
           </div>
         )}
 
+        {role === "provider" && milestoneBudgetFullyAllocated && (
+          <p className="text-xs text-muted-foreground">
+            Deposit, milestones, and final payment already equal the agreed price, so no more paid milestones can be added.
+          </p>
+        )}
+
         {/* Add milestone form */}
-        {showAdd && role === "provider" && (
+        {showAdd && role === "provider" && !milestoneBudgetFullyAllocated && (
           <div className="space-y-2">
             <div className="flex gap-2">
               <Input
@@ -359,15 +375,37 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                 <Input
                   type="number"
                   value={newAmount}
-                  onChange={(e) => setNewAmount(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "") {
+                      setNewAmount("");
+                      return;
+                    }
+
+                    const parsedValue = parseFloat(value);
+                    if (Number.isNaN(parsedValue)) {
+                      setNewAmount(value);
+                      return;
+                    }
+
+                    if (agreedPrice > 0) {
+                      setNewAmount(String(Math.min(parsedValue, remainingMilestoneBudget)));
+                      return;
+                    }
+
+                    setNewAmount(value);
+                  }}
                   placeholder="£ Amount"
                 />
               </div>
-              <Button size="sm" onClick={addMilestone} disabled={adding}>
+              <Button size="sm" onClick={addMilestone} disabled={adding || milestoneBudgetFullyAllocated}>
                 {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">Set the payment amount due at this milestone. The customer must have paid this before work can continue.</p>
+            <p className="text-xs text-muted-foreground">
+              Set the payment amount due at this milestone. The customer must have paid this before work can continue.
+              {agreedPrice > 0 && ` £${remainingMilestoneBudget.toFixed(2)} remains available to allocate.`}
+            </p>
           </div>
         )}
 
