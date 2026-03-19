@@ -448,7 +448,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
         )}
 
         {/* Add milestone form */}
-        {showAdd && role === "provider" && !milestoneBudgetFullyAllocated && (
+        {showAdd && role === "provider" && !milestonesLocked && !milestoneBudgetFullyAllocated && (
           <div className="space-y-2">
             <div className="flex gap-2">
               <Input
