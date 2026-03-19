@@ -544,7 +544,7 @@ const JobDetail = () => {
                   </Button>
                 )}
                 {job.status !== "cancelled" && job.status !== "completed" && (
-                  <Button variant="destructive" size="sm" onClick={cancelJob}>Cancel Job</Button>
+                  <Button variant="destructive" size="sm" onClick={() => setCancelDialogOpen(true)}>Cancel Job</Button>
                 )}
               </div>
             </>
