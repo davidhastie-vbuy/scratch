@@ -170,6 +170,35 @@ const ProviderJobDetail = () => {
     setSubmitting(false);
   };
 
+  const hasConfirmedPayment = escrowPayments.some(p => p.status === "held" || p.status === "released");
+
+  const handleCancelJob = async () => {
+    setCancellingJob(true);
+    if (!hasConfirmedPayment) {
+      // Pre-payment: provider can cancel freely
+      await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId!);
+      toast({ title: "Job cancelled", description: "The job has been cancelled." });
+      setCancelDialogOpen(false);
+      fetchAll();
+    } else {
+      // Post-payment: send cancellation request to customer via messaging
+      if (conversationId) {
+        await supabase.from("messages").insert({
+          conversation_id: conversationId,
+          sender_user_id: user!.id,
+          body: "🚫 The provider has requested to cancel this job. Customer confirmation is required before the job can be cancelled.",
+          message_type: "cancellation_request",
+          metadata: { status: "pending", requested_by: user!.id, initiated_by: "provider" },
+        } as any);
+        toast({ title: "Cancellation requested", description: "The customer has been notified. Both parties must agree to cancel the job." });
+      } else {
+        toast({ title: "Could not find conversation", description: "Please contact support.", variant: "destructive" });
+      }
+      setCancelDialogOpen(false);
+    }
+    setCancellingJob(false);
+  };
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!job) return <p className="text-muted-foreground">Job not found.</p>;
 
