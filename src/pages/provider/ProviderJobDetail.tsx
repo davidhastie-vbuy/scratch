@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, MessageSquare, Star } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, MessageSquare, Star, XCircle } from "lucide-react";
 import ProviderScheduleForm from "@/components/ProviderScheduleForm";
 import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
@@ -39,6 +40,9 @@ const ProviderJobDetail = () => {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [hasReviewed, setHasReviewed] = useState(false);
   const [customerName, setCustomerName] = useState("the customer");
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancellingJob, setCancellingJob] = useState(false);
+  const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
 
   const [quoteForm, setQuoteForm] = useState({
     priceMin: "",
@@ -53,11 +57,12 @@ const ProviderJobDetail = () => {
   }, [jobId, user]);
 
   const fetchAll = async () => {
-    const [jobRes, mediaRes, quoteRes, convRes] = await Promise.all([
+    const [jobRes, mediaRes, quoteRes, convRes, escrowRes] = await Promise.all([
       supabase.from("jobs").select("*").eq("id", jobId!).single(),
       supabase.from("job_media").select("*").eq("job_id", jobId!),
       supabase.from("quotes").select("*").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
       supabase.from("conversations").select("id").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
+      supabase.from("escrow_payments").select("*").eq("job_id", jobId!).eq("provider_user_id", user!.id),
     ]);
     setJob(jobRes.data);
     const mediaData = mediaRes.data ?? [];
@@ -73,6 +78,7 @@ const ProviderJobDetail = () => {
     }
     setExistingQuote(quoteRes.data);
     setConversationId(convRes.data?.id ?? null);
+    setEscrowPayments(escrowRes.data ?? []);
 
     // Check review status and get customer name
     if (jobRes.data && user) {
@@ -162,6 +168,35 @@ const ProviderJobDetail = () => {
       fetchAll();
     }
     setSubmitting(false);
+  };
+
+  const hasConfirmedPayment = escrowPayments.some(p => p.status === "held" || p.status === "released");
+
+  const handleCancelJob = async () => {
+    setCancellingJob(true);
+    if (!hasConfirmedPayment) {
+      // Pre-payment: provider can cancel freely
+      await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId!);
+      toast({ title: "Job cancelled", description: "The job has been cancelled." });
+      setCancelDialogOpen(false);
+      fetchAll();
+    } else {
+      // Post-payment: send cancellation request to customer via messaging
+      if (conversationId) {
+        await supabase.from("messages").insert({
+          conversation_id: conversationId,
+          sender_user_id: user!.id,
+          body: "🚫 The provider has requested to cancel this job. Customer confirmation is required before the job can be cancelled.",
+          message_type: "cancellation_request",
+          metadata: { status: "pending", requested_by: user!.id, initiated_by: "provider" },
+        } as any);
+        toast({ title: "Cancellation requested", description: "The customer has been notified. Both parties must agree to cancel the job." });
+      } else {
+        toast({ title: "Could not find conversation", description: "Please contact support.", variant: "destructive" });
+      }
+      setCancelDialogOpen(false);
+    }
+    setCancellingJob(false);
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -415,6 +450,15 @@ const ProviderJobDetail = () => {
         </Card>
       )}
 
+      {/* Cancel Job Button - visible when provider's quote is accepted and job is active */}
+      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && (
+        <div className="flex justify-end">
+          <Button variant="destructive" size="sm" onClick={() => setCancelDialogOpen(true)}>
+            <XCircle className="mr-2 h-4 w-4" /> Cancel Job
+          </Button>
+        </div>
+      )}
+
       {/* Review Dialog */}
       <ReviewDialog
         open={reviewOpen}
@@ -427,6 +471,31 @@ const ProviderJobDetail = () => {
         revieweeName={customerName}
         onReviewSubmitted={fetchAll}
       />
+
+      {/* Cancel Job Confirmation Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel this job?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>Once you cancel this job, all details will be permanently deleted and it will no longer be available.</p>
+              {hasConfirmedPayment && (
+                <p className="font-medium text-foreground">
+                  Because a payment has been made on this job, the customer must also confirm the cancellation before it takes effect. A cancellation request will be sent to the customer.
+                </p>
+              )}
+              <p>Are you sure you want to proceed?</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancellingJob}>Go Back</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelJob} disabled={cancellingJob} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {cancellingJob ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {hasConfirmedPayment ? "Request Cancellation" : "Confirm Cancel"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
