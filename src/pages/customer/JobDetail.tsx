@@ -426,7 +426,7 @@ const JobDetail = () => {
     });
   };
 
-  const sendCounterProposal = async (data: { agreed_price: number; urgency: string; urgency_label: string }) => {
+  const sendCounterProposal = async (data: { agreed_price: number }) => {
     if (!chatConvId) return;
     // Decline existing pending proposals
     for (const m of chatMessages) {
@@ -439,9 +439,9 @@ const JobDetail = () => {
     await supabase.from("messages").insert({
       conversation_id: chatConvId,
       sender_user_id: user!.id,
-      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}, needed: ${data.urgency_label}`,
+      body: `Counter-proposal: £${data.agreed_price.toFixed(2)}`,
       message_type: "proposal",
-      metadata: { ...data, status: "pending" },
+      metadata: { agreed_price: data.agreed_price, status: "pending" },
     } as any);
     toast({ title: "Counter-proposal sent" });
     setCounterDialog(null);
