@@ -406,7 +406,9 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   if (loading) return <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
 
-  const showTracker = ["in_progress"].includes(job.status) || (job.status === "accepted" && job.milestones_confirmed);
+  // Providers can always see the tracker once milestones exist (so they can edit/delete before payment)
+  const showForProvider = role === "provider" && milestones.length > 0;
+  const showTracker = ["in_progress"].includes(job.status) || (job.status === "accepted" && job.milestones_confirmed) || showForProvider;
   if (!showTracker) return null;
 
   return (
