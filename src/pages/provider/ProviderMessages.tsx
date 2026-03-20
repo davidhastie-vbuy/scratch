@@ -311,6 +311,8 @@ const ProviderMessages = () => {
     } as any);
 
     toast({ title: "Terms accepted!", description: "The job has been scheduled." });
+    // Email customer about acceptance — they need to pay deposit
+    sendProposalEmail(selected.customer_user_id, user!.id, selected.jobs?.title || "a job", "accepted");
     setAccepting(false);
     await refreshMessages();
     fetchConversations();
