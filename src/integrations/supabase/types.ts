@@ -1305,6 +1305,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _supabase_anon_key: { Args: never; Returns: string }
+      _supabase_url: { Args: never; Returns: string }
       count_providers_in_slot: {
         Args: { _category: string; _postcode: string }
         Returns: number
