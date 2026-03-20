@@ -329,6 +329,8 @@ const ProviderMessages = () => {
       message_type: "system",
     } as any);
     toast({ title: "Proposal declined" });
+    // Email customer about decline
+    sendProposalEmail(selected!.customer_user_id, user!.id, selected!.jobs?.title || "a job", "declined");
     await refreshMessages();
   };
 
