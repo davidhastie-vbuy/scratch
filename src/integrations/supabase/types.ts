@@ -1347,6 +1347,10 @@ export type Database = {
         Args: { _job_id: string; _user_id: string }
         Returns: boolean
       }
+      resubmit_provider_application: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "customer" | "provider" | "admin"
