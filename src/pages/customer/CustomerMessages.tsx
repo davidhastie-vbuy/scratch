@@ -321,6 +321,7 @@ const CustomerMessages = () => {
     } as any);
 
     toast({ title: "Terms accepted in principle!", description: "The provider will now set up milestone payments." });
+    sendProviderActionEmail(selected!.provider_user_id, user!.id, selected!.jobs?.title || "a job", "accepted");
     setAccepting(false);
     await refreshMessages();
     fetchConversations();
