@@ -1048,6 +1048,7 @@ export type Database = {
           price_max: number
           price_min: number
           provider_user_id: string
+          reminder_sent_at: string | null
           status: Database["public"]["Enums"]["quote_status"]
           updated_at: string
         }
@@ -1061,6 +1062,7 @@ export type Database = {
           price_max: number
           price_min: number
           provider_user_id: string
+          reminder_sent_at?: string | null
           status?: Database["public"]["Enums"]["quote_status"]
           updated_at?: string
         }
@@ -1074,6 +1076,7 @@ export type Database = {
           price_max?: number
           price_min?: number
           provider_user_id?: string
+          reminder_sent_at?: string | null
           status?: Database["public"]["Enums"]["quote_status"]
           updated_at?: string
         }
