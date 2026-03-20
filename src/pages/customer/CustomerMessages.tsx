@@ -343,6 +343,7 @@ const CustomerMessages = () => {
     } as any);
 
     toast({ title: "Proposal declined" });
+    sendProviderActionEmail(selected!.provider_user_id, user!.id, selected!.jobs?.title || "a job", "declined");
     setAccepting(false);
     await refreshMessages();
   };
