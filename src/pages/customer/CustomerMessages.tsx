@@ -379,6 +379,7 @@ const CustomerMessages = () => {
       metadata: { agreed_price: data.agreed_price, status: "pending" },
     } as any);
     toast({ title: "Counter-proposal sent" });
+    sendProviderActionEmail(selected!.provider_user_id, user!.id, selected!.jobs?.title || "a job", "countered");
     setCounterDialog(null);
     await refreshMessages();
   };
