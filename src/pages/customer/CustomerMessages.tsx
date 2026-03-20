@@ -13,6 +13,100 @@ import QuoteBanner from "@/components/messaging/QuoteBanner";
 import { AttachmentButton, StagedFilePreview, MessageAttachments, uploadAttachments, type StagedFile } from "@/components/messaging/ChatAttachments";
 import { cn } from "@/lib/utils";
 
+const sendProviderActionEmail = async (
+  providerUserId: string,
+  customerUserId: string,
+  jobTitle: string,
+  action: "accepted" | "declined" | "countered"
+) => {
+  try {
+    const { data: providerProfile } = await supabase
+      .from("profiles")
+      .select("email, first_name")
+      .eq("id", providerUserId)
+      .single();
+    if (!providerProfile?.email) return;
+
+    const { data: pp } = await supabase
+      .from("provider_profiles")
+      .select("email_notifications_enabled")
+      .eq("user_id", providerUserId)
+      .single();
+    if (pp && !pp.email_notifications_enabled) return;
+
+    const { data: customerProfile } = await supabase
+      .from("profiles")
+      .select("first_name, last_name, full_name")
+      .eq("id", customerUserId)
+      .single();
+    const customerName = customerProfile
+      ? `${customerProfile.first_name || ""} ${customerProfile.last_name || ""}`.trim() || customerProfile.full_name || "The customer"
+      : "The customer";
+
+    const providerFirst = providerProfile.first_name || "there";
+    const siteUrl = "https://bookatrade.lovable.app";
+
+    let subject = "";
+    let heading = "";
+    let body = "";
+    let ctaLabel = "";
+    let ctaLink = "";
+    let borderColor = "";
+    let headingColor = "";
+
+    if (action === "accepted") {
+      subject = `BookATrade: ${customerName} accepted your proposal for "${jobTitle}"`;
+      heading = "🎉 Proposal Accepted!";
+      body = `<strong>${customerName}</strong> has accepted your proposed terms for "<strong>${jobTitle}</strong>". Please log in to set up the milestones and payment schedule so the job can get started.`;
+      ctaLabel = "Set Up Milestones";
+      ctaLink = `${siteUrl}/provider/messages`;
+      borderColor = "#22863a";
+      headingColor = "#22863a";
+    } else if (action === "declined") {
+      subject = `BookATrade: Your proposal for "${jobTitle}" was declined`;
+      heading = "Proposal Declined";
+      body = `<strong>${customerName}</strong> has declined your proposed terms for "<strong>${jobTitle}</strong>". Log in to message them and discuss the job further.`;
+      ctaLabel = "Message Customer";
+      ctaLink = `${siteUrl}/provider/messages`;
+      borderColor = "#d29922";
+      headingColor = "#d29922";
+    } else {
+      subject = `BookATrade: ${customerName} sent a counter-offer on "${jobTitle}"`;
+      heading = "New Counter-Offer Received";
+      body = `<strong>${customerName}</strong> has sent a counter-offer on "<strong>${jobTitle}</strong>". Log in to review the updated terms and continue the discussion.`;
+      ctaLabel = "Review Counter-Offer";
+      ctaLink = `${siteUrl}/provider/messages`;
+      borderColor = "#0366d6";
+      headingColor = "#0366d6";
+    }
+
+    const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#ffffff;">
+      <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #1a1a2e;">
+        <h1 style="margin:0;font-size:22px;color:#1a1a2e;">BookATrade</h1>
+      </div>
+      <div style="padding:24px 0;">
+        <p style="font-size:15px;color:#333;">Hi ${providerFirst},</p>
+        <div style="background:#f4f4f8;border-left:4px solid ${borderColor};padding:16px;margin:16px 0;border-radius:4px;">
+          <p style="margin:0 0 8px;font-weight:bold;font-size:16px;color:${headingColor};">${heading}</p>
+          <p style="margin:0;font-size:14px;color:#555;">${body}</p>
+        </div>
+        <div style="text-align:center;padding:16px 0;">
+          <a href="${ctaLink}" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">${ctaLabel}</a>
+        </div>
+      </div>
+      <div style="text-align:center;padding-top:16px;border-top:1px solid #eee;">
+        <p style="font-size:12px;color:#aaa;margin:0;">&copy; BookATrade. All rights reserved.</p>
+      </div>
+    </div>`;
+
+    await supabase.functions.invoke("send-provider-email", {
+      body: { to: providerProfile.email, subject, html },
+    });
+  } catch (e) {
+    console.error("Failed to send provider action email:", e);
+  }
+};
+
 interface ConversationWithUnread {
   id: string;
   job_id: string;
@@ -227,6 +321,7 @@ const CustomerMessages = () => {
     } as any);
 
     toast({ title: "Terms accepted in principle!", description: "The provider will now set up milestone payments." });
+    sendProviderActionEmail(selected!.provider_user_id, user!.id, selected!.jobs?.title || "a job", "accepted");
     setAccepting(false);
     await refreshMessages();
     fetchConversations();
@@ -248,6 +343,7 @@ const CustomerMessages = () => {
     } as any);
 
     toast({ title: "Proposal declined" });
+    sendProviderActionEmail(selected!.provider_user_id, user!.id, selected!.jobs?.title || "a job", "declined");
     setAccepting(false);
     await refreshMessages();
   };
@@ -283,6 +379,7 @@ const CustomerMessages = () => {
       metadata: { agreed_price: data.agreed_price, status: "pending" },
     } as any);
     toast({ title: "Counter-proposal sent" });
+    sendProviderActionEmail(selected!.provider_user_id, user!.id, selected!.jobs?.title || "a job", "countered");
     setCounterDialog(null);
     await refreshMessages();
   };
