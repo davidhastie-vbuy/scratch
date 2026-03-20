@@ -283,6 +283,35 @@ const JobDetail = () => {
           message_type: "cancellation_request",
           metadata: { status: "pending", requested_by: user!.id },
         } as any);
+        // Email provider about cancellation request
+        try {
+          const { data: providerProfile } = await supabase.from("profiles").select("email, first_name").eq("id", job.provider_id).single();
+          const { data: pp } = await supabase.from("provider_profiles").select("email_notifications_enabled, contact_first_name, business_name").eq("user_id", job.provider_id).single();
+          if (providerProfile?.email && pp?.email_notifications_enabled !== false) {
+            const catLabel = job.category ? job.category.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()) : "N/A";
+            const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#ffffff;">
+              <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #1a1a2e;"><h1 style="margin:0;font-size:22px;color:#1a1a2e;">BookATrade</h1></div>
+              <div style="padding:24px 0;">
+                <p style="font-size:15px;color:#333;">Hi ${pp.contact_first_name || "there"},</p>
+                <p style="font-size:15px;color:#333;">The customer has requested to cancel a job you are working on. Your confirmation is required before the job can be cancelled.</p>
+                <div style="background:#f4f4f8;border-left:4px solid #cb2431;padding:16px;margin:16px 0;border-radius:4px;">
+                  <p style="margin:0 0 8px;font-weight:bold;font-size:15px;color:#cb2431;">Cancellation Request</p>
+                  <p style="margin:0 0 6px;font-size:14px;color:#555;"><strong>Job:</strong> ${job.title}</p>
+                  <p style="margin:0 0 6px;font-size:14px;color:#555;"><strong>Category:</strong> ${catLabel}</p>
+                  <p style="margin:0;font-size:14px;color:#555;"><strong>Area:</strong> ${job.postcode_district}</p>
+                </div>
+                <p style="font-size:14px;color:#555;">Please log in to review the request and accept or decline the cancellation.</p>
+                <div style="text-align:center;padding:16px 0;">
+                  <a href="https://bookatrade.lovable.app/provider/messages" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">Review Request</a>
+                </div>
+              </div>
+              <div style="text-align:center;padding-top:16px;border-top:1px solid #eee;"><p style="font-size:12px;color:#aaa;margin:0;">&copy; BookATrade. All rights reserved.</p></div>
+            </div>`;
+            await supabase.functions.invoke("send-provider-email", {
+              body: { to: providerProfile.email, subject: `BookATrade: Cancellation requested for "${job.title}"`, html },
+            });
+          }
+        } catch (e) { console.error("Failed to send cancellation email:", e); }
         toast({ title: "Cancellation requested", description: "The provider has been notified. Both parties must agree to cancel the job." });
       } else {
         toast({ title: "Could not find conversation", description: "Please contact support.", variant: "destructive" });
