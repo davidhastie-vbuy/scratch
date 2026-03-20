@@ -120,10 +120,9 @@ const ProviderProfile = () => {
 
   const handleResubmit = async () => {
     setResubmitting(true);
-    const { error } = await supabase
-      .from("provider_profiles")
-      .update({ status: "pending_review" as any })
-      .eq("user_id", user!.id);
+    const { error } = await supabase.rpc("resubmit_provider_application", {
+      _user_id: user!.id,
+    });
     if (error) {
       toast({ title: "Re-submit failed", description: error.message, variant: "destructive" });
     } else {
