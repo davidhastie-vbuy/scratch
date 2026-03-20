@@ -13,6 +13,71 @@ import QuoteBanner from "@/components/messaging/QuoteBanner";
 import { AttachmentButton, StagedFilePreview, MessageAttachments, uploadAttachments, type StagedFile } from "@/components/messaging/ChatAttachments";
 import { cn } from "@/lib/utils";
 
+const sendProposalEmail = async (
+  customerUserId: string,
+  providerUserId: string,
+  jobTitle: string,
+  action: "accepted" | "declined" | "countered"
+) => {
+  try {
+    const { data: customerProfile } = await supabase
+      .from("profiles")
+      .select("email, first_name")
+      .eq("id", customerUserId)
+      .single();
+    const { data: providerProfile } = await supabase
+      .from("provider_profiles")
+      .select("business_name")
+      .eq("user_id", providerUserId)
+      .single();
+
+    if (!customerProfile?.email) return;
+
+    const providerName = providerProfile?.business_name || "A provider";
+    const firstName = customerProfile.first_name?.trim() || "there";
+    const siteUrl = "https://bookatrade.lovable.app";
+
+    let subjectLine = "";
+    let actionHtml = "";
+
+    if (action === "accepted") {
+      subjectLine = `${providerName} has accepted your proposal for "${jobTitle}"`;
+      actionHtml = `<p style="font-size:15px;color:#333;"><strong>${providerName}</strong> has accepted your proposal for "<strong>${jobTitle}</strong>".</p>`
+        + `<p style="font-size:15px;color:#333;">To get things started, please log in and pay your first milestone (the deposit) so work can begin.</p>`;
+    } else if (action === "declined") {
+      subjectLine = `${providerName} has declined your proposal for "${jobTitle}"`;
+      actionHtml = `<p style="font-size:15px;color:#333;"><strong>${providerName}</strong> has declined your proposal for "<strong>${jobTitle}</strong>".</p>`
+        + `<p style="font-size:15px;color:#333;">Log in to message the provider and discuss the job further.</p>`;
+    } else {
+      subjectLine = `${providerName} has sent a counter-offer for "${jobTitle}"`;
+      actionHtml = `<p style="font-size:15px;color:#333;"><strong>${providerName}</strong> has sent a counter-offer on "<strong>${jobTitle}</strong>".</p>`
+        + `<p style="font-size:15px;color:#333;">Log in to review their updated terms and continue the discussion.</p>`;
+    }
+
+    const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#ffffff;">`
+      + `<div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #1a1a2e;">`
+      + `<h1 style="margin:0;font-size:22px;color:#1a1a2e;">BookATrade</h1>`
+      + `</div>`
+      + `<div style="padding:24px 0;">`
+      + `<p style="font-size:15px;color:#333;">Hi ${firstName},</p>`
+      + actionHtml
+      + `<div style="text-align:center;padding:16px 0;">`
+      + `<a href="${siteUrl}" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">Log in to BookATrade</a>`
+      + `</div>`
+      + `</div>`
+      + `<div style="text-align:center;padding-top:16px;border-top:1px solid #eee;">`
+      + `<p style="font-size:12px;color:#aaa;margin:0;">&copy; BookATrade. All rights reserved.</p>`
+      + `</div>`
+      + `</div>`;
+
+    await supabase.functions.invoke("send-provider-email", {
+      body: { to: customerProfile.email, subject: `BookATrade: ${subjectLine}`, html },
+    });
+  } catch (err) {
+    console.error("Failed to send proposal action email:", err);
+  }
+};
+
 interface ConversationWithUnread {
   id: string;
   job_id: string;
