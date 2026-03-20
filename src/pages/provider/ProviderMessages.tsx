@@ -256,6 +256,8 @@ const ProviderMessages = () => {
     } as any);
     toast({ title: "Proposal sent to customer" });
     setProposeDefaults(undefined);
+    // Email customer about counter-offer
+    sendProposalEmail(selected.customer_user_id, user!.id, selected.jobs?.title || "a job", "countered");
     await refreshMessages();
   };
 
