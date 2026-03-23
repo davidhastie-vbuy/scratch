@@ -327,14 +327,42 @@ const PostJob = () => {
               </div>
               {files.length > 0 && (
                 <div className="space-y-2">
-                  {files.map((f, i) => (
-                    <div key={i} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
-                      <span className="truncate">{f.name} <span className="text-muted-foreground">({(f.size / 1024 / 1024).toFixed(1)}MB)</span></span>
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setFiles(files.filter((_, j) => j !== i))}>
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {files.map((f, i) => (
+                      <div key={i} className="relative group rounded-lg border overflow-hidden bg-muted/30 aspect-square">
+                        {f.type.startsWith("video") ? (
+                          <video
+                            src={URL.createObjectURL(f)}
+                            className="h-full w-full object-cover"
+                            muted
+                            playsInline
+                            preload="metadata"
+                          />
+                        ) : (
+                          <img
+                            src={URL.createObjectURL(f)}
+                            alt={f.name}
+                            className="h-full w-full object-cover"
+                          />
+                        )}
+                        {f.type.startsWith("video") && (
+                          <div className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white font-medium">
+                            MP4
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setFiles(files.filter((_, j) => j !== i))}
+                          className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-1.5 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <p className="text-[10px] text-white truncate">{f.name}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                   <p className="text-xs text-muted-foreground">{files.length}/10 files</p>
                 </div>
               )}
