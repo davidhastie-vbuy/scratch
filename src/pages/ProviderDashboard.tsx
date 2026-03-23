@@ -50,12 +50,11 @@ const ProviderDashboard = () => {
 
       // Fetch unread message count
       const fetchUnread = async () => {
-        // Get conversations where this provider is involved
         const { data: convs } = await supabase
           .from("conversations")
           .select("id")
           .eq("provider_user_id", user.id);
-        if (!convs || convs.length === 0) return;
+        if (!convs || convs.length === 0) { setUnreadMessages(0); return; }
         const convIds = convs.map(c => c.id);
         const { count } = await supabase
           .from("messages")
@@ -67,18 +66,24 @@ const ProviderDashboard = () => {
       };
       fetchUnread();
 
-      // Realtime for new messages
+      // Realtime for new/updated messages
       const channel = supabase
         .channel("provider-unread-messages")
-        .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
-          fetchUnread();
-        })
-        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages" }, () => {
-          fetchUnread();
-        })
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => fetchUnread())
+        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages" }, () => fetchUnread())
         .subscribe();
 
-      return () => { supabase.removeChannel(channel); };
+      // Re-check when tab regains focus (catches reads from messages page)
+      const onFocus = () => fetchUnread();
+      window.addEventListener("focus", onFocus);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") fetchUnread();
+      });
+
+      return () => {
+        supabase.removeChannel(channel);
+        window.removeEventListener("focus", onFocus);
+      };
     }
   }, [user]);
 
