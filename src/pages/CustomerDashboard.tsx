@@ -46,7 +46,17 @@ const CustomerDashboard = () => {
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages" }, () => fetchUnread())
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Re-check when tab regains focus (catches reads from messages page)
+    const onFocus = () => fetchUnread();
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") fetchUnread();
+    });
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener("focus", onFocus);
+    };
   }, [user]);
 
   const navItems = allNavItems.map(item =>
