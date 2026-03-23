@@ -396,7 +396,7 @@ const ProviderPublicPage = () => {
                 <SelectContent>
                   {customerJobs.map(j => (
                     <SelectItem key={j.id} value={j.id} disabled={alreadyInvited.includes(j.id)}>
-                      {j.title} {alreadyInvited.includes(j.id) ? "(already invited)" : ""}
+                      {j.title} {alreadyInvited.includes(j.id) ? "(already invited or quoted)" : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
