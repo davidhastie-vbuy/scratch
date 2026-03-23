@@ -177,12 +177,20 @@ const ProviderPublicPage = () => {
     const eligible = (jobs ?? []).filter((j: any) => providerCategories.includes(j.category));
     setCustomerJobs(eligible);
 
-    const { data: existing } = await supabase
-      .from("job_invitations")
-      .select("job_id")
-      .eq("provider_user_id", providerId)
-      .eq("customer_user_id", user.id);
-    setAlreadyInvited((existing ?? []).map((e: any) => e.job_id));
+    const [invRes, quoteRes] = await Promise.all([
+      supabase
+        .from("job_invitations")
+        .select("job_id")
+        .eq("provider_user_id", providerId)
+        .eq("customer_user_id", user.id),
+      supabase
+        .from("quotes")
+        .select("job_id")
+        .eq("provider_user_id", providerId),
+    ]);
+    const invitedIds = (invRes.data ?? []).map((e: any) => e.job_id);
+    const quotedIds = (quoteRes.data ?? []).map((e: any) => e.job_id);
+    setAlreadyInvited([...new Set([...invitedIds, ...quotedIds])]);
 
     setSelectedJobId("");
     setInviteOpen(true);
@@ -388,7 +396,7 @@ const ProviderPublicPage = () => {
                 <SelectContent>
                   {customerJobs.map(j => (
                     <SelectItem key={j.id} value={j.id} disabled={alreadyInvited.includes(j.id)}>
-                      {j.title} {alreadyInvited.includes(j.id) ? "(already invited)" : ""}
+                      {j.title} {alreadyInvited.includes(j.id) ? "(already invited or quoted)" : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
