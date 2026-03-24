@@ -250,9 +250,33 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const canProviderCancel = role === "provider" && milestones.some((m) => m.flag_count >= 5);
 
   const cancelJobDueToFlags = async () => {
+    setCancelling(true);
     await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId);
-    toast({ title: "Job cancelled due to unresolved flags." });
+    toast({ title: "Job cancelled", description: "All escrow funds will be returned to the customer." });
+    setShowCancelConfirm(false);
+    setCancelling(false);
     onRefresh?.();
+  };
+
+  const escalateToAdmin = async () => {
+    if (!escalateReason.trim()) {
+      toast({ title: "Reason required", description: "Please explain why you're escalating.", variant: "destructive" });
+      return;
+    }
+    setEscalating(true);
+    const { error } = await supabase.from("job_disputes").insert({
+      job_id: jobId,
+      raised_by: user!.id,
+      reason: `[Escalated after milestone flags] ${escalateReason.trim()}`,
+    } as any);
+    if (error) {
+      toast({ title: "Failed to escalate", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Escalated to admin", description: "An admin will review the job, milestones, and all communications." });
+      setShowEscalate(false);
+      setEscalateReason("");
+    }
+    setEscalating(false);
   };
 
   // Payment helpers
