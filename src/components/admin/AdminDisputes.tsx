@@ -115,15 +115,18 @@ const AdminDisputes = () => {
     const dispute = disputes.find((d) => d.id === disputeId);
     await supabase.from("job_disputes").update({ status } as any).eq("id", disputeId);
 
-    // Post status change to the conversation so both parties see it
     const det = details[disputeId];
-    if (det?.conversationId && user) {
-      const statusLabel = status.replace("_", " ");
-      await supabase.from("messages").insert({
-        conversation_id: det.conversationId,
-        sender_user_id: user.id,
-        body: `⚖️ Dispute status updated to "${statusLabel}" by admin.`,
-        message_type: "system",
+    const statusLabel = status.replace("_", " ");
+
+    // Use edge function to post status change to conversation, notify, and email both parties
+    if (det?.job) {
+      await supabase.functions.invoke("notify-dispute-reply", {
+        body: {
+          dispute_id: disputeId,
+          body: `Dispute status updated to "${statusLabel}".`,
+          conversation_id: det.conversationId || null,
+          job_id: det.job.id,
+        },
       });
     }
 
@@ -145,6 +148,9 @@ const AdminDisputes = () => {
     if (!body) return;
     setSending(disputeId);
 
+    const dispute = disputes.find((d) => d.id === disputeId);
+    const det = details[disputeId];
+
     // Always save to dispute_messages for the dispute thread
     await supabase.from("dispute_messages").insert({
       dispute_id: disputeId,
@@ -153,17 +159,16 @@ const AdminDisputes = () => {
       is_admin_only: isAdminOnly,
     } as any);
 
-    // If "Reply to All", also post to the actual conversation so both parties see it
-    if (!isAdminOnly) {
-      const det = details[disputeId];
-      if (det?.conversationId) {
-        await supabase.from("messages").insert({
-          conversation_id: det.conversationId,
-          sender_user_id: user!.id,
-          body: `⚖️ Admin (Dispute): ${body}`,
-          message_type: "system",
-        });
-      }
+    // If "Reply to All", use edge function to post to conversation, notify, and email both parties
+    if (!isAdminOnly && det?.job) {
+      await supabase.functions.invoke("notify-dispute-reply", {
+        body: {
+          dispute_id: disputeId,
+          body,
+          conversation_id: det.conversationId || null,
+          job_id: det.job.id,
+        },
+      });
     }
 
     setNewMessage((prev) => ({ ...prev, [disputeId]: "" }));
@@ -177,7 +182,6 @@ const AdminDisputes = () => {
     setMessages((prev) => ({ ...prev, [disputeId]: data ?? [] }));
 
     // Refresh conversation messages in details
-    const det = details[disputeId];
     if (det?.conversationId) {
       const { data: cm } = await supabase
         .from("messages")
