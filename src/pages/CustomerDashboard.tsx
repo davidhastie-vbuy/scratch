@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Outlet } from "react-router-dom";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Home, PlusCircle, Briefcase, MessageSquare, HelpCircle, User, Users, Heart } from "lucide-react";
-import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
+import { MESSAGE_UNREAD_UPDATED_EVENT, UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 
 const allNavItems = [
   { label: "Dashboard", path: "/dashboard", icon: <Home className="h-4 w-4" /> },
@@ -50,14 +50,20 @@ const CustomerDashboard = () => {
 
     // Re-check when tab regains focus (catches reads from messages page)
     const onFocus = () => fetchUnread();
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", () => {
+    const onUnreadUpdated = () => fetchUnread();
+    const onVisibilityChange = () => {
       if (document.visibilityState === "visible") fetchUnread();
-    });
+    };
+
+    window.addEventListener("focus", onFocus);
+    window.addEventListener(MESSAGE_UNREAD_UPDATED_EVENT, onUnreadUpdated);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       supabase.removeChannel(channel);
       window.removeEventListener("focus", onFocus);
+      window.removeEventListener(MESSAGE_UNREAD_UPDATED_EVENT, onUnreadUpdated);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [user]);
 

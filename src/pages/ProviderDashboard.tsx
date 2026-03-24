@@ -5,7 +5,7 @@ import { Outlet, useLocation, Navigate } from "react-router-dom";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { Home, Briefcase, FileText, MessageSquare, HelpCircle, User, Clock, Wrench, AlertTriangle, XCircle, ImageIcon, CalendarDays, Wallet, ClipboardList } from "lucide-react";
-import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
+import { MESSAGE_UNREAD_UPDATED_EVENT, UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 
 const STATUS_CONFIG: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: typeof Clock }> = {
   pending: { label: "Pending Approval", variant: "secondary", icon: Clock },
@@ -77,14 +77,20 @@ const ProviderDashboard = () => {
 
       // Re-check when tab regains focus (catches reads from messages page)
       const onFocus = () => fetchUnread();
-      window.addEventListener("focus", onFocus);
-      document.addEventListener("visibilitychange", () => {
+      const onUnreadUpdated = () => fetchUnread();
+      const onVisibilityChange = () => {
         if (document.visibilityState === "visible") fetchUnread();
-      });
+      };
+
+      window.addEventListener("focus", onFocus);
+      window.addEventListener(MESSAGE_UNREAD_UPDATED_EVENT, onUnreadUpdated);
+      document.addEventListener("visibilitychange", onVisibilityChange);
 
       return () => {
         supabase.removeChannel(channel);
         window.removeEventListener("focus", onFocus);
+        window.removeEventListener(MESSAGE_UNREAD_UPDATED_EVENT, onUnreadUpdated);
+        document.removeEventListener("visibilitychange", onVisibilityChange);
       };
     }
   }, [user]);
