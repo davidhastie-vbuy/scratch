@@ -9,8 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import {
   CheckCircle2, Circle, Flag, Plus, Send, Loader2, AlertTriangle, MessageSquareWarning,
-  ChevronDown, ChevronUp, PoundSterling, Pencil, Trash2, X, Check,
+  ChevronDown, ChevronUp, PoundSterling, Pencil, Trash2, X, Check, ShieldAlert,
 } from "lucide-react";
 import { format } from "date-fns";
 
