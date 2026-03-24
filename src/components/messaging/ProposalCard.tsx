@@ -38,6 +38,7 @@ interface Props {
 }
 
 const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCounter, onSetupMilestones, accepting, hasAcceptedProposal }: Props) => {
+  const [showDeclineConfirm, setShowDeclineConfirm] = useState(false);
   const isPending = proposal.status === "pending";
   const isAccepted = proposal.status === "accepted";
   const isDeclined = proposal.status === "declined";
