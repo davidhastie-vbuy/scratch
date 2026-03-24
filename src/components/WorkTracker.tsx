@@ -255,6 +255,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   };
 
   const canProviderCancel = role === "provider" && milestones.some((m) => m.flag_count >= 5);
+  const hasFlaggedMilestone = milestones.some((m) => m.status === "flagged" || m.flag_count > 0);
 
   const cancelJobDueToFlags = async () => {
     setCancelling(true);
