@@ -333,11 +333,50 @@ const AdminDisputes = () => {
                       <SelectContent>
                         <SelectItem value="open">Open</SelectItem>
                         <SelectItem value="under_review">Under Review</SelectItem>
-                        <SelectItem value="resolved">Resolved</SelectItem>
                         <SelectItem value="closed">Closed</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Resolution buttons - only show for non-resolved disputes */}
+                  {d.status !== "resolved" && d.status !== "closed" && (
+                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
+                      <p className="text-sm font-medium">Resolve Dispute</p>
+                      <p className="text-xs text-muted-foreground">
+                        Choose which party to rule in favour of. This will update the milestone status and notify both parties.
+                      </p>
+                      {det && (() => {
+                        const flaggedMilestones = (det.milestones || []).filter(
+                          (m: any) => m.status === "flagged" || m.flag_count > 0
+                        );
+                        return flaggedMilestones.length > 0 ? (
+                          <p className="text-xs text-muted-foreground">
+                            Affected milestone(s): <span className="font-medium text-foreground">{flaggedMilestones.map((m: any) => m.title).join(", ")}</span>
+                          </p>
+                        ) : null;
+                      })()}
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => resolveInFavour(d.id, "provider")}
+                          disabled={resolving === d.id}
+                        >
+                          {resolving === d.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <UserCheck className="mr-1 h-3 w-3" />}
+                          Favour Provider
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => resolveInFavour(d.id, "customer")}
+                          disabled={resolving === d.id}
+                        >
+                          {resolving === d.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <UserX className="mr-1 h-3 w-3" />}
+                          Favour Customer
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
                   {det && (
                     <>
