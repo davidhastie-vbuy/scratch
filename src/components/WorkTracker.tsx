@@ -5,7 +5,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,7 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   CheckCircle2, Circle, Flag, Plus, Send, Loader2, AlertTriangle, MessageSquareWarning,
-  ChevronDown, ChevronUp, PoundSterling, Pencil, Trash2, X, Check, ShieldAlert,
+  ChevronDown, ChevronUp, PoundSterling, Pencil, Trash2, X, Check, ShieldAlert, Clock,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -39,6 +38,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const [milestones, setMilestones] = useState<any[]>([]);
   const [comments, setComments] = useState<Record<string, any[]>>({});
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
+  const [changeRequests, setChangeRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -48,7 +48,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const [newAmount, setNewAmount] = useState("");
   const [adding, setAdding] = useState(false);
 
-  // Editing milestones
+  // Editing milestones (change request mode)
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editAmount, setEditAmount] = useState("");
@@ -73,12 +73,15 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const [escalateReason, setEscalateReason] = useState("");
   const [escalating, setEscalating] = useState(false);
 
+  // Change request review
+  const [reviewingCR, setReviewingCR] = useState<string | null>(null);
+
   useEffect(() => {
     fetchMilestones();
   }, [jobId]);
 
   const fetchMilestones = async () => {
-    const [msRes, paymentsRes] = await Promise.all([
+    const [msRes, paymentsRes, crRes] = await Promise.all([
       supabase
         .from("job_milestones")
         .select("*")
@@ -89,11 +92,17 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
         .select("*")
         .eq("job_id", jobId)
         .order("created_at"),
+      supabase
+        .from("milestone_change_requests")
+        .select("*")
+        .eq("job_id", jobId)
+        .order("created_at"),
     ]);
 
     const ms = msRes.data ?? [];
     setMilestones(ms);
     setEscrowPayments(paymentsRes.data ?? []);
+    setChangeRequests(crRes.data ?? []);
 
     // Fetch comments for all milestones
     if (ms.length > 0) {
@@ -131,20 +140,12 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     }
 
     if (parsedAmount !== null && (!Number.isFinite(parsedAmount) || parsedAmount <= 0)) {
-      toast({
-        title: "Enter a valid amount",
-        description: "Milestone payments must be greater than £0.00.",
-        variant: "destructive",
-      });
+      toast({ title: "Enter a valid amount", description: "Milestone payments must be greater than £0.00.", variant: "destructive" });
       return;
     }
 
     if (parsedAmount !== null && agreedPrice > 0 && parsedAmount > remainingBudget) {
-      toast({
-        title: "Milestone exceeds agreed price",
-        description: `You only have £${remainingBudget.toFixed(2)} left to allocate.`,
-        variant: "destructive",
-      });
+      toast({ title: "Milestone exceeds agreed price", description: `You only have £${remainingBudget.toFixed(2)} left to allocate.`, variant: "destructive" });
       return;
     }
 
@@ -178,7 +179,6 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     }
     setActing(milestoneId);
 
-    // Insert comment
     await supabase.from("milestone_comments").insert({
       milestone_id: milestoneId,
       user_id: user!.id,
@@ -186,7 +186,6 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       action,
     } as any);
 
-    // Update milestone status
     const milestone = milestones.find((m) => m.id === milestoneId);
     let newStatus: string;
     let flagCount = milestone?.flag_count ?? 0;
@@ -206,9 +205,6 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       completed_at: (action === "complete" || action === "reconfirm") ? new Date().toISOString() : milestone?.completed_at,
     } as any).eq("id", milestoneId);
 
-    // Queries stay in the work tracker only - no messages sent
-
-    // If customer accepts a milestone, trigger payment release
     if (action === "accept" && role === "customer") {
       try {
         const { error } = await supabase.functions.invoke("release-escrow-payment", {
@@ -289,11 +285,8 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const getPaymentStatus = (milestoneId: string): "unpaid" | "pending" | "complete" | "failed" => {
     const payments = escrowPayments.filter((p) => p.milestone_id === milestoneId);
     if (payments.length === 0) return "unpaid";
-    // Check for held/released (complete)
     if (payments.some((p) => p.status === "held" || p.status === "released")) return "complete";
-    // Check for failed
     if (payments.some((p) => p.status === "failed")) return "failed";
-    // Otherwise pending
     if (payments.some((p) => p.status === "pending")) return "pending";
     return "unpaid";
   };
@@ -329,19 +322,39 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     }
   };
 
+  // ---- Milestone edit logic ----
   const agreedPrice = Number(job.agreed_price ?? 0);
   const totalMilestoneAmounts = milestones.reduce((sum, m) => sum + (Number(m.payment_amount) || 0), 0);
   const remainingMilestoneBudget = agreedPrice > 0
     ? Math.max(0, Math.round((agreedPrice - totalMilestoneAmounts) * 100) / 100)
     : 0;
   const milestoneBudgetFullyAllocated = agreedPrice > 0 && totalMilestoneAmounts >= agreedPrice - 0.01;
-  // Has any milestone payment been successfully paid? If so, lock editing
+
+  // Has the deposit (first milestone) been paid?
+  const depositMilestone = milestones.find((m) => m.sort_order === 0);
+  const depositPaid = depositMilestone
+    ? escrowPayments.some((p) => p.milestone_id === depositMilestone.id && (p.status === "held" || p.status === "released"))
+    : false;
+
+  // Has ANY milestone payment been confirmed?
   const hasAnyConfirmedPayment = escrowPayments.some(
     (p) => p.status === "held" || p.status === "released"
   );
-  // Can provider edit/delete milestones? Only before any payment is confirmed
-  const canEditMilestones = role === "provider" && !hasAnyConfirmedPayment;
 
+  // Determine if a specific milestone has been paid
+  const isMilestonePaid = (milestoneId: string) => {
+    return escrowPayments.some((p) => p.milestone_id === milestoneId && (p.status === "held" || p.status === "released"));
+  };
+
+  // Provider can propose changes to unpaid milestones ONLY after deposit is paid
+  const canProposeChanges = role === "provider" && depositPaid;
+
+  // Get pending change request for a milestone
+  const getPendingCR = (milestoneId: string) => {
+    return changeRequests.find((cr) => cr.milestone_id === milestoneId && cr.status === "pending");
+  };
+
+  // Provider: start proposing a change (uses the edit form but submits as change request)
   const startEditMilestone = (m: any) => {
     setEditingId(m.id);
     setEditTitle(m.title);
@@ -354,7 +367,8 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     setEditAmount("");
   };
 
-  const saveEditMilestone = async (milestoneId: string) => {
+  // Submit a change request (not a direct edit)
+  const submitChangeRequest = async (milestoneId: string) => {
     if (!editTitle.trim()) {
       toast({ title: "Title required", variant: "destructive" });
       return;
@@ -379,21 +393,56 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       }
     }
     setSavingEdit(true);
-    const { error } = await supabase
-      .from("job_milestones")
-      .update({
-        title: editTitle.trim(),
-        payment_amount: parsedAmount,
-      } as any)
-      .eq("id", milestoneId);
+    const { error } = await supabase.from("milestone_change_requests").insert({
+      milestone_id: milestoneId,
+      job_id: jobId,
+      requested_by: user!.id,
+      proposed_title: editTitle.trim(),
+      proposed_amount: parsedAmount,
+    } as any);
     if (error) {
-      toast({ title: "Failed to update", description: error.message, variant: "destructive" });
+      toast({ title: "Failed to submit change request", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Milestone updated" });
+      toast({ title: "Change request submitted", description: "The customer will need to approve this change." });
       cancelEdit();
       fetchMilestones();
     }
     setSavingEdit(false);
+  };
+
+  // Customer approves a change request
+  const approveChangeRequest = async (cr: any) => {
+    setReviewingCR(cr.id);
+    // Apply the changes to the milestone
+    const { error: updateError } = await supabase.from("job_milestones").update({
+      title: cr.proposed_title,
+      payment_amount: cr.proposed_amount,
+    } as any).eq("id", cr.milestone_id);
+    if (updateError) {
+      toast({ title: "Failed to apply changes", description: updateError.message, variant: "destructive" });
+      setReviewingCR(null);
+      return;
+    }
+    // Mark change request as approved
+    await supabase.from("milestone_change_requests").update({
+      status: "approved",
+      resolved_at: new Date().toISOString(),
+    } as any).eq("id", cr.id);
+    toast({ title: "Change approved", description: "The milestone has been updated." });
+    setReviewingCR(null);
+    fetchMilestones();
+  };
+
+  // Customer rejects a change request
+  const rejectChangeRequest = async (cr: any) => {
+    setReviewingCR(cr.id);
+    await supabase.from("milestone_change_requests").update({
+      status: "rejected",
+      resolved_at: new Date().toISOString(),
+    } as any).eq("id", cr.id);
+    toast({ title: "Change rejected", description: "The milestone remains unchanged." });
+    setReviewingCR(null);
+    fetchMilestones();
   };
 
   const deleteMilestone = async (milestoneId: string) => {
@@ -420,10 +469,12 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   if (loading) return <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
 
-  // Providers can always see the tracker once milestones exist (so they can edit/delete before payment)
   const showForProvider = role === "provider" && milestones.length > 0;
   const showTracker = ["in_progress"].includes(job.status) || (job.status === "accepted" && job.milestones_confirmed) || showForProvider;
   if (!showTracker) return null;
+
+  // Pending change requests for customer banner
+  const pendingCRs = changeRequests.filter((cr) => cr.status === "pending");
 
   return (
     <Card>
@@ -438,7 +489,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowAdd(!showAdd)}
-                disabled={milestoneBudgetFullyAllocated || hasAnyConfirmedPayment}
+                disabled={milestoneBudgetFullyAllocated || !depositPaid}
               >
                 <Plus className="mr-1 h-3 w-3" /> Add Milestone
               </Button>
@@ -459,20 +510,43 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
           </div>
         )}
 
-        {role === "provider" && hasAnyConfirmedPayment && (
+        {role === "provider" && !depositPaid && hasAnyConfirmedPayment === false && (
           <p className="text-xs text-muted-foreground">
-            Milestones are locked because a payment has been made. No further changes can be made to milestones.
+            Milestones are locked until the customer pays the deposit. No changes can be made until then.
           </p>
         )}
 
-        {role === "provider" && !hasAnyConfirmedPayment && milestoneBudgetFullyAllocated && (
+        {role === "provider" && !depositPaid && milestones.length > 0 && !hasAnyConfirmedPayment && (
+          <div className="rounded-lg border bg-muted/30 p-3">
+            <p className="text-sm text-muted-foreground">
+              ⏳ Waiting for the customer to pay the deposit before milestones can be edited.
+            </p>
+          </div>
+        )}
+
+        {/* Pending change requests banner for customer */}
+        {role === "customer" && pendingCRs.length > 0 && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-primary shrink-0" />
+              <p className="text-sm font-medium">
+                {pendingCRs.length} milestone change {pendingCRs.length === 1 ? "request" : "requests"} awaiting your approval
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The provider has proposed changes to milestones below. Expand the relevant milestone to review.
+            </p>
+          </div>
+        )}
+
+        {role === "provider" && !depositPaid && milestoneBudgetFullyAllocated && (
           <p className="text-xs text-muted-foreground">
             Deposit, milestones, and final payment already equal the agreed price, so no more paid milestones can be added.
           </p>
         )}
 
-        {/* Add milestone form */}
-        {showAdd && role === "provider" && !milestoneBudgetFullyAllocated && !hasAnyConfirmedPayment && (
+        {/* Add milestone form - only after deposit is paid */}
+        {showAdd && role === "provider" && !milestoneBudgetFullyAllocated && depositPaid && (
           <div className="space-y-2">
             <div className="flex gap-2">
               <Input
@@ -487,22 +561,13 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                   value={newAmount}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value === "") {
-                      setNewAmount("");
-                      return;
-                    }
-
+                    if (value === "") { setNewAmount(""); return; }
                     const parsedValue = parseFloat(value);
-                    if (Number.isNaN(parsedValue)) {
-                      setNewAmount(value);
-                      return;
-                    }
-
+                    if (Number.isNaN(parsedValue)) { setNewAmount(value); return; }
                     if (agreedPrice > 0) {
                       setNewAmount(String(Math.min(parsedValue, remainingMilestoneBudget)));
                       return;
                     }
-
                     setNewAmount(value);
                   }}
                   placeholder="£ Amount"
@@ -613,7 +678,11 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
               const isCustomer = role === "customer";
               const payment = getPaymentForMilestone(m.id);
               const isDeposit = m.title === "Deposit" || m.title === "Full Payment";
-              const isEditable = canEditMilestones && !isDeposit && !m.is_auto && m.status === "pending";
+              const milestoneIsPaid = isMilestonePaid(m.id);
+
+              // Provider can propose edits: deposit must be paid, milestone must be unpaid, not deposit, not auto, pending status
+              const canPropose = canProposeChanges && !isDeposit && !m.is_auto && m.status === "pending" && !milestoneIsPaid;
+              const pendingCR = getPendingCR(m.id);
               const isEditing = editingId === m.id;
 
               // Provider can only complete milestone if payment for it is confirmed (held/released)
@@ -630,6 +699,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                 <div key={m.id} className="rounded-lg border p-3 space-y-2">
                   {isEditing ? (
                     <div className="space-y-2">
+                      <p className="text-xs font-medium text-primary">Propose changes (requires customer approval)</p>
                       <div className="flex gap-2">
                         <Input
                           value={editTitle}
@@ -646,9 +716,9 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                         />
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" onClick={() => saveEditMilestone(m.id)} disabled={savingEdit}>
-                          {savingEdit ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Check className="mr-1 h-3 w-3" />}
-                          Save
+                        <Button size="sm" onClick={() => submitChangeRequest(m.id)} disabled={savingEdit}>
+                          {savingEdit ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
+                          Submit for Approval
                         </Button>
                         <Button size="sm" variant="ghost" onClick={cancelEdit}>
                           <X className="mr-1 h-3 w-3" /> Cancel
@@ -678,45 +748,37 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                             {Number(m.payment_amount).toFixed(2)}
                           </Badge>
                         )}
+                        {pendingCR && (
+                          <Badge variant="outline" className="text-xs border-primary text-primary gap-1">
+                            <Clock className="h-3 w-3" />
+                            Change pending
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
-                        {isEditable && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={(e) => { e.stopPropagation(); startEditMilestone(m); }}
-                            >
-                              <Pencil className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 text-muted-foreground hover:text-destructive"
-                              onClick={(e) => { e.stopPropagation(); deleteMilestone(m.id); }}
-                              disabled={deletingId === m.id}
-                            >
-                              {deletingId === m.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
-                            </Button>
-                          </>
+                        {canPropose && !pendingCR && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={(e) => { e.stopPropagation(); startEditMilestone(m); }}
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </Button>
                         )}
                         <Badge className={STATUS_COLORS[m.status] || ""}>{m.status}</Badge>
                         {m.flag_count > 0 && (
                           <span className="text-xs text-destructive">({m.flag_count}/5 flags)</span>
                         )}
-                        {/* Payment status badge - role-specific */}
+                        {/* Payment status badge */}
                         {m.payment_amount && (() => {
                           const pStatus = getPaymentStatus(m.id);
-                          const payment = getPaymentForMilestone(m.id);
-                          if (isProvider) {
-                            if (pStatus === "complete") {
-                              return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
-                            }
-                            return <Badge variant="outline" className="text-xs">Payment pending</Badge>;
-                          }
+                          const pmnt = getPaymentForMilestone(m.id);
                           if (pStatus === "complete") {
-                            return <Badge variant="default" className="text-xs">{payment?.status === "released" ? "Released" : "Paid"}</Badge>;
+                            return <Badge variant="default" className="text-xs">{pmnt?.status === "released" ? "Released" : "Paid"}</Badge>;
+                          }
+                          if (isProvider) {
+                            return <Badge variant="outline" className="text-xs">Payment pending</Badge>;
                           }
                           if (pStatus === "pending") {
                             return <Badge variant="outline" className="text-xs">Confirming…</Badge>;
@@ -730,11 +792,64 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
                   {isExpanded && (
                     <div className="pl-6 space-y-3">
+                      {/* Pending change request for customer to review */}
+                      {isCustomer && pendingCR && (
+                        <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
+                          <p className="text-sm font-medium flex items-center gap-2">
+                            <Pencil className="h-3 w-3" /> Provider has proposed changes
+                          </p>
+                          <div className="text-sm space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">New title:</span>
+                              <span className="font-medium">{pendingCR.proposed_title}</span>
+                            </div>
+                            {pendingCR.proposed_amount !== null && (
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">New amount:</span>
+                                <span className="font-medium">£{Number(pendingCR.proposed_amount).toFixed(2)}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => approveChangeRequest(pendingCR)}
+                              disabled={reviewingCR === pendingCR.id}
+                            >
+                              {reviewingCR === pendingCR.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Check className="mr-1 h-3 w-3" />}
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => rejectChangeRequest(pendingCR)}
+                              disabled={reviewingCR === pendingCR.id}
+                            >
+                              <X className="mr-1 h-3 w-3" /> Reject
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Provider sees pending change request status */}
+                      {isProvider && pendingCR && (
+                        <div className="rounded-lg border bg-muted/30 p-3">
+                          <p className="text-sm text-muted-foreground flex items-center gap-2">
+                            <Clock className="h-3 w-3" />
+                            Change request submitted — waiting for customer approval.
+                          </p>
+                          <div className="text-xs mt-1 space-y-0.5">
+                            <p>Proposed title: <span className="font-medium">{pendingCR.proposed_title}</span></p>
+                            {pendingCR.proposed_amount !== null && (
+                              <p>Proposed amount: <span className="font-medium">£{Number(pendingCR.proposed_amount).toFixed(2)}</span></p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Customer payment actions */}
                       {isCustomer && m.payment_amount && (() => {
                         const pStatus = getPaymentStatus(m.id);
-                        // Find the first milestone that hasn't been confirmed paid (held/released) to enforce sequential payment
-                        // Pending (abandoned) payments should NOT block retry
                         const nextUnpaidMilestone = milestones.find(ms => {
                           if (!ms.payment_amount) return false;
                           const msPayment = escrowPayments.find(p => p.milestone_id === ms.id && (p.status === "held" || p.status === "released"));
