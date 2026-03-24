@@ -64,6 +64,15 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const [disputeReason, setDisputeReason] = useState("");
   const [raisingDispute, setRaisingDispute] = useState(false);
 
+  // Cancel confirmation
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+
+  // Escalate to admin
+  const [showEscalate, setShowEscalate] = useState(false);
+  const [escalateReason, setEscalateReason] = useState("");
+  const [escalating, setEscalating] = useState(false);
+
   useEffect(() => {
     fetchMilestones();
   }, [jobId]);
