@@ -412,7 +412,7 @@ const JobDetail = () => {
     await supabase.from("messages").insert({
       conversation_id: chatConvId,
       sender_user_id: user!.id,
-      body: `✅ Terms accepted in principle! Price: £${Number(metadata.agreed_price).toFixed(2)}.\n\n⏳ Next steps:\n1. The provider will now set up milestone payments.\n2. Pay the first milestone deposit before work can begin.\n3. You can review milestones and request changes if needed.\n\n💡 The job is fully confirmed once you make the first milestone payment.`,
+      body: `✅ Terms accepted in principle! Price: £${Number(metadata.agreed_price).toFixed(2)}.\n\n⏳ Next steps:\n1. Please set up payment milestones for this job.\n2. Once the customer pays the first milestone deposit, you can start work based on the agreed schedule.\n\n💡 The job is fully confirmed once the customer makes the first milestone payment.`,
       message_type: "system",
     } as any);
 
