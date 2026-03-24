@@ -293,6 +293,33 @@ const AdminDisputes = () => {
                         </div>
                       )}
 
+                      {/* Milestone query comments */}
+                      {det.milestoneComments && det.milestoneComments.length > 0 && (
+                        <div className="rounded-lg border p-3 text-sm space-y-1">
+                          <p className="font-medium">Milestone Queries ({det.milestoneComments.length} messages)</p>
+                          <div className="max-h-60 overflow-y-auto space-y-1">
+                            {det.milestoneComments.map((mc: any) => {
+                              const milestone = det.milestones.find((m: any) => m.id === mc.milestone_id);
+                              const isCustomer = mc.user_id === det.job.customer_user_id;
+                              const isProvider = mc.user_id === det.job.provider_id;
+                              const senderLabel = isCustomer ? "Customer" : isProvider ? "Provider" : "Admin";
+                              const borderColor = isCustomer ? "border-blue-400" : isProvider ? "border-green-400" : "border-yellow-400";
+
+                              return (
+                                <div key={mc.id} className={`text-xs border-l-2 ${borderColor} pl-2`}>
+                                  <span className="text-muted-foreground">
+                                    <span className="font-medium">{senderLabel}</span> · {format(new Date(mc.created_at), "d MMM, h:mm a")}
+                                    {milestone && <Badge variant="outline" className="text-[10px] ml-1">{milestone.title}</Badge>}
+                                    <Badge variant="outline" className="text-[10px] ml-1">{mc.action}</Badge>
+                                  </span>
+                                  {mc.body && <p>{mc.body}</p>}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Full conversation messages between customer and provider */}
                       {det.conversationMessages.length > 0 && (
                         <div className="rounded-lg border p-3 text-sm space-y-1">
