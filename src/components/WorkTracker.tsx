@@ -815,7 +815,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                         )}
                         <Badge className={STATUS_COLORS[m.status] || ""}>{m.status}</Badge>
                         {m.flag_count > 0 && (
-                          <span className="text-xs text-destructive">({m.flag_count}/5 flags)</span>
+                          <span className="text-xs text-destructive">({m.flag_count} {m.flag_count === 1 ? "query" : "queries"})</span>
                         )}
                         {/* Payment status badge */}
                         {m.payment_amount && (() => {
