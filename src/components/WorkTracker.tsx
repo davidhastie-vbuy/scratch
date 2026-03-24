@@ -9,8 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import {
   CheckCircle2, Circle, Flag, Plus, Send, Loader2, AlertTriangle, MessageSquareWarning,
-  ChevronDown, ChevronUp, PoundSterling, Pencil, Trash2, X, Check,
+  ChevronDown, ChevronUp, PoundSterling, Pencil, Trash2, X, Check, ShieldAlert,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -59,6 +63,15 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const [showDispute, setShowDispute] = useState(false);
   const [disputeReason, setDisputeReason] = useState("");
   const [raisingDispute, setRaisingDispute] = useState(false);
+
+  // Cancel confirmation
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+
+  // Escalate to admin
+  const [showEscalate, setShowEscalate] = useState(false);
+  const [escalateReason, setEscalateReason] = useState("");
+  const [escalating, setEscalating] = useState(false);
 
   useEffect(() => {
     fetchMilestones();
@@ -193,30 +206,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       completed_at: (action === "complete" || action === "reconfirm") ? new Date().toISOString() : milestone?.completed_at,
     } as any).eq("id", milestoneId);
 
-    // If customer queries (flags) a milestone, send a message in the conversation
-    if (action === "flag" && role === "customer" && comment.trim()) {
-      try {
-        // Find or create conversation for this job
-        const { data: conv } = await supabase
-          .from("conversations")
-          .select("id")
-          .eq("job_id", jobId)
-          .eq("customer_user_id", user!.id)
-          .limit(1)
-          .maybeSingle();
-
-        if (conv) {
-          await supabase.from("messages").insert({
-            conversation_id: conv.id,
-            sender_user_id: user!.id,
-            body: `📋 **Milestone query: "${milestone?.title}"**\n\n${comment}`,
-            message_type: "text",
-          } as any);
-        }
-      } catch (e) {
-        console.error("Failed to send milestone query message:", e);
-      }
-    }
+    // Queries stay in the work tracker only - no messages sent
 
     // If customer accepts a milestone, trigger payment release
     if (action === "accept" && role === "customer") {
@@ -260,9 +250,33 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const canProviderCancel = role === "provider" && milestones.some((m) => m.flag_count >= 5);
 
   const cancelJobDueToFlags = async () => {
+    setCancelling(true);
     await supabase.from("jobs").update({ status: "cancelled" } as any).eq("id", jobId);
-    toast({ title: "Job cancelled due to unresolved flags." });
+    toast({ title: "Job cancelled", description: "All escrow funds will be returned to the customer." });
+    setShowCancelConfirm(false);
+    setCancelling(false);
     onRefresh?.();
+  };
+
+  const escalateToAdmin = async () => {
+    if (!escalateReason.trim()) {
+      toast({ title: "Reason required", description: "Please explain why you're escalating.", variant: "destructive" });
+      return;
+    }
+    setEscalating(true);
+    const { error } = await supabase.from("job_disputes").insert({
+      job_id: jobId,
+      raised_by: user!.id,
+      reason: `[Escalated after milestone flags] ${escalateReason.trim()}`,
+    } as any);
+    if (error) {
+      toast({ title: "Failed to escalate", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Escalated to admin", description: "An admin will review the job, milestones, and all communications." });
+      setShowEscalate(false);
+      setEscalateReason("");
+    }
+    setEscalating(false);
   };
 
   // Payment helpers
@@ -526,17 +540,66 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
           </div>
         )}
 
-        {/* Provider cancel option */}
         {canProviderCancel && (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
-            <div className="space-y-1">
-              <p className="text-sm font-medium">A milestone has been flagged 5 times.</p>
-              <p className="text-xs text-muted-foreground">You may cancel this job if the issues cannot be resolved.</p>
-              <Button size="sm" variant="destructive" onClick={cancelJobDueToFlags}>Cancel Job</Button>
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 space-y-3">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium">A milestone has been flagged 5 or more times without resolution.</p>
+                <p className="text-xs text-muted-foreground">You can cancel the job or escalate to an admin for review.</p>
+              </div>
             </div>
+            <div className="flex gap-2 pl-6">
+              <Button size="sm" variant="destructive" onClick={() => setShowCancelConfirm(true)}>
+                <X className="mr-1 h-3 w-3" /> Cancel Job
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setShowEscalate(!showEscalate)}>
+                <ShieldAlert className="mr-1 h-3 w-3" /> Escalate to Admin
+              </Button>
+            </div>
+            {showEscalate && (
+              <div className="pl-6 space-y-2">
+                <Textarea
+                  value={escalateReason}
+                  onChange={(e) => setEscalateReason(e.target.value)}
+                  placeholder="Explain the situation for the admin to review…"
+                  rows={3}
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={escalateToAdmin} disabled={escalating}>
+                    {escalating ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
+                    Submit Escalation
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setShowEscalate(false)}>Cancel</Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
+
+        {/* Cancel confirmation dialog */}
+        <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cancel this job?</AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2">
+                <p>By cancelling this job, <strong>you will not receive any payment</strong> for outstanding milestones. All funds held in escrow will be returned to the customer.</p>
+                <p>This action cannot be undone.</p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={cancelling}>Go Back</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={cancelJobDueToFlags}
+                disabled={cancelling}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {cancelling ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
+                Yes, Cancel Job
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Milestones */}
         {milestones.length === 0 ? (
