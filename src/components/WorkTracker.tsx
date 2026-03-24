@@ -205,6 +205,17 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       completed_at: (action === "complete" || action === "reconfirm") ? new Date().toISOString() : milestone?.completed_at,
     } as any).eq("id", milestoneId);
 
+    // Notify customer when provider marks milestone as complete
+    if ((action === "complete" || action === "reconfirm") && role === "provider") {
+      try {
+        await supabase.functions.invoke("notify-milestone-complete", {
+          body: { job_id: jobId, milestone_id: milestoneId },
+        });
+      } catch (e) {
+        console.error("Milestone notification failed:", e);
+      }
+    }
+
     if (action === "accept" && role === "customer") {
       try {
         const { error } = await supabase.functions.invoke("release-escrow-payment", {
