@@ -575,6 +575,57 @@ export type Database = {
           },
         ]
       }
+      milestone_change_requests: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          milestone_id: string
+          proposed_amount: number | null
+          proposed_title: string
+          requested_by: string
+          resolved_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          milestone_id: string
+          proposed_amount?: number | null
+          proposed_title: string
+          requested_by: string
+          resolved_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          milestone_id?: string
+          proposed_amount?: number | null
+          proposed_title?: string
+          requested_by?: string
+          resolved_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milestone_change_requests_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milestone_change_requests_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "job_milestones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       milestone_comments: {
         Row: {
           action: string
