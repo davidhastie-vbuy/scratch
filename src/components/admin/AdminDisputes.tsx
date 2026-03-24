@@ -20,6 +20,7 @@ const AdminDisputes = () => {
   const [messages, setMessages] = useState<Record<string, any[]>>({});
   const [newMessage, setNewMessage] = useState<Record<string, string>>({});
   const [sending, setSending] = useState<string | null>(null);
+  const [resolving, setResolving] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDisputes();
