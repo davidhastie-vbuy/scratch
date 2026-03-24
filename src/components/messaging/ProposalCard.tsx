@@ -123,6 +123,8 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+          </div>
+        )}
 
         {isAccepted && (
           <div className="space-y-2">
