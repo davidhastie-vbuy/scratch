@@ -224,8 +224,8 @@ const CustomerMessages = () => {
     }
   };
 
-  const markConversationAsRead = async (conversationId: string) => {
-    const unreadMessageIds = messages
+  const markConversationAsRead = async (conversationId: string, conversationMessages: any[] = messages) => {
+    const unreadMessageIds = conversationMessages
       .filter((message: any) => message.sender_user_id !== user!.id && !message.read_at && isUnreadMessageType(message.message_type))
       .map((message: any) => message.id);
 
@@ -264,7 +264,7 @@ const CustomerMessages = () => {
     setMessages(msgs);
     fetchAttachments(msgs.map((m: any) => m.id));
 
-    await markConversationAsRead(conv.id);
+    await markConversationAsRead(conv.id, msgs);
 
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
@@ -301,7 +301,7 @@ const CustomerMessages = () => {
     const msgs = data ?? [];
     setMessages(msgs);
     fetchAttachments(msgs.map((m: any) => m.id));
-    await markConversationAsRead(selected.id);
+    await markConversationAsRead(selected.id, msgs);
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
