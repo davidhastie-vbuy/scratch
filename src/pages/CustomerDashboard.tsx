@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Outlet } from "react-router-dom";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Home, PlusCircle, Briefcase, MessageSquare, HelpCircle, User, Users, Heart } from "lucide-react";
+import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 
 const allNavItems = [
   { label: "Dashboard", path: "/dashboard", icon: <Home className="h-4 w-4" /> },
@@ -36,7 +37,7 @@ const CustomerDashboard = () => {
         .in("conversation_id", convIds)
         .neq("sender_user_id", user.id)
         .is("read_at", null)
-        .eq("message_type", "text");
+        .in("message_type", UNREAD_MESSAGE_TYPES);
       setUnreadMessages(count ?? 0);
     };
     fetchUnread();
