@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, MessageSquareWarning, ChevronDown, ChevronUp, Send } from "lucide-react";
+import { Loader2, MessageSquareWarning, ChevronDown, ChevronUp, Send, UserCheck, UserX } from "lucide-react";
 import { format } from "date-fns";
 
 const AdminDisputes = () => {
@@ -20,6 +20,7 @@ const AdminDisputes = () => {
   const [messages, setMessages] = useState<Record<string, any[]>>({});
   const [newMessage, setNewMessage] = useState<Record<string, string>>({});
   const [sending, setSending] = useState<string | null>(null);
+  const [resolving, setResolving] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDisputes();
@@ -118,7 +119,6 @@ const AdminDisputes = () => {
     const det = details[disputeId];
     const statusLabel = status.replace("_", " ");
 
-    // Use edge function to post status change to conversation, notify, and email both parties
     if (det?.job) {
       await supabase.functions.invoke("notify-dispute-reply", {
         body: {
@@ -132,7 +132,6 @@ const AdminDisputes = () => {
 
     toast({ title: `Dispute marked as ${status}` });
     fetchDisputes();
-    // Refresh details to show updated conversation
     if (det) {
       setDetails((prev) => {
         const copy = { ...prev };
@@ -141,6 +140,92 @@ const AdminDisputes = () => {
       });
       if (dispute) await loadDetails(dispute);
     }
+  };
+
+  const resolveInFavour = async (disputeId: string, favouredParty: "provider" | "customer") => {
+    setResolving(disputeId);
+    const det = details[disputeId];
+    if (!det?.job) { setResolving(null); return; }
+
+    const flaggedMilestones = (det.milestones || []).filter(
+      (m: any) => m.status === "flagged" || m.flag_count > 0
+    );
+
+    if (favouredParty === "provider") {
+      // Mark flagged milestones as accepted (work deemed complete)
+      for (const m of flaggedMilestones) {
+        await supabase.from("job_milestones").update({
+          status: "accepted" as any,
+          flag_count: 0,
+          completed_at: new Date().toISOString(),
+        }).eq("id", m.id);
+      }
+
+      // Check if ALL milestones are now accepted → complete the job
+      const allMilestones = det.milestones || [];
+      const remainingPending = allMilestones.filter(
+        (m: any) => !flaggedMilestones.find((f: any) => f.id === m.id) && m.status !== "accepted"
+      );
+      if (remainingPending.length === 0) {
+        await supabase.from("jobs").update({ status: "completed" as any }).eq("id", det.job.id);
+      }
+
+      const msg = flaggedMilestones.length > 0
+        ? `Dispute resolved in favour of the provider. Milestone(s) "${flaggedMilestones.map((m: any) => m.title).join(", ")}" marked as accepted. The job continues as normal.`
+        : "Dispute resolved in favour of the provider.";
+
+      await notifyResolution(disputeId, det, msg);
+    } else {
+      // Favour customer: reset flagged milestones to pending so provider can redo work
+      for (const m of flaggedMilestones) {
+        await supabase.from("job_milestones").update({
+          status: "pending" as any,
+          flag_count: 0,
+          completed_at: null,
+        }).eq("id", m.id);
+
+        // Add a milestone comment so the history is visible
+        await supabase.from("milestone_comments").insert({
+          milestone_id: m.id,
+          user_id: user!.id,
+          action: "admin_reset",
+          body: "Admin ruled in favour of customer. Provider must redo this milestone.",
+        });
+      }
+
+      const msg = flaggedMilestones.length > 0
+        ? `Dispute resolved in favour of the customer. Milestone(s) "${flaggedMilestones.map((m: any) => m.title).join(", ")}" reset to pending. The provider must redo the work.`
+        : "Dispute resolved in favour of the customer. The provider must redo the work.";
+
+      await notifyResolution(disputeId, det, msg);
+    }
+
+    // Mark dispute as resolved
+    await supabase.from("job_disputes").update({ status: "resolved" as any }).eq("id", disputeId);
+
+    toast({ title: `Dispute resolved in favour of ${favouredParty}` });
+    fetchDisputes();
+
+    // Refresh details
+    const dispute = disputes.find((d) => d.id === disputeId);
+    setDetails((prev) => {
+      const copy = { ...prev };
+      delete copy[disputeId];
+      return copy;
+    });
+    if (dispute) await loadDetails(dispute);
+    setResolving(null);
+  };
+
+  const notifyResolution = async (disputeId: string, det: any, message: string) => {
+    await supabase.functions.invoke("notify-dispute-reply", {
+      body: {
+        dispute_id: disputeId,
+        body: message,
+        conversation_id: det.conversationId || null,
+        job_id: det.job.id,
+      },
+    });
   };
 
   const sendMessage = async (disputeId: string, isAdminOnly: boolean) => {
@@ -248,11 +333,50 @@ const AdminDisputes = () => {
                       <SelectContent>
                         <SelectItem value="open">Open</SelectItem>
                         <SelectItem value="under_review">Under Review</SelectItem>
-                        <SelectItem value="resolved">Resolved</SelectItem>
                         <SelectItem value="closed">Closed</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Resolution buttons - only show for non-resolved disputes */}
+                  {d.status !== "resolved" && d.status !== "closed" && (
+                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
+                      <p className="text-sm font-medium">Resolve Dispute</p>
+                      <p className="text-xs text-muted-foreground">
+                        Choose which party to rule in favour of. This will update the milestone status and notify both parties.
+                      </p>
+                      {det && (() => {
+                        const flaggedMilestones = (det.milestones || []).filter(
+                          (m: any) => m.status === "flagged" || m.flag_count > 0
+                        );
+                        return flaggedMilestones.length > 0 ? (
+                          <p className="text-xs text-muted-foreground">
+                            Affected milestone(s): <span className="font-medium text-foreground">{flaggedMilestones.map((m: any) => m.title).join(", ")}</span>
+                          </p>
+                        ) : null;
+                      })()}
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => resolveInFavour(d.id, "provider")}
+                          disabled={resolving === d.id}
+                        >
+                          {resolving === d.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <UserCheck className="mr-1 h-3 w-3" />}
+                          Favour Provider
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => resolveInFavour(d.id, "customer")}
+                          disabled={resolving === d.id}
+                        >
+                          {resolving === d.id ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <UserX className="mr-1 h-3 w-3" />}
+                          Favour Customer
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
                   {det && (
                     <>
