@@ -197,30 +197,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       completed_at: (action === "complete" || action === "reconfirm") ? new Date().toISOString() : milestone?.completed_at,
     } as any).eq("id", milestoneId);
 
-    // If customer queries (flags) a milestone, send a message in the conversation
-    if (action === "flag" && role === "customer" && comment.trim()) {
-      try {
-        // Find or create conversation for this job
-        const { data: conv } = await supabase
-          .from("conversations")
-          .select("id")
-          .eq("job_id", jobId)
-          .eq("customer_user_id", user!.id)
-          .limit(1)
-          .maybeSingle();
-
-        if (conv) {
-          await supabase.from("messages").insert({
-            conversation_id: conv.id,
-            sender_user_id: user!.id,
-            body: `📋 **Milestone query: "${milestone?.title}"**\n\n${comment}`,
-            message_type: "text",
-          } as any);
-        }
-      } catch (e) {
-        console.error("Failed to send milestone query message:", e);
-      }
-    }
+    // Queries stay in the work tracker only - no messages sent
 
     // If customer accepts a milestone, trigger payment release
     if (action === "accept" && role === "customer") {
