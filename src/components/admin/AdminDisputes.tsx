@@ -37,7 +37,6 @@ const AdminDisputes = () => {
   const loadDetails = async (dispute: any) => {
     if (details[dispute.id]) return;
 
-    // Fetch job, profiles, milestones, messages, conversations all at once
     const [jobRes, msgsRes, milestonesRes, conversationsRes] = await Promise.all([
       supabase.from("jobs").select("*").eq("id", dispute.job_id).single(),
       supabase.from("dispute_messages").select("*").eq("dispute_id", dispute.id).order("created_at"),
@@ -48,8 +47,8 @@ const AdminDisputes = () => {
     const job = jobRes.data;
     let customerProfile = null;
     let providerProfile = null;
-    let raisedByProfile = null;
     let conversationMessages: any[] = [];
+    let conversationId: string | null = null;
 
     if (job) {
       const [cp, pp] = await Promise.all([
@@ -59,7 +58,6 @@ const AdminDisputes = () => {
       customerProfile = cp.data;
       providerProfile = pp.data;
 
-      // Get milestone comments
       const milestoneIds = (milestonesRes.data ?? []).map((m: any) => m.id);
       let milestoneComments: any[] = [];
       if (milestoneIds.length > 0) {
@@ -71,13 +69,18 @@ const AdminDisputes = () => {
         milestoneComments = mc ?? [];
       }
 
-      // Get conversation messages
       if (conversationsRes.data && conversationsRes.data.length > 0) {
-        const convIds = conversationsRes.data.map((c: any) => c.id);
+        // Find the conversation between the assigned provider and customer
+        const mainConv = conversationsRes.data.find(
+          (c: any) => c.provider_user_id === job.provider_id
+        ) || conversationsRes.data[0];
+        conversationId = mainConv.id;
+
+        // Fetch ALL messages from this conversation
         const { data: cm } = await supabase
           .from("messages")
           .select("*")
-          .in("conversation_id", convIds)
+          .eq("conversation_id", mainConv.id)
           .order("created_at");
         conversationMessages = cm ?? [];
       }
@@ -91,6 +94,7 @@ const AdminDisputes = () => {
           milestones: milestonesRes.data ?? [],
           milestoneComments,
           conversationMessages,
+          conversationId,
         },
       }));
     }
@@ -108,29 +112,84 @@ const AdminDisputes = () => {
   };
 
   const updateStatus = async (disputeId: string, status: string) => {
+    const dispute = disputes.find((d) => d.id === disputeId);
     await supabase.from("job_disputes").update({ status } as any).eq("id", disputeId);
+
+    // Post status change to the conversation so both parties see it
+    const det = details[disputeId];
+    if (det?.conversationId && user) {
+      const statusLabel = status.replace("_", " ");
+      await supabase.from("messages").insert({
+        conversation_id: det.conversationId,
+        sender_user_id: user.id,
+        body: `⚖️ Dispute status updated to "${statusLabel}" by admin.`,
+        message_type: "system",
+      });
+    }
+
     toast({ title: `Dispute marked as ${status}` });
     fetchDisputes();
+    // Refresh details to show updated conversation
+    if (det) {
+      setDetails((prev) => {
+        const copy = { ...prev };
+        delete copy[disputeId];
+        return copy;
+      });
+      if (dispute) await loadDetails(dispute);
+    }
   };
 
   const sendMessage = async (disputeId: string, isAdminOnly: boolean) => {
     const body = newMessage[disputeId]?.trim();
     if (!body) return;
     setSending(disputeId);
+
+    // Always save to dispute_messages for the dispute thread
     await supabase.from("dispute_messages").insert({
       dispute_id: disputeId,
       sender_user_id: user!.id,
       body,
       is_admin_only: isAdminOnly,
     } as any);
+
+    // If "Reply to All", also post to the actual conversation so both parties see it
+    if (!isAdminOnly) {
+      const det = details[disputeId];
+      if (det?.conversationId) {
+        await supabase.from("messages").insert({
+          conversation_id: det.conversationId,
+          sender_user_id: user!.id,
+          body: `⚖️ Admin (Dispute): ${body}`,
+          message_type: "system",
+        });
+      }
+    }
+
     setNewMessage((prev) => ({ ...prev, [disputeId]: "" }));
-    // Refresh messages
+
+    // Refresh dispute messages
     const { data } = await supabase
       .from("dispute_messages")
       .select("*")
       .eq("dispute_id", disputeId)
       .order("created_at");
     setMessages((prev) => ({ ...prev, [disputeId]: data ?? [] }));
+
+    // Refresh conversation messages in details
+    const det = details[disputeId];
+    if (det?.conversationId) {
+      const { data: cm } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", det.conversationId)
+        .order("created_at");
+      setDetails((prev) => ({
+        ...prev,
+        [disputeId]: { ...prev[disputeId], conversationMessages: cm ?? [] },
+      }));
+    }
+
     setSending(null);
   };
 
@@ -234,26 +293,44 @@ const AdminDisputes = () => {
                         </div>
                       )}
 
-                      {/* Conversation messages */}
+                      {/* Full conversation messages between customer and provider */}
                       {det.conversationMessages.length > 0 && (
                         <div className="rounded-lg border p-3 text-sm space-y-1">
-                          <p className="font-medium">Chat History ({det.conversationMessages.length} messages)</p>
-                          <div className="max-h-40 overflow-y-auto space-y-1">
-                            {det.conversationMessages.map((msg: any) => (
-                              <div key={msg.id} className="text-xs border-l-2 border-muted pl-2">
-                                <span className="text-muted-foreground">
-                                  {msg.sender_user_id === det.job.customer_user_id ? "Customer" : "Provider"} · {format(new Date(msg.created_at), "d MMM, h:mm a")}
-                                </span>
-                                <p>{msg.body}</p>
-                              </div>
-                            ))}
+                          <p className="font-medium">Full Chat History ({det.conversationMessages.length} messages)</p>
+                          <div className="max-h-60 overflow-y-auto space-y-1">
+                            {det.conversationMessages.map((msg: any) => {
+                              const isCustomer = msg.sender_user_id === det.job.customer_user_id;
+                              const isProvider = msg.sender_user_id === det.job.provider_id;
+                              const senderLabel = isCustomer
+                                ? "Customer"
+                                : isProvider
+                                ? "Provider"
+                                : "Admin";
+                              const borderColor = isCustomer
+                                ? "border-blue-400"
+                                : isProvider
+                                ? "border-green-400"
+                                : "border-yellow-400";
+
+                              return (
+                                <div key={msg.id} className={`text-xs border-l-2 ${borderColor} pl-2`}>
+                                  <span className="text-muted-foreground">
+                                    <span className="font-medium">{senderLabel}</span> · {format(new Date(msg.created_at), "d MMM, h:mm a")}
+                                    {msg.message_type !== "text" && (
+                                      <Badge variant="outline" className="text-[10px] ml-1">{msg.message_type}</Badge>
+                                    )}
+                                  </span>
+                                  <p>{msg.body}</p>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
                     </>
                   )}
 
-                  {/* Dispute messages */}
+                  {/* Dispute messages (internal thread) */}
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Dispute Messages</p>
                     {dMsgs.length > 0 && (
