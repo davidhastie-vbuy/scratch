@@ -617,6 +617,41 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
           </div>
         )}
 
+        {/* Escalate to admin - available to both parties as soon as any milestone is queried */}
+        {hasFlaggedMilestone && !canProviderCancel && (
+          <div className="rounded-lg border border-orange-300 bg-orange-50 dark:border-orange-700 dark:bg-orange-950/30 p-3 space-y-3">
+            <div className="flex items-start gap-2">
+              <ShieldAlert className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium">A milestone query is unresolved</p>
+                <p className="text-xs text-muted-foreground">If you're unable to resolve this between yourselves, you can escalate to an admin for review.</p>
+              </div>
+            </div>
+            <div className="pl-6">
+              <Button size="sm" variant="outline" onClick={() => setShowEscalate(!showEscalate)}>
+                <ShieldAlert className="mr-1 h-3 w-3" /> Escalate to Admin
+              </Button>
+            </div>
+            {showEscalate && (
+              <div className="pl-6 space-y-2">
+                <Textarea
+                  value={escalateReason}
+                  onChange={(e) => setEscalateReason(e.target.value)}
+                  placeholder="Explain the situation for the admin to review…"
+                  rows={3}
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={escalateToAdmin} disabled={escalating}>
+                    {escalating ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
+                    Submit Escalation
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setShowEscalate(false)}>Cancel</Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {canProviderCancel && (
           <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 space-y-3">
             <div className="flex items-start gap-2">
