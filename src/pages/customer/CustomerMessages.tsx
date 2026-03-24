@@ -12,6 +12,7 @@ import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import QuoteBanner from "@/components/messaging/QuoteBanner";
 import { AttachmentButton, StagedFilePreview, MessageAttachments, uploadAttachments, type StagedFile } from "@/components/messaging/ChatAttachments";
 import { cn } from "@/lib/utils";
+import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 
 const sendProviderActionEmail = async (
   providerUserId: string,
@@ -157,7 +158,7 @@ const CustomerMessages = () => {
           .eq("conversation_id", c.id)
           .neq("sender_user_id", user!.id)
           .is("read_at", null)
-          .eq("message_type", "text");
+          .in("message_type", UNREAD_MESSAGE_TYPES);
 
         const { data: lastMsg } = await supabase
           .from("messages")
@@ -230,7 +231,7 @@ const CustomerMessages = () => {
       .eq("conversation_id", conversationId)
       .neq("sender_user_id", user!.id)
       .is("read_at", null)
-      .eq("message_type", "text");
+      .in("message_type", UNREAD_MESSAGE_TYPES);
 
     setConversations(prev =>
       prev.map(c => c.id === conversationId ? { ...c, unreadCount: 0 } : c)

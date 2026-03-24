@@ -1,0 +1,1 @@
+export const UNREAD_MESSAGE_TYPES = ["text", "proposal"] as const;

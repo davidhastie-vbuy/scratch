@@ -5,6 +5,7 @@ import { Outlet, useLocation, Navigate } from "react-router-dom";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { Home, Briefcase, FileText, MessageSquare, HelpCircle, User, Clock, Wrench, AlertTriangle, XCircle, ImageIcon, CalendarDays, Wallet, ClipboardList } from "lucide-react";
+import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 
 const STATUS_CONFIG: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: typeof Clock }> = {
   pending: { label: "Pending Approval", variant: "secondary", icon: Clock },
@@ -62,7 +63,7 @@ const ProviderDashboard = () => {
           .in("conversation_id", convIds)
           .neq("sender_user_id", user.id)
           .is("read_at", null)
-          .eq("message_type", "text");
+          .in("message_type", UNREAD_MESSAGE_TYPES);
         setUnreadMessages(count ?? 0);
       };
       fetchUnread();
