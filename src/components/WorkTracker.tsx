@@ -540,17 +540,66 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
           </div>
         )}
 
-        {/* Provider cancel option */}
         {canProviderCancel && (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
-            <div className="space-y-1">
-              <p className="text-sm font-medium">A milestone has been flagged 5 times.</p>
-              <p className="text-xs text-muted-foreground">You may cancel this job if the issues cannot be resolved.</p>
-              <Button size="sm" variant="destructive" onClick={cancelJobDueToFlags}>Cancel Job</Button>
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 space-y-3">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium">A milestone has been flagged 5 or more times without resolution.</p>
+                <p className="text-xs text-muted-foreground">You can cancel the job or escalate to an admin for review.</p>
+              </div>
             </div>
+            <div className="flex gap-2 pl-6">
+              <Button size="sm" variant="destructive" onClick={() => setShowCancelConfirm(true)}>
+                <X className="mr-1 h-3 w-3" /> Cancel Job
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setShowEscalate(!showEscalate)}>
+                <ShieldAlert className="mr-1 h-3 w-3" /> Escalate to Admin
+              </Button>
+            </div>
+            {showEscalate && (
+              <div className="pl-6 space-y-2">
+                <Textarea
+                  value={escalateReason}
+                  onChange={(e) => setEscalateReason(e.target.value)}
+                  placeholder="Explain the situation for the admin to review…"
+                  rows={3}
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={escalateToAdmin} disabled={escalating}>
+                    {escalating ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
+                    Submit Escalation
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setShowEscalate(false)}>Cancel</Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
+
+        {/* Cancel confirmation dialog */}
+        <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cancel this job?</AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2">
+                <p>By cancelling this job, <strong>you will not receive any payment</strong> for outstanding milestones. All funds held in escrow will be returned to the customer.</p>
+                <p>This action cannot be undone.</p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={cancelling}>Go Back</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={cancelJobDueToFlags}
+                disabled={cancelling}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {cancelling ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
+                Yes, Cancel Job
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Milestones */}
         {milestones.length === 0 ? (
