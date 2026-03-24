@@ -79,7 +79,7 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
 
         {showActions && (
           <div className="space-y-2 pt-1">
-            <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
               <Button size="sm" onClick={onAccept} disabled={accepting || actionsLocked} className="flex-1">
                 <Check className="mr-1 h-3.5 w-3.5" /> Accept
               </Button>
@@ -88,8 +88,8 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
                   <RefreshCw className="mr-1 h-3.5 w-3.5" /> Counter
                 </Button>
               )}
-              <Button size="sm" variant="outline" onClick={onDecline} disabled={accepting || actionsLocked} className="flex-1">
-                <X className="mr-1 h-3.5 w-3.5" /> Decline
+              <Button size="sm" variant="ghost" onClick={() => setShowDeclineConfirm(true)} disabled={accepting || actionsLocked} className="px-2 text-xs text-muted-foreground hover:text-destructive">
+                <X className="mr-1 h-3 w-3" /> Decline
               </Button>
             </div>
             {actionsLocked && (
@@ -97,8 +97,32 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
                 Actions are locked because the job has already been accepted in principle.
               </p>
             )}
-          </div>
-        )}
+
+            <AlertDialog open={showDeclineConfirm} onOpenChange={setShowDeclineConfirm}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-destructive" />
+                    Decline this proposal?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action is final. Once you decline this proposal you will no longer be able to accept or counter it. Are you sure you want to proceed?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Go Back</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => {
+                      setShowDeclineConfirm(false);
+                      onDecline?.();
+                    }}
+                  >
+                    Yes, Decline Proposal
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
         {isAccepted && (
           <div className="space-y-2">
