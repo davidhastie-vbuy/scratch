@@ -119,7 +119,6 @@ const AdminDisputes = () => {
     const det = details[disputeId];
     const statusLabel = status.replace("_", " ");
 
-    // Use edge function to post status change to conversation, notify, and email both parties
     if (det?.job) {
       await supabase.functions.invoke("notify-dispute-reply", {
         body: {
@@ -133,7 +132,6 @@ const AdminDisputes = () => {
 
     toast({ title: `Dispute marked as ${status}` });
     fetchDisputes();
-    // Refresh details to show updated conversation
     if (det) {
       setDetails((prev) => {
         const copy = { ...prev };
@@ -142,6 +140,92 @@ const AdminDisputes = () => {
       });
       if (dispute) await loadDetails(dispute);
     }
+  };
+
+  const resolveInFavour = async (disputeId: string, favouredParty: "provider" | "customer") => {
+    setResolving(disputeId);
+    const det = details[disputeId];
+    if (!det?.job) { setResolving(null); return; }
+
+    const flaggedMilestones = (det.milestones || []).filter(
+      (m: any) => m.status === "flagged" || m.flag_count > 0
+    );
+
+    if (favouredParty === "provider") {
+      // Mark flagged milestones as accepted (work deemed complete)
+      for (const m of flaggedMilestones) {
+        await supabase.from("job_milestones").update({
+          status: "accepted" as any,
+          flag_count: 0,
+          completed_at: new Date().toISOString(),
+        }).eq("id", m.id);
+      }
+
+      // Check if ALL milestones are now accepted → complete the job
+      const allMilestones = det.milestones || [];
+      const remainingPending = allMilestones.filter(
+        (m: any) => !flaggedMilestones.find((f: any) => f.id === m.id) && m.status !== "accepted"
+      );
+      if (remainingPending.length === 0) {
+        await supabase.from("jobs").update({ status: "completed" as any }).eq("id", det.job.id);
+      }
+
+      const msg = flaggedMilestones.length > 0
+        ? `Dispute resolved in favour of the provider. Milestone(s) "${flaggedMilestones.map((m: any) => m.title).join(", ")}" marked as accepted. The job continues as normal.`
+        : "Dispute resolved in favour of the provider.";
+
+      await notifyResolution(disputeId, det, msg);
+    } else {
+      // Favour customer: reset flagged milestones to pending so provider can redo work
+      for (const m of flaggedMilestones) {
+        await supabase.from("job_milestones").update({
+          status: "pending" as any,
+          flag_count: 0,
+          completed_at: null,
+        }).eq("id", m.id);
+
+        // Add a milestone comment so the history is visible
+        await supabase.from("milestone_comments").insert({
+          milestone_id: m.id,
+          user_id: user!.id,
+          action: "admin_reset",
+          body: "Admin ruled in favour of customer. Provider must redo this milestone.",
+        });
+      }
+
+      const msg = flaggedMilestones.length > 0
+        ? `Dispute resolved in favour of the customer. Milestone(s) "${flaggedMilestones.map((m: any) => m.title).join(", ")}" reset to pending. The provider must redo the work.`
+        : "Dispute resolved in favour of the customer. The provider must redo the work.";
+
+      await notifyResolution(disputeId, det, msg);
+    }
+
+    // Mark dispute as resolved
+    await supabase.from("job_disputes").update({ status: "resolved" as any }).eq("id", disputeId);
+
+    toast({ title: `Dispute resolved in favour of ${favouredParty}` });
+    fetchDisputes();
+
+    // Refresh details
+    const dispute = disputes.find((d) => d.id === disputeId);
+    setDetails((prev) => {
+      const copy = { ...prev };
+      delete copy[disputeId];
+      return copy;
+    });
+    if (dispute) await loadDetails(dispute);
+    setResolving(null);
+  };
+
+  const notifyResolution = async (disputeId: string, det: any, message: string) => {
+    await supabase.functions.invoke("notify-dispute-reply", {
+      body: {
+        dispute_id: disputeId,
+        body: message,
+        conversation_id: det.conversationId || null,
+        job_id: det.job.id,
+      },
+    });
   };
 
   const sendMessage = async (disputeId: string, isAdminOnly: boolean) => {
