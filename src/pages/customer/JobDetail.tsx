@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { transformAcceptedMessageForCustomer } from "@/lib/message-transform";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -832,7 +833,7 @@ const JobDetail = () => {
                     return (
                       <div key={m.id} className="flex justify-center">
                         <div className="bg-muted/50 rounded-lg px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
-                          {m.body}
+                          {transformAcceptedMessageForCustomer(m.body)}
                         </div>
                       </div>
                     );

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from "react";
+import { transformAcceptedMessageForCustomer } from "@/lib/message-transform";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -621,7 +622,7 @@ const CustomerMessages = () => {
                   return (
                     <div key={m.id} className="flex justify-center">
                       <div className="bg-muted/50 rounded-lg px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
-                        {m.body}
+                        {transformAcceptedMessageForCustomer(m.body)}
                       </div>
                     </div>
                   );
