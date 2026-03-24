@@ -1337,6 +1337,17 @@ export type Database = {
         Args: { _job_id: string }
         Returns: boolean
       }
+      is_valid_message_update: {
+        Args: {
+          _body: string
+          _conversation_id: string
+          _created_at: string
+          _id: string
+          _message_type: string
+          _sender_user_id: string
+        }
+        Returns: boolean
+      }
       provider_has_declined_quote: {
         Args: { _job_id: string; _user_id: string }
         Returns: boolean
