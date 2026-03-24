@@ -12,7 +12,7 @@ import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import QuoteBanner from "@/components/messaging/QuoteBanner";
 import { AttachmentButton, StagedFilePreview, MessageAttachments, uploadAttachments, type StagedFile } from "@/components/messaging/ChatAttachments";
 import { cn } from "@/lib/utils";
-import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
+import { dispatchMessageUnreadUpdated, isUnreadMessageType, UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 
 const sendProviderActionEmail = async (
   providerUserId: string,
@@ -224,18 +224,32 @@ const CustomerMessages = () => {
     }
   };
 
-  const markConversationAsRead = async (conversationId: string) => {
-    await supabase
-      .from("messages")
-      .update({ read_at: new Date().toISOString() } as any)
-      .eq("conversation_id", conversationId)
-      .neq("sender_user_id", user!.id)
-      .is("read_at", null)
-      .in("message_type", UNREAD_MESSAGE_TYPES);
+  const markConversationAsRead = async (conversationId: string, conversationMessages: any[] = messages) => {
+    const unreadMessageIds = conversationMessages
+      .filter((message: any) => message.sender_user_id !== user!.id && !message.read_at && isUnreadMessageType(message.message_type))
+      .map((message: any) => message.id);
 
-    setConversations(prev =>
-      prev.map(c => c.id === conversationId ? { ...c, unreadCount: 0 } : c)
+    if (unreadMessageIds.length === 0) return;
+
+    const readAt = new Date().toISOString();
+    const unreadIdSet = new Set(unreadMessageIds);
+    const { error } = await supabase
+      .from("messages")
+      .update({ read_at: readAt } as any)
+      .in("id", unreadMessageIds);
+
+    if (error) {
+      console.error("Failed to mark conversation as read:", error);
+      return;
+    }
+
+    setMessages(prev =>
+      prev.map((message: any) => unreadIdSet.has(message.id) ? { ...message, read_at: readAt } : message)
     );
+    setConversations(prev =>
+      prev.map(c => c.id === conversationId ? { ...c, unreadCount: Math.max(0, c.unreadCount - unreadMessageIds.length) } : c)
+    );
+    dispatchMessageUnreadUpdated();
   };
 
   const openConversation = async (conv: ConversationWithUnread) => {
@@ -250,7 +264,7 @@ const CustomerMessages = () => {
     setMessages(msgs);
     fetchAttachments(msgs.map((m: any) => m.id));
 
-    await markConversationAsRead(conv.id);
+    await markConversationAsRead(conv.id, msgs);
 
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
@@ -287,7 +301,7 @@ const CustomerMessages = () => {
     const msgs = data ?? [];
     setMessages(msgs);
     fetchAttachments(msgs.map((m: any) => m.id));
-    await markConversationAsRead(selected.id);
+    await markConversationAsRead(selected.id, msgs);
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
