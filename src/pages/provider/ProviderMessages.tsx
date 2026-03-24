@@ -128,7 +128,8 @@ const ProviderMessages = () => {
           .select("id", { count: "exact", head: true })
           .eq("conversation_id", c.id)
           .neq("sender_user_id", user!.id)
-          .is("read_at", null);
+          .is("read_at", null)
+          .eq("message_type", "text");
 
         const { data: lastMsg } = await supabase
           .from("messages")
@@ -176,6 +177,20 @@ const ProviderMessages = () => {
     }
   };
 
+  const markConversationAsRead = async (conversationId: string) => {
+    await supabase
+      .from("messages")
+      .update({ read_at: new Date().toISOString() } as any)
+      .eq("conversation_id", conversationId)
+      .neq("sender_user_id", user!.id)
+      .is("read_at", null)
+      .eq("message_type", "text");
+
+    setConversations(prev =>
+      prev.map(c => c.id === conversationId ? { ...c, unreadCount: 0 } : c)
+    );
+  };
+
   const openConversation = async (conv: ConversationWithUnread) => {
     setSelected(conv);
     setStagedFiles([]);
@@ -188,16 +203,7 @@ const ProviderMessages = () => {
     setMessages(msgs);
     fetchAttachments(msgs.map((m: any) => m.id));
 
-    await supabase
-      .from("messages")
-      .update({ read_at: new Date().toISOString() } as any)
-      .eq("conversation_id", conv.id)
-      .neq("sender_user_id", user!.id)
-      .is("read_at", null);
-
-    setConversations(prev =>
-      prev.map(c => c.id === conv.id ? { ...c, unreadCount: 0 } : c)
-    );
+    await markConversationAsRead(conv.id);
 
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
@@ -234,6 +240,7 @@ const ProviderMessages = () => {
     const msgs = data ?? [];
     setMessages(msgs);
     fetchAttachments(msgs.map((m: any) => m.id));
+    await markConversationAsRead(selected.id);
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
