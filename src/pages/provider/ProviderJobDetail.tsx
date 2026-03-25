@@ -200,14 +200,14 @@ const ProviderJobDetail = () => {
     setCancellingJob(false);
   };
 
+  const isActiveJob = !!job && ["accepted", "in_progress"].includes(job.status);
+  const { actions: jobActionsMap } = useJobActions(isActiveJob && job ? [job.id] : [], "provider", user?.id);
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!job) return <p className="text-muted-foreground">Job not found.</p>;
 
   const catName = categories.find(c => c.slug === job.category)?.name ?? job.category;
   const quotesMaxed = job.quote_count >= 3;
-
-  const isActiveJob = ["accepted", "in_progress"].includes(job.status);
-  const { actions: jobActionsMap } = useJobActions(isActiveJob ? [job.id] : [], "provider", user?.id);
   const jobActions = jobActionsMap[job.id] ?? [];
 
   // If this provider's quote was declined and job is awarded, show restricted view

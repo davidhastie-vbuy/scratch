@@ -498,15 +498,15 @@ const JobDetail = () => {
     return () => { supabase.removeChannel(channel); };
   }, [chatConvId]);
 
+  const isActiveJob = !!job && ["accepted", "in_progress"].includes(job.status);
+  const { actions: jobActionsMap } = useJobActions(isActiveJob && job ? [job.id] : [], "customer", user?.id);
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!job) return <p className="text-muted-foreground">Job not found.</p>;
 
   const catName = categories.find(c => c.slug === job.category)?.name ?? job.category;
   const totalHeld = escrowPayments.filter(p => p.status === "held").reduce((s, p) => s + Number(p.amount), 0);
   const totalPending = escrowPayments.filter(p => p.status === "pending").reduce((s, p) => s + Number(p.amount), 0);
-
-  const isActiveJob = ["accepted", "in_progress"].includes(job.status);
-  const { actions: jobActionsMap } = useJobActions(isActiveJob ? [job.id] : [], "customer", user?.id);
   const jobActions = jobActionsMap[job.id] ?? [];
 
   return (
