@@ -178,8 +178,8 @@ const CustomerMessages = () => {
     );
 
     enriched.sort((a, b) => {
-      const aTime = a.lastMessageAt ?? a.created_at ?? "";
-      const bTime = b.lastMessageAt ?? b.created_at ?? "";
+      const aTime = a.lastMessageAt ?? "";
+      const bTime = b.lastMessageAt ?? "";
       return bTime.localeCompare(aTime);
     });
     setConversations(enriched);
