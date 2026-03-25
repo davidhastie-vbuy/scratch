@@ -229,6 +229,17 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       } catch (e) {
         console.error("Payment release failed:", e);
       }
+
+      // Check if ALL milestones are now accepted → mark job as completed
+      const updatedMilestones = milestones.map((m) =>
+        m.id === milestoneId ? { ...m, status: "accepted" } : m
+      );
+      const allAccepted = updatedMilestones.length > 0 && updatedMilestones.every((m) => m.status === "accepted");
+      if (allAccepted) {
+        await supabase.from("jobs").update({ status: "completed" } as any).eq("id", jobId);
+        toast({ title: "Job completed! 🎉", description: "All milestones have been accepted. You can now leave a review." });
+        onRefresh?.();
+      }
     }
 
     setActionComment((prev) => ({ ...prev, [milestoneId]: "" }));
