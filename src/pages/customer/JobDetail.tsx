@@ -286,6 +286,9 @@ const JobDetail = () => {
           message_type: "cancellation_request",
           metadata: { status: "pending", requested_by: user!.id },
         } as any);
+
+        // Add notification for provider (notification insert blocked by RLS, handled via email + message)
+
         // Email provider about cancellation request
         try {
           const { data: providerProfile } = await supabase.from("profiles").select("email, first_name").eq("id", job.provider_id).single();
