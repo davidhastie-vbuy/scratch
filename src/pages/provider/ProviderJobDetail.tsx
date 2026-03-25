@@ -21,6 +21,7 @@ import MediaLightbox from "@/components/MediaLightbox";
 
 import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import ReviewDialog from "@/components/reviews/ReviewDialog";
+import CancellationRequestBanner from "@/components/CancellationRequestBanner";
 import { format } from "date-fns";
 
 const ProviderJobDetail = () => {
@@ -254,6 +255,10 @@ const ProviderJobDetail = () => {
       <Button variant="ghost" size="sm" onClick={() => navigate("/provider/jobs")}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Jobs
       </Button>
+
+      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && hasConfirmedPayment && (
+        <CancellationRequestBanner jobId={jobId!} role="provider" onResolved={fetchAll} />
+      )}
 
       {jobActions.length > 0 && (
         <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
