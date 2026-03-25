@@ -139,6 +139,32 @@ serve(async (req) => {
           .eq("id", bulkPayment.id);
       }
 
+      // Check if all milestones are accepted → auto-complete job (bulk path)
+      const { data: allMs } = await supabaseAdmin
+        .from("job_milestones")
+        .select("id, status")
+        .eq("job_id", job_id);
+      const allDone = allMs && allMs.length > 0 && allMs.every((m: any) => m.status === "accepted");
+      if (allDone && job.status !== "completed") {
+        await supabaseAdmin.from("jobs").update({ status: "completed" }).eq("id", job_id);
+        await supabaseAdmin.from("notifications").insert([
+          {
+            user_id: job.customer_user_id,
+            type: "job_completed",
+            title: "Job completed",
+            body: `"${job.title}" is now complete. Leave a review!`,
+            link: `/dashboard/jobs/${job_id}`,
+          },
+          {
+            user_id: job.provider_id!,
+            type: "job_completed",
+            title: "Job completed",
+            body: `"${job.title}" is now complete. Leave a review!`,
+            link: `/provider/jobs/${job_id}`,
+          },
+        ]);
+      }
+
       return new Response(JSON.stringify({ released: true, provider_payout: providerPayout, platform_fee: platformFee }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -166,6 +192,34 @@ serve(async (req) => {
       body: `£${providerPayout.toFixed(2)} has been released for "${job.title}"`,
       link: `/provider/jobs/${job_id}`,
     });
+
+    // Check if all milestones are accepted → auto-complete job
+    const { data: allMilestones } = await supabaseAdmin
+      .from("job_milestones")
+      .select("id, status")
+      .eq("job_id", job_id);
+    const allAccepted = allMilestones && allMilestones.length > 0 && allMilestones.every((m: any) => m.status === "accepted");
+    if (allAccepted && job.status !== "completed") {
+      await supabaseAdmin.from("jobs").update({ status: "completed" }).eq("id", job_id);
+
+      // Notify both parties
+      await supabaseAdmin.from("notifications").insert([
+        {
+          user_id: job.customer_user_id,
+          type: "job_completed",
+          title: "Job completed",
+          body: `"${job.title}" is now complete. Leave a review!`,
+          link: `/dashboard/jobs/${job_id}`,
+        },
+        {
+          user_id: job.provider_id!,
+          type: "job_completed",
+          title: "Job completed",
+          body: `"${job.title}" is now complete. Leave a review!`,
+          link: `/provider/jobs/${job_id}`,
+        },
+      ]);
+    }
 
     return new Response(JSON.stringify({ released: true, provider_payout: providerPayout, platform_fee: platformFee }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
