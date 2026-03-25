@@ -572,22 +572,20 @@ const ProviderMessages = () => {
                     </div>
                   );
                 }
-                if ((m as any).message_type === "system") {
-                  const isAdminDispute = typeof m.body === "string" && m.body.startsWith("⚖️");
-                  if (isAdminDispute) {
-                    return (
-                      <div key={m.id} className="flex justify-center">
-                        <div className="max-w-[80%] rounded-lg px-4 py-3 text-sm bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 break-words overflow-hidden">
-                          <p className="font-semibold text-xs text-blue-600 dark:text-blue-400 mb-1">Admin – Dispute Update</p>
-                          <p>{m.body.replace(/^⚖️\s*Admin\s*\(Dispute\):\s*/, "")}</p>
-                          <p className="text-[10px] mt-1 text-blue-500 dark:text-blue-400">
-                            {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  }
+                if ((m as any).message_type === "admin" || ((m as any).message_type === "system" && typeof m.body === "string" && m.body.startsWith("⚖️"))) {
                   return (
+                    <div key={m.id} className="flex justify-center">
+                      <div className="max-w-[80%] rounded-lg px-4 py-3 text-sm bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 break-words overflow-hidden">
+                        <p className="font-semibold text-xs text-blue-600 dark:text-blue-400 mb-1">Admin – Dispute Update</p>
+                        <p>{m.body.replace(/^⚖️\s*Admin\s*\(Dispute\):\s*/, "")}</p>
+                        <p className="text-[10px] mt-1 text-blue-500 dark:text-blue-400">
+                          {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }
+                if ((m as any).message_type === "system") {
                     <div key={m.id} className="flex justify-center">
                       <div className="bg-muted/50 rounded-lg px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
                         {m.body}
