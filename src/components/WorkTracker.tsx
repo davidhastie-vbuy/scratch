@@ -199,11 +199,18 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       flagCount += 1;
     }
 
-    await supabase.from("job_milestones").update({
+    const { error: updateError } = await supabase.from("job_milestones").update({
       status: newStatus,
       flag_count: flagCount,
       completed_at: (action === "complete" || action === "reconfirm") ? new Date().toISOString() : milestone?.completed_at,
     } as any).eq("id", milestoneId);
+
+    if (updateError) {
+      toast({ title: "Failed to update milestone", description: updateError.message, variant: "destructive" });
+      setActing(null);
+      await fetchMilestones();
+      return;
+    }
 
     // Notify customer when provider marks milestone as complete
     if ((action === "complete" || action === "reconfirm") && role === "provider") {
@@ -243,7 +250,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
     }
 
     setActionComment((prev) => ({ ...prev, [milestoneId]: "" }));
-    fetchMilestones();
+    await fetchMilestones();
     setActing(null);
   };
 
