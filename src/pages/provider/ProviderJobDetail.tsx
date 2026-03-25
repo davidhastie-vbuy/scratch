@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, MessageSquare, Star, XCircle } from "lucide-react";
+import { Loader2, ArrowLeft, Send, AlertTriangle, CalendarDays, MessageSquare, Star, XCircle, AlertCircle } from "lucide-react";
+import { useJobActions } from "@/hooks/use-job-actions";
 import ProviderScheduleForm from "@/components/ProviderScheduleForm";
 import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
@@ -199,11 +200,15 @@ const ProviderJobDetail = () => {
     setCancellingJob(false);
   };
 
+  const isActiveJob = !!job && ["accepted", "in_progress"].includes(job.status);
+  const { actions: jobActionsMap } = useJobActions(isActiveJob && job ? [job.id] : [], "provider", user?.id);
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!job) return <p className="text-muted-foreground">Job not found.</p>;
 
   const catName = categories.find(c => c.slug === job.category)?.name ?? job.category;
   const quotesMaxed = job.quote_count >= 3;
+  const jobActions = jobActionsMap[job.id] ?? [];
 
   // If this provider's quote was declined and job is awarded, show restricted view
   const isDeclined = existingQuote?.status === "declined";
@@ -244,6 +249,18 @@ const ProviderJobDetail = () => {
       <Button variant="ghost" size="sm" onClick={() => navigate("/provider/jobs")}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Jobs
       </Button>
+
+      {jobActions.length > 0 && (
+        <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+          <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-sm text-destructive">Action Required</p>
+            {jobActions.map((a, i) => (
+              <p key={i} className="text-sm text-muted-foreground mt-0.5">• {a.label}</p>
+            ))}
+          </div>
+        </div>
+      )}
 
       <Card>
         <CardHeader>

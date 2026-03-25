@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
+import { useJobActions } from "@/hooks/use-job-actions";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Briefcase } from "lucide-react";
+import { Loader2, Briefcase, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const STATUS_LABELS: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -39,11 +40,19 @@ const MyJobs = () => {
     setLoading(false);
   };
 
+  const activeJobIds = jobs
+    .filter(j => ["accepted", "in_progress"].includes(j.status))
+    .map(j => j.id);
+
+  const { actions } = useJobActions(activeJobIds, "customer", user?.id);
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   const openJobs = jobs.filter(j => ["open", "quoted", "quotes_closed"].includes(j.status));
   const inProgressJobs = jobs.filter(j => ["accepted", "in_progress"].includes(j.status));
   const pastJobs = jobs.filter(j => ["completed", "cancelled"].includes(j.status));
+
+  const actionCount = inProgressJobs.filter(j => (actions[j.id]?.length ?? 0) > 0).length;
 
   const renderJobList = (list: any[], emptyMsg: string) => {
     if (list.length === 0) {
@@ -59,12 +68,21 @@ const MyJobs = () => {
       <div className="grid gap-4">
         {list.map((job) => {
           const st = STATUS_LABELS[job.status] ?? { label: job.status, variant: "secondary" as const };
+          const jobActions = actions[job.id] ?? [];
           return (
             <Card key={job.id} className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate(`/dashboard/jobs/${job.id}`)}>
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <CardTitle className="text-base">{job.title}</CardTitle>
-                  <Badge variant={st.variant}>{st.label}</Badge>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {jobActions.length > 0 && (
+                      <Badge variant="destructive" className="gap-1 text-xs">
+                        <AlertCircle className="h-3 w-3" />
+                        Action Required
+                      </Badge>
+                    )}
+                    <Badge variant={st.variant}>{st.label}</Badge>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -76,6 +94,15 @@ const MyJobs = () => {
                   <span>•</span>
                   <span>{job.quote_count}/3 quotes</span>
                 </div>
+                {jobActions.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {jobActions.map((a, i) => (
+                      <span key={i} className="text-xs font-medium text-destructive">
+                        • {a.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground mt-2">Posted {new Date(job.created_at).toLocaleDateString()}</p>
               </CardContent>
             </Card>
@@ -104,6 +131,11 @@ const MyJobs = () => {
             {inProgressJobs.length > 0 && (
               <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
                 {inProgressJobs.length}
+              </Badge>
+            )}
+            {actionCount > 0 && (
+              <Badge variant="destructive" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                {actionCount}
               </Badge>
             )}
           </TabsTrigger>

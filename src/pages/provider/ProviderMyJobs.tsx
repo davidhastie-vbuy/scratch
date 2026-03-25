@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useJobActions } from "@/hooks/use-job-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ClipboardList, MessageSquare, MapPin, Calendar, User } from "lucide-react";
+import { Loader2, ClipboardList, MessageSquare, MapPin, Calendar, User, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface JobRow {
@@ -47,7 +48,6 @@ const ProviderMyJobs = () => {
   }, [user]);
 
   const fetchJobs = async () => {
-    // Jobs where this provider was awarded (provider_id = user)
     const { data } = await supabase
       .from("jobs")
       .select("id, title, category, postcode_district, status, scheduled_start, scheduled_end, agreed_price, created_at, updated_at, customer_user_id")
@@ -61,7 +61,6 @@ const ProviderMyJobs = () => {
       return;
     }
 
-    // Fetch customer names
     const customerIds = [...new Set(data.map(j => j.customer_user_id))];
     const { data: profiles } = await supabase
       .from("profiles")
@@ -81,8 +80,13 @@ const ProviderMyJobs = () => {
     setLoading(false);
   };
 
+  const activeJobIds = jobs
+    .filter(j => ["accepted", "in_progress"].includes(j.status))
+    .map(j => j.id);
+
+  const { actions } = useJobActions(activeJobIds, "provider", user?.id);
+
   const handleMessage = async (job: JobRow) => {
-    // Find or create conversation, then navigate to messages
     const { data: existing } = await supabase
       .from("conversations")
       .select("id")
@@ -109,10 +113,13 @@ const ProviderMyJobs = () => {
     }
   };
 
-  // Categorise jobs
   const upcoming = jobs.filter(j => j.status === "accepted");
   const current = jobs.filter(j => j.status === "in_progress");
   const past = jobs.filter(j => j.status === "completed" || j.status === "cancelled");
+
+  const upcomingActionCount = upcoming.filter(j => (actions[j.id]?.length ?? 0) > 0).length;
+  const currentActionCount = current.filter(j => (actions[j.id]?.length ?? 0) > 0).length;
+  const totalActionCount = upcomingActionCount + currentActionCount;
 
   if (loading) {
     return (
@@ -136,6 +143,7 @@ const ProviderMyJobs = () => {
       <div className="grid gap-4">
         {list.map(job => {
           const st = STATUS_MAP[job.status] ?? { label: job.status, variant: "secondary" as const };
+          const jobActions = actions[job.id] ?? [];
           return (
             <Card key={job.id} className="hover:bg-accent/30 transition-colors">
               <CardHeader className="pb-2">
@@ -146,7 +154,15 @@ const ProviderMyJobs = () => {
                   >
                     {job.title}
                   </CardTitle>
-                  <Badge variant={st.variant}>{st.label}</Badge>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {jobActions.length > 0 && (
+                      <Badge variant="destructive" className="gap-1 text-xs">
+                        <AlertCircle className="h-3 w-3" />
+                        Action Required
+                      </Badge>
+                    )}
+                    <Badge variant={st.variant}>{st.label}</Badge>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -171,6 +187,15 @@ const ProviderMyJobs = () => {
                     </span>
                   )}
                 </div>
+                {jobActions.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {jobActions.map((a, i) => (
+                      <span key={i} className="text-xs font-medium text-destructive">
+                        • {a.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <Button
                     size="sm"
@@ -211,12 +236,22 @@ const ProviderMyJobs = () => {
                 {upcoming.length}
               </Badge>
             )}
+            {upcomingActionCount > 0 && (
+              <Badge variant="destructive" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                {upcomingActionCount}
+              </Badge>
+            )}
           </TabsTrigger>
           <TabsTrigger value="current" className="gap-1.5">
             Current
             {current.length > 0 && (
               <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
                 {current.length}
+              </Badge>
+            )}
+            {currentActionCount > 0 && (
+              <Badge variant="destructive" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                {currentActionCount}
               </Badge>
             )}
           </TabsTrigger>

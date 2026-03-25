@@ -13,7 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake, AlertTriangle, Star } from "lucide-react";
+import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake, AlertTriangle, Star, AlertCircle } from "lucide-react";
+import { useJobActions } from "@/hooks/use-job-actions";
 import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import MilestonePaymentSection from "@/components/MilestonePaymentSection";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
@@ -497,18 +498,34 @@ const JobDetail = () => {
     return () => { supabase.removeChannel(channel); };
   }, [chatConvId]);
 
+  const isActiveJob = !!job && ["accepted", "in_progress"].includes(job.status);
+  const { actions: jobActionsMap } = useJobActions(isActiveJob && job ? [job.id] : [], "customer", user?.id);
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!job) return <p className="text-muted-foreground">Job not found.</p>;
 
   const catName = categories.find(c => c.slug === job.category)?.name ?? job.category;
   const totalHeld = escrowPayments.filter(p => p.status === "held").reduce((s, p) => s + Number(p.amount), 0);
   const totalPending = escrowPayments.filter(p => p.status === "pending").reduce((s, p) => s + Number(p.amount), 0);
+  const jobActions = jobActionsMap[job.id] ?? [];
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard/jobs")}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Jobs
       </Button>
+
+      {jobActions.length > 0 && (
+        <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+          <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-sm text-destructive">Action Required</p>
+            {jobActions.map((a, i) => (
+              <p key={i} className="text-sm text-muted-foreground mt-0.5">• {a.label}</p>
+            ))}
+          </div>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
