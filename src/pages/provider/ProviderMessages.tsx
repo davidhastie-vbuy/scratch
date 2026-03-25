@@ -624,6 +624,7 @@ const ProviderMessages = () => {
         onClose={() => { setProposeOpen(false); setProposeDefaults(undefined); }}
         onSubmit={sendProposal}
         defaults={proposeDefaults}
+        lockPrice={!!(proposeDefaults as any)?._customerProposalMsgId}
       />
     </div>
   );
