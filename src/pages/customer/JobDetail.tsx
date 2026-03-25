@@ -860,6 +860,7 @@ const JobDetail = () => {
                     );
                   }
                   if ((m as any).message_type === "system") {
+                    return (
                       <div key={m.id} className="flex justify-center">
                         <div className="bg-muted/50 rounded-lg px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
                           {transformAcceptedMessageForCustomer(m.body)}
