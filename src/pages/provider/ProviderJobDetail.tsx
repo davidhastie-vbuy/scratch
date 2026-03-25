@@ -415,7 +415,7 @@ const ProviderJobDetail = () => {
       <WorkTracker jobId={jobId!} job={job} role="provider" onRefresh={fetchAll} />
 
       {/* Schedule - visible when provider's quote was accepted */}
-      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && (
+      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && !allMilestonesCompleted && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
