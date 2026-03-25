@@ -138,8 +138,7 @@ const AdminDisputes = () => {
         delete copy[disputeId];
         return copy;
       });
-      if (dispute) await loadDetails(dispute);
-    }
+      if (dispute) await loadDetails(dispute, true);
   };
 
   const resolveInFavour = async (disputeId: string, favouredParty: "provider" | "customer") => {
@@ -213,7 +212,7 @@ const AdminDisputes = () => {
       delete copy[disputeId];
       return copy;
     });
-    if (dispute) await loadDetails(dispute);
+    if (dispute) await loadDetails(dispute, true);
     setResolving(null);
   };
 
