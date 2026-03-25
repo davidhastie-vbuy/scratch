@@ -22,6 +22,7 @@ import ProposalCard from "@/components/messaging/ProposalCard";
 import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
 import ReviewDialog from "@/components/reviews/ReviewDialog";
+import CancellationRequestBanner from "@/components/CancellationRequestBanner";
 import { format } from "date-fns";
 
 const JobDetail = () => {
@@ -514,6 +515,10 @@ const JobDetail = () => {
       <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard/jobs")}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Jobs
       </Button>
+
+      {["accepted", "in_progress"].includes(job.status) && hasConfirmedPayment && (
+        <CancellationRequestBanner jobId={jobId!} role="customer" onResolved={fetchAll} />
+      )}
 
       {jobActions.length > 0 && (
         <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
