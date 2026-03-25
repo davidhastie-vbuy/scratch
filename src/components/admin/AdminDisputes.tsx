@@ -139,6 +139,7 @@ const AdminDisputes = () => {
         return copy;
       });
       if (dispute) await loadDetails(dispute, true);
+    }
   };
 
   const resolveInFavour = async (disputeId: string, favouredParty: "provider" | "customer") => {
