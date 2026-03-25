@@ -83,6 +83,9 @@ const ProviderJobDetail = () => {
     setConversationId(convRes.data?.id ?? null);
     setEscrowPayments(escrowRes.data ?? []);
 
+    const milestones = milestonesRes.data ?? [];
+    setAllMilestonesCompleted(milestones.length > 0 && milestones.every(m => m.status === "completed" || m.status === "accepted"));
+
     // Check review status and get customer name
     if (jobRes.data && user) {
       const { data: existingReview } = await supabase
