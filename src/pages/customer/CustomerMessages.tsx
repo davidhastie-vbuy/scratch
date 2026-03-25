@@ -114,7 +114,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; id?: string; updated_at?: string };
+  jobs?: { title?: string; status?: string; id?: string; updated_at?: string; provider_id?: string | null };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
@@ -145,7 +145,7 @@ const CustomerMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title, status, id, updated_at)")
+      .select("*, jobs(title, status, id, updated_at, provider_id)")
       .eq("customer_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -177,12 +177,23 @@ const CustomerMessages = () => {
       })
     );
 
-    enriched.sort((a, b) => {
+    const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+    const visible = enriched.filter(c => {
+      const jobStatus = c.jobs?.status;
+      const isTerminal = ["cancelled", "completed"].includes(jobStatus ?? "");
+      const providerNotAccepted = ["accepted", "in_progress", "completed"].includes(jobStatus ?? "")
+        && c.jobs?.provider_id != null && c.jobs.provider_id !== c.provider_user_id;
+      const isInactive = isTerminal || providerNotAccepted;
+      if (!isInactive) return true;
+      const lastActivity = c.lastMessageAt ?? "";
+      return lastActivity > fourteenDaysAgo;
+    });
+    visible.sort((a, b) => {
       const aTime = a.lastMessageAt ?? "";
       const bTime = b.lastMessageAt ?? "";
       return bTime.localeCompare(aTime);
     });
-    setConversations(enriched);
+    setConversations(visible);
     setLoading(false);
 
     // Auto-select conversation from navigation state (only once per navigation)
