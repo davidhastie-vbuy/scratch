@@ -35,8 +35,8 @@ const AdminDisputes = () => {
     setLoading(false);
   };
 
-  const loadDetails = async (dispute: any) => {
-    if (details[dispute.id]) return;
+  const loadDetails = async (dispute: any, force = false) => {
+    if (!force && details[dispute.id]) return;
 
     const [jobRes, msgsRes, milestonesRes, conversationsRes] = await Promise.all([
       supabase.from("jobs").select("*").eq("id", dispute.job_id).single(),
@@ -138,7 +138,7 @@ const AdminDisputes = () => {
         delete copy[disputeId];
         return copy;
       });
-      if (dispute) await loadDetails(dispute);
+      if (dispute) await loadDetails(dispute, true);
     }
   };
 
@@ -213,7 +213,7 @@ const AdminDisputes = () => {
       delete copy[disputeId];
       return copy;
     });
-    if (dispute) await loadDetails(dispute);
+    if (dispute) await loadDetails(dispute, true);
     setResolving(null);
   };
 
