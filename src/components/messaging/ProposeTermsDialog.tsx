@@ -21,6 +21,7 @@ interface Props {
   onClose: () => void;
   onSubmit: (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => Promise<void>;
   defaults?: ProposalDefaults;
+  lockPrice?: boolean;
 }
 
 const parseDurationDays = (dur?: string): number => {
@@ -29,7 +30,7 @@ const parseDurationDays = (dur?: string): number => {
   return dayMatch ? parseInt(dayMatch[1]) : 1;
 };
 
-const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults }: Props) => {
+const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults, lockPrice }: Props) => {
   const [price, setPrice] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [startTime, setStartTime] = useState("09:00");
@@ -87,7 +88,10 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults }: Props) => {
 
           <div className="space-y-2">
             <Label>Agreed Price (£) *</Label>
-            <Input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 500" min="1" step="0.01" />
+            <Input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 500" min="1" step="0.01" disabled={lockPrice} className={lockPrice ? "bg-muted" : ""} />
+            {lockPrice && (
+              <p className="text-xs text-muted-foreground">Price is locked to the customer's proposal. Use Counter to negotiate a different price.</p>
+            )}
           </div>
 
           <div className="space-y-2">
