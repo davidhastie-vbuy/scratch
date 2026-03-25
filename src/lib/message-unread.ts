@@ -1,4 +1,4 @@
-export const UNREAD_MESSAGE_TYPES = ["text", "proposal"] as const;
+export const UNREAD_MESSAGE_TYPES = ["text", "proposal", "admin"] as const;
 
 export const MESSAGE_UNREAD_UPDATED_EVENT = "message-unread-updated";
 

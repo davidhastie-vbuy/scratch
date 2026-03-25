@@ -57,7 +57,7 @@ serve(async (req) => {
         conversation_id,
         sender_user_id: userData.user.id,
         body: `⚖️ Admin (Dispute): ${body}`,
-        message_type: "system",
+        message_type: "admin",
       });
     }
 
