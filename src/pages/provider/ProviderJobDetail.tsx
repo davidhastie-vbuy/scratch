@@ -44,6 +44,7 @@ const ProviderJobDetail = () => {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancellingJob, setCancellingJob] = useState(false);
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
+  const [allMilestonesCompleted, setAllMilestonesCompleted] = useState(false);
 
   const [quoteForm, setQuoteForm] = useState({
     priceMin: "",
@@ -58,12 +59,13 @@ const ProviderJobDetail = () => {
   }, [jobId, user]);
 
   const fetchAll = async () => {
-    const [jobRes, mediaRes, quoteRes, convRes, escrowRes] = await Promise.all([
+    const [jobRes, mediaRes, quoteRes, convRes, escrowRes, milestonesRes] = await Promise.all([
       supabase.from("jobs").select("*").eq("id", jobId!).single(),
       supabase.from("job_media").select("*").eq("job_id", jobId!),
       supabase.from("quotes").select("*").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
       supabase.from("conversations").select("id").eq("job_id", jobId!).eq("provider_user_id", user!.id).maybeSingle(),
       supabase.from("escrow_payments").select("*").eq("job_id", jobId!).eq("provider_user_id", user!.id),
+      supabase.from("job_milestones").select("id, status").eq("job_id", jobId!),
     ]);
     setJob(jobRes.data);
     const mediaData = mediaRes.data ?? [];
@@ -80,6 +82,9 @@ const ProviderJobDetail = () => {
     setExistingQuote(quoteRes.data);
     setConversationId(convRes.data?.id ?? null);
     setEscrowPayments(escrowRes.data ?? []);
+
+    const milestones = milestonesRes.data ?? [];
+    setAllMilestonesCompleted(milestones.length > 0 && milestones.every(m => m.status === "completed" || m.status === "accepted"));
 
     // Check review status and get customer name
     if (jobRes.data && user) {
@@ -410,7 +415,7 @@ const ProviderJobDetail = () => {
       <WorkTracker jobId={jobId!} job={job} role="provider" onRefresh={fetchAll} />
 
       {/* Schedule - visible when provider's quote was accepted */}
-      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && (
+      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && !allMilestonesCompleted && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
