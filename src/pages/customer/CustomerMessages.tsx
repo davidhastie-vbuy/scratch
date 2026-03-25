@@ -177,12 +177,23 @@ const CustomerMessages = () => {
       })
     );
 
-    enriched.sort((a, b) => {
+    const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+    const visible = enriched.filter(c => {
+      const jobStatus = c.jobs?.status;
+      const isTerminal = ["cancelled", "completed"].includes(jobStatus ?? "");
+      const providerNotAccepted = ["accepted", "in_progress", "completed"].includes(jobStatus ?? "")
+        && c.jobs?.provider_id != null && c.jobs.provider_id !== c.provider_user_id;
+      const isInactive = isTerminal || providerNotAccepted;
+      if (!isInactive) return true;
+      const lastActivity = c.lastMessageAt ?? "";
+      return lastActivity > fourteenDaysAgo;
+    });
+    visible.sort((a, b) => {
       const aTime = a.lastMessageAt ?? "";
       const bTime = b.lastMessageAt ?? "";
       return bTime.localeCompare(aTime);
     });
-    setConversations(enriched);
+    setConversations(visible);
     setLoading(false);
 
     // Auto-select conversation from navigation state (only once per navigation)
