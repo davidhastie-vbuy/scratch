@@ -177,6 +177,11 @@ const CustomerMessages = () => {
       })
     );
 
+    enriched.sort((a, b) => {
+      const aTime = a.lastMessageAt ?? "";
+      const bTime = b.lastMessageAt ?? "";
+      return bTime.localeCompare(aTime);
+    });
     setConversations(enriched);
     setLoading(false);
 
