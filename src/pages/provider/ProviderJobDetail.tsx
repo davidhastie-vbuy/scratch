@@ -44,6 +44,7 @@ const ProviderJobDetail = () => {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancellingJob, setCancellingJob] = useState(false);
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
+  const [allMilestonesCompleted, setAllMilestonesCompleted] = useState(false);
 
   const [quoteForm, setQuoteForm] = useState({
     priceMin: "",
