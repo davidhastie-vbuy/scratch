@@ -22,9 +22,9 @@ const QuestionnaireAnswers = ({ category, answers }: Props) => {
       <h4 className="text-sm font-semibold">Category Details</h4>
       <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
         {entries.map(([key, value]) => (
-          <div key={key} className="flex justify-between gap-4 text-sm">
-            <span className="text-muted-foreground shrink-0">{labelMap.get(key) || key}</span>
-            <span className="text-right">{String(value)}</span>
+          <div key={key} className="text-sm space-y-0.5">
+            <p className="text-muted-foreground font-medium">{labelMap.get(key) || key}</p>
+            <p>{String(value)}</p>
           </div>
         ))}
       </div>
