@@ -553,15 +553,9 @@ const JobDetail = () => {
                 <Label>Description</Label>
                 <Textarea value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} rows={4} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Timeline</Label>
-                  <Input value={editForm.timeline} onChange={e => setEditForm(f => ({ ...f, timeline: e.target.value }))} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Budget</Label>
-                  <Input value={editForm.budget} onChange={e => setEditForm(f => ({ ...f, budget: e.target.value }))} />
-                </div>
+              <div className="space-y-2">
+                <Label>Timeline</Label>
+                <Input value={editForm.timeline} onChange={e => setEditForm(f => ({ ...f, timeline: e.target.value }))} />
               </div>
               <div className="flex gap-2">
                 <Button onClick={handleSave} disabled={saving}>
