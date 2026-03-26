@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake, AlertTriangle, Star, AlertCircle } from "lucide-react";
+import { Loader2, ArrowLeft, Pencil, Save, CalendarDays, PoundSterling, CreditCard, MessageSquare, Send, Handshake, AlertTriangle, Star, AlertCircle, Upload, X } from "lucide-react";
 import { useJobActions } from "@/hooks/use-job-actions";
 import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import MilestonePaymentSection from "@/components/MilestonePaymentSection";
@@ -44,6 +44,8 @@ const JobDetail = () => {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: "", description: "", timeline: "", budget: "" });
   const [saving, setSaving] = useState(false);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [mediaToDelete, setMediaToDelete] = useState<string[]>([]);
 
   // Negotiate dialog
   const [negotiateDialog, setNegotiateDialog] = useState<{ quoteId: string; providerUserId: string; priceMin: number; priceMax: number } | null>(null);
@@ -161,20 +163,70 @@ const JobDetail = () => {
     setLoading(false);
   };
 
+  const addEditFiles = (fileList: FileList | null) => {
+    if (!fileList) return;
+    const allowed = ["image/png", "image/jpeg", "video/mp4"];
+    const maxSize = 10 * 1024 * 1024;
+    const toAdd: File[] = [];
+    for (const f of Array.from(fileList)) {
+      if (!allowed.includes(f.type)) {
+        toast({ title: "Invalid file type", description: `${f.name} must be PNG, JPG, or MP4`, variant: "destructive" });
+        continue;
+      }
+      if (f.size > maxSize) {
+        toast({ title: "File too large", description: `${f.name} exceeds 10MB`, variant: "destructive" });
+        continue;
+      }
+      toAdd.push(f);
+    }
+    const existingCount = media.filter(m => !mediaToDelete.includes(m.id)).length;
+    const combined = [...newFiles, ...toAdd].slice(0, Math.max(0, 10 - existingCount));
+    setNewFiles(combined);
+  };
+
   const handleSave = async () => {
     setSaving(true);
-    const { error } = await supabase.from("jobs").update({
-      title: editForm.title.trim(),
-      description: editForm.description.trim(),
-      timeline: editForm.timeline || null,
-      budget: editForm.budget || null,
-    } as any).eq("id", jobId!);
-    if (error) {
-      toast({ title: "Save failed", description: error.message, variant: "destructive" });
-    } else {
+    try {
+      const { error } = await supabase.from("jobs").update({
+        title: editForm.title.trim(),
+        description: editForm.description.trim(),
+        timeline: editForm.timeline || null,
+        budget: editForm.budget || null,
+      } as any).eq("id", jobId!);
+      if (error) throw error;
+
+      // Delete removed media
+      for (const mediaId of mediaToDelete) {
+        const m = media.find(item => item.id === mediaId);
+        if (m) {
+          await supabase.storage.from("job-media").remove([m.file_url]);
+          await supabase.from("job_media").delete().eq("id", mediaId);
+        }
+      }
+
+      // Upload new files
+      for (const file of newFiles) {
+        const path = `${user!.id}/${jobId}/${Date.now()}-${file.name}`;
+        const { error: upErr } = await supabase.storage.from("job-media").upload(path, file);
+        if (!upErr) {
+          await supabase.from("job_media").insert({
+            job_id: jobId,
+            user_id: user!.id,
+            file_url: path,
+            file_name: file.name,
+            file_type: file.type,
+            file_size: file.size,
+          } as any);
+        }
+      }
+
       toast({ title: "Job updated" });
       setEditing(false);
+      setNewFiles([]);
+      setMediaToDelete([]);
       fetchAll();
+    } catch (err: any) {
+      toast({ title: "Save failed", description: err.message, variant: "destructive" });
     }
     setSaving(false);
   };
@@ -557,11 +609,77 @@ const JobDetail = () => {
                 <Label>Timeline</Label>
                 <Input value={editForm.timeline} onChange={e => setEditForm(f => ({ ...f, timeline: e.target.value }))} />
               </div>
+              {/* Media editing section */}
+              <div className="space-y-2">
+                <Label>Photos & Videos <span className="text-muted-foreground text-xs">(PNG, JPG, MP4 — max 10MB each, up to 10 files)</span></Label>
+                {/* Existing media */}
+                {media.filter(m => !mediaToDelete.includes(m.id)).length > 0 && (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {media.filter(m => !mediaToDelete.includes(m.id)).map(m => {
+                      const url = mediaUrls[m.file_url];
+                      if (!url) return null;
+                      return (
+                        <div key={m.id} className="relative group rounded-lg border overflow-hidden bg-muted/30 aspect-square">
+                          {m.file_type.startsWith("image") ? (
+                            <img src={url} alt={m.file_name} className="h-full w-full object-cover" />
+                          ) : (
+                            <video src={url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setMediaToDelete(prev => [...prev, m.id])}
+                            className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                {/* New files preview */}
+                {newFiles.length > 0 && (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {newFiles.map((f, i) => (
+                      <div key={i} className="relative group rounded-lg border overflow-hidden bg-muted/30 aspect-square border-dashed border-primary/40">
+                        {f.type.startsWith("video") ? (
+                          <video src={URL.createObjectURL(f)} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                        ) : (
+                          <img src={URL.createObjectURL(f)} alt={f.name} className="h-full w-full object-cover" />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setNewFiles(prev => prev.filter((_, j) => j !== i))}
+                          className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-1.5 py-0.5">
+                          <p className="text-[10px] text-white truncate">New</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {/* Upload button */}
+                <div
+                  className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => document.getElementById("edit-file-input")?.click()}
+                >
+                  <Upload className="mx-auto h-6 w-6 text-muted-foreground mb-1" />
+                  <p className="text-sm text-muted-foreground">Click to add photos or videos</p>
+                  <input id="edit-file-input" type="file" multiple accept="image/png,image/jpeg,video/mp4" className="hidden" onChange={e => addEditFiles(e.target.files)} />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {media.filter(m => !mediaToDelete.includes(m.id)).length + newFiles.length}/10 files
+                </p>
+              </div>
+
               <div className="flex gap-2">
                 <Button onClick={handleSave} disabled={saving}>
                   {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Save
                 </Button>
-                <Button variant="outline" onClick={() => setEditing(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => { setEditing(false); setNewFiles([]); setMediaToDelete([]); }}>Cancel</Button>
               </div>
             </div>
           ) : (
