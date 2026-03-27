@@ -46,6 +46,7 @@ const ProviderJobDetail = () => {
   const [cancellingJob, setCancellingJob] = useState(false);
   const [escrowPayments, setEscrowPayments] = useState<any[]>([]);
   const [allMilestonesCompleted, setAllMilestonesCompleted] = useState(false);
+  const [actionsRefreshKey, setActionsRefreshKey] = useState(0);
 
   const [quoteForm, setQuoteForm] = useState({
     priceMin: "",
@@ -107,6 +108,7 @@ const ProviderJobDetail = () => {
       }
     }
 
+    setActionsRefreshKey(k => k + 1);
     setLoading(false);
   };
 
@@ -245,7 +247,7 @@ const ProviderJobDetail = () => {
   };
 
   const isActiveJob = !!job && ["accepted", "in_progress"].includes(job.status);
-  const { actions: jobActionsMap } = useJobActions(isActiveJob && job ? [job.id] : [], "provider", user?.id);
+  const { actions: jobActionsMap } = useJobActions(isActiveJob && job ? [job.id] : [], "provider", user?.id, actionsRefreshKey);
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!job) return <p className="text-muted-foreground">Job not found.</p>;

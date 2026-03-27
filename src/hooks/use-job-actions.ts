@@ -15,7 +15,8 @@ export interface JobAction {
 export function useJobActions(
   jobIds: string[],
   role: "customer" | "provider",
-  userId: string | undefined
+  userId: string | undefined,
+  refreshKey?: number
 ) {
   const [actions, setActions] = useState<Record<string, JobAction[]>>({});
   const [loading, setLoading] = useState(false);
@@ -26,7 +27,7 @@ export function useJobActions(
       return;
     }
     fetchActions();
-  }, [jobIds.join(","), role, userId]);
+  }, [jobIds.join(","), role, userId, refreshKey]);
 
   const fetchActions = async () => {
     setLoading(true);
