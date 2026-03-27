@@ -108,6 +108,7 @@ const ProviderJobDetail = () => {
       }
     }
 
+    setActionsRefreshKey(k => k + 1);
     setLoading(false);
   };
 
