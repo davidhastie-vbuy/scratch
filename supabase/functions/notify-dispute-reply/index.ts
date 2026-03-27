@@ -121,7 +121,7 @@ serve(async (req) => {
             </a>
           </div>
           <p style="color:#999;font-size:12px;margin-top:24px;">
-            — The TradeTrust Team
+            — The BookATrade Team
           </p>
         </div>
       `;
@@ -129,7 +129,7 @@ serve(async (req) => {
       await supabaseAdmin.functions.invoke("send-provider-email", {
         body: {
           to: profile.email,
-          subject: `Dispute update on "${job.title}" — TradeTrust`,
+          subject: `Dispute update on "${job.title}" — BookATrade`,
           html,
         },
       });
