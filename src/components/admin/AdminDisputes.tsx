@@ -456,7 +456,20 @@ const AdminDisputes = () => {
                         </div>
                       )}
 
-                      {/* Full conversation messages between customer and provider */}
+                      {/* All Media Section */}
+                      <MediaGallery
+                        label="Job Photos/Videos"
+                        items={(det.jobMedia || []).map((m: any) => ({ bucket: "job-media", path: m.file_url, name: m.file_name, type: m.file_type }))}
+                      />
+                      <MediaGallery
+                        label="Chat Attachments"
+                        items={(det.chatAttachments || []).map((a: any) => ({ bucket: "chat-attachments", path: a.file_url, name: a.file_name, type: a.file_type }))}
+                      />
+                      <MediaGallery
+                        label="Dispute Attachments"
+                        items={(det.disputeAttachments || []).map((a: any) => ({ bucket: "dispute-attachments", path: a.file_url, name: a.file_name, type: a.file_type }))}
+                      />
+
                       {det.conversationMessages.length > 0 && (
                         <div className="rounded-lg border p-3 text-sm space-y-1">
                           <p className="font-medium">Full Chat History ({det.conversationMessages.length} messages)</p>
