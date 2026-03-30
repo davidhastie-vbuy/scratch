@@ -200,8 +200,8 @@ const AdminDisputes = () => {
       await notifyResolution(disputeId, det, msg);
     }
 
-    // Mark dispute as resolved
-    await supabase.from("job_disputes").update({ status: "resolved" as any }).eq("id", disputeId);
+    // Mark dispute as closed
+    await supabase.from("job_disputes").update({ status: "closed" as any }).eq("id", disputeId);
 
     toast({ title: `Dispute resolved in favour of ${favouredParty}` });
     fetchDisputes();
@@ -284,8 +284,7 @@ const AdminDisputes = () => {
 
   const statusColor = (s: string) => {
     if (s === "open") return "destructive" as const;
-    if (s === "under_review") return "secondary" as const;
-    if (s === "resolved") return "default" as const;
+    if (s === "closed") return "default" as const;
     return "outline" as const;
   };
 
@@ -323,23 +322,8 @@ const AdminDisputes = () => {
                     <p className="text-muted-foreground">{d.reason}</p>
                   </div>
 
-                  {/* Status control */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">Status:</span>
-                    <Select value={d.status} onValueChange={(v) => updateStatus(d.id, v)}>
-                      <SelectTrigger className="w-40 h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="open">Open</SelectItem>
-                        <SelectItem value="under_review">Under Review</SelectItem>
-                        <SelectItem value="closed">Closed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Resolution buttons - only show for non-resolved disputes */}
-                  {d.status !== "resolved" && d.status !== "closed" && (
+                  {/* Resolution buttons - only show for open disputes */}
+                  {d.status === "open" && (
                     <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
                       <p className="text-sm font-medium">Resolve Dispute</p>
                       <p className="text-xs text-muted-foreground">
@@ -501,21 +485,28 @@ const AdminDisputes = () => {
                         ))}
                       </div>
                     )}
-                    <Textarea
-                      value={newMessage[d.id] || ""}
-                      onChange={(e) => setNewMessage((prev) => ({ ...prev, [d.id]: e.target.value }))}
-                      placeholder="Reply to dispute…"
-                      rows={2}
-                      className="text-sm"
-                    />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={() => sendMessage(d.id, false)} disabled={sending === d.id}>
-                        <Send className="mr-1 h-3 w-3" /> Reply to All
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => sendMessage(d.id, true)} disabled={sending === d.id}>
-                        Internal Note
-                      </Button>
-                    </div>
+                    {d.status === "open" && (
+                      <>
+                        <Textarea
+                          value={newMessage[d.id] || ""}
+                          onChange={(e) => setNewMessage((prev) => ({ ...prev, [d.id]: e.target.value }))}
+                          placeholder="Reply to dispute…"
+                          rows={2}
+                          className="text-sm"
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => sendMessage(d.id, false)} disabled={sending === d.id}>
+                            <Send className="mr-1 h-3 w-3" /> Reply to All
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => sendMessage(d.id, true)} disabled={sending === d.id}>
+                            Internal Note
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                    {d.status === "closed" && (
+                      <p className="text-xs text-muted-foreground italic">This dispute has been closed and cannot be reopened.</p>
+                    )}
                   </div>
                 </CardContent>
               )}
