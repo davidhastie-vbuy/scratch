@@ -73,9 +73,9 @@ const MyJobs = () => {
           return (
             <Card key={job.id} className="cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => navigate(`/dashboard/jobs/${job.id}`)}>
               <CardHeader className="pb-2">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                   <CardTitle className="text-base">{job.title}</CardTitle>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
                     {jobActions.length > 0 && (
                       <Badge variant="destructive" className="gap-1 text-xs">
                         <AlertCircle className="h-3 w-3" />

@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MessageSquare, Send, Handshake, Clock } from "lucide-react";
+import { Loader2, MessageSquare, Send, Handshake, Clock, ArrowLeft } from "lucide-react";
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
@@ -502,7 +502,11 @@ const CustomerMessages = () => {
 
   return (
     <div className="flex gap-4 h-[calc(100vh-12rem)] overflow-hidden">
-      <div className="w-72 shrink-0 border rounded-lg overflow-y-auto">
+      {/* Conversation list - hidden on mobile when a chat is selected */}
+      <div className={cn(
+        "w-full md:w-72 shrink-0 border rounded-lg overflow-y-auto",
+        selected ? "hidden md:block" : "block"
+      )}>
         <div className="p-3 border-b"><h3 className="font-semibold text-sm">Conversations</h3></div>
         {conversations.length === 0 ? (
           <p className="text-sm text-muted-foreground p-4">No conversations yet. Accept a quote to start messaging.</p>
@@ -540,7 +544,11 @@ const CustomerMessages = () => {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col border rounded-lg min-w-0">
+      {/* Chat area - full width on mobile when selected */}
+      <div className={cn(
+        "flex-1 flex flex-col border rounded-lg min-w-0",
+        selected ? "block" : "hidden md:flex"
+      )}>
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
             <div className="text-center">
@@ -552,7 +560,10 @@ const CustomerMessages = () => {
           <>
             <div className="p-3 border-b">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-sm">{selected.jobs?.title ?? "Chat"}</h3>
+                <Button variant="ghost" size="icon" className="md:hidden h-8 w-8 shrink-0" onClick={() => setSelected(null)}>
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <h3 className="font-semibold text-sm truncate">{selected.jobs?.title ?? "Chat"}</h3>
                 <ScoreBadge userId={selected.provider_user_id} role="provider" />
               </div>
             </div>

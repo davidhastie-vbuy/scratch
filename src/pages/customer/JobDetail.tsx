@@ -589,9 +589,9 @@ const JobDetail = () => {
 
       <Card>
         <CardHeader>
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle>{job.title}</CardTitle>
-            <Badge>{job.status.replace("_", " ")}</Badge>
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+            <CardTitle className="text-lg sm:text-xl">{job.title}</CardTitle>
+            <Badge className="self-start">{job.status.replace("_", " ")}</Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -694,24 +694,24 @@ const JobDetail = () => {
                   <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number(job.agreed_price).toFixed(2)}</span></div>
                 )}
                 {job.scheduled_start && (
-                  <div className="flex justify-between">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-0">
                     <span className="text-muted-foreground">Starts</span>
-                    <span>
+                    <span className="flex flex-wrap items-center gap-1">
                       {format(new Date(job.scheduled_start), "dd/MM/yyyy 'at' h:mm a")}
                       {hasConfirmedPayment
-                        ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
-                        : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
+                        ? <Badge variant="default" className="text-[10px] px-1.5 py-0">Confirmed</Badge>
+                        : <Badge variant="outline" className="text-[10px] px-1.5 py-0">Suggested</Badge>}
                     </span>
                   </div>
                 )}
                 {job.scheduled_end && (
-                  <div className="flex justify-between">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-0">
                     <span className="text-muted-foreground">Ends</span>
-                    <span>
+                    <span className="flex flex-wrap items-center gap-1">
                       {format(new Date(job.scheduled_end), "dd/MM/yyyy 'at' h:mm a")}
                       {hasConfirmedPayment
-                        ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
-                        : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
+                        ? <Badge variant="default" className="text-[10px] px-1.5 py-0">Confirmed</Badge>
+                        : <Badge variant="outline" className="text-[10px] px-1.5 py-0">Suggested</Badge>}
                     </span>
                   </div>
                 )}
