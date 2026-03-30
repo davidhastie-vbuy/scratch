@@ -317,17 +317,21 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const raiseDispute = async () => {
     if (!disputeReason.trim()) return;
     setRaisingDispute(true);
-    const { error } = await supabase.from("job_disputes").insert({
+    const { data, error } = await supabase.from("job_disputes").insert({
       job_id: jobId,
       raised_by: user!.id,
       reason: disputeReason.trim(),
-    } as any);
+    } as any).select("id").single();
     if (error) {
       toast({ title: "Failed to raise dispute", description: error.message, variant: "destructive" });
     } else {
+      if (data && disputeFiles.length > 0) {
+        await uploadDisputeAttachments(data.id, disputeFiles);
+      }
       toast({ title: "Dispute raised", description: "An admin will review your case." });
       setShowDispute(false);
       setDisputeReason("");
+      setDisputeFiles([]);
     }
     setRaisingDispute(false);
   };
