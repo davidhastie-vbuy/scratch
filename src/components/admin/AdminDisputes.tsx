@@ -38,11 +38,12 @@ const AdminDisputes = () => {
   const loadDetails = async (dispute: any, force = false) => {
     if (!force && details[dispute.id]) return;
 
-    const [jobRes, msgsRes, milestonesRes, conversationsRes] = await Promise.all([
+    const [jobRes, msgsRes, milestonesRes, conversationsRes, disputeAttRes] = await Promise.all([
       supabase.from("jobs").select("*").eq("id", dispute.job_id).single(),
       supabase.from("dispute_messages").select("*").eq("dispute_id", dispute.id).order("created_at"),
       supabase.from("job_milestones").select("*").eq("job_id", dispute.job_id).order("sort_order"),
       supabase.from("conversations").select("*").eq("job_id", dispute.job_id),
+      supabase.from("dispute_attachments").select("*").eq("dispute_id", dispute.id).order("created_at"),
     ]);
 
     const job = jobRes.data;
@@ -50,14 +51,18 @@ const AdminDisputes = () => {
     let providerProfile = null;
     let conversationMessages: any[] = [];
     let conversationId: string | null = null;
+    let jobMedia: any[] = [];
+    let chatAttachments: any[] = [];
 
     if (job) {
-      const [cp, pp] = await Promise.all([
+      const [cp, pp, jmRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", job.customer_user_id).single(),
         supabase.from("profiles").select("*").eq("id", job.provider_id).single(),
+        supabase.from("job_media").select("*").eq("job_id", job.id).order("uploaded_at"),
       ]);
       customerProfile = cp.data;
       providerProfile = pp.data;
+      jobMedia = jmRes.data ?? [];
 
       const milestoneIds = (milestonesRes.data ?? []).map((m: any) => m.id);
       let milestoneComments: any[] = [];
@@ -71,19 +76,28 @@ const AdminDisputes = () => {
       }
 
       if (conversationsRes.data && conversationsRes.data.length > 0) {
-        // Find the conversation between the assigned provider and customer
         const mainConv = conversationsRes.data.find(
           (c: any) => c.provider_user_id === job.provider_id
         ) || conversationsRes.data[0];
         conversationId = mainConv.id;
 
-        // Fetch ALL messages from this conversation
         const { data: cm } = await supabase
           .from("messages")
           .select("*")
           .eq("conversation_id", mainConv.id)
           .order("created_at");
         conversationMessages = cm ?? [];
+
+        // Fetch chat attachments for all messages in this conversation
+        const messageIds = (cm ?? []).map((m: any) => m.id);
+        if (messageIds.length > 0) {
+          const { data: ca } = await supabase
+            .from("message_attachments")
+            .select("*")
+            .in("message_id", messageIds)
+            .order("created_at");
+          chatAttachments = ca ?? [];
+        }
       }
 
       setDetails((prev) => ({
@@ -96,6 +110,9 @@ const AdminDisputes = () => {
           milestoneComments,
           conversationMessages,
           conversationId,
+          jobMedia,
+          chatAttachments,
+          disputeAttachments: disputeAttRes.data ?? [],
         },
       }));
     }
