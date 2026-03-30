@@ -10,6 +10,52 @@ import { Loader2, MessageSquareWarning, ChevronDown, ChevronUp, Send, UserCheck,
 import { format } from "date-fns";
 import { getSignedStorageUrl } from "@/lib/storage-urls";
 
+// Media gallery for displaying signed-url images/videos from storage
+const MediaGallery = ({ label, items }: { label: string; items: { bucket: string; path: string; name: string; type: string }[] }) => {
+  const [urls, setUrls] = useState<Record<string, string>>({});
+
+  if (!items || items.length === 0) return null;
+
+  const loadUrl = async (bucket: string, path: string) => {
+    const key = `${bucket}/${path}`;
+    if (urls[key]) return;
+    const url = await getSignedStorageUrl(bucket, path);
+    if (url) setUrls(prev => ({ ...prev, [key]: url }));
+  };
+
+  return (
+    <div className="rounded-lg border p-3 text-sm space-y-2">
+      <p className="font-medium flex items-center gap-1"><Image className="h-3.5 w-3.5" /> {label} ({items.length})</p>
+      <div className="flex flex-wrap gap-2">
+        {items.map((item, i) => {
+          const key = `${item.bucket}/${item.path}`;
+          const url = urls[key];
+          const isVideo = item.type?.startsWith("video/");
+
+          if (!url) {
+            loadUrl(item.bucket, item.path);
+            return (
+              <div key={i} className="w-24 h-20 rounded bg-muted flex items-center justify-center">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
+            );
+          }
+
+          if (isVideo) {
+            return <video key={i} src={url} controls className="max-w-[200px] max-h-[150px] rounded" />;
+          }
+
+          return (
+            <a key={i} href={url} target="_blank" rel="noopener noreferrer" title={item.name}>
+              <img src={url} alt={item.name} className="max-w-[200px] max-h-[150px] rounded object-cover" />
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const AdminDisputes = () => {
   const { user } = useAuth();
   const { toast } = useToast();
