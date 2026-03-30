@@ -354,17 +354,21 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       return;
     }
     setEscalating(true);
-    const { error } = await supabase.from("job_disputes").insert({
+    const { data, error } = await supabase.from("job_disputes").insert({
       job_id: jobId,
       raised_by: user!.id,
       reason: `[Escalated after milestone flags] ${escalateReason.trim()}`,
-    } as any);
+    } as any).select("id").single();
     if (error) {
       toast({ title: "Failed to escalate", description: error.message, variant: "destructive" });
     } else {
+      if (data && escalateFiles.length > 0) {
+        await uploadDisputeAttachments(data.id, escalateFiles);
+      }
       toast({ title: "Escalated to admin", description: "An admin will review the job, milestones, and all communications." });
       setShowEscalate(false);
       setEscalateReason("");
+      setEscalateFiles([]);
     }
     setEscalating(false);
   };
