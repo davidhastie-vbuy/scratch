@@ -693,12 +693,34 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
               placeholder="Describe the issue…"
               rows={3}
             />
+            <div>
+              <input ref={disputeFileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple className="hidden" onChange={(e) => handleDisputeFiles(e, "dispute")} />
+              <Button type="button" size="sm" variant="outline" onClick={() => disputeFileRef.current?.click()}>
+                <Paperclip className="mr-1 h-3 w-3" /> Attach Photos/Videos
+              </Button>
+              {disputeFiles.length > 0 && (
+                <div className="flex gap-2 mt-2 overflow-x-auto">
+                  {disputeFiles.map((f, i) => (
+                    <div key={i} className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+                      {f.isVideo ? (
+                        <div className="flex items-center justify-center h-full"><Film className="h-6 w-6 text-muted-foreground" /></div>
+                      ) : (
+                        <img src={f.preview} alt="preview" className="w-full h-full object-cover" />
+                      )}
+                      <button onClick={() => removeDisputeFile(i, "dispute")} className="absolute top-0 right-0 bg-destructive text-destructive-foreground rounded-bl p-0.5">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="flex gap-2">
               <Button size="sm" variant="destructive" onClick={raiseDispute} disabled={raisingDispute}>
                 {raisingDispute ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
                 Submit Dispute
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setShowDispute(false)}>Cancel</Button>
+              <Button size="sm" variant="ghost" onClick={() => { setShowDispute(false); setDisputeFiles([]); }}>Cancel</Button>
             </div>
           </div>
         )}
