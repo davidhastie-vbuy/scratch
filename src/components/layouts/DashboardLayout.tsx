@@ -89,7 +89,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
             </div>
           </div>
           {/* Mobile nav */}
-          <div className="flex md:hidden overflow-x-auto border-t px-2 gap-1 bg-card">
+          <div className="flex md:hidden overflow-x-auto border-t px-1 gap-0.5 bg-card scrollbar-hide">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
@@ -97,7 +97,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
                 end
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-1.5 whitespace-nowrap px-3 py-2.5 text-xs font-semibold border-b-2 transition-colors",
+                    "flex flex-col items-center gap-0.5 whitespace-nowrap px-2 py-2 text-[10px] font-semibold border-b-2 transition-colors min-w-[3.5rem]",
                     isActive
                       ? "border-primary text-primary"
                       : "border-transparent text-muted-foreground"
@@ -105,9 +105,9 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
                 }
               >
                 {item.icon}
-                {item.label}
+                <span className="truncate max-w-[4rem]">{item.label}</span>
                 {item.badge != null && item.badge > 0 && (
-                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">
+                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[8px] font-bold text-destructive-foreground -mt-0.5">
                     {item.badge > 9 ? "9+" : item.badge}
                   </span>
                 )}

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MessageSquare, Send, Handshake, Clock, ListChecks } from "lucide-react";
+import { Loader2, MessageSquare, Send, Handshake, Clock, ListChecks, ArrowLeft } from "lucide-react";
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ProposeTermsDialog from "@/components/messaging/ProposeTermsDialog";
@@ -428,7 +428,10 @@ const ProviderMessages = () => {
 
   return (
     <div className="flex gap-4 h-[calc(100vh-12rem)] overflow-hidden">
-      <div className="w-72 shrink-0 border rounded-lg overflow-y-auto">
+      <div className={cn(
+        "w-full md:w-72 shrink-0 border rounded-lg overflow-y-auto",
+        selected ? "hidden md:block" : "block"
+      )}>
         <div className="p-3 border-b"><h3 className="font-semibold text-sm">Conversations</h3></div>
         {conversations.length === 0 ? (
           <p className="text-sm text-muted-foreground p-4">No conversations yet. Submit a quote to start messaging.</p>
@@ -466,7 +469,10 @@ const ProviderMessages = () => {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col border rounded-lg min-w-0">
+      <div className={cn(
+        "flex-1 flex flex-col border rounded-lg min-w-0",
+        selected ? "block" : "hidden md:flex"
+      )}>
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
             <div className="text-center">
@@ -478,16 +484,19 @@ const ProviderMessages = () => {
           <>
             <div className="p-3 border-b flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
+                <Button variant="ghost" size="icon" className="md:hidden h-8 w-8 shrink-0" onClick={() => setSelected(null)}>
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
                 <h3 className="font-semibold text-sm truncate">{selected.jobs?.title ?? "Chat"}</h3>
                 <ScoreBadge userId={selected.customer_user_id} role="customer" />
               </div>
               {canSetupMilestones ? (
                 <Button size="sm" onClick={() => navigate(`/provider/jobs/${selected.job_id}`)}>
-                  <ListChecks className="mr-2 h-4 w-4" /> Set Up Milestones
+                  <ListChecks className="mr-2 h-4 w-4" /> <span className="hidden sm:inline">Set Up Milestones</span><span className="sm:hidden">Milestones</span>
                 </Button>
               ) : !conversationAcceptedInPrinciple ? (
                 <Button size="sm" variant="outline" onClick={() => { setProposeDefaults(undefined); setProposeOpen(true); }}>
-                  <Handshake className="mr-2 h-4 w-4" /> Propose Terms
+                  <Handshake className="mr-2 h-4 w-4" /> <span className="hidden sm:inline">Propose Terms</span><span className="sm:hidden">Propose</span>
                 </Button>
               ) : null}
             </div>
