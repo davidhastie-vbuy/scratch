@@ -427,10 +427,10 @@ const AdminProviderList = () => {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{p.contact_first_name} {p.contact_last_name}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{p.email || "N/A"}</TableCell>
-                    <TableCell>{tradeName(p.trade_category)}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{p.contact_first_name} {p.contact_last_name}</TableCell>
+                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{p.email || "N/A"}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{tradeName(p.trade_category)}</TableCell>
+                    <TableCell className="hidden md:table-cell text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Badge variant={cfg.variant} className="gap-1">
                         <Icon className="h-3 w-3" />
