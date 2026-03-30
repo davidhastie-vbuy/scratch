@@ -330,24 +330,24 @@ const ProviderJobDetail = () => {
               <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number((job as any).agreed_price).toFixed(2)}</span></div>
             )}
             {(job as any).scheduled_start && (
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-0">
                 <span className="text-muted-foreground">Starts</span>
-                <span>
+                <span className="flex flex-wrap items-center gap-1">
                   {format(new Date((job as any).scheduled_start), "PPP 'at' h:mm a")}
                   {hasConfirmedPayment
-                    ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
-                    : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
+                    ? <Badge variant="default" className="text-[10px] px-1.5 py-0">Confirmed</Badge>
+                    : <Badge variant="outline" className="text-[10px] px-1.5 py-0">Suggested</Badge>}
                 </span>
               </div>
             )}
             {(job as any).scheduled_end && (
-              <div className="flex justify-between">
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-0">
                 <span className="text-muted-foreground">Ends</span>
-                <span>
+                <span className="flex flex-wrap items-center gap-1">
                   {format(new Date((job as any).scheduled_end), "PPP 'at' h:mm a")}
                   {hasConfirmedPayment
-                    ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
-                    : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
+                    ? <Badge variant="default" className="text-[10px] px-1.5 py-0">Confirmed</Badge>
+                    : <Badge variant="outline" className="text-[10px] px-1.5 py-0">Suggested</Badge>}
                 </span>
               </div>
             )}
