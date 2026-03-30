@@ -64,6 +64,50 @@ serve(async (req) => {
             })
             .eq("id", payment.id);
           confirmed++;
+
+          // If this is the deposit (first milestone), check if start date needs adjusting
+          if (payment.milestone_id) {
+            const { data: milestone } = await supabaseAdmin
+              .from("job_milestones")
+              .select("sort_order")
+              .eq("id", payment.milestone_id)
+              .single();
+
+            // sort_order 0 = deposit milestone
+            if (milestone && milestone.sort_order === 0) {
+              const { data: job } = await supabaseAdmin
+                .from("jobs")
+                .select("scheduled_start, scheduled_end")
+                .eq("id", job_id)
+                .single();
+
+              if (job?.scheduled_start) {
+                const scheduledStart = new Date(job.scheduled_start);
+                const now = new Date();
+
+                if (now > scheduledStart) {
+                  // Start date has passed — move to 24 hours from now
+                  const newStart = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                  const updateData: Record<string, string> = {
+                    scheduled_start: newStart.toISOString(),
+                  };
+
+                  // Preserve the original duration if end date exists
+                  if (job.scheduled_end) {
+                    const originalDuration = new Date(job.scheduled_end).getTime() - scheduledStart.getTime();
+                    updateData.scheduled_end = new Date(newStart.getTime() + originalDuration).toISOString();
+                  }
+
+                  await supabaseAdmin
+                    .from("jobs")
+                    .update(updateData)
+                    .eq("id", job_id);
+
+                  console.log(`Adjusted start date for job ${job_id}: deposit paid after original start date`);
+                }
+              }
+            }
+          }
         } else if (session.status === "expired" || session.status === "complete") {
           // Session expired or completed without payment — mark as failed so customer can retry
           await supabaseAdmin

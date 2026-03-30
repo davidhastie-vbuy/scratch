@@ -330,10 +330,26 @@ const ProviderJobDetail = () => {
               <div className="flex justify-between"><span className="text-muted-foreground">Agreed Price</span><span className="font-semibold">£{Number((job as any).agreed_price).toFixed(2)}</span></div>
             )}
             {(job as any).scheduled_start && (
-              <div className="flex justify-between"><span className="text-muted-foreground">Starts</span><span>{format(new Date((job as any).scheduled_start), "PPP 'at' h:mm a")}</span></div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Starts</span>
+                <span>
+                  {format(new Date((job as any).scheduled_start), "PPP 'at' h:mm a")}
+                  {hasConfirmedPayment
+                    ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
+                    : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
+                </span>
+              </div>
             )}
             {(job as any).scheduled_end && (
-              <div className="flex justify-between"><span className="text-muted-foreground">Ends</span><span>{format(new Date((job as any).scheduled_end), "PPP 'at' h:mm a")}</span></div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Ends</span>
+                <span>
+                  {format(new Date((job as any).scheduled_end), "PPP 'at' h:mm a")}
+                  {hasConfirmedPayment
+                    ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
+                    : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
+                </span>
+              </div>
             )}
           </div>
           <p className="text-sm whitespace-pre-wrap">{job.description}</p>
@@ -473,13 +489,23 @@ const ProviderJobDetail = () => {
                 {job.scheduled_start && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Current Start</span>
-                    <span>{format(new Date(job.scheduled_start), "PPP 'at' h:mm a")}</span>
+                    <span>
+                      {format(new Date(job.scheduled_start), "PPP 'at' h:mm a")}
+                      {hasConfirmedPayment
+                        ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
+                        : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
+                    </span>
                   </div>
                 )}
                 {job.scheduled_end && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Current End</span>
-                    <span>{format(new Date(job.scheduled_end), "PPP 'at' h:mm a")}</span>
+                    <span>
+                      {format(new Date(job.scheduled_end), "PPP 'at' h:mm a")}
+                      {hasConfirmedPayment
+                        ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
+                        : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
+                    </span>
                   </div>
                 )}
               </div>
