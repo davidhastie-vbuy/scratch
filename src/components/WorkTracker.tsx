@@ -807,12 +807,34 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                   placeholder="Explain the situation for the admin to review…"
                   rows={3}
                 />
+                <div>
+                  <input ref={escalateFileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple className="hidden" onChange={(e) => handleDisputeFiles(e, "escalate")} />
+                  <Button type="button" size="sm" variant="outline" onClick={() => escalateFileRef.current?.click()}>
+                    <Paperclip className="mr-1 h-3 w-3" /> Attach Photos/Videos
+                  </Button>
+                  {escalateFiles.length > 0 && (
+                    <div className="flex gap-2 mt-2 overflow-x-auto">
+                      {escalateFiles.map((f, i) => (
+                        <div key={i} className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+                          {f.isVideo ? (
+                            <div className="flex items-center justify-center h-full"><Film className="h-6 w-6 text-muted-foreground" /></div>
+                          ) : (
+                            <img src={f.preview} alt="preview" className="w-full h-full object-cover" />
+                          )}
+                          <button onClick={() => removeDisputeFile(i, "escalate")} className="absolute top-0 right-0 bg-destructive text-destructive-foreground rounded-bl p-0.5">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={escalateToAdmin} disabled={escalating}>
                     {escalating ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
                     Submit Escalation
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setShowEscalate(false)}>Cancel</Button>
+                  <Button size="sm" variant="ghost" onClick={() => { setShowEscalate(false); setEscalateFiles([]); }}>Cancel</Button>
                 </div>
               </div>
             )}
