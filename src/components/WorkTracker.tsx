@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +14,7 @@ import {
 import {
   CheckCircle2, Circle, Flag, Plus, Send, Loader2, AlertTriangle, MessageSquareWarning,
   ChevronDown, ChevronUp, PoundSterling, Pencil, Trash2, X, Check, ShieldAlert, Clock,
+  Paperclip, Film,
 } from "lucide-react";
 import { format } from "date-fns";
 
