@@ -355,7 +355,7 @@ const CustomerMessages = () => {
     await supabase.from("messages").insert({
       conversation_id: selected!.id,
       sender_user_id: user!.id,
-      body: `✅ Terms accepted in principle! Price: £${Number(proposal.agreed_price).toFixed(2)}, starting ${new Date(proposal.start_date).toLocaleDateString()}, duration: ${proposal.duration}.\n\n⏳ Next steps:\n1. Please set up payment milestones for this job.\n2. Once the customer pays the first milestone deposit, you can start work based on the agreed schedule.\n\n💡 The job is fully confirmed once the customer makes the first milestone payment.`,
+      body: `✅ Terms accepted in principle! Price: £${Number(proposal.agreed_price).toFixed(2)}, starting ${format(new Date(proposal.start_date), "dd/MM/yyyy")}, duration: ${proposal.duration}.\n\n⏳ Next steps:\n1. Please set up payment milestones for this job.\n2. Once the customer pays the first milestone deposit, you can start work based on the agreed schedule.\n\n💡 The job is fully confirmed once the customer makes the first milestone payment.`,
       message_type: "system",
     } as any);
 

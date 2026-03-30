@@ -697,7 +697,7 @@ const JobDetail = () => {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Starts</span>
                     <span>
-                      {format(new Date(job.scheduled_start), "PPP 'at' h:mm a")}
+                      {format(new Date(job.scheduled_start), "dd/MM/yyyy 'at' h:mm a")}
                       {hasConfirmedPayment
                         ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
                         : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
@@ -708,7 +708,7 @@ const JobDetail = () => {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Ends</span>
                     <span>
-                      {format(new Date(job.scheduled_end), "PPP 'at' h:mm a")}
+                      {format(new Date(job.scheduled_end), "dd/MM/yyyy 'at' h:mm a")}
                       {hasConfirmedPayment
                         ? <Badge variant="default" className="ml-2 text-[10px] px-1.5 py-0">Confirmed</Badge>
                         : <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Suggested</Badge>}
@@ -919,13 +919,13 @@ const JobDetail = () => {
               {job.scheduled_start && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Starts</span>
-                  <span>{format(new Date(job.scheduled_start), "PPP 'at' h:mm a")}</span>
+                  <span>{format(new Date(job.scheduled_start), "dd/MM/yyyy 'at' h:mm a")}</span>
                 </div>
               )}
               {job.scheduled_end && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Ends</span>
-                  <span>{format(new Date(job.scheduled_end), "PPP 'at' h:mm a")}</span>
+                  <span>{format(new Date(job.scheduled_end), "dd/MM/yyyy 'at' h:mm a")}</span>
                 </div>
               )}
             </div>

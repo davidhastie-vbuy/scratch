@@ -103,7 +103,7 @@ const MyJobs = () => {
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground mt-2">Posted {new Date(job.created_at).toLocaleDateString()}</p>
+                <p className="text-xs text-muted-foreground mt-2">Posted {format(new Date(job.created_at), "dd/MM/yyyy")}</p>
               </CardContent>
             </Card>
           );
