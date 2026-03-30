@@ -547,7 +547,7 @@ const CustomerMessages = () => {
       {/* Chat area - full width on mobile when selected */}
       <div className={cn(
         "flex-1 flex flex-col border rounded-lg min-w-0",
-        selected ? "block" : "hidden md:flex"
+        selected ? "flex" : "hidden md:flex"
       )}>
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
