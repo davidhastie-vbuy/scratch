@@ -74,6 +74,65 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const [escalateReason, setEscalateReason] = useState("");
   const [escalating, setEscalating] = useState(false);
 
+  // Dispute/escalation file uploads
+  const [disputeFiles, setDisputeFiles] = useState<{ file: File; preview: string; isVideo: boolean }[]>([]);
+  const [escalateFiles, setEscalateFiles] = useState<{ file: File; preview: string; isVideo: boolean }[]>([]);
+  const disputeFileRef = useRef<HTMLInputElement>(null);
+  const escalateFileRef = useRef<HTMLInputElement>(null);
+
+  const DISPUTE_ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif", "video/mp4", "video/webm", "video/quicktime"];
+  const MAX_DISPUTE_FILE_SIZE = 5 * 1024 * 1024;
+
+  const handleDisputeFiles = (e: React.ChangeEvent<HTMLInputElement>, target: "dispute" | "escalate") => {
+    const files = Array.from(e.target.files || []);
+    const setter = target === "dispute" ? setDisputeFiles : setEscalateFiles;
+    for (const file of files) {
+      if (!DISPUTE_ACCEPTED_TYPES.includes(file.type)) {
+        toast({ title: "Unsupported file type", description: "Only images and videos are allowed.", variant: "destructive" });
+        continue;
+      }
+      if (file.size > MAX_DISPUTE_FILE_SIZE) {
+        toast({ title: "File too large", description: `${file.name} exceeds the 5MB limit.`, variant: "destructive" });
+        continue;
+      }
+      const isVideo = file.type.startsWith("video/");
+      const preview = URL.createObjectURL(file);
+      setter(prev => [...prev, { file, preview, isVideo }]);
+    }
+    e.target.value = "";
+  };
+
+  const removeDisputeFile = (idx: number, target: "dispute" | "escalate") => {
+    const setter = target === "dispute" ? setDisputeFiles : setEscalateFiles;
+    setter(prev => {
+      URL.revokeObjectURL(prev[idx].preview);
+      return prev.filter((_, i) => i !== idx);
+    });
+  };
+
+  const uploadDisputeAttachments = async (disputeId: string, files: { file: File; preview: string; isVideo: boolean }[]) => {
+    for (const sf of files) {
+      const ext = sf.file.name.split(".").pop() || "bin";
+      const storagePath = `${user!.id}/${disputeId}/${crypto.randomUUID()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("dispute-attachments")
+        .upload(storagePath, sf.file, { contentType: sf.file.type });
+      if (uploadErr) {
+        console.error("Dispute attachment upload error:", uploadErr);
+        continue;
+      }
+      await supabase.from("dispute_attachments").insert({
+        dispute_id: disputeId,
+        user_id: user!.id,
+        file_url: storagePath,
+        file_name: sf.file.name,
+        file_type: sf.file.type,
+        file_size: sf.file.size,
+      } as any);
+      URL.revokeObjectURL(sf.preview);
+    }
+  };
+
   // Change request review
   const [reviewingCR, setReviewingCR] = useState<string | null>(null);
 
