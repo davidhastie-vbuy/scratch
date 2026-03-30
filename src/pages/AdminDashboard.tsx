@@ -20,73 +20,85 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-sidebar text-sidebar-foreground">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-sidebar-primary" />
-            <h1 className="font-display text-xl font-bold">Book A Trade Admin</h1>
+        <div className="container flex h-14 sm:h-16 items-center justify-between px-3 sm:px-6">
+          <div className="flex items-center gap-2 min-w-0">
+            <Shield className="h-5 w-5 text-sidebar-primary shrink-0" />
+            <h1 className="font-display text-base sm:text-xl font-bold truncate">Book A Trade Admin</h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <NotificationBell />
-            <span className="rounded-full bg-sidebar-accent px-3 py-1 text-xs font-medium text-sidebar-accent-foreground">
+            <span className="hidden sm:inline-block rounded-full bg-sidebar-accent px-3 py-1 text-xs font-medium text-sidebar-accent-foreground">
               Admin
             </span>
             <Button variant="ghost" size="sm" className="text-sidebar-foreground hover:text-sidebar-primary-foreground" onClick={signOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign out
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline ml-2">Sign out</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container py-8">
-        <div className="mb-6">
-          <h2 className="font-display text-2xl font-bold">Platform Management</h2>
-          <p className="text-muted-foreground">Manage users, categories, and support</p>
+      <main className="container py-4 sm:py-8 px-3 sm:px-6">
+        <div className="mb-4 sm:mb-6">
+          <h2 className="font-display text-xl sm:text-2xl font-bold">Platform Management</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Manage users, categories, and support</p>
         </div>
 
         <Tabs defaultValue="providers" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="providers" className="gap-1.5">
-              <Wrench className="h-4 w-4" />
-              Providers
-            </TabsTrigger>
-            <TabsTrigger value="customers" className="gap-1.5">
-              <Users className="h-4 w-4" />
-              Customers
-            </TabsTrigger>
-            <TabsTrigger value="categories" className="gap-1.5">
-              <Tag className="h-4 w-4" />
-              Categories
-            </TabsTrigger>
-            <TabsTrigger value="support" className="gap-1.5">
-              <HelpCircle className="h-4 w-4" />
-              Support Tickets
-            </TabsTrigger>
-            <TabsTrigger value="admins" className="gap-1.5">
-              <UserPlus className="h-4 w-4" />
-              Admins
-            </TabsTrigger>
-            <TabsTrigger value="recommendations" className="gap-1.5">
-              <Star className="h-4 w-4" />
-              Recommendations
-            </TabsTrigger>
-            <TabsTrigger value="disputes" className="gap-1.5">
-              <MessageSquareWarning className="h-4 w-4" />
-              Disputes
-            </TabsTrigger>
-            <TabsTrigger value="payouts" className="gap-1.5">
-              <Banknote className="h-4 w-4" />
-              Payouts
-            </TabsTrigger>
-            <TabsTrigger value="legal" className="gap-1.5">
-              <FileText className="h-4 w-4" />
-              Legal Pages
-            </TabsTrigger>
-            <TabsTrigger value="slots" className="gap-1.5">
-              <LayoutGrid className="h-4 w-4" />
-              Provider Slots
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto scrollbar-hide -mx-3 px-3 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex w-auto min-w-max">
+              <TabsTrigger value="providers" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <Wrench className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Providers</span>
+                <span className="sm:hidden">Prov</span>
+              </TabsTrigger>
+              <TabsTrigger value="customers" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Customers</span>
+                <span className="sm:hidden">Cust</span>
+              </TabsTrigger>
+              <TabsTrigger value="categories" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <Tag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Categories</span>
+                <span className="sm:hidden">Cat</span>
+              </TabsTrigger>
+              <TabsTrigger value="support" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <HelpCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Support Tickets</span>
+                <span className="sm:hidden">Support</span>
+              </TabsTrigger>
+              <TabsTrigger value="admins" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <UserPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Admins</span>
+                <span className="sm:hidden">Admin</span>
+              </TabsTrigger>
+              <TabsTrigger value="recommendations" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Recommendations</span>
+                <span className="sm:hidden">Recs</span>
+              </TabsTrigger>
+              <TabsTrigger value="disputes" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <MessageSquareWarning className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Disputes</span>
+                <span className="sm:hidden">Disp</span>
+              </TabsTrigger>
+              <TabsTrigger value="payouts" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <Banknote className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Payouts</span>
+                <span className="sm:hidden">Pay</span>
+              </TabsTrigger>
+              <TabsTrigger value="legal" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Legal Pages</span>
+                <span className="sm:hidden">Legal</span>
+              </TabsTrigger>
+              <TabsTrigger value="slots" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Provider Slots</span>
+                <span className="sm:hidden">Slots</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
           <TabsContent value="providers">
             <AdminProviderList />
           </TabsContent>

@@ -384,7 +384,7 @@ const AdminDisputes = () => {
                       <div className="rounded-lg border p-3 space-y-1 text-sm">
                         <p className="font-medium">Job: {det.job.title}</p>
                         <p className="text-muted-foreground">{det.job.description}</p>
-                        <div className="grid grid-cols-2 gap-1 text-xs text-muted-foreground mt-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs text-muted-foreground mt-2">
                           <span>Status: {det.job.status}</span>
                           <span>Category: {det.job.category}</span>
                           <span>Budget: {det.job.budget || "—"}</span>
@@ -393,7 +393,7 @@ const AdminDisputes = () => {
                       </div>
 
                       {/* Contact info */}
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="rounded-lg border p-3 text-sm space-y-1">
                           <p className="font-medium">Customer</p>
                           <p>{det.customerProfile?.first_name} {det.customerProfile?.last_name}</p>

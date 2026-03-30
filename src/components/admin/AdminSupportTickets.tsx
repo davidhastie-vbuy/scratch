@@ -109,15 +109,15 @@ const AdminSupportTickets = () => {
       {tickets.length === 0 ? (
         <p className="text-sm text-muted-foreground">No support tickets.</p>
       ) : (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Subject</TableHead>
-                <TableHead>Submitted By</TableHead>
-                <TableHead>Role</TableHead>
+                <TableHead className="hidden sm:table-cell">Submitted By</TableHead>
+                <TableHead className="hidden md:table-cell">Role</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
+                <TableHead className="hidden sm:table-cell">Created</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -127,17 +127,17 @@ const AdminSupportTickets = () => {
                 return (
                   <TableRow key={t.id}>
                      <TableCell className="font-medium">{t.subject}</TableCell>
-                     <TableCell>
+                     <TableCell className="hidden sm:table-cell">
                        <div className="text-sm">
                          {t._profile ? (t._profile.first_name || t._profile.last_name ? `${t._profile.first_name ?? ''} ${t._profile.last_name ?? ''}`.trim() : t._profile.full_name || '—') : '—'}
                        </div>
                        {t._profile?.email && <div className="text-xs text-muted-foreground">{t._profile.email}</div>}
                      </TableCell>
-                     <TableCell>
+                     <TableCell className="hidden md:table-cell">
                        <Badge variant="outline" className="capitalize">{t._role ?? '—'}</Badge>
                      </TableCell>
                      <TableCell><Badge variant={st.variant}>{st.label}</Badge></TableCell>
-                     <TableCell className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</TableCell>
+                     <TableCell className="hidden sm:table-cell text-xs text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" onClick={() => openTicket(t)}>
                         <Eye className="h-4 w-4" />

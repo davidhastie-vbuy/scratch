@@ -387,17 +387,17 @@ const AdminProviderList = () => {
       ) : filtered.length === 0 ? (
         <p className="text-muted-foreground text-sm">No providers found.</p>
       ) : (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
              <TableHeader>
               <TableRow>
                 <TableHead>Business</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Trade</TableHead>
-                <TableHead>Submitted</TableHead>
+                <TableHead className="hidden sm:table-cell">Contact</TableHead>
+                <TableHead className="hidden md:table-cell">Email</TableHead>
+                <TableHead className="hidden sm:table-cell">Trade</TableHead>
+                <TableHead className="hidden md:table-cell">Submitted</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-[260px]">Actions</TableHead>
+                <TableHead className="w-[180px] sm:w-[260px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
