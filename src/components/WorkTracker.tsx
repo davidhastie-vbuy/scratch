@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +14,7 @@ import {
 import {
   CheckCircle2, Circle, Flag, Plus, Send, Loader2, AlertTriangle, MessageSquareWarning,
   ChevronDown, ChevronUp, PoundSterling, Pencil, Trash2, X, Check, ShieldAlert, Clock,
+  Paperclip, Film,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -72,6 +73,65 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const [showEscalate, setShowEscalate] = useState(false);
   const [escalateReason, setEscalateReason] = useState("");
   const [escalating, setEscalating] = useState(false);
+
+  // Dispute/escalation file uploads
+  const [disputeFiles, setDisputeFiles] = useState<{ file: File; preview: string; isVideo: boolean }[]>([]);
+  const [escalateFiles, setEscalateFiles] = useState<{ file: File; preview: string; isVideo: boolean }[]>([]);
+  const disputeFileRef = useRef<HTMLInputElement>(null);
+  const escalateFileRef = useRef<HTMLInputElement>(null);
+
+  const DISPUTE_ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif", "video/mp4", "video/webm", "video/quicktime"];
+  const MAX_DISPUTE_FILE_SIZE = 5 * 1024 * 1024;
+
+  const handleDisputeFiles = (e: React.ChangeEvent<HTMLInputElement>, target: "dispute" | "escalate") => {
+    const files = Array.from(e.target.files || []);
+    const setter = target === "dispute" ? setDisputeFiles : setEscalateFiles;
+    for (const file of files) {
+      if (!DISPUTE_ACCEPTED_TYPES.includes(file.type)) {
+        toast({ title: "Unsupported file type", description: "Only images and videos are allowed.", variant: "destructive" });
+        continue;
+      }
+      if (file.size > MAX_DISPUTE_FILE_SIZE) {
+        toast({ title: "File too large", description: `${file.name} exceeds the 5MB limit.`, variant: "destructive" });
+        continue;
+      }
+      const isVideo = file.type.startsWith("video/");
+      const preview = URL.createObjectURL(file);
+      setter(prev => [...prev, { file, preview, isVideo }]);
+    }
+    e.target.value = "";
+  };
+
+  const removeDisputeFile = (idx: number, target: "dispute" | "escalate") => {
+    const setter = target === "dispute" ? setDisputeFiles : setEscalateFiles;
+    setter(prev => {
+      URL.revokeObjectURL(prev[idx].preview);
+      return prev.filter((_, i) => i !== idx);
+    });
+  };
+
+  const uploadDisputeAttachments = async (disputeId: string, files: { file: File; preview: string; isVideo: boolean }[]) => {
+    for (const sf of files) {
+      const ext = sf.file.name.split(".").pop() || "bin";
+      const storagePath = `${user!.id}/${disputeId}/${crypto.randomUUID()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("dispute-attachments")
+        .upload(storagePath, sf.file, { contentType: sf.file.type });
+      if (uploadErr) {
+        console.error("Dispute attachment upload error:", uploadErr);
+        continue;
+      }
+      await supabase.from("dispute_attachments").insert({
+        dispute_id: disputeId,
+        user_id: user!.id,
+        file_url: storagePath,
+        file_name: sf.file.name,
+        file_type: sf.file.type,
+        file_size: sf.file.size,
+      } as any);
+      URL.revokeObjectURL(sf.preview);
+    }
+  };
 
   // Change request review
   const [reviewingCR, setReviewingCR] = useState<string | null>(null);
@@ -257,17 +317,21 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
   const raiseDispute = async () => {
     if (!disputeReason.trim()) return;
     setRaisingDispute(true);
-    const { error } = await supabase.from("job_disputes").insert({
+    const { data, error } = await supabase.from("job_disputes").insert({
       job_id: jobId,
       raised_by: user!.id,
       reason: disputeReason.trim(),
-    } as any);
+    } as any).select("id").single();
     if (error) {
       toast({ title: "Failed to raise dispute", description: error.message, variant: "destructive" });
     } else {
+      if (data && disputeFiles.length > 0) {
+        await uploadDisputeAttachments(data.id, disputeFiles);
+      }
       toast({ title: "Dispute raised", description: "An admin will review your case." });
       setShowDispute(false);
       setDisputeReason("");
+      setDisputeFiles([]);
     }
     setRaisingDispute(false);
   };
@@ -290,17 +354,21 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
       return;
     }
     setEscalating(true);
-    const { error } = await supabase.from("job_disputes").insert({
+    const { data, error } = await supabase.from("job_disputes").insert({
       job_id: jobId,
       raised_by: user!.id,
       reason: `[Escalated after milestone flags] ${escalateReason.trim()}`,
-    } as any);
+    } as any).select("id").single();
     if (error) {
       toast({ title: "Failed to escalate", description: error.message, variant: "destructive" });
     } else {
+      if (data && escalateFiles.length > 0) {
+        await uploadDisputeAttachments(data.id, escalateFiles);
+      }
       toast({ title: "Escalated to admin", description: "An admin will review the job, milestones, and all communications." });
       setShowEscalate(false);
       setEscalateReason("");
+      setEscalateFiles([]);
     }
     setEscalating(false);
   };
@@ -625,12 +693,34 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
               placeholder="Describe the issue…"
               rows={3}
             />
+            <div>
+              <input ref={disputeFileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple className="hidden" onChange={(e) => handleDisputeFiles(e, "dispute")} />
+              <Button type="button" size="sm" variant="outline" onClick={() => disputeFileRef.current?.click()}>
+                <Paperclip className="mr-1 h-3 w-3" /> Attach Photos/Videos
+              </Button>
+              {disputeFiles.length > 0 && (
+                <div className="flex gap-2 mt-2 overflow-x-auto">
+                  {disputeFiles.map((f, i) => (
+                    <div key={i} className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+                      {f.isVideo ? (
+                        <div className="flex items-center justify-center h-full"><Film className="h-6 w-6 text-muted-foreground" /></div>
+                      ) : (
+                        <img src={f.preview} alt="preview" className="w-full h-full object-cover" />
+                      )}
+                      <button onClick={() => removeDisputeFile(i, "dispute")} className="absolute top-0 right-0 bg-destructive text-destructive-foreground rounded-bl p-0.5">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="flex gap-2">
               <Button size="sm" variant="destructive" onClick={raiseDispute} disabled={raisingDispute}>
                 {raisingDispute ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
                 Submit Dispute
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setShowDispute(false)}>Cancel</Button>
+              <Button size="sm" variant="ghost" onClick={() => { setShowDispute(false); setDisputeFiles([]); }}>Cancel</Button>
             </div>
           </div>
         )}
@@ -658,12 +748,34 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                   placeholder="Explain the situation for the admin to review…"
                   rows={3}
                 />
+                <div>
+                  <input ref={escalateFileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple className="hidden" onChange={(e) => handleDisputeFiles(e, "escalate")} />
+                  <Button type="button" size="sm" variant="outline" onClick={() => escalateFileRef.current?.click()}>
+                    <Paperclip className="mr-1 h-3 w-3" /> Attach Photos/Videos
+                  </Button>
+                  {escalateFiles.length > 0 && (
+                    <div className="flex gap-2 mt-2 overflow-x-auto">
+                      {escalateFiles.map((f, i) => (
+                        <div key={i} className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+                          {f.isVideo ? (
+                            <div className="flex items-center justify-center h-full"><Film className="h-6 w-6 text-muted-foreground" /></div>
+                          ) : (
+                            <img src={f.preview} alt="preview" className="w-full h-full object-cover" />
+                          )}
+                          <button onClick={() => removeDisputeFile(i, "escalate")} className="absolute top-0 right-0 bg-destructive text-destructive-foreground rounded-bl p-0.5">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={escalateToAdmin} disabled={escalating}>
                     {escalating ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
                     Submit Escalation
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setShowEscalate(false)}>Cancel</Button>
+                  <Button size="sm" variant="ghost" onClick={() => { setShowEscalate(false); setEscalateFiles([]); }}>Cancel</Button>
                 </div>
               </div>
             )}
@@ -695,12 +807,34 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                   placeholder="Explain the situation for the admin to review…"
                   rows={3}
                 />
+                <div>
+                  <input ref={escalateFileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple className="hidden" onChange={(e) => handleDisputeFiles(e, "escalate")} />
+                  <Button type="button" size="sm" variant="outline" onClick={() => escalateFileRef.current?.click()}>
+                    <Paperclip className="mr-1 h-3 w-3" /> Attach Photos/Videos
+                  </Button>
+                  {escalateFiles.length > 0 && (
+                    <div className="flex gap-2 mt-2 overflow-x-auto">
+                      {escalateFiles.map((f, i) => (
+                        <div key={i} className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+                          {f.isVideo ? (
+                            <div className="flex items-center justify-center h-full"><Film className="h-6 w-6 text-muted-foreground" /></div>
+                          ) : (
+                            <img src={f.preview} alt="preview" className="w-full h-full object-cover" />
+                          )}
+                          <button onClick={() => removeDisputeFile(i, "escalate")} className="absolute top-0 right-0 bg-destructive text-destructive-foreground rounded-bl p-0.5">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={escalateToAdmin} disabled={escalating}>
                     {escalating ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Send className="mr-1 h-3 w-3" />}
                     Submit Escalation
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setShowEscalate(false)}>Cancel</Button>
+                  <Button size="sm" variant="ghost" onClick={() => { setShowEscalate(false); setEscalateFiles([]); }}>Cancel</Button>
                 </div>
               </div>
             )}
