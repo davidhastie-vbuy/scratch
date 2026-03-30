@@ -314,9 +314,9 @@ const ProviderJobDetail = () => {
 
       <Card>
         <CardHeader>
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle>{job.title}</CardTitle>
-            <Badge>{job.status.replace("_", " ")}</Badge>
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+            <CardTitle className="text-lg sm:text-xl">{job.title}</CardTitle>
+            <Badge className="self-start">{job.status.replace("_", " ")}</Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
