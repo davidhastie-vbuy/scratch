@@ -1083,9 +1083,15 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                         </div>
                       )}
 
-                      {m.status === "accepted" && (
-                        <p className="text-xs text-green-600">✓ Milestone accepted by customer{payment?.status === "released" ? " — payment released" : ""}</p>
-                      )}
+                      {m.status === "accepted" && (() => {
+                        const adminAccepted = (comments[m.id] || []).some((c: any) => c.action === "admin_accepted");
+                        return (
+                          <p className="text-xs text-green-600">
+                            ✓ {adminAccepted ? "Milestone approved by admin" : "Milestone accepted by customer"}
+                            {payment?.status === "released" ? " — payment released" : ""}
+                          </p>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>

@@ -158,6 +158,13 @@ const AdminDisputes = () => {
           flag_count: 0,
           completed_at: new Date().toISOString(),
         }).eq("id", m.id);
+
+        await supabase.from("milestone_comments").insert({
+          milestone_id: m.id,
+          user_id: user!.id,
+          action: "admin_accepted",
+          body: "Admin ruled in favour of provider. Milestone approved by admin.",
+        });
       }
 
       // Check if ALL milestones are now accepted → complete the job
