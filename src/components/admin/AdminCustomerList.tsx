@@ -203,17 +203,17 @@ const AdminCustomerList = () => {
         ) : customerJobs.length === 0 ? (
           <p className="text-muted-foreground text-sm">This customer has not posted any jobs yet.</p>
         ) : (
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Title</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Postcode</TableHead>
-                  <TableHead>Budget</TableHead>
-                  <TableHead>Quotes</TableHead>
+                  <TableHead className="hidden sm:table-cell">Category</TableHead>
+                  <TableHead className="hidden md:table-cell">Postcode</TableHead>
+                  <TableHead className="hidden md:table-cell">Budget</TableHead>
+                  <TableHead className="hidden sm:table-cell">Quotes</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Posted</TableHead>
+                  <TableHead className="hidden md:table-cell">Posted</TableHead>
                   <TableHead className="w-[80px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -221,12 +221,12 @@ const AdminCustomerList = () => {
                 {customerJobs.map((job) => (
                   <TableRow key={job.id}>
                     <TableCell className="font-medium">{job.title}</TableCell>
-                    <TableCell>{tradeName(job.category)}</TableCell>
-                    <TableCell>{job.postcode_district}</TableCell>
-                    <TableCell>{job.budget || "—"}</TableCell>
-                    <TableCell>{job.quote_count}/3</TableCell>
+                    <TableCell className="hidden sm:table-cell">{tradeName(job.category)}</TableCell>
+                    <TableCell className="hidden md:table-cell">{job.postcode_district}</TableCell>
+                    <TableCell className="hidden md:table-cell">{job.budget || "—"}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{job.quote_count}/3</TableCell>
                     <TableCell>{getStatusBadge(job.status)}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
+                    <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
                       {new Date(job.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
@@ -345,14 +345,14 @@ const AdminCustomerList = () => {
       ) : filtered.length === 0 ? (
         <p className="text-muted-foreground text-sm">No customers found.</p>
       ) : (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>City</TableHead>
+                <TableHead className="hidden sm:table-cell">Phone</TableHead>
+                <TableHead className="hidden sm:table-cell">City</TableHead>
                 <TableHead className="w-[120px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -360,9 +360,9 @@ const AdminCustomerList = () => {
               {filtered.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell className="font-medium">{c.full_name || "—"}</TableCell>
-                  <TableCell>{c.email || "—"}</TableCell>
-                  <TableCell>{c.phone || "—"}</TableCell>
-                  <TableCell>{c.city || "—"}</TableCell>
+                  <TableCell className="max-w-[150px] truncate">{c.email || "—"}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{c.phone || "—"}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{c.city || "—"}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <Button variant="ghost" size="icon" onClick={() => openCustomerJobs(c)} title="View jobs">

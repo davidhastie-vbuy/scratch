@@ -387,17 +387,17 @@ const AdminProviderList = () => {
       ) : filtered.length === 0 ? (
         <p className="text-muted-foreground text-sm">No providers found.</p>
       ) : (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
              <TableHeader>
               <TableRow>
                 <TableHead>Business</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Trade</TableHead>
-                <TableHead>Submitted</TableHead>
+                <TableHead className="hidden sm:table-cell">Contact</TableHead>
+                <TableHead className="hidden md:table-cell">Email</TableHead>
+                <TableHead className="hidden sm:table-cell">Trade</TableHead>
+                <TableHead className="hidden md:table-cell">Submitted</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-[260px]">Actions</TableHead>
+                <TableHead className="w-[180px] sm:w-[260px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -427,10 +427,10 @@ const AdminProviderList = () => {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{p.contact_first_name} {p.contact_last_name}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{p.email || "N/A"}</TableCell>
-                    <TableCell>{tradeName(p.trade_category)}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{p.contact_first_name} {p.contact_last_name}</TableCell>
+                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground">{p.email || "N/A"}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{tradeName(p.trade_category)}</TableCell>
+                    <TableCell className="hidden md:table-cell text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Badge variant={cfg.variant} className="gap-1">
                         <Icon className="h-3 w-3" />

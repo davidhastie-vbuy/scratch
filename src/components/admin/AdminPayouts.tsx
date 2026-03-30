@@ -136,13 +136,13 @@ const AdminPayouts = () => {
           {pending.length === 0 ? (
             <p className="text-sm text-muted-foreground">No pending payout requests.</p>
           ) : (
-            <Table>
+            <div className="overflow-x-auto"><Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Provider</TableHead>
                   <TableHead>Amount</TableHead>
-                  <TableHead>Bank Details</TableHead>
-                  <TableHead>Requested</TableHead>
+                  <TableHead className="hidden sm:table-cell">Bank Details</TableHead>
+                  <TableHead className="hidden sm:table-cell">Requested</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -156,7 +156,7 @@ const AdminPayouts = () => {
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold">£{Number(r.net_amount).toFixed(2)}</TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="hidden sm:table-cell text-sm">
                       {r.bank ? (
                         <div>
                           <p>{r.bank.account_name}</p>
@@ -166,7 +166,7 @@ const AdminPayouts = () => {
                         <span className="text-muted-foreground">No bank details</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm">{format(new Date(r.created_at), "dd MMM yyyy")}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-sm">{format(new Date(r.created_at), "dd MMM yyyy")}</TableCell>
                     <TableCell className="text-right">
                       {showRejectForm === r.id ? (
                         <div className="space-y-2 text-left">
@@ -198,7 +198,7 @@ const AdminPayouts = () => {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           )}
         </CardContent>
       </Card>
@@ -207,7 +207,7 @@ const AdminPayouts = () => {
         <Card>
           <CardHeader><CardTitle>Payout History</CardTitle></CardHeader>
           <CardContent>
-            <Table>
+            <div className="overflow-x-auto"><Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Provider</TableHead>
@@ -232,7 +232,7 @@ const AdminPayouts = () => {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+            </Table></div>
           </CardContent>
         </Card>
       )}
