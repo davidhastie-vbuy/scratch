@@ -86,8 +86,16 @@ serve(async (req) => {
                 const now = new Date();
 
                 if (now > scheduledStart) {
-                  // Start date has passed — move to 24 hours from now
-                  const newStart = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                  // Start date has passed — move to 9am on the next working day (Mon-Fri)
+                  const newStart = new Date(now);
+                  // Move to next day first
+                  newStart.setDate(newStart.getDate() + 1);
+                  // Skip weekends: if Saturday (6) move to Monday, if Sunday (0) move to Monday
+                  const dayOfWeek = newStart.getDay();
+                  if (dayOfWeek === 6) newStart.setDate(newStart.getDate() + 2); // Sat -> Mon
+                  else if (dayOfWeek === 0) newStart.setDate(newStart.getDate() + 1); // Sun -> Mon
+                  // Set time to 9:00 AM
+                  newStart.setHours(9, 0, 0, 0);
                   const updateData: Record<string, string> = {
                     scheduled_start: newStart.toISOString(),
                   };
