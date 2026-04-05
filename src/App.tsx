@@ -110,6 +110,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/legal" element={<LegalPage />} />
             <Route path="/legal/:slug" element={<LegalPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
