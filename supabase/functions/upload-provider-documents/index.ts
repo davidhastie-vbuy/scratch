@@ -25,6 +25,24 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Authentication is REQUIRED
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const formData = await req.formData();
     const userId = formData.get("user_id") as string;
 
@@ -35,17 +53,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Verify auth if Authorization header is present, and ensure user_id matches
-    const authHeader = req.headers.get("Authorization");
-    if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-      if (!authError && user && user.id !== userId) {
-        return new Response(JSON.stringify({ error: "User ID mismatch" }), {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    // Ensure authenticated user matches the user_id
+    if (user.id !== userId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Get the provider profile created by the trigger (with retry for race condition)
@@ -77,12 +90,10 @@ Deno.serve(async (req) => {
     const uploaded: string[] = [];
 
     for (const file of files) {
-      // Validate file size
       if (file.size > MAX_FILE_SIZE) {
         console.error("File too large:", file.name, file.size);
         continue;
       }
-      // Validate file type
       if (!ALLOWED_TYPES.includes(file.type)) {
         console.error("Invalid file type:", file.name, file.type);
         continue;
