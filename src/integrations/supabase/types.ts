@@ -50,6 +50,13 @@ export type Database = {
             referencedRelation: "provider_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "application_status_history_provider_profile_id_fkey"
+            columns: ["provider_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_provider_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       conversations: {
@@ -891,6 +898,13 @@ export type Database = {
             referencedRelation: "provider_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "provider_documents_provider_profile_id_fkey"
+            columns: ["provider_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_provider_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       provider_portfolio_images: {
@@ -971,6 +985,13 @@ export type Database = {
             columns: ["provider_profile_id"]
             isOneToOne: false
             referencedRelation: "provider_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_portfolio_projects_provider_profile_id_fkey"
+            columns: ["provider_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_provider_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1394,7 +1415,69 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_provider_profiles: {
+        Row: {
+          about_work: string | null
+          accreditations: string[] | null
+          additional_categories: string[] | null
+          banner_url: string | null
+          business_description: string | null
+          business_name: string | null
+          created_at: string | null
+          email_notifications_enabled: boolean | null
+          id: string | null
+          logo_url: string | null
+          operating_areas: string[] | null
+          public_bio: string | null
+          qualifications_certifications: string | null
+          status: Database["public"]["Enums"]["provider_status"] | null
+          trade_category: string | null
+          updated_at: string | null
+          user_id: string | null
+          years_experience: string | null
+        }
+        Insert: {
+          about_work?: string | null
+          accreditations?: string[] | null
+          additional_categories?: string[] | null
+          banner_url?: string | null
+          business_description?: string | null
+          business_name?: string | null
+          created_at?: string | null
+          email_notifications_enabled?: boolean | null
+          id?: string | null
+          logo_url?: string | null
+          operating_areas?: string[] | null
+          public_bio?: string | null
+          qualifications_certifications?: string | null
+          status?: Database["public"]["Enums"]["provider_status"] | null
+          trade_category?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          years_experience?: string | null
+        }
+        Update: {
+          about_work?: string | null
+          accreditations?: string[] | null
+          additional_categories?: string[] | null
+          banner_url?: string | null
+          business_description?: string | null
+          business_name?: string | null
+          created_at?: string | null
+          email_notifications_enabled?: boolean | null
+          id?: string | null
+          logo_url?: string | null
+          operating_areas?: string[] | null
+          public_bio?: string | null
+          qualifications_certifications?: string | null
+          status?: Database["public"]["Enums"]["provider_status"] | null
+          trade_category?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          years_experience?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       _supabase_anon_key: { Args: never; Returns: string }

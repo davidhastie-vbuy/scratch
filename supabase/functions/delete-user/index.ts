@@ -17,7 +17,6 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify the caller is an admin
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(
@@ -39,7 +38,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check caller is admin
     const { data: callerRole } = await supabaseAdmin
       .from("user_roles")
       .select("role")
@@ -63,7 +61,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Prevent admin from deleting themselves
     if (user_id === caller.id) {
       return new Response(
         JSON.stringify({ error: "You cannot delete your own account" }),
@@ -71,30 +68,27 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Delete provider profile if exists (cascade handled by DB for documents etc.)
     await supabaseAdmin
       .from("provider_profiles")
       .delete()
       .eq("user_id", user_id);
 
-    // Delete profile
     await supabaseAdmin
       .from("profiles")
       .delete()
       .eq("id", user_id);
 
-    // Delete user roles
     await supabaseAdmin
       .from("user_roles")
       .delete()
       .eq("user_id", user_id);
 
-    // Delete the auth user (this is the primary deletion)
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id);
 
     if (deleteError) {
+      console.error("Delete user error:", deleteError);
       return new Response(
-        JSON.stringify({ error: deleteError.message }),
+        JSON.stringify({ error: "Failed to delete user. Please try again." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -104,8 +98,9 @@ Deno.serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
+    console.error("delete-user error:", err);
     return new Response(
-      JSON.stringify({ error: err.message }),
+      JSON.stringify({ error: "An unexpected error occurred. Please try again." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

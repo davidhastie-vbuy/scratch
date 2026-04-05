@@ -45,7 +45,7 @@ serve(async (req) => {
     if (!res.ok) {
       console.error("Resend API error:", data);
       return new Response(
-        JSON.stringify({ error: "Failed to send email", details: data }),
+        JSON.stringify({ error: "Failed to send email. Please try again." }),
         { status: res.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -57,7 +57,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("send-provider-email error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: "An unexpected error occurred. Please try again." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
