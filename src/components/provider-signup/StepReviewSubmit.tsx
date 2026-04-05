@@ -106,9 +106,7 @@ const StepReviewSubmit = ({ form, tradeCategories, agreements, onAgreementsChang
           />
           <Label htmlFor="agree-terms" className="text-xs font-normal leading-tight cursor-pointer">
             I agree to the{" "}
-            <a href="/legal/terms-of-service?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Terms of Service</a>{" "}
-            and{" "}
-            <a href="/legal/privacy-policy?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Privacy Policy</a>, including the commission structure.
+            <a href="/legal?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Terms & Conditions</a>, including the commission structure.
           </Label>
         </div>
 

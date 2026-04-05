@@ -18,8 +18,16 @@ interface LegalPage {
 }
 
 const PAGES = [
+  { slug: "platform-terms", label: "Platform Terms of Use" },
   { slug: "terms-of-service", label: "Terms of Service" },
-  { slug: "privacy-policy", label: "Privacy Policy" },
+  { slug: "privacy-policy", label: "Privacy Notice" },
+  { slug: "acceptable-use", label: "Acceptable Use Policy" },
+  { slug: "payment-terms", label: "Payment & Escrow Terms" },
+  { slug: "cancellation-policy", label: "Cancellation & Refund Policy" },
+  { slug: "dispute-resolution", label: "Dispute Resolution Policy" },
+  { slug: "review-policy", label: "Review & Feedback Policy" },
+  { slug: "provider-standards", label: "Provider Standards & Conduct" },
+  { slug: "sanctions-policy", label: "Deactivation & Sanctions Policy" },
 ];
 
 const AdminLegalPages = () => {
