@@ -7,6 +7,7 @@ import { NavLink, useNavigate, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/bookatrade-logo.png";
+import logoDark from "@/assets/bookatrade-logo-dark.jpeg";
 
 interface NavItem {
   label: string;
