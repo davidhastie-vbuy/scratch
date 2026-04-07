@@ -60,7 +60,7 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults, lockPrice }: Pr
     return addDays(start, parsedDays);
   }, [startDate, startTime, parsedDays]);
 
-  const isValid = !isNaN(parsedPrice) && parsedPrice > 0 && startDate && parsedDays > 0;
+  const isValid = !isNaN(parsedPrice) && parsedPrice > 0 && startDate && parsedDays > 0 && termsAccepted;
 
   const durationLabel = `${parsedDays} day${parsedDays !== 1 ? "s" : ""}`;
 
