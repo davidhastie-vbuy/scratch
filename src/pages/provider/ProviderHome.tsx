@@ -5,7 +5,7 @@ import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Briefcase, FileText, MessageSquare, Clock, AlertTriangle, XCircle,
-  MessageCircle, ClipboardList, ArrowRight, CheckCircle2, Wallet, CalendarDays, ImageIcon
+  MessageCircle, ClipboardList, ArrowRight, CheckCircle2, Wallet, CalendarDays, ImageIcon, PoundSterling
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
