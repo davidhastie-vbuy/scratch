@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Briefcase, FileText, MessageSquare, Clock, AlertTriangle, XCircle,
