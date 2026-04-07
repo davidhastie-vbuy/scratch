@@ -37,6 +37,7 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults, lockPrice }: Pr
   const [startTime, setStartTime] = useState("09:00");
   const [durationDays, setDurationDays] = useState("1");
   const [submitting, setSubmitting] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     if (open) {
