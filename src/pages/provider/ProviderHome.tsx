@@ -57,10 +57,10 @@ const ProviderHome = () => {
   }, [user]);
 
   const statCards = [
-    { label: "Active Jobs", value: stats.activeJobs, icon: Briefcase, color: "text-primary" },
-    { label: "Pending Quotes", value: stats.pendingQuotes, icon: Clock, color: "text-warning" },
-    { label: "Completed", value: stats.completedJobs, icon: CheckCircle2, color: "text-success" },
-    { label: "Unread Messages", value: stats.unreadMessages, icon: MessageSquare, color: "text-primary" },
+    { label: "Active Jobs", value: stats.activeJobs, icon: Briefcase, color: "text-primary", format: "number" as const },
+    { label: "Pending Quotes", value: stats.pendingQuotes, icon: Clock, color: "text-warning", format: "number" as const },
+    { label: "Completed", value: stats.completedJobs, icon: CheckCircle2, color: "text-success", format: "number" as const },
+    { label: "Earnings to Date", value: stats.totalEarnings, icon: PoundSterling, color: "text-primary", format: "currency" as const },
   ];
 
   const quickActions = [
