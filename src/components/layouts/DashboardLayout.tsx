@@ -123,8 +123,8 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
           <span className="hidden sm:inline">·</span>
           <a href={`/legal/privacy-policy?audience=${audience}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground hover:underline">Privacy Policy</a>
         </footer>
+      </div>
     </div>
-  );
 };
 
 export default DashboardLayout;
