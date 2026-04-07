@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarIcon, Loader2, Send } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
