@@ -147,7 +147,9 @@ const ProviderHome = () => {
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-2xl font-extrabold leading-none">{s.value}</p>
+                      <p className="text-2xl font-extrabold leading-none">
+                        {s.format === "currency" ? `£${s.value.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : s.value}
+                      </p>
                       <p className="text-xs text-muted-foreground mt-0.5 truncate">{s.label}</p>
                     </div>
                   </CardContent>
