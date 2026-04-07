@@ -75,9 +75,9 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
         <header className="border-b bg-card shadow-sm">
           <div className="flex h-16 items-center justify-between px-4 md:px-6">
             <div className="flex items-center gap-3">
-              <div className="md:hidden flex items-center gap-2 mr-2">
+              <Link to={dashboardPath} className="md:hidden flex items-center gap-2 mr-2 hover:opacity-80 transition-opacity">
                 <img src={logo} alt="BookATrade logo" className="h-7 w-7" />
-              </div>
+              </Link>
               <h1 className="font-display text-xl font-extrabold truncate">{title}</h1>
             </div>
             <div className="flex items-center gap-2">
