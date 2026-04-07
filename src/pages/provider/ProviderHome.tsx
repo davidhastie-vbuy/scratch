@@ -22,7 +22,7 @@ const ProviderHome = () => {
   const [status, setStatus] = useState("pending");
   const [businessName, setBusinessName] = useState("");
   const [adminNote, setAdminNote] = useState("");
-  const [stats, setStats] = useState({ activeJobs: 0, pendingQuotes: 0, completedJobs: 0, unreadMessages: 0 });
+  const [stats, setStats] = useState({ activeJobs: 0, pendingQuotes: 0, completedJobs: 0, totalEarnings: 0 });
 
   useEffect(() => {
     if (!user) return;
