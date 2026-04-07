@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut, Home, Wrench, Shield } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/bookatrade-logo.png";
@@ -26,16 +26,17 @@ interface DashboardLayoutProps {
 const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: DashboardLayoutProps) => {
   const { signOut } = useAuth();
   const audience = roleBadge.toLowerCase() === "provider" ? "provider" : "customer";
+  const dashboardPath = audience === "provider" ? "/provider" : "/dashboard";
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 flex-col bg-foreground text-primary-foreground">
-        <div className="flex h-16 items-center gap-2.5 border-b border-primary-foreground/10 px-4">
+        <Link to={dashboardPath} className="flex h-16 items-center gap-2.5 border-b border-primary-foreground/10 px-4 hover:opacity-80 transition-opacity">
           <img src={logo} alt="BookATrade logo" className="h-9 w-9" />
           <span className="font-display text-lg font-extrabold">
             Book<span className="text-primary">A</span>Trade
           </span>
-        </div>
+        </Link>
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => (
             <NavLink
@@ -74,9 +75,9 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
         <header className="border-b bg-card shadow-sm">
           <div className="flex h-16 items-center justify-between px-4 md:px-6">
             <div className="flex items-center gap-3">
-              <div className="md:hidden flex items-center gap-2 mr-2">
+              <Link to={dashboardPath} className="md:hidden flex items-center gap-2 mr-2 hover:opacity-80 transition-opacity">
                 <img src={logo} alt="BookATrade logo" className="h-7 w-7" />
-              </div>
+              </Link>
               <h1 className="font-display text-xl font-extrabold truncate">{title}</h1>
             </div>
             <div className="flex items-center gap-2">
