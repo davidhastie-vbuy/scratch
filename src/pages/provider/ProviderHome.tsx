@@ -67,7 +67,7 @@ const ProviderHome = () => {
     { label: "Available Jobs", desc: "Browse and quote on matching jobs", icon: Briefcase, path: "/provider/jobs" },
     { label: "My Jobs", desc: "Track your awarded and active jobs", icon: ClipboardList, path: "/provider/my-jobs" },
     { label: "My Quotes", desc: "Track your submitted quotes", icon: FileText, path: "/provider/quotes" },
-    { label: "Messages", desc: "Chat with customers", icon: MessageSquare, path: "/provider/messages", badge: stats.unreadMessages },
+    { label: "Messages", desc: "Chat with customers", icon: MessageSquare, path: "/provider/messages" },
     { label: "Calendar", desc: "View your upcoming schedule", icon: CalendarDays, path: "/provider/calendar" },
     { label: "Portfolio", desc: "Showcase your previous work", icon: ImageIcon, path: "/provider/portfolio" },
   ];
