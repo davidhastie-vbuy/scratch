@@ -45,6 +45,7 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults, lockPrice }: Pr
       setStartDate(defaults?.start_date ? new Date(defaults.start_date) : undefined);
       setStartTime(defaults?.start_time || "09:00");
       setDurationDays(String(parseDurationDays(defaults?.duration)));
+      setTermsAccepted(false);
     }
   }, [open, defaults]);
 
