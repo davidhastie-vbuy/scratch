@@ -125,6 +125,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
         </footer>
       </div>
     </div>
+  );
 };
 
 export default DashboardLayout;
