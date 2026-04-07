@@ -7,6 +7,7 @@ import { NavLink, useNavigate, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/bookatrade-logo.png";
+import logoDark from "@/assets/bookatrade-logo-dark.jpeg";
 
 interface NavItem {
   label: string;
@@ -32,7 +33,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 flex-col bg-foreground text-primary-foreground">
         <Link to={dashboardPath} className="flex h-16 items-center gap-2.5 border-b border-primary-foreground/10 px-4 hover:opacity-80 transition-opacity">
-          <img src={logo} alt="BookATrade logo" className="h-9 w-9" />
+          <img src={logoDark} alt="BookATrade logo" className="h-9 w-9 rounded-full" />
           <span className="font-display text-lg font-extrabold">
             Book<span className="text-primary">A</span>Trade
           </span>
