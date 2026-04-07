@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarIcon, Loader2, Send } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -36,6 +37,7 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults, lockPrice }: Pr
   const [startTime, setStartTime] = useState("09:00");
   const [durationDays, setDurationDays] = useState("1");
   const [submitting, setSubmitting] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -43,6 +45,7 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults, lockPrice }: Pr
       setStartDate(defaults?.start_date ? new Date(defaults.start_date) : undefined);
       setStartTime(defaults?.start_time || "09:00");
       setDurationDays(String(parseDurationDays(defaults?.duration)));
+      setTermsAccepted(false);
     }
   }, [open, defaults]);
 
@@ -57,7 +60,7 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults, lockPrice }: Pr
     return addDays(start, parsedDays);
   }, [startDate, startTime, parsedDays]);
 
-  const isValid = !isNaN(parsedPrice) && parsedPrice > 0 && startDate && parsedDays > 0;
+  const isValid = !isNaN(parsedPrice) && parsedPrice > 0 && startDate && parsedDays > 0 && termsAccepted;
 
   const durationLabel = `${parsedDays} day${parsedDays !== 1 ? "s" : ""}`;
 
@@ -131,6 +134,23 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults, lockPrice }: Pr
               <span className="font-medium">{format(endDate, "PPP")}</span>
             </div>
           )}
+
+          <div className="flex items-start gap-2 rounded-lg border border-border p-3">
+            <Checkbox
+              id="accept-terms"
+              checked={termsAccepted}
+              onCheckedChange={(checked) => setTermsAccepted(!!checked)}
+              className="mt-0.5"
+            />
+            <Label htmlFor="accept-terms" className="text-xs font-normal leading-tight cursor-pointer">
+              I confirm I have read and agree to the{" "}
+              <a href="/legal?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Terms & Conditions</a>, including the{" "}
+              <a href="/legal/payment-terms?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Payment Terms</a>,{" "}
+              <a href="/legal/cancellation-policy?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Cancellation & Refund Policy</a>,{" "}
+              <a href="/legal/dispute-resolution?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Dispute Resolution</a>, and{" "}
+              <a href="/legal/provider-standards?audience=provider" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Standards of Conduct</a>.
+            </Label>
+          </div>
 
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
