@@ -28,11 +28,11 @@ const ProviderHome = () => {
     if (!user) return;
 
     const fetchData = async () => {
-      const [profileRes, jobsRes, quotesRes, msgsRes] = await Promise.all([
+      const [profileRes, jobsRes, quotesRes, earningsRes] = await Promise.all([
         supabase.from("provider_profiles").select("status, business_name, admin_note").eq("user_id", user.id).single(),
         supabase.from("jobs").select("status").eq("provider_id", user.id),
         supabase.from("quotes").select("status").eq("provider_user_id", user.id),
-        supabase.from("conversations").select("id").eq("provider_user_id", user.id),
+        supabase.from("provider_transactions").select("amount").eq("provider_user_id", user.id).eq("type", "earning"),
       ]);
 
       if (profileRes.data) {
