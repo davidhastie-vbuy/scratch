@@ -378,8 +378,7 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-6 text-sm text-primary-foreground/60">
-              <Link to="/legal/terms-of-service?audience=customer" className="hover:text-primary transition-colors">Terms</Link>
-              <Link to="/legal/privacy-policy?audience=customer" className="hover:text-primary transition-colors">Privacy</Link>
+              <Link to="/legal?audience=customer" className="hover:text-primary transition-colors">Terms & Conditions</Link>
               <Link to="/login" className="hover:text-primary transition-colors">Sign in</Link>
             </div>
           </div>

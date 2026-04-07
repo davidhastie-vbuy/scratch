@@ -302,9 +302,7 @@ const Signup = () => {
               <CardFooter className="flex flex-col gap-3">
                 <p className="text-xs text-muted-foreground text-center">
                   By creating an account, you agree to our{" "}
-                  <a href="/legal/terms-of-service?audience=customer" target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:underline">Terms of Service</a>{" "}
-                  and{" "}
-                  <a href="/legal/privacy-policy?audience=customer" target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:underline">Privacy Policy</a>.
+                  <a href="/legal?audience=customer" target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:underline">Terms & Conditions</a>.
                 </p>
                 <Button type="submit" className="w-full h-11 font-bold shadow-md" disabled={loading}>
                   {loading ? "Creating account..." : "Create account"}
