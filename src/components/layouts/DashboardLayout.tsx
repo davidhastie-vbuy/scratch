@@ -26,16 +26,17 @@ interface DashboardLayoutProps {
 const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: DashboardLayoutProps) => {
   const { signOut } = useAuth();
   const audience = roleBadge.toLowerCase() === "provider" ? "provider" : "customer";
+  const dashboardPath = audience === "provider" ? "/provider" : "/dashboard";
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 flex-col bg-foreground text-primary-foreground">
-        <div className="flex h-16 items-center gap-2.5 border-b border-primary-foreground/10 px-4">
+        <Link to={dashboardPath} className="flex h-16 items-center gap-2.5 border-b border-primary-foreground/10 px-4 hover:opacity-80 transition-opacity">
           <img src={logo} alt="BookATrade logo" className="h-9 w-9" />
           <span className="font-display text-lg font-extrabold">
             Book<span className="text-primary">A</span>Trade
           </span>
-        </div>
+        </Link>
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => (
             <NavLink
