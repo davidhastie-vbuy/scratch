@@ -118,7 +118,11 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
         <main className="flex-1 p-4 md:p-6 overflow-auto">
           {children}
         </main>
-      </div>
+        <footer className="border-t bg-card px-4 py-3 text-center text-xs text-muted-foreground flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+          <a href={`/legal?audience=${audience}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground hover:underline">Terms & Conditions</a>
+          <span className="hidden sm:inline">·</span>
+          <a href={`/legal/privacy-policy?audience=${audience}`} target="_blank" rel="noopener noreferrer" className="hover:text-foreground hover:underline">Privacy Policy</a>
+        </footer>
     </div>
   );
 };
