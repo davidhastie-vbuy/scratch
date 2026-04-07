@@ -80,11 +80,33 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
   // Find the next unpaid milestone — pending (abandoned) payments should NOT block retry
   const nextUnpaid = milestones.find(m => !getPaymentForMilestone(m.id));
 
+  // Check if this is the first payment (no milestones paid yet)
+  const isFirstPayment = !milestones.some(m => getPaymentForMilestone(m.id));
+
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
         Pay each milestone before that stage of work begins. Funds are held securely and released as milestones are accepted.
       </p>
+
+      {isFirstPayment && (
+        <div className="flex items-start gap-2 rounded-lg border border-border p-3">
+          <Checkbox
+            id="accept-payment-terms"
+            checked={termsAccepted}
+            onCheckedChange={(checked) => setTermsAccepted(!!checked)}
+            className="mt-0.5"
+          />
+          <Label htmlFor="accept-payment-terms" className="text-xs font-normal leading-tight cursor-pointer">
+            I confirm I have read and agree to the{" "}
+            <a href="/legal?audience=customer" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Terms & Conditions</a>, including the{" "}
+            <a href="/legal/payment-terms?audience=customer" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Payment Terms</a>,{" "}
+            <a href="/legal/cancellation-policy?audience=customer" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Cancellation & Refund Policy</a>, and{" "}
+            <a href="/legal/dispute-resolution?audience=customer" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Dispute Resolution Policy</a>.
+          </Label>
+        </div>
+      )}
+
       <div className="space-y-2">
         {milestones.map((m) => {
           const paid = getPaymentForMilestone(m.id);
@@ -127,7 +149,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
                           onPaymentComplete();
                         } else if (!error && data?.expired > 0) {
                           toast({ title: "Payment not completed", description: "The checkout session expired. Please try paying again." });
-                          onPaymentComplete(); // refresh to show Pay button again
+                          onPaymentComplete();
                         } else if (!error) {
                           toast({ title: "Still processing", description: "Payment not yet confirmed. Please try again shortly." });
                         } else {
@@ -143,7 +165,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
                   <Button
                     size="sm"
                     onClick={() => payMilestone(m.id, Number(m.payment_amount))}
-                    disabled={processingPayment}
+                    disabled={processingPayment || (isFirstPayment && !termsAccepted)}
                   >
                     {processingPayment ? (
                       <Loader2 className="mr-1 h-3 w-3 animate-spin" />
