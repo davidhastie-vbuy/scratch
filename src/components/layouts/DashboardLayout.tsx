@@ -33,7 +33,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 flex-col bg-foreground text-primary-foreground">
         <Link to={dashboardPath} className="flex h-16 items-center gap-2.5 border-b border-primary-foreground/10 px-4 hover:opacity-80 transition-opacity">
-          <img src={logoDark} alt="BookATrade logo" className="h-9 w-9 rounded-full" />
+          <img src={logoDark} alt="BookATrade logo" className="h-9 w-auto object-contain" />
           <span className="font-display text-lg font-extrabold">
             Book<span className="text-primary">A</span>Trade
           </span>
@@ -77,7 +77,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
           <div className="flex h-16 items-center justify-between px-4 md:px-6">
             <div className="flex items-center gap-3">
               <Link to={dashboardPath} className="md:hidden flex items-center gap-2 mr-2 hover:opacity-80 transition-opacity">
-                <img src={logo} alt="BookATrade logo" className="h-7 w-7" />
+                <img src={logo} alt="BookATrade logo" className="h-7 w-auto object-contain" />
               </Link>
               <h1 className="font-display text-xl font-extrabold truncate">{title}</h1>
             </div>
