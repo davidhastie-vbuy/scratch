@@ -19,6 +19,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
   const [milestones, setMilestones] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     fetchMilestones();
