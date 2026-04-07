@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PlusCircle, Briefcase, MessageSquare, Users, Heart, HelpCircle, ArrowRight, ClipboardList, CheckCircle2, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -43,7 +44,8 @@ const CustomerHome = () => {
           .select("id", { count: "exact", head: true })
           .in("conversation_id", convIds)
           .neq("sender_user_id", user.id)
-          .is("read_at", null);
+          .is("read_at", null)
+          .in("message_type", UNREAD_MESSAGE_TYPES);
         unreadMessages = count ?? 0;
       }
 
