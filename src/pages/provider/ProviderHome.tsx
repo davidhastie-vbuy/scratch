@@ -175,11 +175,6 @@ const ProviderHome = () => {
                           <Icon className="h-4.5 w-4.5" />
                         </div>
                         <span className="flex-1">{a.label}</span>
-                        {a.badge != null && a.badge > 0 && (
-                          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
-                            {a.badge > 9 ? "9+" : a.badge}
-                          </span>
-                        )}
                         <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                       </CardTitle>
                     </CardHeader>
