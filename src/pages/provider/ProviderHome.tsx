@@ -48,20 +48,9 @@ const ProviderHome = () => {
       const quotes = quotesRes.data ?? [];
       const pendingQuotes = quotes.filter(q => q.status === "pending").length;
 
-      let unreadMessages = 0;
-      if (msgsRes.data && msgsRes.data.length > 0) {
-        const convIds = msgsRes.data.map(c => c.id);
-        const { count } = await supabase
-          .from("messages")
-          .select("id", { count: "exact", head: true })
-          .in("conversation_id", convIds)
-          .neq("sender_user_id", user.id)
-          .is("read_at", null)
-          .in("message_type", UNREAD_MESSAGE_TYPES);
-        unreadMessages = count ?? 0;
-      }
+      const totalEarnings = (earningsRes.data ?? []).reduce((sum, t) => sum + Number(t.amount), 0);
 
-      setStats({ activeJobs, pendingQuotes, completedJobs, unreadMessages });
+      setStats({ activeJobs, pendingQuotes, completedJobs, totalEarnings });
     };
 
     fetchData();
