@@ -56,7 +56,8 @@ const ProviderHome = () => {
           .select("id", { count: "exact", head: true })
           .in("conversation_id", convIds)
           .neq("sender_user_id", user.id)
-          .is("read_at", null);
+          .is("read_at", null)
+          .in("message_type", UNREAD_MESSAGE_TYPES);
         unreadMessages = count ?? 0;
       }
 
