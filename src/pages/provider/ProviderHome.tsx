@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Briefcase, FileText, MessageSquare, Clock, AlertTriangle, XCircle,
-  MessageCircle, ClipboardList, ArrowRight, CheckCircle2, Wallet, CalendarDays, ImageIcon
+  MessageCircle, ClipboardList, ArrowRight, CheckCircle2, Wallet, CalendarDays, ImageIcon, PoundSterling
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -22,17 +21,17 @@ const ProviderHome = () => {
   const [status, setStatus] = useState("pending");
   const [businessName, setBusinessName] = useState("");
   const [adminNote, setAdminNote] = useState("");
-  const [stats, setStats] = useState({ activeJobs: 0, pendingQuotes: 0, completedJobs: 0, unreadMessages: 0 });
+  const [stats, setStats] = useState({ activeJobs: 0, pendingQuotes: 0, completedJobs: 0, totalEarnings: 0 });
 
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
-      const [profileRes, jobsRes, quotesRes, msgsRes] = await Promise.all([
+      const [profileRes, jobsRes, quotesRes, earningsRes] = await Promise.all([
         supabase.from("provider_profiles").select("status, business_name, admin_note").eq("user_id", user.id).single(),
         supabase.from("jobs").select("status").eq("provider_id", user.id),
         supabase.from("quotes").select("status").eq("provider_user_id", user.id),
-        supabase.from("conversations").select("id").eq("provider_user_id", user.id),
+        supabase.from("provider_transactions").select("amount").eq("provider_user_id", user.id).eq("type", "earning"),
       ]);
 
       if (profileRes.data) {
@@ -48,37 +47,26 @@ const ProviderHome = () => {
       const quotes = quotesRes.data ?? [];
       const pendingQuotes = quotes.filter(q => q.status === "pending").length;
 
-      let unreadMessages = 0;
-      if (msgsRes.data && msgsRes.data.length > 0) {
-        const convIds = msgsRes.data.map(c => c.id);
-        const { count } = await supabase
-          .from("messages")
-          .select("id", { count: "exact", head: true })
-          .in("conversation_id", convIds)
-          .neq("sender_user_id", user.id)
-          .is("read_at", null)
-          .in("message_type", UNREAD_MESSAGE_TYPES);
-        unreadMessages = count ?? 0;
-      }
+      const totalEarnings = (earningsRes.data ?? []).reduce((sum, t) => sum + Number(t.amount), 0);
 
-      setStats({ activeJobs, pendingQuotes, completedJobs, unreadMessages });
+      setStats({ activeJobs, pendingQuotes, completedJobs, totalEarnings });
     };
 
     fetchData();
   }, [user]);
 
   const statCards = [
-    { label: "Active Jobs", value: stats.activeJobs, icon: Briefcase, color: "text-primary" },
-    { label: "Pending Quotes", value: stats.pendingQuotes, icon: Clock, color: "text-warning" },
-    { label: "Completed", value: stats.completedJobs, icon: CheckCircle2, color: "text-success" },
-    { label: "Unread Messages", value: stats.unreadMessages, icon: MessageSquare, color: "text-primary" },
+    { label: "Active Jobs", value: stats.activeJobs, icon: Briefcase, color: "text-primary", format: "number" as const },
+    { label: "Pending Quotes", value: stats.pendingQuotes, icon: Clock, color: "text-warning", format: "number" as const },
+    { label: "Completed", value: stats.completedJobs, icon: CheckCircle2, color: "text-success", format: "number" as const },
+    { label: "Earnings to Date", value: stats.totalEarnings, icon: PoundSterling, color: "text-primary", format: "currency" as const },
   ];
 
   const quickActions = [
     { label: "Available Jobs", desc: "Browse and quote on matching jobs", icon: Briefcase, path: "/provider/jobs" },
     { label: "My Jobs", desc: "Track your awarded and active jobs", icon: ClipboardList, path: "/provider/my-jobs" },
     { label: "My Quotes", desc: "Track your submitted quotes", icon: FileText, path: "/provider/quotes" },
-    { label: "Messages", desc: "Chat with customers", icon: MessageSquare, path: "/provider/messages", badge: stats.unreadMessages },
+    { label: "Messages", desc: "Chat with customers", icon: MessageSquare, path: "/provider/messages" },
     { label: "Calendar", desc: "View your upcoming schedule", icon: CalendarDays, path: "/provider/calendar" },
     { label: "Portfolio", desc: "Showcase your previous work", icon: ImageIcon, path: "/provider/portfolio" },
   ];
@@ -158,7 +146,9 @@ const ProviderHome = () => {
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-2xl font-extrabold leading-none">{s.value}</p>
+                      <p className="text-2xl font-extrabold leading-none">
+                        {s.format === "currency" ? `£${s.value.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : s.value}
+                      </p>
                       <p className="text-xs text-muted-foreground mt-0.5 truncate">{s.label}</p>
                     </div>
                   </CardContent>
@@ -184,11 +174,6 @@ const ProviderHome = () => {
                           <Icon className="h-4.5 w-4.5" />
                         </div>
                         <span className="flex-1">{a.label}</span>
-                        {a.badge != null && a.badge > 0 && (
-                          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
-                            {a.badge > 9 ? "9+" : a.badge}
-                          </span>
-                        )}
                         <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                       </CardTitle>
                     </CardHeader>
