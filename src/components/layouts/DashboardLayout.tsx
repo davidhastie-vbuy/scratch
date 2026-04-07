@@ -25,7 +25,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: DashboardLayoutProps) => {
   const { signOut } = useAuth();
-
+  const audience = roleBadge.toLowerCase() === "provider" ? "provider" : "customer";
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
