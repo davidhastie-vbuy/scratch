@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.send-quote-reminders]
 verify_jwt = false
+
+[functions.auth-email-hook]
+verify_jwt = false
