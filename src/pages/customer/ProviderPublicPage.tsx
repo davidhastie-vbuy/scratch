@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star, Heart } from "lucide-react";
+import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star, Heart, Briefcase } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ReviewsList from "@/components/reviews/ReviewsList";
@@ -30,6 +30,7 @@ interface ProviderData {
   operating_areas: string[] | null;
   about_work: string | null;
   additional_categories: string[] | null;
+  qualifications_certifications: string | null;
 }
 
 interface Project {
@@ -69,7 +70,7 @@ const ProviderPublicPage = () => {
   const fetchProvider = async () => {
     const { data: profile } = await supabase
       .from("provider_profiles")
-      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work, additional_categories")
+      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work, additional_categories, qualifications_certifications")
       .eq("user_id", providerId!)
       .eq("status", "active" as any)
       .single();
@@ -299,14 +300,42 @@ const ProviderPublicPage = () => {
         </CardContent>
       </Card>
 
-      {/* About */}
-      {(provider.public_bio || provider.about_work || provider.business_description) && (
+      {/* About / Bio */}
+      {provider.public_bio && (
         <Card>
           <CardHeader><CardTitle className="text-lg">About</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm whitespace-pre-wrap">
-              {provider.public_bio || provider.about_work || provider.business_description}
-            </p>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.public_bio}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Business Description */}
+      {provider.business_description && provider.business_description !== provider.public_bio && (
+        <Card>
+          <CardHeader><CardTitle className="text-lg">Business Description</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.business_description}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* About Their Work */}
+      {provider.about_work && provider.about_work !== provider.public_bio && provider.about_work !== provider.business_description && (
+        <Card>
+          <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Briefcase className="h-4 w-4" /> About Their Work</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.about_work}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Qualifications & Certifications */}
+      {provider.qualifications_certifications && (
+        <Card>
+          <CardHeader><CardTitle className="text-lg">Qualifications & Certifications</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.qualifications_certifications}</p>
           </CardContent>
         </Card>
       )}

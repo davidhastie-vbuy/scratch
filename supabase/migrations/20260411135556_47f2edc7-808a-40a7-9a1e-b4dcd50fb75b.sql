@@ -1,0 +1,1 @@
+DROP POLICY "Authenticated users can view active provider documents" ON public.provider_documents;
