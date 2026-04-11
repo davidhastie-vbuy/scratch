@@ -324,10 +324,39 @@ const ProviderPublicPage = () => {
       {(provider.public_bio || provider.about_work || provider.business_description) && (
         <Card>
           <CardHeader><CardTitle className="text-lg">About</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm whitespace-pre-wrap">
-              {provider.public_bio || provider.about_work || provider.business_description}
-            </p>
+          <CardContent className="space-y-4">
+            {provider.business_description && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Business Description</p>
+                <p className="text-sm whitespace-pre-wrap">{provider.business_description}</p>
+              </div>
+            )}
+            {provider.about_work && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">About Their Work</p>
+                <p className="text-sm whitespace-pre-wrap">{provider.about_work}</p>
+              </div>
+            )}
+            {provider.public_bio && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Bio</p>
+                <p className="text-sm whitespace-pre-wrap">{provider.public_bio}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Qualifications & Certifications */}
+      {provider.qualifications_certifications && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <GraduationCap className="h-5 w-5 text-primary" /> Qualifications & Certifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.qualifications_certifications}</p>
           </CardContent>
         </Card>
       )}
