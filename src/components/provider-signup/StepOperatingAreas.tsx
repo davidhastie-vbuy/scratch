@@ -61,13 +61,13 @@ const StepOperatingAreas = ({ form, updateForm, errors }: Props) => {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>Add postcodes or town/city names</Label>
+        <Label>Add postcodes</Label>
         <p className="text-xs text-muted-foreground">
-          Enter UK postcode districts (e.g. CW2, CW1) or town/city names and press Enter or click Add.
+          Enter UK postcode districts (e.g. CW2, CW1) and press Enter or click Add.
         </p>
         <div className="flex gap-2">
           <Input
-            placeholder="e.g. CW2 or Crewe"
+            placeholder="e.g. CW1"
             value={input}
             onChange={(e) => { setInput(e.target.value); setInputError(""); }}
             onKeyDown={handleKeyDown}
@@ -101,7 +101,7 @@ const StepOperatingAreas = ({ form, updateForm, errors }: Props) => {
 
       {form.operatingAreas.length === 0 && (
         <div className="rounded-lg border-2 border-dashed border-muted p-8 text-center">
-          <p className="text-sm text-muted-foreground">No areas added yet. Add the postcodes and towns where you offer services.</p>
+          <p className="text-sm text-muted-foreground">No areas added yet. Add the postcodes where you offer services.</p>
         </div>
       )}
     </div>
