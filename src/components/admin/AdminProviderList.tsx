@@ -913,6 +913,9 @@ const AdminProviderList = () => {
                       <p className="truncate font-medium text-xs">{doc.file_name}</p>
                       <p className="text-[10px] text-muted-foreground">{formatSize(doc.file_size)} · {new Date(doc.uploaded_at).toLocaleDateString()}</p>
                     </div>
+                    <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => setViewingDoc(doc)} title="View">
+                      <Eye className="h-3.5 w-3.5" />
+                    </Button>
                     <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => downloadDoc(doc)} title="Download">
                       <Download className="h-3.5 w-3.5" />
                     </Button>
