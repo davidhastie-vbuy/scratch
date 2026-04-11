@@ -70,7 +70,7 @@ const ProviderPublicPage = () => {
   const fetchProvider = async () => {
     const { data: profile } = await supabase
       .from("provider_profiles")
-      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work, additional_categories")
+      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work, additional_categories, qualifications_certifications")
       .eq("user_id", providerId!)
       .eq("status", "active" as any)
       .single();
