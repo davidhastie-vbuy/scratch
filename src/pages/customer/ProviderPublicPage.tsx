@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star, Heart } from "lucide-react";
+import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star, Heart, Briefcase } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ReviewsList from "@/components/reviews/ReviewsList";
