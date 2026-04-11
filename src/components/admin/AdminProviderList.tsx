@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye, AlertTriangle, History, MessageSquare, Trash2, Bell } from "lucide-react";
+import DocumentViewer from "@/components/DocumentViewer";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -83,6 +84,7 @@ const AdminProviderList = () => {
   const [newArea, setNewArea] = useState("");
   const [deletingProvider, setDeletingProvider] = useState<ProviderWithEmail | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<ProviderDocument | null>(null);
   const { toast } = useToast();
   const { categories: tradeCategories } = useTradeCategories(false);
 
@@ -710,6 +712,9 @@ const AdminProviderList = () => {
                           <p className="truncate font-medium text-xs">{doc.file_name}</p>
                           <p className="text-[10px] text-muted-foreground">{formatSize(doc.file_size)} · {new Date(doc.uploaded_at).toLocaleDateString()}</p>
                         </div>
+                        <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => setViewingDoc(doc)} title="View">
+                          <Eye className="h-3.5 w-3.5" />
+                        </Button>
                         <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => downloadDoc(doc)} title="Download">
                           <Download className="h-3.5 w-3.5" />
                         </Button>
