@@ -377,6 +377,41 @@ const ProviderPublicPage = () => {
         </Card>
       )}
 
+      {/* Supporting Documents */}
+      {documents.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" /> Credentials & Documents
+            </CardTitle>
+            <CardDescription>Supporting documents uploaded by this provider</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {documents.map((doc) => (
+                <div key={doc.id} className="flex items-center gap-3 rounded-md border border-border bg-muted/30 px-3 py-2">
+                  <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="flex-1 truncate text-sm">{doc.file_name}</span>
+                  <Button variant="outline" size="sm" onClick={() => setViewingDoc(doc)}>
+                    View
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Document Viewer */}
+      {viewingDoc && (
+        <DocumentViewer
+          fileUrl={viewingDoc.file_url}
+          fileName={viewingDoc.file_name}
+          fileType={viewingDoc.file_type}
+          onClose={() => setViewingDoc(null)}
+        />
+      )}
+
       {/* Portfolio Projects */}
       {projects.length > 0 && (
         <>
