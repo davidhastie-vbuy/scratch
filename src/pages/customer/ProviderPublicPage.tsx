@@ -9,10 +9,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star, Heart } from "lucide-react";
+import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star, Heart, FileText, Briefcase, GraduationCap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ReviewsList from "@/components/reviews/ReviewsList";
+import DocumentViewer from "@/components/DocumentViewer";
 
 interface ProviderData {
   id: string;
@@ -29,7 +30,17 @@ interface ProviderData {
   accreditations: string[] | null;
   operating_areas: string[] | null;
   about_work: string | null;
+  qualifications_certifications: string | null;
   additional_categories: string[] | null;
+  user_id: string;
+}
+
+interface DocData {
+  id: string;
+  file_name: string;
+  file_url: string;
+  file_size: number;
+  file_type: string;
 }
 
 interface Project {
@@ -51,6 +62,8 @@ const ProviderPublicPage = () => {
   const [loading, setLoading] = useState(true);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<DocData[]>([]);
+  const [viewingDoc, setViewingDoc] = useState<DocData | null>(null);
   const [isFavourite, setIsFavourite] = useState(false);
   const [canFavourite, setCanFavourite] = useState(false);
   const [favouriteLoading, setFavouriteLoading] = useState(false);
@@ -69,13 +82,21 @@ const ProviderPublicPage = () => {
   const fetchProvider = async () => {
     const { data: profile } = await supabase
       .from("provider_profiles")
-      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work, additional_categories")
+      .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work, qualifications_certifications, additional_categories")
       .eq("user_id", providerId!)
       .eq("status", "active" as any)
       .single();
 
     if (!profile) { setLoading(false); return; }
     setProvider(profile as any);
+
+    // Fetch supporting documents
+    const { data: docs } = await supabase
+      .from("provider_documents")
+      .select("id, file_name, file_url, file_size, file_type")
+      .eq("provider_profile_id", profile.id)
+      .order("uploaded_at", { ascending: false });
+    setDocuments((docs as DocData[]) ?? []);
 
     const { data: projs } = await supabase
       .from("provider_portfolio_projects")
@@ -303,10 +324,39 @@ const ProviderPublicPage = () => {
       {(provider.public_bio || provider.about_work || provider.business_description) && (
         <Card>
           <CardHeader><CardTitle className="text-lg">About</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm whitespace-pre-wrap">
-              {provider.public_bio || provider.about_work || provider.business_description}
-            </p>
+          <CardContent className="space-y-4">
+            {provider.business_description && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Business Description</p>
+                <p className="text-sm whitespace-pre-wrap">{provider.business_description}</p>
+              </div>
+            )}
+            {provider.about_work && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">About Their Work</p>
+                <p className="text-sm whitespace-pre-wrap">{provider.about_work}</p>
+              </div>
+            )}
+            {provider.public_bio && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Bio</p>
+                <p className="text-sm whitespace-pre-wrap">{provider.public_bio}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Qualifications & Certifications */}
+      {provider.qualifications_certifications && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <GraduationCap className="h-5 w-5 text-primary" /> Qualifications & Certifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.qualifications_certifications}</p>
           </CardContent>
         </Card>
       )}
@@ -326,6 +376,41 @@ const ProviderPublicPage = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Supporting Documents */}
+      {documents.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" /> Credentials & Documents
+            </CardTitle>
+            <CardDescription>Supporting documents uploaded by this provider</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {documents.map((doc) => (
+                <div key={doc.id} className="flex items-center gap-3 rounded-md border border-border bg-muted/30 px-3 py-2">
+                  <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="flex-1 truncate text-sm">{doc.file_name}</span>
+                  <Button variant="outline" size="sm" onClick={() => setViewingDoc(doc)}>
+                    View
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Document Viewer */}
+      <DocumentViewer
+        open={!!viewingDoc}
+        onOpenChange={(open) => { if (!open) setViewingDoc(null); }}
+        fileUrl={viewingDoc?.file_url ?? ""}
+        fileName={viewingDoc?.file_name ?? ""}
+        fileType={viewingDoc?.file_type ?? ""}
+        bucket="provider-documents"
+      />
 
       {/* Portfolio Projects */}
       {projects.length > 0 && (
