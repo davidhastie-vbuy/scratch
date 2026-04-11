@@ -9,10 +9,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star, Heart } from "lucide-react";
+import { Loader2, ArrowLeft, MapPin, Phone, Calendar, Award, Send, Star, Heart, FileText, Briefcase, GraduationCap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ReviewsList from "@/components/reviews/ReviewsList";
+import DocumentViewer from "@/components/DocumentViewer";
 
 interface ProviderData {
   id: string;
@@ -29,7 +30,17 @@ interface ProviderData {
   accreditations: string[] | null;
   operating_areas: string[] | null;
   about_work: string | null;
+  qualifications_certifications: string | null;
   additional_categories: string[] | null;
+  user_id: string;
+}
+
+interface DocData {
+  id: string;
+  file_name: string;
+  file_url: string;
+  file_size: number;
+  file_type: string;
 }
 
 interface Project {
@@ -51,6 +62,8 @@ const ProviderPublicPage = () => {
   const [loading, setLoading] = useState(true);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<DocData[]>([]);
+  const [viewingDoc, setViewingDoc] = useState<DocData | null>(null);
   const [isFavourite, setIsFavourite] = useState(false);
   const [canFavourite, setCanFavourite] = useState(false);
   const [favouriteLoading, setFavouriteLoading] = useState(false);
@@ -69,13 +82,21 @@ const ProviderPublicPage = () => {
   const fetchProvider = async () => {
     const { data: profile } = await supabase
       .from("provider_profiles")
-      .select("id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work, additional_categories")
+      .select("id, user_id, business_name, contact_first_name, contact_last_name, trade_category, business_description, public_bio, logo_url, banner_url, postcode, years_experience, accreditations, operating_areas, about_work, qualifications_certifications, additional_categories")
       .eq("user_id", providerId!)
       .eq("status", "active" as any)
       .single();
 
     if (!profile) { setLoading(false); return; }
     setProvider(profile as any);
+
+    // Fetch supporting documents
+    const { data: docs } = await supabase
+      .from("provider_documents")
+      .select("id, file_name, file_url, file_size, file_type")
+      .eq("provider_profile_id", profile.id)
+      .order("uploaded_at", { ascending: false });
+    setDocuments((docs as DocData[]) ?? []);
 
     const { data: projs } = await supabase
       .from("provider_portfolio_projects")
