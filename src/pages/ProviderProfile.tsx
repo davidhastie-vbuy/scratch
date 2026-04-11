@@ -24,6 +24,7 @@ interface ProviderProfileData {
   postcode: string;
   trade_category: string;
   business_description: string;
+  about_work: string;
   logo_url: string;
   operating_areas: string[];
   pending_operating_areas: string[] | null;
@@ -43,7 +44,7 @@ const ProviderProfile = () => {
   const [profile, setProfile] = useState<ProviderProfileData>({
     business_name: "", contact_first_name: "", contact_last_name: "",
     phone: "", business_address: "", postcode: "",
-    trade_category: "other", business_description: "", logo_url: "",
+    trade_category: "other", business_description: "", about_work: "", logo_url: "",
     operating_areas: [], pending_operating_areas: null, pending_trade_category: null,
     additional_categories: [], pending_additional_categories: null,
     email_notifications_enabled: true,
@@ -73,7 +74,7 @@ const ProviderProfile = () => {
   const fetchProfile = async () => {
     const { data } = await supabase
       .from("provider_profiles")
-      .select("id, status, business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, logo_url, operating_areas, pending_operating_areas, pending_trade_category, additional_categories, pending_additional_categories, email_notifications_enabled")
+      .select("id, status, business_name, contact_first_name, contact_last_name, phone, business_address, postcode, trade_category, business_description, about_work, logo_url, operating_areas, pending_operating_areas, pending_trade_category, additional_categories, pending_additional_categories, email_notifications_enabled")
       .eq("user_id", user!.id)
       .single();
     if (data) {
@@ -83,7 +84,7 @@ const ProviderProfile = () => {
         contact_last_name: data.contact_last_name ?? "", phone: data.phone ?? "",
         business_address: data.business_address ?? "", postcode: data.postcode ?? "",
         trade_category: data.trade_category ?? "other", business_description: data.business_description ?? "",
-        logo_url: data.logo_url ?? "",
+        about_work: (data as any).about_work ?? "", logo_url: data.logo_url ?? "",
         operating_areas: areas,
         pending_operating_areas: (data as any).pending_operating_areas ?? null,
         pending_trade_category: (data as any).pending_trade_category ?? null,
@@ -114,6 +115,7 @@ const ProviderProfile = () => {
       contact_last_name: profile.contact_last_name.trim(), phone: profile.phone.trim(),
       business_address: profile.business_address.trim(), postcode: profile.postcode.trim(),
       business_description: profile.business_description.trim(),
+      about_work: profile.about_work.trim(),
     }).eq("user_id", user!.id);
     if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
     else toast({ title: "Profile updated" });
@@ -369,6 +371,11 @@ const ProviderProfile = () => {
               <Label>Short description</Label>
               <Textarea value={profile.business_description} onChange={e => setProfile(p => ({ ...p, business_description: e.target.value }))} maxLength={300} rows={3} />
               <p className="text-xs text-muted-foreground">{profile.business_description.length}/300</p>
+            </div>
+            <div className="space-y-2">
+              <Label>About Your Work</Label>
+              <Textarea value={profile.about_work} onChange={e => setProfile(p => ({ ...p, about_work: e.target.value }))} maxLength={1000} rows={3} placeholder="Describe the type of work you do and what sets you apart..." />
+              <p className="text-xs text-muted-foreground">{profile.about_work.length}/1000</p>
             </div>
             <Button type="submit" className="w-full" disabled={saving}>
               {saving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : <><Save className="mr-2 h-4 w-4" /> Save changes</>}
