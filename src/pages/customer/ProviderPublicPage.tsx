@@ -300,14 +300,42 @@ const ProviderPublicPage = () => {
         </CardContent>
       </Card>
 
-      {/* About */}
-      {(provider.public_bio || provider.about_work || provider.business_description) && (
+      {/* About / Bio */}
+      {provider.public_bio && (
         <Card>
           <CardHeader><CardTitle className="text-lg">About</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm whitespace-pre-wrap">
-              {provider.public_bio || provider.about_work || provider.business_description}
-            </p>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.public_bio}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Business Description */}
+      {provider.business_description && provider.business_description !== provider.public_bio && (
+        <Card>
+          <CardHeader><CardTitle className="text-lg">Business Description</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.business_description}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* About Their Work */}
+      {provider.about_work && provider.about_work !== provider.public_bio && provider.about_work !== provider.business_description && (
+        <Card>
+          <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Briefcase className="h-4 w-4" /> About Their Work</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.about_work}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Qualifications & Certifications */}
+      {provider.qualifications_certifications && (
+        <Card>
+          <CardHeader><CardTitle className="text-lg">Qualifications & Certifications</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-sm whitespace-pre-wrap">{provider.qualifications_certifications}</p>
           </CardContent>
         </Card>
       )}
