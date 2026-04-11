@@ -30,6 +30,7 @@ interface ProviderData {
   operating_areas: string[] | null;
   about_work: string | null;
   additional_categories: string[] | null;
+  qualifications_certifications: string | null;
 }
 
 interface Project {
