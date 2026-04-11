@@ -948,6 +948,18 @@ const AdminProviderList = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Document Viewer */}
+      {viewingDoc && (
+        <DocumentViewer
+          open={!!viewingDoc}
+          onOpenChange={(o) => !o && setViewingDoc(null)}
+          fileUrl={viewingDoc.file_url}
+          fileName={viewingDoc.file_name}
+          fileType={viewingDoc.file_type}
+          bucket="provider-documents"
+        />
+      )}
     </div>
   );
 };
