@@ -403,14 +403,14 @@ const ProviderPublicPage = () => {
       )}
 
       {/* Document Viewer */}
-      {viewingDoc && (
-        <DocumentViewer
-          fileUrl={viewingDoc.file_url}
-          fileName={viewingDoc.file_name}
-          fileType={viewingDoc.file_type}
-          onClose={() => setViewingDoc(null)}
-        />
-      )}
+      <DocumentViewer
+        open={!!viewingDoc}
+        onOpenChange={(open) => { if (!open) setViewingDoc(null); }}
+        fileUrl={viewingDoc?.file_url ?? ""}
+        fileName={viewingDoc?.file_name ?? ""}
+        fileType={viewingDoc?.file_type ?? ""}
+        bucket="provider-documents"
+      />
 
       {/* Portfolio Projects */}
       {projects.length > 0 && (
