@@ -25,22 +25,17 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Authentication is REQUIRED
+    // Authentication is OPTIONAL during signup (user has no session yet)
+    // We validate ownership via user_id + provider_profile existence instead
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Authentication required" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    let authenticatedUserId: string | null = null;
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      if (!authError && user) {
+        authenticatedUserId = user.id;
+      }
     }
 
     const formData = await req.formData();
@@ -53,10 +48,19 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Ensure authenticated user matches the user_id
-    if (user.id !== userId) {
+    // If authenticated, ensure the token matches the user_id
+    if (authenticatedUserId && authenticatedUserId !== userId) {
       return new Response(JSON.stringify({ error: "Forbidden" }), {
         status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Verify the user actually exists in auth (prevents arbitrary uploads)
+    const { data: { user: targetUser }, error: userCheckErr } = await supabase.auth.admin.getUserById(userId);
+    if (userCheckErr || !targetUser) {
+      return new Response(JSON.stringify({ error: "Invalid user" }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

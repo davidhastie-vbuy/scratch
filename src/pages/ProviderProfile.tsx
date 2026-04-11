@@ -11,8 +11,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Camera, Loader2, MapPin, Plus, X, Clock, Wrench, Mail, Upload, FileText, Trash2 } from "lucide-react";
+import { Save, Camera, Loader2, MapPin, Plus, X, Clock, Wrench, Mail, Upload, FileText, Trash2, Eye } from "lucide-react";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
+import DocumentViewer from "@/components/DocumentViewer";
 
 interface ProviderProfileData {
   business_name: string;
@@ -63,6 +64,7 @@ const ProviderProfile = () => {
   const [providerProfileId, setProviderProfileId] = useState<string | null>(null);
   const [providerStatus, setProviderStatus] = useState<string | null>(null);
   const [resubmitting, setResubmitting] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<typeof documents[0] | null>(null);
 
   useEffect(() => {
     if (user) fetchProfile();
@@ -596,6 +598,9 @@ const ProviderProfile = () => {
                   <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <span className="flex-1 truncate">{doc.file_name}</span>
                   <span className="shrink-0 text-xs text-muted-foreground">{formatFileSize(doc.file_size)}</span>
+                  <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setViewingDoc(doc)} title="View">
+                    <Eye className="h-3.5 w-3.5" />
+                  </Button>
                   <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteDoc(doc)}>
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -639,6 +644,18 @@ const ProviderProfile = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Document Viewer */}
+      {viewingDoc && (
+        <DocumentViewer
+          open={!!viewingDoc}
+          onOpenChange={(o) => !o && setViewingDoc(null)}
+          fileUrl={viewingDoc.file_url}
+          fileName={viewingDoc.file_name}
+          fileType={viewingDoc.file_type}
+          bucket="provider-documents"
+        />
+      )}
     </div>
   );
 };
