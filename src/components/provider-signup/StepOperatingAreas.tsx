@@ -23,16 +23,8 @@ const StepOperatingAreas = ({ form, updateForm, errors }: Props) => {
     const value = input.trim();
     if (!value) return;
 
-    // Check if it looks like a postcode district - validate format
-    const isPostcodeFormat = /\d/.test(value);
-    if (isPostcodeFormat && !UK_POSTCODE_DISTRICT.test(value)) {
+    if (!UK_POSTCODE_DISTRICT.test(value)) {
       setInputError("Invalid UK postcode district (e.g. CW2, SW1)");
-      return;
-    }
-
-    // Min length for town names
-    if (!isPostcodeFormat && value.length < 2) {
-      setInputError("Town/city name must be at least 2 characters");
       return;
     }
 
