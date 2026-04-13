@@ -8,6 +8,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import HomeRedirect from "@/components/HomeRedirect";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 // Customer
@@ -57,6 +59,8 @@ const App = () => (
             <Route path="/" element={<HomeRedirect />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Customer routes */}
             <Route
