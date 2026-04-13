@@ -8,6 +8,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import HomeRedirect from "@/components/HomeRedirect";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 // Customer
