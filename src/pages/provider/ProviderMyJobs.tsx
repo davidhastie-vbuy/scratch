@@ -14,6 +14,7 @@ interface JobRow {
   title: string;
   category: string;
   postcode_district: string;
+  full_postcode: string | null;
   status: string;
   scheduled_start: string | null;
   scheduled_end: string | null;
@@ -50,7 +51,7 @@ const ProviderMyJobs = () => {
   const fetchJobs = async () => {
     const { data } = await supabase
       .from("jobs")
-      .select("id, title, category, postcode_district, status, scheduled_start, scheduled_end, agreed_price, created_at, updated_at, customer_user_id")
+      .select("id, title, category, postcode_district, full_postcode, status, scheduled_start, scheduled_end, agreed_price, created_at, updated_at, customer_user_id")
       .eq("provider_id", user!.id)
       .in("status", ["accepted", "in_progress", "completed", "cancelled"])
       .order("updated_at", { ascending: false });
@@ -173,7 +174,7 @@ const ProviderMyJobs = () => {
                   </span>
                   <span className="flex items-center gap-1">
                     <MapPin className="h-3.5 w-3.5" />
-                    {job.postcode_district}
+                    {job.full_postcode ?? job.postcode_district}
                   </span>
                   {job.agreed_price != null && (
                     <span className="font-medium text-foreground">

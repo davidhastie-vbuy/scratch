@@ -442,7 +442,7 @@ const AdminDisputes = () => {
                           <span>Status: {det.job.status}</span>
                           <span>Category: {det.job.category}</span>
                           <span>Budget: {det.job.budget || "—"}</span>
-                          <span>Location: {det.job.postcode_district}</span>
+                          <span>Location: {det.job.full_postcode ?? det.job.postcode_district}</span>
                         </div>
                       </div>
 

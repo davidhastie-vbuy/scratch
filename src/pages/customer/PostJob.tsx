@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, ArrowRight, Upload, X, CheckCircle2, Loader2, Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { categoryQuestionnaires } from "@/lib/category-questionnaires";
-import { extractPostcodeDistrict } from "@/lib/format-postcode";
+import { extractPostcodeDistrict, formatPostcode } from "@/lib/format-postcode";
 
 const TIMELINES = ["ASAP", "Within 1 week", "Within 2 weeks", "Within 1 month", "Flexible"];
 
@@ -109,6 +109,7 @@ const PostJob = () => {
           description: form.description.trim() + (form.additionalNotes ? `\n\nAdditional notes: ${form.additionalNotes.trim()}` : ""),
           category: form.category,
           postcode_district: extractPostcodeDistrict(form.postcodeDistrict),
+          full_postcode: formatPostcode(form.postcodeDistrict),
           timeline: form.timeline || null,
           questionnaire_answers: Object.keys(filteredAnswers).length > 0 ? filteredAnswers : null,
         } as any)

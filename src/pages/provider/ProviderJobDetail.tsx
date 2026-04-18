@@ -222,7 +222,7 @@ const ProviderJobDetail = () => {
                   <p style="margin:0 0 8px;font-weight:bold;font-size:15px;color:#cb2431;">Cancellation Request</p>
                   <p style="margin:0 0 6px;font-size:14px;color:#555;"><strong>Job:</strong> ${job.title}</p>
                   <p style="margin:0 0 6px;font-size:14px;color:#555;"><strong>Category:</strong> ${catLabel}</p>
-                  <p style="margin:0;font-size:14px;color:#555;"><strong>Area:</strong> ${job.postcode_district}</p>
+                  <p style="margin:0;font-size:14px;color:#555;"><strong>Area:</strong> ${(job as any).full_postcode ?? job.postcode_district}</p>
                 </div>
                 <p style="font-size:14px;color:#555;">Please log in to review the request and accept or decline the cancellation.</p>
                 <div style="text-align:center;padding:16px 0;">
@@ -273,7 +273,7 @@ const ProviderJobDetail = () => {
           <CardContent className="space-y-4">
             <div className="grid gap-2 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Category</span><span>{catName}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.postcode_district}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.full_postcode ?? job.postcode_district}</span></div>
             </div>
             <div className="rounded-lg border border-muted bg-muted/30 p-4 text-sm space-y-2">
               <p className="font-medium">This job has been awarded to another provider</p>
@@ -322,7 +322,7 @@ const ProviderJobDetail = () => {
         <CardContent className="space-y-4">
           <div className="grid gap-2 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Category</span><span>{catName}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.postcode_district}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.full_postcode ?? job.postcode_district}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Timeline</span><span>{job.timeline || "—"}</span></div>
             
             <div className="flex justify-between"><span className="text-muted-foreground">Quotes</span><span>{job.quote_count}/3</span></div>
