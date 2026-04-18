@@ -222,7 +222,7 @@ const ProviderJobDetail = () => {
                   <p style="margin:0 0 8px;font-weight:bold;font-size:15px;color:#cb2431;">Cancellation Request</p>
                   <p style="margin:0 0 6px;font-size:14px;color:#555;"><strong>Job:</strong> ${job.title}</p>
                   <p style="margin:0 0 6px;font-size:14px;color:#555;"><strong>Category:</strong> ${catLabel}</p>
-                  <p style="margin:0;font-size:14px;color:#555;"><strong>Area:</strong> ${job.postcode_district}</p>
+                  <p style="margin:0;font-size:14px;color:#555;"><strong>Area:</strong> ${(job as any).full_postcode ?? job.postcode_district}</p>
                 </div>
                 <p style="font-size:14px;color:#555;">Please log in to review the request and accept or decline the cancellation.</p>
                 <div style="text-align:center;padding:16px 0;">
