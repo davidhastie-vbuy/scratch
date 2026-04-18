@@ -33,7 +33,7 @@ const AvailableJobs = () => {
         .order("created_at", { ascending: false }),
       supabase
         .from("job_invitations")
-        .select("*, jobs:job_id(id, title, description, category, postcode_district, budget, timeline, quote_count, status, created_at)")
+        .select("*, jobs:job_id(id, title, description, category, postcode_district, full_postcode, budget, timeline, quote_count, status, created_at)")
         .eq("provider_user_id", user!.id)
         .eq("status", "pending" as any),
     ]);
@@ -167,7 +167,7 @@ const AvailableJobs = () => {
           <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>{categories.find(c => c.slug === job.category)?.name ?? job.category}</span>
             <span>•</span>
-            <span>{job.postcode_district}</span>
+            <span>{job.full_postcode ?? job.postcode_district}</span>
             {job.timeline && <><span>•</span><span>{job.timeline}</span></>}
           </div>
           <p className="text-xs text-muted-foreground mt-2">Posted {new Date(job.created_at).toLocaleDateString()}</p>

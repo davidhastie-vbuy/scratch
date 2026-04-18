@@ -222,7 +222,7 @@ const AdminCustomerList = () => {
                   <TableRow key={job.id}>
                     <TableCell className="font-medium">{job.title}</TableCell>
                     <TableCell className="hidden sm:table-cell">{tradeName(job.category)}</TableCell>
-                    <TableCell className="hidden md:table-cell">{job.postcode_district}</TableCell>
+                    <TableCell className="hidden md:table-cell">{(job as any).full_postcode ?? job.postcode_district}</TableCell>
                     <TableCell className="hidden md:table-cell">{job.budget || "—"}</TableCell>
                     <TableCell className="hidden sm:table-cell">{job.quote_count}/3</TableCell>
                     <TableCell>{getStatusBadge(job.status)}</TableCell>

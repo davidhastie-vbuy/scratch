@@ -26,7 +26,7 @@ const MyQuotes = () => {
   const fetchQuotes = async () => {
     const { data } = await supabase
       .from("quotes")
-      .select("*, jobs(title, postcode_district, status)")
+      .select("*, jobs(title, postcode_district, full_postcode, status)")
       .eq("provider_user_id", user!.id)
       .order("created_at", { ascending: false });
     setQuotes(data ?? []);
@@ -70,7 +70,7 @@ const MyQuotes = () => {
                   <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
                     <span>£{Number(q.price_min).toFixed(0)} – £{Number(q.price_max).toFixed(0)}</span>
                     <span>•</span>
-                    <span>{job?.postcode_district}</span>
+                    <span>{job?.full_postcode ?? job?.postcode_district}</span>
                   </div>
                 )}
                 <p className="text-xs text-muted-foreground mt-2">Quoted {new Date(q.created_at).toLocaleDateString()}</p>
