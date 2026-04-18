@@ -1486,6 +1486,7 @@ export type Database = {
         Args: { _category: string; _postcode: string }
         Returns: number
       }
+      extract_postcode_district: { Args: { _raw: string }; Returns: string }
       get_job_provider_id: { Args: { _job_id: string }; Returns: string }
       get_job_status: { Args: { _job_id: string }; Returns: string }
       has_role: {
