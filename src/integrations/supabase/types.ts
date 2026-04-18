@@ -459,6 +459,7 @@ export type Database = {
           created_at: string
           customer_user_id: string
           description: string
+          full_postcode: string | null
           id: string
           milestones_confirmed: boolean
           postcode_district: string
@@ -479,6 +480,7 @@ export type Database = {
           created_at?: string
           customer_user_id: string
           description: string
+          full_postcode?: string | null
           id?: string
           milestones_confirmed?: boolean
           postcode_district: string
@@ -499,6 +501,7 @@ export type Database = {
           created_at?: string
           customer_user_id?: string
           description?: string
+          full_postcode?: string | null
           id?: string
           milestones_confirmed?: boolean
           postcode_district?: string
