@@ -46,8 +46,9 @@ const PostJob = () => {
     if (user) {
       supabase.from("profiles").select("postcode").eq("id", user.id).single().then(({ data }) => {
         if (data?.postcode) {
-          const district = data.postcode.trim().split(" ")[0].toUpperCase();
-          setForm(f => f.postcodeDistrict ? f : { ...f, postcodeDistrict: district });
+          // Prefill with the customer's full postcode (formatted), not just the district
+          const formatted = formatPostcode(data.postcode);
+          setForm(f => f.postcodeDistrict ? f : { ...f, postcodeDistrict: formatted });
         }
       });
     }
@@ -62,7 +63,7 @@ const PostJob = () => {
     if (s === 0) {
       if (!form.title.trim()) errs.title = "Title is required";
       if (!form.category) errs.category = "Select a category";
-      if (!form.postcodeDistrict.trim()) errs.postcodeDistrict = "Postcode district is required (e.g. CW2)";
+      if (!form.postcodeDistrict.trim()) errs.postcodeDistrict = "Postcode is required (e.g. CW2 6RW)";
       if (!form.description.trim()) errs.description = "Description is required";
     }
     setErrors(errs);
@@ -229,8 +230,9 @@ const PostJob = () => {
                 {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
               </div>
               <div className="space-y-2">
-                <Label>Postcode district * <span className="text-muted-foreground text-xs">(e.g. CW2, SW1)</span></Label>
-                <Input value={form.postcodeDistrict} onChange={(e) => setForm(f => ({ ...f, postcodeDistrict: e.target.value }))} maxLength={10} placeholder="CW2" />
+                <Label>Postcode * <span className="text-muted-foreground text-xs">(e.g. CW2 6RW)</span></Label>
+                <Input value={form.postcodeDistrict} onChange={(e) => setForm(f => ({ ...f, postcodeDistrict: e.target.value }))} maxLength={10} placeholder="CW2 6RW" />
+                <p className="text-xs text-muted-foreground">Enter your full postcode. Only the area part (e.g. CW2) is used to match local providers.</p>
                 {errors.postcodeDistrict && <p className="text-sm text-destructive">{errors.postcodeDistrict}</p>}
               </div>
               <div className="space-y-2">
@@ -302,7 +304,7 @@ const PostJob = () => {
                 <div className="text-sm space-y-1 text-muted-foreground">
                   <p><strong>Title:</strong> {form.title}</p>
                   <p><strong>Category:</strong> {categories.find(c => c.slug === form.category)?.name}</p>
-                  <p><strong>Location:</strong> {form.postcodeDistrict.toUpperCase()}</p>
+                  <p><strong>Location:</strong> {formatPostcode(form.postcodeDistrict)}</p>
                   <p><strong>Timeline:</strong> {form.timeline || "Not specified"}</p>
                   {hasQuestionnaire && Object.entries(questionnaireAnswers).filter(([_, v]) => v?.trim()).length > 0 && (
                     <p><strong>Questionnaire:</strong> {Object.entries(questionnaireAnswers).filter(([_, v]) => v?.trim()).length} question{Object.entries(questionnaireAnswers).filter(([_, v]) => v?.trim()).length !== 1 ? "s" : ""} answered</p>
