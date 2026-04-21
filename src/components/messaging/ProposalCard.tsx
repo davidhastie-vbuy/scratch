@@ -22,7 +22,7 @@ interface ProposalData {
   duration?: string;
   urgency?: string;
   urgency_label?: string;
-  status: "pending" | "accepted" | "declined";
+  status: "pending" | "accepted" | "declined" | "superseded";
 }
 
 interface Props {
