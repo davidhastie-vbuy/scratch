@@ -275,13 +275,16 @@ const ProviderMessages = () => {
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
-  const sendProposal = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string }) => {
+  const sendProposal = async (data: { agreed_price: number; start_date: string; start_time: string; duration: string; end_date: string; _customerProposalMsgId?: string }) => {
     if (!selected) return;
-    // Decline all pending proposals (including the customer one we're responding to)
+    const acceptedCustomerProposalId = (proposeDefaults as any)?._customerProposalMsgId;
+    // Resolve all pending proposals. The customer proposal the provider accepted (and is now finalising)
+    // is marked as "superseded" (Pending Confirmation) instead of "declined".
     for (const m of messages) {
       if ((m as any).message_type === "proposal" && (m as any).metadata?.status === "pending") {
+        const newStatus = acceptedCustomerProposalId && m.id === acceptedCustomerProposalId ? "superseded" : "declined";
         await supabase.from("messages").update({
-          metadata: { ...(m as any).metadata, status: "declined" },
+          metadata: { ...(m as any).metadata, status: newStatus },
         } as any).eq("id", m.id);
       }
     }

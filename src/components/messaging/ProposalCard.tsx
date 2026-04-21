@@ -22,7 +22,7 @@ interface ProposalData {
   duration?: string;
   urgency?: string;
   urgency_label?: string;
-  status: "pending" | "accepted" | "declined";
+  status: "pending" | "accepted" | "declined" | "superseded";
 }
 
 interface Props {
@@ -42,19 +42,28 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
   const isPending = proposal.status === "pending";
   const isAccepted = proposal.status === "accepted";
   const isDeclined = proposal.status === "declined";
+  const isSuperseded = proposal.status === "superseded";
 
   const showActions = isPending && !isOwnMessage;
   const actionsLocked = !!hasAcceptedProposal;
 
+  const badgeLabel = isSuperseded ? "accepted" : proposal.status;
+  const badgeVariant = isAccepted || isSuperseded ? "default" : isDeclined ? "destructive" : "secondary";
+  const borderClass = isAccepted || isSuperseded
+    ? "border-green-500/30 bg-green-50/50"
+    : isDeclined
+      ? "border-destructive/30 bg-destructive/5"
+      : "border-primary/30 bg-primary/5";
+
   return (
-    <Card className={`max-w-[85%] border-2 ${isAccepted ? "border-green-500/30 bg-green-50/50" : isDeclined ? "border-destructive/30 bg-destructive/5" : "border-primary/30 bg-primary/5"}`}>
+    <Card className={`max-w-[85%] border-2 ${borderClass}`}>
       <CardContent className="p-3 space-y-2">
         <div className="flex items-center justify-between gap-2">
           <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             {isOwnMessage ? "Your Proposal" : role === "customer" ? "Proposal from Provider" : "Proposal from Customer"}
           </span>
-          <Badge variant={isAccepted ? "default" : isDeclined ? "destructive" : "secondary"} className="text-xs">
-            {proposal.status}
+          <Badge variant={badgeVariant} className="text-xs">
+            {badgeLabel}
           </Badge>
         </div>
 
@@ -144,6 +153,9 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
         )}
         {isDeclined && (
           <p className="text-xs text-destructive font-medium">Terms declined</p>
+        )}
+        {isSuperseded && (
+          <p className="text-xs text-green-700 font-medium">✓ Accepted — Terms Pending Confirmation</p>
         )}
       </CardContent>
     </Card>
