@@ -154,6 +154,9 @@ const ProposalCard = ({ proposal, isOwnMessage, role, onAccept, onDecline, onCou
         {isDeclined && (
           <p className="text-xs text-destructive font-medium">Terms declined</p>
         )}
+        {isSuperseded && (
+          <p className="text-xs text-green-700 font-medium">✓ Accepted — Terms Pending Confirmation</p>
+        )}
       </CardContent>
     </Card>
   );
