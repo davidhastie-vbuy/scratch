@@ -67,6 +67,8 @@ const JobDetail = () => {
   // Inline messaging
   const [chatDialog, setChatDialog] = useState<{ providerUserId: string; quoteId: string } | null>(null);
   const [acceptDialog, setAcceptDialog] = useState<{ message: any } | null>(null);
+  const [editSiteDialog, setEditSiteDialog] = useState(false);
+  const [savingSite, setSavingSite] = useState(false);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [chatMsg, setChatMsg] = useState("");
   const [chatSending, setChatSending] = useState(false);
