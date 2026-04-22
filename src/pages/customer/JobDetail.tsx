@@ -919,6 +919,43 @@ const JobDetail = () => {
           onReviewSubmitted={fetchAll}
         />
       )}
+      {/* Job site details (visible to provider once accepted) */}
+      {["accepted", "in_progress", "completed"].includes(job.status) && ((job as any).job_address || (job as any).job_phone || (job as any).access_notes) && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-base">Job site details</CardTitle>
+            {!hasConfirmedPayment && job.status === "accepted" && (
+              <Button variant="outline" size="sm" onClick={() => setEditSiteDialog(true)}>
+                <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {(job as any).job_address && (
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Address</p>
+                <p className="whitespace-pre-wrap">{(job as any).job_address}</p>
+              </div>
+            )}
+            {(job as any).job_phone && (
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Contact phone</p>
+                <p>{(job as any).job_phone}</p>
+              </div>
+            )}
+            {(job as any).access_notes && (
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Access notes</p>
+                <p className="whitespace-pre-wrap">{(job as any).access_notes}</p>
+              </div>
+            )}
+            {!hasConfirmedPayment && job.status === "accepted" && (
+              <p className="text-xs text-muted-foreground">You can update these details until the first deposit is paid.</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Schedule - read only for customer */}
       {["accepted", "in_progress"].includes(job.status) && (job.scheduled_start || job.scheduled_end) && (
         <Card>
