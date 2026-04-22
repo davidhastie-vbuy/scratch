@@ -44,9 +44,6 @@ const HomeAuthPanel = () => {
       full_name: `${firstName} ${lastName}`.trim(),
       first_name: firstName,
       last_name: lastName,
-      phone,
-      address_line_1: addressLine1,
-      city,
       postcode: formatPostcode(postcode),
     };
     const { error } = await supabase.auth.signUp({
