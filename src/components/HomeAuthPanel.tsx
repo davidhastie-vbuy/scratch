@@ -26,9 +26,6 @@ const HomeAuthPanel = () => {
   // Customer signup fields
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [addressLine1, setAddressLine1] = useState("");
-  const [city, setCity] = useState("");
   const [postcode, setPostcode] = useState("");
 
   const handleRoleChange = (next: Role) => {
