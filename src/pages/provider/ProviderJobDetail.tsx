@@ -323,6 +323,24 @@ const ProviderJobDetail = () => {
           <div className="grid gap-2 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Category</span><span>{catName}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.full_postcode ?? job.postcode_district}</span></div>
+            {(job as any).job_address && ["accepted", "in_progress", "completed"].includes(job.status) && (
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-0">
+                <span className="text-muted-foreground">Job address</span>
+                <span className="sm:text-right whitespace-pre-wrap">{(job as any).job_address}</span>
+              </div>
+            )}
+            {(job as any).job_phone && ["accepted", "in_progress", "completed"].includes(job.status) && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Customer phone</span>
+                <a href={`tel:${(job as any).job_phone}`} className="text-primary hover:underline">{(job as any).job_phone}</a>
+              </div>
+            )}
+            {(job as any).access_notes && ["accepted", "in_progress", "completed"].includes(job.status) && (
+              <div className="flex flex-col gap-1">
+                <span className="text-muted-foreground">Access notes</span>
+                <span className="whitespace-pre-wrap rounded-md bg-muted/50 p-2 text-sm">{(job as any).access_notes}</span>
+              </div>
+            )}
             <div className="flex justify-between"><span className="text-muted-foreground">Timeline</span><span>{job.timeline || "—"}</span></div>
             
             <div className="flex justify-between"><span className="text-muted-foreground">Quotes</span><span>{job.quote_count}/3</span></div>
