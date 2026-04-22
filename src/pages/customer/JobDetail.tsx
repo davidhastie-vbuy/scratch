@@ -1055,6 +1055,14 @@ const JobDetail = () => {
         />
       )}
 
+      <AcceptanceDetailsDialog
+        open={!!acceptDialog}
+        onOpenChange={(o) => !o && !chatAccepting && setAcceptDialog(null)}
+        jobId={jobId ?? null}
+        submitting={chatAccepting}
+        onConfirm={(details) => acceptDialog && performChatAccept(acceptDialog.message, details)}
+      />
+
       {/* Cancel Job Confirmation Dialog */}
       <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
         <AlertDialogContent>
