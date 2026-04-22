@@ -1102,6 +1102,27 @@ const JobDetail = () => {
         onConfirm={(details) => acceptDialog && performChatAccept(acceptDialog.message, details)}
       />
 
+      <AcceptanceDetailsDialog
+        open={editSiteDialog}
+        onOpenChange={(o) => !o && !savingSite && setEditSiteDialog(false)}
+        jobId={jobId ?? null}
+        title="Edit job site details"
+        confirmLabel="Save changes"
+        submitting={savingSite}
+        onConfirm={async (details) => {
+          setSavingSite(true);
+          await supabase.from("jobs").update({
+            job_address: details.job_address,
+            job_phone: details.job_phone,
+            access_notes: details.access_notes || null,
+          } as any).eq("id", jobId!);
+          setSavingSite(false);
+          setEditSiteDialog(false);
+          toast({ title: "Site details updated" });
+          fetchAll();
+        }}
+      />
+
       {/* Cancel Job Confirmation Dialog */}
       <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
         <AlertDialogContent>
