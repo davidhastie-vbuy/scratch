@@ -453,6 +453,7 @@ export type Database = {
       }
       jobs: {
         Row: {
+          access_notes: string | null
           agreed_price: number | null
           budget: string | null
           category: string
@@ -461,6 +462,8 @@ export type Database = {
           description: string
           full_postcode: string | null
           id: string
+          job_address: string | null
+          job_phone: string | null
           milestones_confirmed: boolean
           postcode_district: string
           provider_id: string | null
@@ -474,6 +477,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          access_notes?: string | null
           agreed_price?: number | null
           budget?: string | null
           category: string
@@ -482,6 +486,8 @@ export type Database = {
           description: string
           full_postcode?: string | null
           id?: string
+          job_address?: string | null
+          job_phone?: string | null
           milestones_confirmed?: boolean
           postcode_district: string
           provider_id?: string | null
@@ -495,6 +501,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          access_notes?: string | null
           agreed_price?: number | null
           budget?: string | null
           category?: string
@@ -503,6 +510,8 @@ export type Database = {
           description?: string
           full_postcode?: string | null
           id?: string
+          job_address?: string | null
+          job_phone?: string | null
           milestones_confirmed?: boolean
           postcode_district?: string
           provider_id?: string | null
