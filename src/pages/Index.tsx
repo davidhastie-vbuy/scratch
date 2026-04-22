@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Shield, ArrowRight, CheckCircle, Star, ClipboardList, Zap, Award, MessageSquare, Users } from "lucide-react";
 import heroImage from "@/assets/hero-trades.jpg";
+import HomeAuthPanel from "@/components/HomeAuthPanel";
 import trustImage from "@/assets/trust-handshake.jpg";
 import qualityImage from "@/assets/quality-work.jpg";
 import peaceImage from "@/assets/peace-of-mind.jpg";
@@ -41,43 +42,37 @@ const Index = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/75 to-foreground/30" />
         </div>
-        <div className="container relative z-10 py-20 md:py-32">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border-2 border-primary/40 bg-primary/15 px-4 py-1.5 text-sm font-semibold text-primary-foreground mb-6 animate-fade-in backdrop-blur-sm shadow-lg shadow-primary/10">
-              <Award className="h-4 w-4 text-primary" />
-              Vetted &bull; Trusted &bull; Guaranteed
+        <div className="container relative z-10 py-12 md:py-20 lg:py-24">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border-2 border-primary/40 bg-primary/15 px-4 py-1.5 text-sm font-semibold text-primary-foreground mb-6 animate-fade-in backdrop-blur-sm shadow-lg shadow-primary/10">
+                <Award className="h-4 w-4 text-primary" />
+                Vetted &bull; Trusted &bull; Guaranteed
+              </div>
+              <h2 className="font-display text-3xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-5xl xl:text-6xl animate-fade-in">
+                Your home deserves
+                <span className="block text-primary drop-shadow-lg">trusted hands.</span>
+              </h2>
+              <p className="mt-6 text-lg text-primary-foreground/80 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0">
+                Find vetted, reliable tradespeople for any job — big or small. Get up to 3 competitive quotes, compare with confidence, and enjoy peace of mind from start to finish.
+              </p>
+              <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-primary-foreground/70 animate-fade-in stagger-4 opacity-0">
+                <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                  Vetted professionals
+                </span>
+                <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                  Up to 3 free quotes
+                </span>
+                <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                  Guaranteed payments
+                </span>
+              </div>
             </div>
-            <h2 className="font-display text-3xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl xl:text-7xl animate-fade-in">
-              Your home deserves
-              <span className="block text-primary drop-shadow-lg">trusted hands.</span>
-            </h2>
-            <p className="mt-6 text-lg text-primary-foreground/80 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0">
-              Find vetted, reliable tradespeople for any job — big or small. Get up to 3 competitive quotes, compare with confidence, and enjoy peace of mind from start to finish.
-            </p>
-            <div className="mt-8 sm:mt-10 flex flex-col gap-3 sm:gap-4 sm:flex-row animate-fade-in stagger-3 opacity-0">
-              <Button size="lg" asChild className="text-base sm:text-lg font-extrabold shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 transition-all duration-300 hover:scale-110 h-14 sm:h-16 px-8 sm:px-12 rounded-2xl">
-                <Link to="/signup">
-                  Post a job free
-                  <ArrowRight className="ml-3 h-5 w-5 sm:h-6 sm:w-6" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild className="text-base sm:text-lg font-extrabold bg-primary-foreground/10 border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/20 hover:border-primary-foreground/60 backdrop-blur-sm h-14 sm:h-16 px-8 sm:px-12 rounded-2xl shadow-xl transition-all duration-300 hover:scale-110">
-                <Link to="/signup">Join as a tradesperson</Link>
-              </Button>
-            </div>
-            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-primary-foreground/70 animate-fade-in stagger-4 opacity-0">
-              <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
-                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                Vetted professionals
-              </span>
-              <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
-                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                Up to 3 free quotes
-              </span>
-              <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
-                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                Guaranteed payments
-              </span>
+            <div className="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto animate-fade-in stagger-3 opacity-0">
+              <HomeAuthPanel />
             </div>
           </div>
         </div>
