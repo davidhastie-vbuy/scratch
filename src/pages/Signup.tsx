@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
@@ -15,9 +15,11 @@ import ProviderSignupStepper from "@/components/provider-signup/ProviderSignupSt
 import logo from "@/assets/bookatrade-logo.png";
 
 const Signup = () => {
+  const [searchParams] = useSearchParams();
+  const initialRole = searchParams.get("role") === "provider" ? "provider" : "customer";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"customer" | "provider">("customer");
+  const [role, setRole] = useState<"customer" | "provider">(initialRole);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
