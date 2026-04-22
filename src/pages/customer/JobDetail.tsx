@@ -18,6 +18,7 @@ import { useJobActions } from "@/hooks/use-job-actions";
 import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import MilestonePaymentSection from "@/components/MilestonePaymentSection";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
+import AcceptanceDetailsDialog, { type AcceptanceDetails } from "@/components/messaging/AcceptanceDetailsDialog";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
@@ -65,6 +66,7 @@ const JobDetail = () => {
 
   // Inline messaging
   const [chatDialog, setChatDialog] = useState<{ providerUserId: string; quoteId: string } | null>(null);
+  const [acceptDialog, setAcceptDialog] = useState<{ message: any } | null>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [chatMsg, setChatMsg] = useState("");
   const [chatSending, setChatSending] = useState(false);
@@ -441,8 +443,13 @@ const JobDetail = () => {
     setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
-  // Accept proposal from provider in inline chat
-  const handleChatAccept = async (msg: any) => {
+  // Accept proposal from provider in inline chat — opens confirmation dialog first
+  const handleChatAccept = (msg: any) => {
+    if (!chatConvId) return;
+    setAcceptDialog({ message: msg });
+  };
+
+  const performChatAccept = async (msg: any, details: AcceptanceDetails) => {
     if (!chatConvId) return;
     setChatAccepting(true);
     const metadata = (msg as any).metadata;
@@ -457,6 +464,9 @@ const JobDetail = () => {
       status: "accepted",
       scheduled_start: metadata.start_date,
       scheduled_end: metadata.end_date || null,
+      job_address: details.job_address,
+      job_phone: details.job_phone,
+      access_notes: details.access_notes || null,
     } as any).eq("id", jobId!);
 
     // Decline other quotes, accept this provider's
@@ -476,6 +486,7 @@ const JobDetail = () => {
 
     toast({ title: "Terms accepted in principle!", description: "The provider will now set up milestone payments." });
     setChatAccepting(false);
+    setAcceptDialog(null);
     const { data: msgs } = await supabase.from("messages").select("*").eq("conversation_id", chatConvId).order("created_at");
     setChatMessages(msgs ?? []);
     fetchAll();
