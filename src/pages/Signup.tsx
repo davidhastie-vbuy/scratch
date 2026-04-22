@@ -74,9 +74,6 @@ const Signup = () => {
       full_name: `${firstName} ${lastName}`.trim(),
       first_name: firstName,
       last_name: lastName,
-      phone,
-      address_line_1: addressLine1,
-      city,
       postcode: formatPostcode(postcode),
     };
 
@@ -96,6 +93,15 @@ const Signup = () => {
       navigate("/login");
     }
     setLoading(false);
+  };
+
+  const handleGoogle = async () => {
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result?.error) {
+      toast({ title: "Google sign-in failed", description: String(result.error), variant: "destructive" });
+    }
   };
 
   if (role === "provider") {
