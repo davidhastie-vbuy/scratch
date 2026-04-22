@@ -139,7 +139,7 @@ const HomeAuthPanel = () => {
             {role === "provider" && (
               <p className="mt-2 text-xs text-muted-foreground">
                 Provider signup uses our full application form.{" "}
-                <Link to="/signup" className="font-bold text-primary hover:underline">
+                <Link to="/signup?role=provider" className="font-bold text-primary hover:underline">
                   Continue to apply
                 </Link>
               </p>
