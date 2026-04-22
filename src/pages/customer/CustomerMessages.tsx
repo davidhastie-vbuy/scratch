@@ -11,6 +11,7 @@ import { Loader2, MessageSquare, Send, Handshake, Clock, ArrowLeft } from "lucid
 import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
+import AcceptanceDetailsDialog, { type AcceptanceDetails } from "@/components/messaging/AcceptanceDetailsDialog";
 import QuoteBanner from "@/components/messaging/QuoteBanner";
 import { AttachmentButton, StagedFilePreview, MessageAttachments, uploadAttachments, type StagedFile } from "@/components/messaging/ChatAttachments";
 import { cn } from "@/lib/utils";
@@ -136,6 +137,7 @@ const CustomerMessages = () => {
   const [accepting, setAccepting] = useState(false);
   const [counterDialog, setCounterDialog] = useState<{ priceMin: number; priceMax: number } | null>(null);
   const [negotiateDialog, setNegotiateDialog] = useState<{ priceMin: number; priceMax: number } | null>(null);
+  const [acceptDialog, setAcceptDialog] = useState<{ message: any } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const processedLocationKeyRef = useRef<string | null>(null);
 
@@ -323,7 +325,15 @@ const CustomerMessages = () => {
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
-  const handleAcceptProposal = async (message: any) => {
+  const handleAcceptProposal = (message: any) => {
+    if (!selected?.job_id) {
+      toast({ title: "Error", description: "Could not find associated job.", variant: "destructive" });
+      return;
+    }
+    setAcceptDialog({ message });
+  };
+
+  const performAccept = async (message: any, details: AcceptanceDetails) => {
     setAccepting(true);
     const proposal = message.metadata;
     const jobId = selected?.job_id;
@@ -344,6 +354,9 @@ const CustomerMessages = () => {
       scheduled_end: proposal.end_date || null,
       status: "accepted",
       provider_id: selected!.provider_user_id,
+      job_address: details.job_address,
+      job_phone: details.job_phone,
+      access_notes: details.access_notes || null,
     } as any).eq("id", jobId);
 
     await supabase.from("quotes").update({ status: "accepted" } as any)
@@ -363,6 +376,7 @@ const CustomerMessages = () => {
     toast({ title: "Terms accepted in principle!", description: "The provider will now set up milestone payments." });
     sendProviderActionEmail(selected!.provider_user_id, user!.id, selected!.jobs?.title || "a job", "accepted");
     setAccepting(false);
+    setAcceptDialog(null);
     await refreshMessages();
     fetchConversations();
   };
@@ -740,6 +754,14 @@ const CustomerMessages = () => {
           onSubmit={sendNegotiation}
         />
       )}
+
+      <AcceptanceDetailsDialog
+        open={!!acceptDialog}
+        onOpenChange={(o) => !o && !accepting && setAcceptDialog(null)}
+        jobId={selected?.job_id ?? null}
+        submitting={accepting}
+        onConfirm={(details) => acceptDialog && performAccept(acceptDialog.message, details)}
+      />
     </div>
   );
 };

@@ -18,6 +18,7 @@ import { useJobActions } from "@/hooks/use-job-actions";
 import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import MilestonePaymentSection from "@/components/MilestonePaymentSection";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
+import AcceptanceDetailsDialog, { type AcceptanceDetails } from "@/components/messaging/AcceptanceDetailsDialog";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ScheduleChangeRequest from "@/components/ScheduleChangeRequest";
 import WorkTracker from "@/components/WorkTracker";
@@ -65,6 +66,9 @@ const JobDetail = () => {
 
   // Inline messaging
   const [chatDialog, setChatDialog] = useState<{ providerUserId: string; quoteId: string } | null>(null);
+  const [acceptDialog, setAcceptDialog] = useState<{ message: any } | null>(null);
+  const [editSiteDialog, setEditSiteDialog] = useState(false);
+  const [savingSite, setSavingSite] = useState(false);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [chatMsg, setChatMsg] = useState("");
   const [chatSending, setChatSending] = useState(false);
@@ -441,8 +445,13 @@ const JobDetail = () => {
     setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
-  // Accept proposal from provider in inline chat
-  const handleChatAccept = async (msg: any) => {
+  // Accept proposal from provider in inline chat — opens confirmation dialog first
+  const handleChatAccept = (msg: any) => {
+    if (!chatConvId) return;
+    setAcceptDialog({ message: msg });
+  };
+
+  const performChatAccept = async (msg: any, details: AcceptanceDetails) => {
     if (!chatConvId) return;
     setChatAccepting(true);
     const metadata = (msg as any).metadata;
@@ -457,6 +466,9 @@ const JobDetail = () => {
       status: "accepted",
       scheduled_start: metadata.start_date,
       scheduled_end: metadata.end_date || null,
+      job_address: details.job_address,
+      job_phone: details.job_phone,
+      access_notes: details.access_notes || null,
     } as any).eq("id", jobId!);
 
     // Decline other quotes, accept this provider's
@@ -476,6 +488,7 @@ const JobDetail = () => {
 
     toast({ title: "Terms accepted in principle!", description: "The provider will now set up milestone payments." });
     setChatAccepting(false);
+    setAcceptDialog(null);
     const { data: msgs } = await supabase.from("messages").select("*").eq("conversation_id", chatConvId).order("created_at");
     setChatMessages(msgs ?? []);
     fetchAll();
@@ -906,6 +919,43 @@ const JobDetail = () => {
           onReviewSubmitted={fetchAll}
         />
       )}
+      {/* Job site details (visible to provider once accepted) */}
+      {["accepted", "in_progress", "completed"].includes(job.status) && ((job as any).job_address || (job as any).job_phone || (job as any).access_notes) && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-base">Job site details</CardTitle>
+            {!hasConfirmedPayment && job.status === "accepted" && (
+              <Button variant="outline" size="sm" onClick={() => setEditSiteDialog(true)}>
+                <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {(job as any).job_address && (
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Address</p>
+                <p className="whitespace-pre-wrap">{(job as any).job_address}</p>
+              </div>
+            )}
+            {(job as any).job_phone && (
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Contact phone</p>
+                <p>{(job as any).job_phone}</p>
+              </div>
+            )}
+            {(job as any).access_notes && (
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-wide">Access notes</p>
+                <p className="whitespace-pre-wrap">{(job as any).access_notes}</p>
+              </div>
+            )}
+            {!hasConfirmedPayment && job.status === "accepted" && (
+              <p className="text-xs text-muted-foreground">You can update these details until the first deposit is paid.</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Schedule - read only for customer */}
       {["accepted", "in_progress"].includes(job.status) && (job.scheduled_start || job.scheduled_end) && (
         <Card>
@@ -1043,6 +1093,35 @@ const JobDetail = () => {
           onSubmit={sendCounterProposal}
         />
       )}
+
+      <AcceptanceDetailsDialog
+        open={!!acceptDialog}
+        onOpenChange={(o) => !o && !chatAccepting && setAcceptDialog(null)}
+        jobId={jobId ?? null}
+        submitting={chatAccepting}
+        onConfirm={(details) => acceptDialog && performChatAccept(acceptDialog.message, details)}
+      />
+
+      <AcceptanceDetailsDialog
+        open={editSiteDialog}
+        onOpenChange={(o) => !o && !savingSite && setEditSiteDialog(false)}
+        jobId={jobId ?? null}
+        title="Edit job site details"
+        confirmLabel="Save changes"
+        submitting={savingSite}
+        onConfirm={async (details) => {
+          setSavingSite(true);
+          await supabase.from("jobs").update({
+            job_address: details.job_address,
+            job_phone: details.job_phone,
+            access_notes: details.access_notes || null,
+          } as any).eq("id", jobId!);
+          setSavingSite(false);
+          setEditSiteDialog(false);
+          toast({ title: "Site details updated" });
+          fetchAll();
+        }}
+      />
 
       {/* Cancel Job Confirmation Dialog */}
       <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
