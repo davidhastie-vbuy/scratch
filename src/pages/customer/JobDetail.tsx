@@ -59,14 +59,6 @@ const JobDetail = () => {
   const [payingAmount, setPayingAmount] = useState("");
   const [processingPayment, setProcessingPayment] = useState(false);
 
-      <AcceptanceDetailsDialog
-        open={!!acceptDialog}
-        onOpenChange={(o) => !o && !chatAccepting && setAcceptDialog(null)}
-        jobId={jobId ?? null}
-        submitting={chatAccepting}
-        onConfirm={(details) => acceptDialog && performChatAccept(acceptDialog.message, details)}
-      />
-
 
   // Review
   const [reviewOpen, setReviewOpen] = useState(false);
