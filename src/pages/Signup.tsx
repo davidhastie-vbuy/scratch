@@ -226,28 +226,12 @@ const Signup = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone number</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="phone" type="tel" placeholder="+44 7700 900000" value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-10 h-11" required maxLength={20} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address line 1</Label>
+                  <Label htmlFor="postcode">Postcode</Label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input id="address" placeholder="123 High Street" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} className="pl-10 h-11" required maxLength={255} />
+                    <Input id="postcode" placeholder="SW1A 1AA" value={postcode} onChange={(e) => setPostcode(e.target.value)} className="pl-10 h-11" required maxLength={10} />
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input id="city" placeholder="London" value={city} onChange={(e) => setCity(e.target.value)} className="h-11" required maxLength={100} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="postcode">Postcode</Label>
-                    <Input id="postcode" placeholder="SW1A 1AA" value={postcode} onChange={(e) => setPostcode(e.target.value)} className="h-11" required maxLength={10} />
-                  </div>
+                  <p className="text-xs text-muted-foreground">Used to match you with local tradespeople. You can add your full address and phone number later.</p>
                 </div>
 
                 {/* Optional recommendation */}
