@@ -32,7 +32,7 @@ const HomeAuthPanel = () => {
     setRole(next);
     if (next === "provider" && mode === "signup") {
       // Provider signup uses the multi-step flow
-      navigate("/signup");
+      navigate("/signup?role=provider");
     }
   };
 
