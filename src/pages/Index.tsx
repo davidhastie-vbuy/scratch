@@ -50,7 +50,7 @@ const Index = () => {
                 Local &bull; Recommended &bull; Trusted
               </div>
               <h2 className="font-display text-3xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-5xl xl:text-6xl animate-fade-in">
-                Fed up of being<br /><br />
+                Fed up of being<br />
                 <span className="block text-primary drop-shadow-lg">let down?</span>
               </h2>
               <p className="mt-6 text-lg leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0 text-primary-foreground font-normal">
