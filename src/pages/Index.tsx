@@ -152,6 +152,59 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Why Us - Duplicate */}
+      <section className="py-20 md:py-28 section-divider bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-16">
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-none shadow-none opacity-0"></span>
+            <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
+              Why Us and Why Now?
+            </h3>
+            <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-lg whitespace-pre-line">
+              {"Most platforms are hit and miss with no guarantees.\nThey lack transparency and accountability.\nBookATrade is built to fix that."}
+            </p>
+          </div>
+          <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
+            {[
+              {
+                step: "1",
+                icon: <Voicemail className="h-6 w-6" />,
+                title: "No Spam",
+                desc: "Your personal details are\nnever shared with any providers.\nYou stay in complete control.",
+              },
+              {
+                step: "2",
+                icon: <Repeat1 className="h-6 w-6" />,
+                title: "No Repeating Yourself",
+                desc: "Post your job requirements once.\nAdd photos and videos.\nProviders know exactly what you need",
+              },
+              {
+                step: "3",
+                icon: <Zap className="h-6 w-6" />,
+                title: "Less Competition",
+                desc: "All providers excel in their field.\nSo we limit the numbers\nand avoid confusion.",
+              },
+            ].map((item) => (
+              <div
+                key={item.step}
+                className="group relative rounded-2xl border-2 border-border/80 bg-card p-8 text-center transition-all duration-300 hover-lift hover:border-primary/40 shadow-md hover:shadow-xl hover:shadow-primary/10"
+              >
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-display text-lg font-extrabold shadow-lg shadow-primary/40 group-hover:animate-pulse-glow transition-shadow ring-4 ring-card">
+                    {item.step}
+                  </div>
+                </div>
+                <div className="mt-4 mb-4 mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-primary border-2 border-primary/20 transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary group-hover:shadow-lg group-hover:shadow-primary/30">
+                  {item.icon}
+                </div>
+                <h4 className="font-display text-lg font-bold text-foreground">{item.title}</h4>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Trust Features with Images */}
       <section className="py-16 md:py-24 bg-muted/50">
         <div className="container space-y-20 md:space-y-32">
