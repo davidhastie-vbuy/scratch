@@ -124,11 +124,11 @@ const Signup = () => {
           <h2 className="font-display text-3xl font-extrabold mb-4">
             Join Book<span className="text-primary">A</span>Trade
           </h2>
-          <p className="text-primary-foreground/60 text-lg leading-relaxed">
-            Whether you need work done or you're a skilled tradesperson — we've built this platform for you.
+          <p className="text-primary-foreground/60 leading-relaxed text-2xl font-bold whitespace-pre-line">
+            {"Stop Guessing.\nStart hiring with confidence.\nNo spam calls. No chasing.\nNever feel let down again."}
           </p>
           <div className="mt-8 flex justify-center gap-3">
-            {["Vetted", "Trusted", "Guaranteed"].map((tag) => (
+            {["Vetted Providers Only", "No Hidden Costs", "You Stay In Control"].map((tag) => (
               <span key={tag} className="rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold text-primary">
                 {tag}
               </span>
