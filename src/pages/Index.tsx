@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield, ArrowRight, CheckCircle, Star, PhoneCall, Send, CircleArrowDown, Phone, Mail, Download, Zap, Award, Users, MailPlus, Repeat1, BrushCleaning, BellRing } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle, Star, PhoneCall, Send, CircleArrowDown, Phone, Mail, Download, Zap, Award, Users, MailPlus, Repeat1, Paintbrush, BellRing } from "lucide-react";
 import heroImage from "@/assets/hero-trades.jpg";
 import HomeAuthPanel from "@/components/HomeAuthPanel";
 import trustImage from "@/assets/trust-handshake.jpg";
@@ -128,7 +128,7 @@ const Index = () => {
               },
               {
                 step: "3",
-                icon: <BrushCleaning className="h-6 w-6" />,
+                icon: <Paintbrush className="h-6 w-6" />,
                 title: "Clear From Start To Finish",
                 desc: "Jobs, quotes, communication, and payments all handled in one place.\nClear, simple, and under your control.",
               },
