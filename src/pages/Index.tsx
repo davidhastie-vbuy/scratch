@@ -116,20 +116,20 @@ const Index = () => {
               {
                 step: "1",
                 icon: <Voicemail className="h-6 w-6" />,
-                title: "No Spam",
-                desc: "Your personal details are\nnever shared with any providers.\nYou stay in complete control.",
+                title: "Post Your Job Once",
+                desc: "Describe what you need, add photos and/or video, and we'll match you with the right tradespeople in your area.",
               },
               {
                 step: "2",
                 icon: <Repeat1 className="h-6 w-6" />,
-                title: "No Repeating Yourself",
-                desc: "Post your job requirements once.\nAdd photos and videos.\nProviders know exactly what you need",
+                title: "Matched, But Not Sent To All",
+                desc: "Each job allows receiving quotes from a small number of highly trusted local providers. No spam for anyone.",
               },
               {
                 step: "3",
                 icon: <Zap className="h-6 w-6" />,
-                title: "Less Competition",
-                desc: "All providers excel in their field.\nSo we limit the numbers\nand avoid confusion.",
+                title: "Clear From Start To Finish",
+                desc: "Jobs, quotes, communication, and payments all handled in one place.\nClear, simple, and under your control.",
               },
             ].map((item) => (
               <div
