@@ -289,7 +289,7 @@ const Index = () => {
                   { icon: <Users className="h-6 w-6" />, label: "Local job leads" },
                   { icon: <Shield className="h-6 w-6" />, label: "Verified badge" },
                   { icon: <Star className="h-6 w-6" />, label: "Build reviews" },
-                  { icon: <Zap className="h-6 w-6" />, label: "Guaranteed payment" },
+                  { icon: <Zap className="h-6 w-6" />, label: "Full Transparency" },
                 ].map((item) => (
                   <div key={item.label} className="flex flex-col items-center gap-3 rounded-2xl bg-primary-foreground/5 border-2 border-primary-foreground/15 p-6 text-center transition-all duration-300 hover:bg-primary-foreground/10 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
                     <div className="text-primary p-3 rounded-xl bg-primary/10 border border-primary/20">{item.icon}</div>
@@ -369,7 +369,7 @@ const Index = () => {
                 <span className="font-display text-lg font-extrabold">
                   Book<span className="text-primary">A</span>Trade
                 </span>
-                <p className="text-xs text-primary-foreground/50">Vetted &bull; Trusted &bull; Guaranteed</p>
+                <p className="text-xs text-primary-foreground/50">Local &bull; Recommended &bull; Trusted</p>
               </div>
             </div>
             <div className="flex items-center gap-6 text-sm text-primary-foreground/60">
