@@ -334,10 +334,10 @@ const Index = () => {
                 
               </div>
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
-                Built On Trust, Backed By Real People
+                Elsewhere...
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- Every provider is vetted before joining.\n- Real reviews from real customers after every job.\n- A dedicated support team always on hand.\n- Secure payments held safely until you're happy.\n- Honest pricing with no hidden surprises.\nBookATrade is built around people, not profit margins."}
+                {"- “Spent £3000 for 0 calls!”\n- “They don’t vet anyone properly.”\n- “Paid for leads… got nothing back.”\n- “We got scammed... But he had glowing reviews.”\n- “Leads get sent to 10 or 12 tradespeople at the same time.”\n- “It’s complete pot luck!”\n- “Cancellation was not possible due to the 12-month contract.”\n\nThis is why we built BookATrade."}
               </p>
             </div>
           </div>
