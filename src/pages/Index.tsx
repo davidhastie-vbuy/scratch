@@ -357,7 +357,7 @@ const Index = () => {
                 <h3 className="font-display text-3xl md:text-4xl font-extrabold leading-tight">
                   Guaranteed,&nbsp;<span className="text-primary drop-shadow-md">Local Jobs</span>
                 </h3>
-                <p className="mt-4 text-primary-foreground/70 text-lg leading-relaxed whitespace-pre-line">
+                <p className="mt-4 text-primary-foreground/70 leading-relaxed whitespace-pre-line text-lg font-semibold">
                   {"Join today and see how we work. No upfront costs. No monthly fees.\nNo paying for leads. No commitment. Only pay us when you get paid."}
                 </p>
                 <Button size="lg" asChild className="mt-8 text-lg font-extrabold h-16 px-12 shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-110 text-center">
