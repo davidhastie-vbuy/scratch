@@ -105,10 +105,10 @@ const Index = () => {
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-none shadow-none opacity-0"></span>
             <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
-              Why Us and Why Now?
+              How It Works
             </h3>
             <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-lg whitespace-pre-line">
-              {"Most platforms are hit and miss with no guarantees.\nThey lack transparency and accountability.\nBookATrade is built to fix that."}
+              {"Post your requirements. Detailed descriptions with images and video allow providers to quote with confidence, all in one place. \nWe never share externally.\n No mass-send. No hidden costs. No chasing."}
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
