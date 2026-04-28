@@ -116,20 +116,20 @@ const Index = () => {
               {
                 step: "1",
                 icon: <ClipboardList className="h-6 w-6" />,
-                title: "Post your job",
-                desc: "Describe what you need, add photos, and we'll match you with the right tradespeople in your area.",
+                title: "No Spam",
+                desc: "Your personal details are\nnever shared with any providers.\nYou stay in complete control.",
               },
               {
                 step: "2",
                 icon: <MessageSquare className="h-6 w-6" />,
-                title: "Compare quotes",
-                desc: "Receive up to 3 quotes from vetted professionals. Compare prices, availability, and reviews.",
+                title: "No Repeating Yourself",
+                desc: "Post your job requirements once.\nAdd photos and videos.\nProviders know exactly what you need",
               },
               {
                 step: "3",
                 icon: <Zap className="h-6 w-6" />,
-                title: "Hire with confidence",
-                desc: "Choose your preferred tradesperson and enjoy quality work backed by real reviews and our support team.",
+                title: "Less Competition",
+                desc: "All providers excel in their field.\nSo we limit the numbers\nand avoid confusion.",
               },
             ].map((item) => (
               <div
@@ -145,7 +145,7 @@ const Index = () => {
                   {item.icon}
                 </div>
                 <h4 className="font-display text-lg font-bold text-foreground">{item.title}</h4>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{item.desc}</p>
               </div>
             ))}
           </div>
