@@ -65,7 +65,7 @@ const Index = () => {
                 </span>
                 <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
                   <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  Only the Best Trades
+                  Only The Best Trades
                 </span>
                 <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
                   <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
