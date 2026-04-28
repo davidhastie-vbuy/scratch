@@ -264,7 +264,7 @@ const Index = () => {
                 Built For Jobs, Not Leads
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"Providers:\n- No upfront or hidden costs \n- No monthly fees. \n- No paying for leads. \n- Jobs ONLY available to a few providers. \n- You don’t work until you get paid. \n- No contracts tying you in"}
+                {"Providers:\n- No upfront or hidden costs\n- No monthly fees.\n- No paying for leads.\n- Jobs ONLY available to a few providers.\n- You don’t work until you get paid.\n- No contracts tying you in"}
               </p>
               <ul className="mt-6 space-y-3">
                 {["\n", "\n", "\n"].map((item, index) => (
