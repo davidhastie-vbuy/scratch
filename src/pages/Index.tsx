@@ -54,9 +54,11 @@ const Index = () => {
                 Fed Up Of Being<br />
                 <span className="block text-primary drop-shadow-lg">Let Down?</span>
               </h2>
-              <p className="mt-6 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0 text-lg text-primary-foreground">
-                <span className="block"><strong>Customers:</strong> Find trusted local tradespeople in a few simple steps.</span>
-                <span className="block"><strong>Providers:</strong> No more paying for leads. Just real jobs with guarateed payment.</span>
+              <p className="mt-6 text-2xl font-bold leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0 text-primary-foreground">
+                Stop guessing.<br />
+                Start hiring with confidence.<br />
+                No spam calls. No chasing.<br />
+                Never feel let down again.
               </p>
               <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-primary-foreground/70 animate-fade-in stagger-4 opacity-0">
                 <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
