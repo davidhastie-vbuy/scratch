@@ -211,21 +211,21 @@ const Index = () => {
           {/* Feature 1 - Vetting: Customer & electrician in hallway */}
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
-              <div className="inline-flex items-center gap-1.5 border-primary/30 px-4 py-1.5 text-xs uppercase tracking-wider mb-5 border-0 rounded-none shadow-none font-thin text-primary-foreground bg-primary-foreground">
-                <Shield className="h-3.5 w-3.5" />
+              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs uppercase tracking-wider mb-5 border-0 rounded-none shadow-none font-thin text-primary-foreground bg-muted px-0 border-muted">
+                <Shield className="lucide lucide-shield bg-muted text-muted w-0 h-0" />
                 
               </div>
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
                 You Stay In Control The Whole Time
               </h3>
               <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line">
-                {"No pressure. No commitment. Nothing is shared unless you choose. Customers:  \nYour personal details are safe. We never share your information.  \nYou choose who to speak to and work with.  \nYou can ignore, accept, or decline any quote.  \nYou can edit or remove your job at any time.  \nNo commitment until you’re ready.  \nYou only release payment when you’re completely satisfied"}
+                {"Customers:\n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can edit or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
               </p>
               <ul className="mt-6 space-y-3">
                 {["\n", "\n", "\n"].map((item, index) => (
                   <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center border-0 bg-muted-foreground border-muted-foreground rounded-none shadow-none text-center">
-                      <CheckCircle className="lucide lucide-circle-check-big text-primary w-0 h-0" />
+                    <span className="flex h-6 w-6 items-center justify-center border-0 border-muted-foreground rounded-none shadow-none text-center bg-muted">
+                      <CheckCircle className="lucide lucide-shield bg-muted text-muted w-0 h-0" />
                     </span>
                     {item}
                   </li>
@@ -255,21 +255,21 @@ const Index = () => {
               />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border-2 border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5 shadow-sm">
-                <Star className="h-3.5 w-3.5" />
-                Quality Guaranteed
+              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs uppercase tracking-wider mb-5 border-muted border-0 rounded-none shadow-none font-thin px-0 bg-muted text-muted">
+                <Star className="lucide lucide-circle-check-big w-0 h-0 bg-muted text-muted border-0 border-none border-muted" />
+                
               </div>
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
-                Skilled professionals who take pride in their craft
+                Built For Jobs, Not Leads
               </h3>
-              <p className="mt-4 text-muted-foreground leading-relaxed text-lg">
-                From plumbing and electrics to carpentry and landscaping — our tradespeople deliver exceptional workmanship across every trade. Real skills, real results.
+              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
+                {"- No upfront or hidden costs \n- No monthly fees. \n- No paying for leads. \n- Jobs ONLY available to a few providers. \n- You don’t work until you get paid. \n- No contracts tying you in"}
               </p>
               <ul className="mt-6 space-y-3">
-                {["13+ trade categories covered", "Experienced, qualified professionals", "Customer reviews after every job"].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full shadow-sm border-0 bg-muted-foreground border-muted-foreground">
-                      <CheckCircle className="h-4 w-4 text-primary" />
+                {["\n", "\n", "\n"].map((item, index) => (
+                  <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
+                    <span className="flex h-6 w-6 items-center justify-center border-0 border-muted bg-muted text-xs font-thin rounded-none shadow-none">
+                      <CheckCircle className="lucide lucide-circle-check-big h-4 w-4 text-primary w-0 h-0 bg-muted text-muted border-0 border-none border-muted" />
                     </span>
                     {item}
                   </li>
@@ -281,21 +281,21 @@ const Index = () => {
           {/* Feature 3 - Peace of mind: Plasterer talking to customer */}
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border-2 border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5 shadow-sm">
-                <Shield className="h-3.5 w-3.5" />
-                Peace of Mind
+              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs font-bold uppercase tracking-wider mb-5 border-muted border-0 px-0 bg-muted text-muted rounded-none shadow-none">
+                <Shield className="lucide lucide-circle-check-big text-muted bg-muted h-0 w-0 border-muted" />
+                
               </div>
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
-                Transparent quotes, no hidden surprises
+                Why People Often Don’t Trust A Trader! 
               </h3>
-              <p className="mt-4 text-muted-foreground leading-relaxed text-lg">
-                Get up to 3 quotes with clear pricing and timelines. Message your tradesperson directly, track job progress, and raise support if needed. We've got your back from start to finish.
+              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
+                {"- Most platforms are completely hit and miss. \n- Jobs get sent to lots of tradespeople. \n- Customers get bombarded with quotes. \n- Providers pay for leads that go nowhere. \n- The trust is broken. \nWe do things differently: \n- Jobs are matched to a fewer local providers. \n- Your details are never shared unless you say so. \n- No more paying for leads. \n- Jobs & payments are handled clearly"}
               </p>
               <ul className="mt-6 space-y-3">
-                {["Up to 3 competitive quotes per job", "Direct messaging with tradespeople", "Dedicated support team"].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full shadow-sm border-0 bg-muted-foreground border-muted-foreground">
-                      <CheckCircle className="h-4 w-4 text-primary" />
+                {["\n", "\n", "\n"].map((item, index) => (
+                  <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
+                    <span className="flex h-6 w-6 items-center justify-center border-0 border-muted bg-muted rounded-none shadow-none">
+                      <CheckCircle className="lucide lucide-circle-check-big h-4 w-4 text-primary text-muted bg-muted h-0 w-0 border-muted" />
                     </span>
                     {item}
                   </li>
