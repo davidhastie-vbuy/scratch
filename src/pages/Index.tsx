@@ -50,7 +50,7 @@ const Index = () => {
                 Local &bull; Recommended &bull; Trusted
               </div>
               <h2 className="font-display text-3xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-5xl xl:text-6xl animate-fade-in">
-                Fed up of being<br /><br />
+                Fed up of being<br />
                 <span className="block text-primary drop-shadow-lg">let down?</span>
               </h2>
               <p className="mt-6 text-lg leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0 text-primary-foreground font-normal">
@@ -93,7 +93,7 @@ const Index = () => {
           ].map((stat) => (
             <div key={stat.label} className="group">
               <div className="font-display text-3xl md:text-4xl font-extrabold text-primary drop-shadow-md group-hover:scale-110 transition-transform duration-300">{stat.value}</div>
-              <div className="mt-1 text-sm text-primary-foreground/70 font-medium">{stat.label}</div>
+              <div className="mt-1 text-sm font-medium text-primary-foreground">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -103,12 +103,12 @@ const Index = () => {
       <section className="py-20 md:py-28 section-divider">
         <div className="container">
           <div className="text-center mb-16">
-            <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5">Simple process</span>
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-none shadow-none opacity-0"></span>
             <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
-              How BookATrade works
+              Why Us and Why Now?
             </h3>
-            <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-lg">
-              Simple, transparent, and built around your peace of mind.
+            <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-lg whitespace-pre-line">
+              {"Most platforms are hit and miss with no guarantees.\nThey lack transparency and accountability.\nBookATrade is built to fix that."}
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
@@ -116,20 +116,20 @@ const Index = () => {
               {
                 step: "1",
                 icon: <ClipboardList className="h-6 w-6" />,
-                title: "Post your job",
-                desc: "Describe what you need, add photos, and we'll match you with the right tradespeople in your area.",
+                title: "No Spam",
+                desc: "Your personal details are\nnever shared with any providers.\nYou stay in complete control.",
               },
               {
                 step: "2",
                 icon: <MessageSquare className="h-6 w-6" />,
-                title: "Compare quotes",
-                desc: "Receive up to 3 quotes from vetted professionals. Compare prices, availability, and reviews.",
+                title: "No Repeating Yourself",
+                desc: "Post your job requirements once.\nAdd photos and videos.\nProviders know exactly what you need",
               },
               {
                 step: "3",
                 icon: <Zap className="h-6 w-6" />,
-                title: "Hire with confidence",
-                desc: "Choose your preferred tradesperson and enjoy quality work backed by real reviews and our support team.",
+                title: "Less Competition",
+                desc: "All providers excel in their field.\nSo we limit the numbers\nand avoid confusion.",
               },
             ].map((item) => (
               <div
@@ -145,7 +145,7 @@ const Index = () => {
                   {item.icon}
                 </div>
                 <h4 className="font-display text-lg font-bold text-foreground">{item.title}</h4>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{item.desc}</p>
               </div>
             ))}
           </div>
