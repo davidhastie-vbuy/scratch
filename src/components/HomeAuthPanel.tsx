@@ -83,6 +83,13 @@ const HomeAuthPanel = () => {
 
   return (
     <div className="w-full rounded-2xl border-2 border-primary-foreground/20 bg-card/95 backdrop-blur-md shadow-2xl shadow-foreground/40 p-5 sm:p-6">
+      {/* Text edit */}
+      <div className="mb-6 text-center">
+        <p className="text-2xl font-bold whitespace-pre-line text-foreground">
+          {"Stop guessing.\nStart hiring with confidence.\nNo spam calls. No chasing.\nNever feel let down again."}
+        </p>
+      </div>
+
       {/* Mode toggle */}
       <div className="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
         <button
