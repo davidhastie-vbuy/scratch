@@ -93,7 +93,7 @@ const Index = () => {
           ].map((stat) => (
             <div key={stat.label} className="group">
               <div className="font-display text-3xl md:text-4xl font-extrabold text-primary drop-shadow-md group-hover:scale-110 transition-transform duration-300">{stat.value}</div>
-              <div className="mt-1 text-sm text-primary-foreground/70 font-medium">{stat.label}</div>
+              <div className="mt-1 text-sm font-medium text-primary-foreground">{stat.label}</div>
             </div>
           ))}
         </div>
