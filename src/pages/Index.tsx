@@ -281,21 +281,21 @@ const Index = () => {
           {/* Feature 3 - Peace of mind: Plasterer talking to customer */}
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border-2 border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5 shadow-sm">
-                <Shield className="h-3.5 w-3.5" />
-                Peace of Mind
+              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs font-bold uppercase tracking-wider mb-5 border-muted border-0 px-0 bg-muted text-muted rounded-none shadow-none">
+                <Shield className="lucide lucide-circle-check-big text-muted bg-muted h-0 w-0 border-muted" />
+                
               </div>
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
-                Transparent quotes, no hidden surprises
+                Why People Often Don’t Trust A Trader! 
               </h3>
-              <p className="mt-4 text-muted-foreground leading-relaxed text-lg">
-                Get up to 3 quotes with clear pricing and timelines. Message your tradesperson directly, track job progress, and raise support if needed. We've got your back from start to finish.
+              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
+                {"- Most platforms are completely hit and miss. \n- Jobs get sent to lots of tradespeople. \n- Customers get bombarded with quotes. \n- Providers pay for leads that go nowhere. \n- The trust is broken. \nWe do things differently: \n- Jobs are matched to a fewer local providers. \n- Your details are never shared unless you say so. \n- No more paying for leads. \n- Jobs & payments are handled clearly"}
               </p>
               <ul className="mt-6 space-y-3">
-                {["Up to 3 competitive quotes per job", "Direct messaging with tradespeople", "Dedicated support team"].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full shadow-sm border-0 bg-muted-foreground border-muted-foreground">
-                      <CheckCircle className="h-4 w-4 text-primary" />
+                {["\n", "\n", "\n"].map((item, index) => (
+                  <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
+                    <span className="flex h-6 w-6 items-center justify-center border-0 border-muted bg-muted rounded-none shadow-none">
+                      <CheckCircle className="lucide lucide-circle-check-big h-4 w-4 text-primary text-muted bg-muted h-0 w-0 border-muted" />
                     </span>
                     {item}
                   </li>
