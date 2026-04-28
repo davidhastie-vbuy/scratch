@@ -47,7 +47,7 @@ const Index = () => {
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border-2 border-primary/40 bg-primary/15 px-4 py-1.5 text-sm font-semibold text-primary-foreground mb-6 animate-fade-in backdrop-blur-sm shadow-lg shadow-primary/10">
                 <Award className="h-4 w-4 text-primary" />
-                Vetted &bull; Trusted &bull; Guaranteed
+                Local &bull; Recommended &bull; Trusted
               </div>
               <h2 className="font-display text-3xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-5xl xl:text-6xl animate-fade-in">
                 Your home deserves
@@ -59,15 +59,15 @@ const Index = () => {
               <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-primary-foreground/70 animate-fade-in stagger-4 opacity-0">
                 <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
                   <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  Vetted professionals
+                  Local Recommendations
                 </span>
                 <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
                   <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  Up to 3 free quotes
+                  Only the Best Trades
                 </span>
                 <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
                   <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  Guaranteed payments
+                  Full Transparency
                 </span>
               </div>
             </div>
