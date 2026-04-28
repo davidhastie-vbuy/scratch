@@ -169,19 +169,19 @@ const Index = () => {
             {[
               {
                 step: "1",
-                icon: <PhoneCall className="h-6 w-6" />,
+                icon: <Phone className="h-6 w-6" />,
                 title: "No Spam",
                 desc: "Your personal details are\nnever shared with any providers.\nYou stay in complete control.",
               },
               {
                 step: "2",
-                icon: <Send className="h-6 w-6" />,
+                icon: <Mail className="h-6 w-6" />,
                 title: "No Repeating Yourself",
                 desc: "Post your job requirements once.\nAdd photos and videos.\nProviders know exactly what you need",
               },
               {
                 step: "3",
-                icon: <CircleArrowDown className="h-6 w-6" />,
+                icon: <Download className="h-6 w-6" />,
                 title: "Less Competition",
                 desc: "All providers excel in their field.\nSo we limit the numbers\nand avoid confusion.",
               },
