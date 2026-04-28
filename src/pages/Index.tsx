@@ -399,9 +399,9 @@ const Index = () => {
               <div className="container">
                 <div className="max-w-md">
                   <h3 className="font-display text-2xl md:text-3xl font-extrabold text-primary-foreground leading-tight">
-                    Had a great experience with a local provider? <span className="text-primary block whitespace-pre-line">{"\nTell us about them!"}</span>
+                    Had a great experience with a local provider? <span className="text-primary block whitespace-pre-line">Tell us about them!</span>
                   </h3>
-                  <p className="mt-2 text-primary-foreground/80 text-sm md:text-lg whitespace-pre-line">
+                  <p className="mt-2 text-primary-foreground/80 text-sm whitespace-pre-line font-sans font-semibold md:text-lg">
                     {"Have your say in which tradespeople are on the platform.\nOnly trusted, recommended providers make it in.\nHelp out the community; have your say."}
                   </p>
                   <Button size="lg" asChild className="mt-6 text-lg font-extrabold h-16 px-12 shadow-2xl shadow-primary/50 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-primary/60">
