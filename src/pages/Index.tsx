@@ -24,10 +24,10 @@ const Index = () => {
           </Link>
           <div className="flex items-center gap-3">
             <Button variant="ghost" asChild className="font-semibold border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all">
-              <Link to="/login">Sign in</Link>
+              <Link to="/login">Sign In</Link>
             </Button>
             <Button asChild className="font-semibold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 border-2 border-primary hover:border-primary/80 transition-all duration-300 hover:scale-105">
-              <Link to="/signup">Get started</Link>
+              <Link to="/signup">Get Started</Link>
             </Button>
           </div>
         </div>
