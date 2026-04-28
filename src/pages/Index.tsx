@@ -8,6 +8,7 @@ import qualityImage from "@/assets/quality-work.jpg";
 import peaceImage from "@/assets/peace-of-mind.jpg";
 import electricianImage from "@/assets/kitchen-electrics.jpg";
 import logo from "@/assets/bookatrade-logo.png";
+import trustedPartnershipImage from "@/assets/trusted-partnership.jpg";
 
 const Index = () => {
   return (
@@ -310,6 +311,34 @@ const Index = () => {
                 alt="Tradesperson discussing work with a happy homeowner"
                 className="relative rounded-2xl shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-center transition-transform duration-500 group-hover:scale-[1.02] border-2 border-border/50"
               />
+            </div>
+          </div>
+
+          {/* Feature 4 - Trusted Partnership */}
+          <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
+            <div className="relative group">
+              <div className="absolute -inset-3 rounded-3xl bg-gradient-to-bl from-primary/25 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-1 rounded-2xl border-2 border-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <img
+                src={trustedPartnershipImage}
+                alt="Tradesperson and homeowner shaking hands outside a home"
+                loading="lazy"
+                width={1024}
+                height={768}
+                className="relative rounded-2xl shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-center transition-transform duration-500 group-hover:scale-[1.02] border-2 border-border/50"
+              />
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs font-bold uppercase tracking-wider mb-5 border-muted border-0 px-0 bg-muted text-muted rounded-none shadow-none">
+                <Shield className="lucide lucide-circle-check-big text-muted bg-muted h-0 w-0 border-muted" />
+                
+              </div>
+              <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
+                Built On Trust, Backed By Real People
+              </h3>
+              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
+                {"- Every provider is vetted before joining.\n- Real reviews from real customers after every job.\n- A dedicated support team always on hand.\n- Secure payments held safely until you're happy.\n- Honest pricing with no hidden surprises.\nBookATrade is built around people, not profit margins."}
+              </p>
             </div>
           </div>
         </div>
