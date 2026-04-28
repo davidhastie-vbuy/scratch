@@ -211,21 +211,21 @@ const Index = () => {
           {/* Feature 1 - Vetting: Customer & electrician in hallway */}
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
-              <div className="inline-flex items-center gap-1.5 border-primary/30 px-4 py-1.5 text-xs uppercase tracking-wider mb-5 border-0 rounded-none shadow-none font-thin text-primary-foreground bg-primary-foreground">
-                <Shield className="h-3.5 w-3.5" />
+              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs uppercase tracking-wider mb-5 border-0 rounded-none shadow-none font-thin text-primary-foreground bg-muted px-0 border-muted">
+                <Shield className="lucide lucide-shield bg-muted text-muted w-0 h-0" />
                 
               </div>
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
                 You Stay In Control The Whole Time
               </h3>
               <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line">
-                {"No pressure. No commitment. Nothing is shared unless you choose. Customers:  \nYour personal details are safe. We never share your information.  \nYou choose who to speak to and work with.  \nYou can ignore, accept, or decline any quote.  \nYou can edit or remove your job at any time.  \nNo commitment until you’re ready.  \nYou only release payment when you’re completely satisfied"}
+                {"Customers:\n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can edit or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
               </p>
               <ul className="mt-6 space-y-3">
                 {["\n", "\n", "\n"].map((item, index) => (
                   <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center border-0 bg-muted-foreground border-muted-foreground rounded-none shadow-none text-center">
-                      <CheckCircle className="lucide lucide-circle-check-big text-primary w-0 h-0" />
+                    <span className="flex h-6 w-6 items-center justify-center border-0 border-muted-foreground rounded-none shadow-none text-center bg-muted">
+                      <CheckCircle className="lucide lucide-shield bg-muted text-muted w-0 h-0" />
                     </span>
                     {item}
                   </li>
