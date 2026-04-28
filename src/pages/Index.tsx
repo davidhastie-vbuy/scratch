@@ -229,7 +229,7 @@ const Index = () => {
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border-2 border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5 shadow-sm">
-                <ClipboardList className="h-3.5 w-3.5" />
+                <Shield className="h-3.5 w-3.5" />
                 Peace of Mind
               </div>
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
