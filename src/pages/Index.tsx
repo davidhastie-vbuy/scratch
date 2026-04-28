@@ -268,7 +268,7 @@ const Index = () => {
               <ul className="mt-6 space-y-3">
                 {["13+ trade categories covered", "Experienced, qualified professionals", "Customer reviews after every job"].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 border border-primary/30 shadow-sm">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full shadow-sm border-0 bg-muted-foreground border-muted-foreground">
                       <CheckCircle className="h-4 w-4 text-primary" />
                     </span>
                     {item}
