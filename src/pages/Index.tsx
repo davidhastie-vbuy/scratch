@@ -355,23 +355,23 @@ const Index = () => {
               <div>
                 <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-4 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5">For tradespeople</span>
                 <h3 className="font-display text-3xl md:text-4xl font-extrabold leading-tight">
-                  Grow your business with <span className="text-primary drop-shadow-md">guaranteed work</span>
+                  Guaranteed,&nbsp;<span className="text-primary drop-shadow-md">Local Jobs</span>
                 </h3>
-                <p className="mt-4 text-primary-foreground/70 text-lg leading-relaxed">
-                  Join our platform, get matched with local jobs, and build your reputation. We handle the vetting so customers trust you from day one.
+                <p className="mt-4 text-primary-foreground/70 text-lg leading-relaxed whitespace-pre-line">
+                  {"Join today and see how we work. No upfront costs. No monthly fees.\nNo paying for leads. No commitment. Only pay us when you get paid."}
                 </p>
                 <Button size="lg" asChild className="mt-8 text-lg font-extrabold h-16 px-12 shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-110">
                   <Link to="/signup">
-                    Apply to join
+                    Explore How BookATrade Works
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: <Users className="h-6 w-6" />, label: "Local job leads" },
-                  { icon: <Shield className="h-6 w-6" />, label: "Verified badge" },
-                  { icon: <Star className="h-6 w-6" />, label: "Build reviews" },
+                  { icon: <Users className="h-6 w-6" />, label: "Real Local Jobs" },
+                  { icon: <Shield className="h-6 w-6" />, label: "Verified Badge" },
+                  { icon: <Star className="h-6 w-6" />, label: "Build Reviews" },
                   { icon: <Zap className="h-6 w-6" />, label: "Full Transparency" },
                 ].map((item) => (
                   <div key={item.label} className="flex flex-col items-center gap-3 rounded-2xl bg-primary-foreground/5 border-2 border-primary-foreground/15 p-6 text-center transition-all duration-300 hover:bg-primary-foreground/10 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
