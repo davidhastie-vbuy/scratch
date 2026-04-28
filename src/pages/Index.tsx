@@ -54,7 +54,8 @@ const Index = () => {
                 <span className="block text-primary drop-shadow-lg">trusted hands.</span>
               </h2>
               <p className="mt-6 text-lg text-primary-foreground/80 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0">
-                Find vetted, reliable tradespeople for any job — big or small. Get up to 3 competitive quotes, compare with confidence, and enjoy peace of mind from start to finish.
+                Customers: Find trusted local tradespeople in a few simple steps<br />
+                Providers: No more paying for leads. Just real jobs with guaranteed payment
               </p>
               <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-primary-foreground/70 animate-fade-in stagger-4 opacity-0">
                 <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
