@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield, ArrowRight, CheckCircle, Star, PhoneCall, Send, CircleArrowDown, Zap, Award, Users } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle, Star, PhoneCall, Send, CircleArrowDown, Phone, Mail, Download, Zap, Award, Users } from "lucide-react";
 import heroImage from "@/assets/hero-trades.jpg";
 import HomeAuthPanel from "@/components/HomeAuthPanel";
 import trustImage from "@/assets/trust-handshake.jpg";
@@ -54,9 +54,9 @@ const Index = () => {
                 Fed Up Of Being<br />
                 <span className="block text-primary drop-shadow-lg">Let Down?</span>
               </h2>
-              <p className="mt-6 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0 text-lg text-primary-foreground">
-                <span className="block"><strong>Customers:</strong> Find trusted local tradespeople in a few simple steps.</span>
-                <span className="block"><strong>Providers:</strong> No more paying for leads. Just real jobs with guarateed payment.</span>
+              <p className="mt-6 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0 text-lg text-primary-foreground" data-section="hero-intro">
+                <span className="block"><b data-label="hero-customers">Customers:</b> Find trusted local tradespeople in a few simple steps.</span>
+                <span className="block"><b data-label="hero-providers">Providers:</b> No more paying for leads. Just real jobs with guarateed payment.</span>
               </p>
               <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-primary-foreground/70 animate-fade-in stagger-4 opacity-0">
                 <span className="flex items-center gap-1.5 sm:gap-2 bg-primary-foreground/5 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 border border-primary-foreground/10">
@@ -169,19 +169,19 @@ const Index = () => {
             {[
               {
                 step: "1",
-                icon: <PhoneCall className="h-6 w-6" />,
+                icon: <Phone className="h-6 w-6" />,
                 title: "No Spam",
                 desc: "Your personal details are\nnever shared with any providers.\nYou stay in complete control.",
               },
               {
                 step: "2",
-                icon: <Send className="h-6 w-6" />,
+                icon: <Mail className="h-6 w-6" />,
                 title: "No Repeating Yourself",
                 desc: "Post your job requirements once.\nAdd photos and videos.\nProviders know exactly what you need",
               },
               {
                 step: "3",
-                icon: <CircleArrowDown className="h-6 w-6" />,
+                icon: <Download className="h-6 w-6" />,
                 title: "Less Competition",
                 desc: "All providers excel in their field.\nSo we limit the numbers\nand avoid confusion.",
               },
