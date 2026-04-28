@@ -115,13 +115,13 @@ const Index = () => {
             {[
               {
                 step: "1",
-                icon: <ClipboardList className="h-6 w-6" />,
+                icon: <Voicemail className="h-6 w-6" />,
                 title: "No Spam",
                 desc: "Your personal details are\nnever shared with any providers.\nYou stay in complete control.",
               },
               {
                 step: "2",
-                icon: <MessageSquare className="h-6 w-6" />,
+                icon: <Repeat1 className="h-6 w-6" />,
                 title: "No Repeating Yourself",
                 desc: "Post your job requirements once.\nAdd photos and videos.\nProviders know exactly what you need",
               },
