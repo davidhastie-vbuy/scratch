@@ -255,21 +255,21 @@ const Index = () => {
               />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border-2 border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5 shadow-sm">
-                <Star className="h-3.5 w-3.5" />
-                Quality Guaranteed
+              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs uppercase tracking-wider mb-5 border-muted border-0 rounded-none shadow-none font-thin px-0 bg-muted text-muted">
+                <Star className="lucide lucide-circle-check-big w-0 h-0 bg-muted text-muted border-0 border-none border-muted" />
+                
               </div>
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
-                Skilled professionals who take pride in their craft
+                Built For Jobs, Not Leads
               </h3>
-              <p className="mt-4 text-muted-foreground leading-relaxed text-lg">
-                From plumbing and electrics to carpentry and landscaping — our tradespeople deliver exceptional workmanship across every trade. Real skills, real results.
+              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
+                {"- No upfront or hidden costs \n- No monthly fees. \n- No paying for leads. \n- Jobs ONLY available to a few providers. \n- You don’t work until you get paid. \n- No contracts tying you in"}
               </p>
               <ul className="mt-6 space-y-3">
-                {["13+ trade categories covered", "Experienced, qualified professionals", "Customer reviews after every job"].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full shadow-sm border-0 bg-muted-foreground border-muted-foreground">
-                      <CheckCircle className="h-4 w-4 text-primary" />
+                {["\n", "\n", "\n"].map((item, index) => (
+                  <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
+                    <span className="flex h-6 w-6 items-center justify-center border-0 border-muted bg-muted text-xs font-thin rounded-none shadow-none">
+                      <CheckCircle className="lucide lucide-circle-check-big h-4 w-4 text-primary w-0 h-0 bg-muted text-muted border-0 border-none border-muted" />
                     </span>
                     {item}
                   </li>
