@@ -103,12 +103,12 @@ const Index = () => {
       <section className="py-20 md:py-28 section-divider">
         <div className="container">
           <div className="text-center mb-16">
-            <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5">Simple process</span>
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-none shadow-none opacity-0"></span>
             <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
-              How BookATrade works
+              Why Us and Why Now?
             </h3>
-            <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-lg">
-              Simple, transparent, and built around your peace of mind.
+            <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-lg whitespace-pre-line">
+              {"Most platforms are hit and miss with no guarantees.\nThey lack transparency and accountability.\nBookATrade is built to fix that."}
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
