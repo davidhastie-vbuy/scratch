@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield, ArrowRight, CheckCircle, Star, PhoneCall, Send, CircleArrowDown, Zap, Award, Users } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle, Star, PhoneCall, Send, CircleArrowDown, Phone, Mail, Download, Zap, Award, Users } from "lucide-react";
 import heroImage from "@/assets/hero-trades.jpg";
 import HomeAuthPanel from "@/components/HomeAuthPanel";
 import trustImage from "@/assets/trust-handshake.jpg";
