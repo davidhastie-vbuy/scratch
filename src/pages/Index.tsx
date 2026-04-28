@@ -53,7 +53,7 @@ const Index = () => {
                 Fed up of being<br /><br />
                 <span className="block text-primary drop-shadow-lg">let down?</span>
               </h2>
-              <p className="mt-6 text-lg text-primary-foreground/80 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0">
+              <p className="mt-6 text-lg leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0 text-primary-foreground font-normal">
                 Customers: Find trusted local tradespeople in a few simple steps<br />
                 Providers: No more paying for leads. Just real jobs with guaranteed payment
               </p>
