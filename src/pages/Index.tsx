@@ -50,8 +50,8 @@ const Index = () => {
                 Local &bull; Recommended &bull; Trusted
               </div>
               <h2 className="font-display text-3xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-5xl xl:text-6xl animate-fade-in">
-                Your home deserves
-                <span className="block text-primary drop-shadow-lg">trusted hands.</span>
+                Fed up of being<br /><br />
+                <span className="block text-primary drop-shadow-lg">let down?</span>
               </h2>
               <p className="mt-6 text-lg text-primary-foreground/80 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0">
                 Customers: Find trusted local tradespeople in a few simple steps<br />
