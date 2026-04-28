@@ -423,20 +423,20 @@ const Index = () => {
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 50%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="container relative z-10 text-center">
           <h3 className="font-display text-3xl font-extrabold text-primary-foreground sm:text-4xl md:text-5xl">
-            Ready to find your perfect tradesperson?
+            See How It Works For Yourself
           </h3>
-          <p className="mt-4 text-primary-foreground/80 max-w-lg mx-auto text-lg">
-            Join thousands of homeowners who trust BookATrade to connect them with reliable, vetted professionals.
+          <p className="mt-4 max-w-lg mx-auto text-lg text-secondary-foreground">
+            Built around what homeowners & trades actually asked for.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Button size="lg" variant="secondary" asChild className="text-lg font-extrabold h-16 px-12 shadow-2xl hover:shadow-2xl transition-all hover:scale-110 rounded-2xl border-2 border-foreground/10">
               <Link to="/signup">
-                Get started free
+                Get Started Free Today
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild className="text-base font-bold bg-transparent border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/15 hover:border-primary-foreground/60 h-13 px-10 rounded-xl shadow-lg transition-all duration-300 hover:scale-105">
-              <Link to="/login">Sign in</Link>
+              <Link to="/login">Sign In</Link>
             </Button>
           </div>
         </div>
