@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield, ArrowRight, CheckCircle, Star, ClipboardList, Zap, Award, MessageSquare, Users } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle, Star, Voicemail, Zap, Award, Repeat1, Users } from "lucide-react";
 import heroImage from "@/assets/hero-trades.jpg";
 import HomeAuthPanel from "@/components/HomeAuthPanel";
 import trustImage from "@/assets/trust-handshake.jpg";
@@ -115,13 +115,13 @@ const Index = () => {
             {[
               {
                 step: "1",
-                icon: <ClipboardList className="h-6 w-6" />,
+                icon: <Voicemail className="h-6 w-6" />,
                 title: "No Spam",
                 desc: "Your personal details are\nnever shared with any providers.\nYou stay in complete control.",
               },
               {
                 step: "2",
-                icon: <MessageSquare className="h-6 w-6" />,
+                icon: <Repeat1 className="h-6 w-6" />,
                 title: "No Repeating Yourself",
                 desc: "Post your job requirements once.\nAdd photos and videos.\nProviders know exactly what you need",
               },
@@ -229,7 +229,7 @@ const Index = () => {
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border-2 border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary mb-5 shadow-sm">
-                <ClipboardList className="h-3.5 w-3.5" />
+                <Shield className="h-3.5 w-3.5" />
                 Peace of Mind
               </div>
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
