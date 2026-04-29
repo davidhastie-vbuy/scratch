@@ -318,15 +318,15 @@ const Index = () => {
       {/* For Tradespeople CTA */}
       <section className="py-20 md:py-28 section-divider">
         <div className="container">
-          <div className="rounded-3xl bg-foreground text-primary-foreground p-10 md:p-16 relative overflow-hidden border-2 border-primary/20 shadow-2xl">
+          <div className="rounded-3xl bg-foreground text-primary-foreground p-6 sm:p-10 md:p-16 relative overflow-hidden border-2 border-primary/20 shadow-2xl">
             <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary/10 -translate-y-1/2 translate-x-1/3" />
             <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-primary/5 translate-y-1/3 -translate-x-1/4" />
             <div className="absolute top-1/2 right-1/4 w-32 h-32 rounded-full bg-primary/5 -translate-y-1/2" />
             <div className="relative z-10 grid md:grid-cols-2 gap-10 items-center">
-              <div className="text-center md:text-left flex flex-col items-center md:items-start">
+              <div className="text-center md:text-left flex flex-col items-center md:items-start w-full">
                 <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-4 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5">For tradespeople</span>
                 <h3 className="font-display text-3xl md:text-4xl font-extrabold leading-tight">
-                  Guaranteed,&nbsp;<span className="text-primary drop-shadow-md">Local Jobs</span>
+                  Guaranteed, <span className="text-primary drop-shadow-md">Local Jobs</span>
                 </h3>
                 <p className="mt-4 text-primary-foreground/70 leading-relaxed whitespace-pre-line text-lg font-medium">
                   {"Join today and see how we work. No upfront costs. No monthly fees.\nNo paying for leads. No commitment. Only pay us when you get paid."}
