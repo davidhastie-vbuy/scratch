@@ -16,9 +16,9 @@ const Index = () => {
       {/* Header */}
       <header className="border-b border-border/60 bg-card/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container flex h-16 items-center justify-between gap-2">
-          <Link to="/" className="flex items-center gap-2 group min-w-0 flex-shrink">
-            <img src={logo} alt="BookATrade logo" className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-full bg-card shadow-md ring-2 ring-primary/20 transition-transform duration-300 group-hover:rotate-6 group-hover:ring-primary/40" />
-            <span className="font-display text-base sm:text-xl font-extrabold text-foreground truncate">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group min-w-0 flex-shrink">
+            <img src={logo} alt="BookATrade logo" className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 rounded-full bg-card shadow-md ring-2 ring-primary/20 transition-transform duration-300 group-hover:rotate-6 group-hover:ring-primary/40" />
+            <span className="font-display text-sm sm:text-xl font-extrabold text-foreground whitespace-nowrap">
               Book<span className="text-primary">A</span>Trade
             </span>
           </Link>
@@ -323,7 +323,7 @@ const Index = () => {
             <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-primary/5 translate-y-1/3 -translate-x-1/4" />
             <div className="absolute top-1/2 right-1/4 w-32 h-32 rounded-full bg-primary/5 -translate-y-1/2" />
             <div className="relative z-10 grid md:grid-cols-2 gap-10 items-center">
-              <div>
+              <div className="text-center md:text-left flex flex-col items-center md:items-start">
                 <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-4 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5">For tradespeople</span>
                 <h3 className="font-display text-3xl md:text-4xl font-extrabold leading-tight">
                   Guaranteed,&nbsp;<span className="text-primary drop-shadow-md">Local Jobs</span>
