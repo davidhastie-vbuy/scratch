@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Mail, Lock } from "lucide-react";
-import logo from "@/assets/bookatrade-logo.png";
+import logo from "@/assets/bookatrade-logo-dark.jpeg";
 import logoDark from "@/assets/bookatrade-logo-dark.jpeg";
 
 const Login = () => {
