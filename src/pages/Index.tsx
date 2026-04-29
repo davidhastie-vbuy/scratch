@@ -221,7 +221,7 @@ const Index = () => {
                 You Stay In Control The Whole Time
               </h3>
               <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line">
-                {"Customers:\n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can edit or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
+                <strong>Customers:</strong>{"\n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can edit or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
