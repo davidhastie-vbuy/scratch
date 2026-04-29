@@ -101,7 +101,8 @@ const Index = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 md:py-28 section-divider">
+      <section className="py-20 md:py-28 section-divider bg-gradient-to-br from-accent/40 via-background to-accent/30">
+
         <div className="container">
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-none shadow-none opacity-0"></span>
@@ -154,7 +155,7 @@ const Index = () => {
       </section>
 
       {/* Why Us - Duplicate */}
-      <section className="py-20 md:py-28 section-divider bg-muted/30">
+      <section className="py-20 md:py-28 section-divider bg-gradient-to-bl from-primary/10 via-accent/30 to-primary/5">
         <div className="container">
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-none shadow-none opacity-0"></span>
