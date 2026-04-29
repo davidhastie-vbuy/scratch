@@ -106,7 +106,7 @@ const NotificationBell = () => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
+      <PopoverContent className="w-[calc(100vw-1rem)] sm:w-80 max-w-sm p-0" align="end" collisionPadding={8}>
         <div className="flex items-center justify-between border-b px-4 py-3">
           <h4 className="text-sm font-semibold">Notifications</h4>
           {unreadCount > 0 && (
@@ -134,7 +134,7 @@ const NotificationBell = () => {
                       <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{n.title}</p>
+                      <p className="text-sm font-medium break-words">{n.title}</p>
                       {n.body && (
                         <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{n.body}</p>
                       )}
