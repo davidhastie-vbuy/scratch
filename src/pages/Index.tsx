@@ -109,7 +109,7 @@ const Index = () => {
             <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
               How It Works
             </h3>
-            <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-lg whitespace-pre-line">
+            <p className="mt-3 max-w-lg mx-auto text-lg whitespace-pre-line text-secondary-foreground">
               {"Post your requirements. Detailed descriptions with images and video allow providers to quote with confidence, all in one place. \nWe never share externally.\n No mass-send. No hidden costs. No chasing."}
             </p>
           </div>
@@ -162,7 +162,7 @@ const Index = () => {
             <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
               Why Us & Why Now?
             </h3>
-            <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-lg whitespace-pre-line">
+            <p className="mt-3 max-w-lg mx-auto text-lg whitespace-pre-line text-secondary-foreground">
               {"Most platforms are hit and miss with no guarantees.\nThey lack transparency and accountability.\nBookATrade is built to fix that."}
             </p>
           </div>
