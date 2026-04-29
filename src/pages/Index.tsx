@@ -7,7 +7,7 @@ import trustImage from "@/assets/trust-handshake.jpg";
 import qualityImage from "@/assets/quality-work.jpg";
 import peaceImage from "@/assets/peace-of-mind.jpg";
 import electricianImage from "@/assets/kitchen-electrics.jpg";
-import logo from "@/assets/bookatrade-logo.png";
+import logo from "@/assets/bookatrade-logo-dark.jpeg";
 import trustedPartnershipImage from "@/assets/trusted-partnership.jpg";
 
 const Index = () => {

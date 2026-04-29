@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Mail, Lock, User, MapPin, Camera, X, Home, Wrench } from "lucide-react";
 import { formatPostcode } from "@/lib/format-postcode";
 import ProviderSignupStepper from "@/components/provider-signup/ProviderSignupStepper";
-import logo from "@/assets/bookatrade-logo.png";
+import logo from "@/assets/bookatrade-logo-dark.jpeg";
 
 const Signup = () => {
   const [searchParams] = useSearchParams();
