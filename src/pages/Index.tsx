@@ -17,7 +17,7 @@ const Index = () => {
       <header className="border-b border-border/60 bg-card/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container flex h-16 items-center justify-between gap-2">
           <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group min-w-0 flex-shrink">
-            <img src={logo} alt="BookATrade logo" className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 rounded-full bg-card shadow-md ring-2 ring-primary/20 transition-transform duration-300 group-hover:rotate-6 group-hover:ring-primary/40" />
+            <img src={logo} alt="BookATrade logo" className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain transition-transform duration-300 group-hover:rotate-6" />
             <span className="font-display text-sm sm:text-xl font-extrabold text-foreground whitespace-nowrap">
               Book<span className="text-primary">A</span>Trade
             </span>
@@ -418,7 +418,7 @@ const Index = () => {
         <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="BookATrade logo" className="h-10 w-10 rounded-full shadow-md ring-2 ring-primary/30" />
+              <img src={logo} alt="BookATrade logo" className="h-10 w-10 object-contain" />
               <div>
                 <span className="font-display text-lg font-extrabold">
                   Book<span className="text-primary">A</span>Trade
