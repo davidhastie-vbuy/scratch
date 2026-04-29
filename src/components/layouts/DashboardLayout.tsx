@@ -74,18 +74,18 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="border-b bg-card shadow-sm">
-          <div className="flex h-16 items-center justify-between px-4 md:px-6">
-            <div className="flex items-center gap-3">
-              <Link to={dashboardPath} className="md:hidden flex items-center gap-2 mr-2 hover:opacity-80 transition-opacity">
+          <div className="flex h-16 items-center justify-between gap-2 px-3 md:px-6">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <Link to={dashboardPath} className="md:hidden flex items-center shrink-0 hover:opacity-80 transition-opacity">
                 <img src={logo} alt="BookATrade logo" className="h-7 w-auto object-contain" />
               </Link>
-              <h1 className="font-display text-xl font-extrabold truncate">{title}</h1>
+              <h1 className="font-display text-sm sm:text-xl font-extrabold truncate min-w-0">{title}</h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               <NotificationBell />
               {statusBadge}
-              <Badge variant="secondary" className="font-bold">{roleBadge}</Badge>
-              <Button variant="ghost" size="sm" className="md:hidden" onClick={signOut}>
+              <Badge variant="secondary" className="font-bold text-[10px] sm:text-xs px-1.5 sm:px-2.5">{roleBadge}</Badge>
+              <Button variant="ghost" size="sm" className="md:hidden px-2" onClick={signOut}>
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
