@@ -457,7 +457,7 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-6 text-sm text-primary-foreground/60">
               <Link to="/legal?audience=customer" className="hover:text-primary transition-colors">Terms & Conditions</Link>
-              <Link to="/login" className="hover:text-primary transition-colors">Sign in</Link>
+              <Link to="/login" className="hover:text-primary transition-colors">Sign In</Link>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-primary-foreground/10 text-center text-xs text-primary-foreground/40">
