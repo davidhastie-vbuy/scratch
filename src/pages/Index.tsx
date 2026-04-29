@@ -221,7 +221,7 @@ const Index = () => {
                 You Stay In Control The Whole Time
               </h3>
               <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line">
-                {"Customers:\n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can edit or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
+                <strong>Customers:</strong>{"\n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can edit or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
@@ -271,7 +271,7 @@ const Index = () => {
                 Why People Often Don’t Trust A Trader! 
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- Most platforms are completely hit and miss. \n- Jobs get sent to lots of tradespeople. \n- Customers get bombarded with quotes. \n- Providers pay for leads that go nowhere. \n- The trust is broken. \nWe do things differently: \n- Jobs are matched to a fewer local providers. \n- Your details are never shared unless you say so. \n- No more paying for leads. \n- Jobs & payments are handled clearly"}
+                {"- Most platforms are completely hit and miss. \n- Jobs get sent to lots of tradespeople. \n- Customers get bombarded with quotes. \n- Providers pay for leads that go nowhere. \n- The trust is broken. \n"}<strong>We do things differently:</strong>{" \n- Jobs are matched to a fewer local providers. \n- Your details are never shared unless you say so. \n- No more paying for leads. \n- Jobs & payments are handled clearly"}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
@@ -308,7 +308,7 @@ const Index = () => {
                 Elsewhere...
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- “Spent £3000 for 0 calls!”\n- “They don’t vet anyone properly.”\n- “Paid for leads… got nothing back.”\n- “We got scammed... But he had glowing reviews.”\n- “Leads get sent to 10 or 12 tradespeople at the same time.”\n- “It’s complete pot luck!”\n- “Cancellation was not possible due to the 12-month contract.”\n\nThis is why we built BookATrade."}
+                {"- “Spent £3000 for 0 calls!”\n- “They don’t vet anyone properly.”\n- “Paid for leads… got nothing back.”\n- “We got scammed... But he had glowing reviews.”\n- “Leads get sent to 10 or 12 tradespeople at the same time.”\n- “It’s complete pot luck!”\n- “Cancellation was not possible due to the 12-month contract.”\n\n"}<strong>This is why we built BookATrade.</strong>{""}
               </p>
             </div>
           </div>
@@ -397,7 +397,7 @@ const Index = () => {
             See How It Works For Yourself
           </h3>
           <p className="mt-4 max-w-lg mx-auto text-lg text-secondary-foreground">
-            Built around what homeowners & trades actually asked for.
+            <strong>Built around what homeowners & trades actually asked for.</strong>
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:items-center">
             <Button size="lg" variant="secondary" asChild className="text-base sm:text-lg font-extrabold h-auto min-h-14 sm:min-h-16 py-3 px-6 sm:px-12 w-full sm:w-auto shadow-2xl hover:shadow-2xl transition-all hover:scale-105 rounded-2xl border-2 border-foreground/10 whitespace-normal">
