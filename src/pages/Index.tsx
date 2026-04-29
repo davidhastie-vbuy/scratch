@@ -208,7 +208,7 @@ const Index = () => {
       </section>
 
       {/* Trust Features with Images */}
-      <section className="py-16 md:py-24 bg-muted/50">
+      <section className="py-16 md:py-24 bg-gradient-to-br from-accent/35 via-background to-primary/10">
         <div className="container space-y-20 md:space-y-32">
           {/* Feature 1 - Vetting: Customer & electrician in hallway */}
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
