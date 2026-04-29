@@ -270,7 +270,7 @@ const Index = () => {
                 {["\n", "\n", "\n"].map((item, index) => (
                   <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
                     <span className="flex h-6 w-6 items-center justify-center border-0 border-muted bg-muted text-xs font-thin rounded-none shadow-none">
-                      <CheckCircle className="lucide lucide-circle-check-big h-4 w-4 text-primary w-0 h-0 bg-muted text-muted border-0 border-none border-muted" />
+                      <CheckCircle className="lucide lucide-circle-check-big lucide lucide-circle-check-big border-0 border-none border-muted text-muted-foreground bg-muted-foreground w-0 h-0" />
                     </span>
                     {item}
                   </li>
@@ -296,7 +296,7 @@ const Index = () => {
                 {["\n", "\n", "\n"].map((item, index) => (
                   <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
                     <span className="flex h-6 w-6 items-center justify-center border-0 border-muted bg-muted rounded-none shadow-none">
-                      <CheckCircle className="lucide lucide-circle-check-big h-4 w-4 text-primary text-muted bg-muted h-0 w-0 border-muted" />
+                      <CheckCircle className="lucide lucide-circle-check-big lucide lucide-circle-check-big border-muted text-muted-foreground bg-muted-foreground h-0 w-0" />
                     </span>
                     {item}
                   </li>
