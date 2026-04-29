@@ -134,7 +134,7 @@ const NotificationBell = () => {
                       <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{n.title}</p>
+                      <p className="text-sm font-medium break-words">{n.title}</p>
                       {n.body && (
                         <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{n.body}</p>
                       )}
