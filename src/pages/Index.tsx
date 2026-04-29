@@ -223,16 +223,6 @@ const Index = () => {
               <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line">
                 {"Customers:\n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can edit or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
               </p>
-              <ul className="mt-6 space-y-3">
-                {["\n", "\n", "\n"].map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center border-0 border-muted-foreground rounded-none shadow-none text-center bg-muted">
-                      <CheckCircle className="lucide lucide-shield bg-muted text-muted w-0 h-0" />
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </div>
             <div className="order-1 md:order-2 relative group">
               <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-primary/25 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -267,16 +257,6 @@ const Index = () => {
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
                 <strong>Providers:</strong>{"\n- No upfront or hidden costs\n- No monthly fees.\n- No paying for leads.\n- Jobs ONLY available to a few providers.\n- You don’t work until you get paid.\n- No contracts tying you in"}
               </p>
-              <ul className="mt-6 space-y-3">
-                {["\n", "\n", "\n"].map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center border-0 border-muted bg-muted text-xs font-thin rounded-none shadow-none">
-                      <CheckCircle className="lucide lucide-circle-check-big lucide lucide-circle-check-big border-0 border-none border-muted text-muted-foreground bg-muted-foreground w-0 h-0" />
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
 
@@ -293,16 +273,6 @@ const Index = () => {
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
                 {"- Most platforms are completely hit and miss. \n- Jobs get sent to lots of tradespeople. \n- Customers get bombarded with quotes. \n- Providers pay for leads that go nowhere. \n- The trust is broken. \nWe do things differently: \n- Jobs are matched to a fewer local providers. \n- Your details are never shared unless you say so. \n- No more paying for leads. \n- Jobs & payments are handled clearly"}
               </p>
-              <ul className="mt-6 space-y-3">
-                {["\n", "\n", "\n"].map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 text-sm text-foreground font-medium">
-                    <span className="flex h-6 w-6 items-center justify-center border-0 border-muted bg-muted rounded-none shadow-none">
-                      <CheckCircle className="lucide lucide-circle-check-big lucide lucide-circle-check-big border-muted text-muted-foreground bg-muted-foreground h-0 w-0" />
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </div>
             <div className="order-1 md:order-2 relative group">
               <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-primary/25 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
