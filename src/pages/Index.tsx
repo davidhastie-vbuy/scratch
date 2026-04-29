@@ -397,7 +397,7 @@ const Index = () => {
             See How It Works For Yourself
           </h3>
           <p className="mt-4 max-w-lg mx-auto text-lg text-secondary-foreground">
-            Built around what homeowners & trades actually asked for.
+            <strong>Built around what homeowners & trades actually asked for.</strong>
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:items-center">
             <Button size="lg" variant="secondary" asChild className="text-base sm:text-lg font-extrabold h-auto min-h-14 sm:min-h-16 py-3 px-6 sm:px-12 w-full sm:w-auto shadow-2xl hover:shadow-2xl transition-all hover:scale-105 rounded-2xl border-2 border-foreground/10 whitespace-normal">
