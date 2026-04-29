@@ -6,7 +6,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/bookatrade-logo.png";
+import logo from "@/assets/bookatrade-logo-dark.jpeg";
 import logoDark from "@/assets/bookatrade-logo-dark.jpeg";
 
 interface NavItem {
