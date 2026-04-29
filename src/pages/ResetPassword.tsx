@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Lock } from "lucide-react";
-import logo from "@/assets/bookatrade-logo-dark.jpeg";
+import logo from "@/assets/bookatrade-logo.png";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
