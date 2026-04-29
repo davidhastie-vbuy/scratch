@@ -15,18 +15,18 @@ const Index = () => {
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
       <header className="border-b border-border/60 bg-card/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-        <div className="container flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <img src={logo} alt="BookATrade logo" className="h-10 w-10 rounded-full bg-card shadow-md ring-2 ring-primary/20 transition-transform duration-300 group-hover:rotate-6 group-hover:ring-primary/40" />
-            <span className="font-display text-xl font-extrabold text-foreground">
+        <div className="container flex h-16 items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-2 group min-w-0 flex-shrink">
+            <img src={logo} alt="BookATrade logo" className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-full bg-card shadow-md ring-2 ring-primary/20 transition-transform duration-300 group-hover:rotate-6 group-hover:ring-primary/40" />
+            <span className="font-display text-base sm:text-xl font-extrabold text-foreground truncate">
               Book<span className="text-primary">A</span>Trade
             </span>
           </Link>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" asChild className="font-semibold border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+            <Button variant="ghost" size="sm" asChild className="font-semibold border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all px-2.5 sm:px-4 sm:h-10">
               <Link to="/login">Sign In</Link>
             </Button>
-            <Button asChild className="font-semibold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 border-2 border-primary hover:border-primary/80 transition-all duration-300 hover:scale-105">
+            <Button size="sm" asChild className="font-semibold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 border-2 border-primary hover:border-primary/80 transition-all duration-300 hover:scale-105 px-2.5 sm:px-4 sm:h-10">
               <Link to="/signup">Get Started</Link>
             </Button>
           </div>
@@ -331,10 +331,10 @@ const Index = () => {
                 <p className="mt-4 text-primary-foreground/70 leading-relaxed whitespace-pre-line text-lg font-medium">
                   {"Join today and see how we work. No upfront costs. No monthly fees.\nNo paying for leads. No commitment. Only pay us when you get paid."}
                 </p>
-                <Button size="lg" asChild className="mt-8 text-lg font-extrabold h-16 px-12 shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-110 text-center">
-                  <Link to="/signup">
-                    {"Explore How\nBookATrade Works"}
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                <Button size="lg" asChild className="mt-8 text-base sm:text-lg font-extrabold h-auto min-h-14 sm:min-h-16 py-3 px-6 sm:px-12 w-full sm:w-auto max-w-full shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-105 text-center whitespace-normal">
+                  <Link to="/signup" className="flex items-center justify-center gap-2">
+                    <span className="whitespace-pre-line">{"Explore How\nBookATrade Works"}</span>
+                    <ArrowRight className="h-5 w-5 flex-shrink-0" />
                   </Link>
                 </Button>
               </div>
@@ -363,22 +363,22 @@ const Index = () => {
             <img
               src={electricianImage}
               alt="Professional electrician working with customer supervision"
-              className="w-full h-64 md:h-80 object-cover object-center"
+              className="w-full h-[28rem] sm:h-80 object-cover object-center"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/70 sm:via-foreground/40 to-foreground/40 sm:to-transparent" />
             <div className="absolute inset-0 flex items-center">
               <div className="container">
                 <div className="max-w-md">
-                  <h3 className="font-display text-2xl md:text-3xl font-extrabold text-primary-foreground leading-tight">
+                  <h3 className="font-display text-xl sm:text-2xl md:text-3xl font-extrabold text-primary-foreground leading-tight">
                     Had a great experience with a local provider? <span className="text-primary block whitespace-pre-line">Tell us about them!</span>
                   </h3>
                   <p className="mt-2 text-primary-foreground/80 text-sm whitespace-pre-line font-sans md:text-lg font-medium">
                     {"Have your say in which providers are on the platform.\nOnly trusted, recommended providers make it in.\nHelp out the community; have your say."}
                   </p>
-                  <Button size="lg" asChild className="mt-6 text-lg font-extrabold h-16 px-12 shadow-2xl shadow-primary/50 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-primary/60">
-                    <Link to="/signup">
-                      Recommend A Provider
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                  <Button size="lg" asChild className="mt-6 text-base sm:text-lg font-extrabold h-auto min-h-14 sm:min-h-16 py-3 px-6 sm:px-12 w-full sm:w-auto max-w-full shadow-2xl shadow-primary/50 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/60 whitespace-normal">
+                    <Link to="/signup" className="flex items-center justify-center gap-2">
+                      <span>Recommend A Provider</span>
+                      <ArrowRight className="h-5 w-5 flex-shrink-0" />
                     </Link>
                   </Button>
                 </div>
@@ -399,14 +399,14 @@ const Index = () => {
           <p className="mt-4 max-w-lg mx-auto text-lg text-secondary-foreground">
             Built around what homeowners & trades actually asked for.
           </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button size="lg" variant="secondary" asChild className="text-lg font-extrabold h-16 px-12 shadow-2xl hover:shadow-2xl transition-all hover:scale-110 rounded-2xl border-2 border-foreground/10">
-              <Link to="/signup">
-                Get Started Free Today
-                <ArrowRight className="ml-2 h-5 w-5" />
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:items-center">
+            <Button size="lg" variant="secondary" asChild className="text-base sm:text-lg font-extrabold h-auto min-h-14 sm:min-h-16 py-3 px-6 sm:px-12 w-full sm:w-auto shadow-2xl hover:shadow-2xl transition-all hover:scale-105 rounded-2xl border-2 border-foreground/10 whitespace-normal">
+              <Link to="/signup" className="flex items-center justify-center gap-2">
+                <span>Get Started Free Today</span>
+                <ArrowRight className="h-5 w-5 flex-shrink-0" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="text-base font-bold bg-transparent border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/15 hover:border-primary-foreground/60 h-13 px-10 rounded-xl shadow-lg transition-all duration-300 hover:scale-105">
+            <Button size="lg" variant="outline" asChild className="text-base font-bold bg-transparent border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/15 hover:border-primary-foreground/60 h-12 sm:h-13 px-6 sm:px-10 w-full sm:w-auto rounded-xl shadow-lg transition-all duration-300 hover:scale-105">
               <Link to="/login">Sign In</Link>
             </Button>
           </div>
