@@ -406,7 +406,7 @@ const Index = () => {
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:items-center">
             <Button size="lg" variant="secondary" asChild className="text-base sm:text-lg font-extrabold h-auto min-h-14 sm:min-h-16 py-3 px-6 sm:px-12 w-full sm:w-auto shadow-2xl hover:shadow-2xl transition-all hover:scale-105 rounded-2xl border-2 border-foreground/10 whitespace-normal">
               <Link to="/signup" className="flex items-center justify-center gap-2">
-                <span>Get Started Free Today</span>
+                <span>See How It Works</span>
                 <ArrowRight className="h-5 w-5 flex-shrink-0" />
               </Link>
             </Button>
