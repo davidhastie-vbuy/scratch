@@ -100,6 +100,35 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Why People Often Don't Trust A Trader */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-accent/35 via-background to-primary/10">
+        <div className="container">
+          <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
+            <div className="order-2 md:order-1">
+              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs font-bold uppercase tracking-wider mb-5 border-muted border-0 px-0 bg-muted text-muted rounded-none shadow-none">
+                <Shield className="lucide lucide-circle-check-big text-muted bg-muted h-0 w-0 border-muted" />
+                
+              </div>
+              <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
+                Why People Often Don't Trust A Trader! 
+              </h3>
+              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
+                {"- Most platforms are completely hit and miss. \n- Jobs get sent to lots of tradespeople. \n- Customers get bombarded with quotes. \n- Providers pay for leads that go nowhere. \n- The trust is broken. \n"}<strong>We know exactly what keeps going wrong.{"\n"}So we built something around fixing that:</strong>{" \n- Jobs are matched to a fewer local providers. \n- Your details are never shared unless you say so. \n- No more paying for leads. \n- Jobs & payments are handled clearly"}
+              </p>
+            </div>
+            <div className="order-1 md:order-2 relative group">
+              <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-primary/25 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-1 rounded-2xl border-2 border-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <img
+                src={peaceImage}
+                alt="Tradesperson discussing work with a happy homeowner"
+                className="relative rounded-2xl shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-center transition-transform duration-500 group-hover:scale-[1.02] border-2 border-border/50"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section className="py-20 md:py-28 section-divider bg-gradient-to-br from-accent/40 via-background to-accent/30">
 
