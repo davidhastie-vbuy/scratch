@@ -291,7 +291,19 @@ const Index = () => {
 
           {/* Feature 4 - Trusted Partnership */}
           <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
-            <div className="relative group">
+            <div className="order-2 md:order-1">
+              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs font-bold uppercase tracking-wider mb-5 border-muted border-0 px-0 bg-muted text-muted rounded-none shadow-none">
+                <Shield className="lucide lucide-circle-check-big text-muted bg-muted h-0 w-0 border-muted" />
+                
+              </div>
+              <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
+                Elsewhere...
+              </h3>
+              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
+                {"- \u201CSpent \u00A33000 for 0 calls!\u201D\n- \u201CThey don\u2019t vet anyone properly.\u201D\n- \u201CPaid for leads\u2026 got nothing back.\u201D\n- \u201CWe got scammed... But he had glowing reviews.\u201D\n- \u201CLeads get sent to 10 or 12 tradespeople at the same time.\u201D\n- \u201CIt\u2019s complete pot luck!\u201D\n- \u201CCancellation was not possible due to the 12-month contract.\u201D\n\n"}<strong>This is why we built BookATrade.</strong>{""}
+              </p>
+            </div>
+            <div className="order-1 md:order-2 relative group">
               <div className="absolute -inset-3 rounded-3xl bg-gradient-to-bl from-primary/25 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="absolute -inset-1 rounded-2xl border-2 border-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <img
@@ -302,18 +314,6 @@ const Index = () => {
                 height={768}
                 className="relative rounded-2xl shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-center transition-transform duration-500 group-hover:scale-[1.02] border-2 border-border/50"
               />
-            </div>
-            <div>
-              <div className="inline-flex items-center gap-1.5 py-1.5 text-xs font-bold uppercase tracking-wider mb-5 border-muted border-0 px-0 bg-muted text-muted rounded-none shadow-none">
-                <Shield className="lucide lucide-circle-check-big text-muted bg-muted h-0 w-0 border-muted" />
-                
-              </div>
-              <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
-                Elsewhere...
-              </h3>
-              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- “Spent £3000 for 0 calls!”\n- “They don’t vet anyone properly.”\n- “Paid for leads… got nothing back.”\n- “We got scammed... But he had glowing reviews.”\n- “Leads get sent to 10 or 12 tradespeople at the same time.”\n- “It’s complete pot luck!”\n- “Cancellation was not possible due to the 12-month contract.”\n\n"}<strong>This is why we built BookATrade.</strong>{""}
-              </p>
             </div>
           </div>
         </div>
