@@ -271,7 +271,7 @@ const Index = () => {
                 Why People Often Don’t Trust A Trader! 
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- Most platforms are completely hit and miss. \n- Jobs get sent to lots of tradespeople. \n- Customers get bombarded with quotes. \n- Providers pay for leads that go nowhere. \n- The trust is broken. \n"}<strong>We do things differently:</strong>{" \n- Jobs are matched to a fewer local providers. \n- Your details are never shared unless you say so. \n- No more paying for leads. \n- Jobs & payments are handled clearly"}
+                {"- Most platforms are completely hit and miss. \n- Jobs get sent to lots of tradespeople. \n- Customers get bombarded with quotes. \n- Providers pay for leads that go nowhere. \n- The trust is broken. \n"}<strong>We built something around fixing that:</strong>{" \n- Jobs are matched to a fewer local providers. \n- Your details are never shared unless you say so. \n- No more paying for leads. \n- Jobs & payments are handled clearly"}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
