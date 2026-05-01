@@ -297,7 +297,8 @@ const Index = () => {
                 Elsewhere...
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- \u201CSpent \u00A33000 for 0 calls!\u201D\n- \u201CThey don\u2019t vet anyone properly.\u201D\n- \u201CPaid for leads\u2026 got nothing back.\u201D\n- \u201CWe got scammed... But he had glowing reviews.\u201D\n- \u201CLeads get sent to 10 or 12 tradespeople at the same time.\u201D\n- \u201CIt\u2019s complete pot luck!\u201D\n- \u201CCancellation was not possible due to the 12-month contract.\u201D\n\n"}<strong>That's why we built BookATrade.</strong>{""}
+                {"- \u201CSpent \u00A33000 for 0 calls!\u201D\n- \u201CThey don\u2019t vet anyone properly.\u201D\n- \u201CPaid for leads\u2026 got nothing back.\u201D\n- \u201CWe got scammed... But he had glowing reviews.\u201D\n- \u201CLeads get sent to 10 or 12 tradespeople at the same time.\u201D\n- \u201CIt\u2019s complete pot luck!\u201D\n- \u201CCancellation was not possible due to the 12-month contract.\u201D\n\n"}
+                <strong>That's why we built BookATrade.</strong>
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
