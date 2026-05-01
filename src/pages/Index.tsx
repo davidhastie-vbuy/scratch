@@ -113,7 +113,7 @@ const Index = () => {
                 Why People Often Don't Trust A Trader! 
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- Most platforms are completely hit and miss. \n- Jobs get sent to lots of tradespeople. \n- Customers get bombarded with quotes. \n- Providers pay for leads that go nowhere. \n- The trust is broken. \n"}<strong>We know exactly what keeps going wrong.{"\n"}So we built something around fixing that:</strong>{" \n- Jobs are matched to a fewer local providers. \n- Your details are never shared unless you say so. \n- No more paying for leads. \n- Jobs & payments are handled clearly"}
+                {"- can be completely hit and miss\n- too much competition for jobs\n- customers bombarded with quotes\n- providers pay for cold or dead leads\n \nWe know your pain. So we fixed it:\n- jobs matched to fewer local providers\n- details are never shared unless you say so\n- no more paying for leads, only guaranteed jobs\n- full transparency and independent oversight"}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
@@ -138,9 +138,6 @@ const Index = () => {
             <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
               How It Works
             </h3>
-            <p className="mt-3 max-w-lg mx-auto text-lg whitespace-pre-line text-secondary-foreground">
-              {"Post your requirements. Detailed descriptions with images and video allow providers to quote with confidence, all in one place. \nWe never share externally.\n No mass-send. No hidden costs. No chasing."}
-            </p>
           </div>
           <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
             {[
@@ -153,8 +150,8 @@ const Index = () => {
               {
                 step: "2",
                 icon: <Repeat1 className="h-6 w-6" />,
-                title: "Matched, But Not Sent To All",
-                desc: "Each job allows receiving quotes from a small number of highly trusted local providers. No spam for anyone.",
+                title: "Tailored Job Matching",
+                desc: "Each job receives quotes from a small number of highly trusted local providers. No spam for anyone.",
               },
               {
                 step: "3",
@@ -189,7 +186,7 @@ const Index = () => {
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-none shadow-none opacity-0"></span>
             <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
-              Why Us & Why Now?
+              Need Work Done? Why Us & Why Now?
             </h3>
             <p className="mt-3 max-w-lg mx-auto text-lg whitespace-pre-line text-secondary-foreground">
               {"Most platforms are hit and miss with no guarantees.\nThey lack transparency and accountability.\nBookATrade is built to fix that."}
@@ -250,7 +247,7 @@ const Index = () => {
                 You Stay In Control The Whole Time
               </h3>
               <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line">
-                <strong>Customers:</strong>{"\n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can edit or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
+                {"Customers: \n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can update or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
@@ -284,7 +281,7 @@ const Index = () => {
                 Built For Jobs, Not Leads
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                <strong>Providers:</strong>{"\n- No upfront or hidden costs\n- No monthly fees.\n- No paying for leads.\n- Jobs ONLY available to a few providers.\n- You don’t work until you get paid.\n- No contracts tying you in"}
+                {"Providers: \n- No upfront or hidden costs.\n- No monthly fees.\n- No paying for leads.\n- Jobs ONLY available to a few providers.\n- You don’t start work until funds are in place.\n- No contracts tying you in."}
               </p>
             </div>
           </div>
@@ -300,7 +297,7 @@ const Index = () => {
                 Elsewhere...
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- \u201CSpent \u00A33000 for 0 calls!\u201D\n- \u201CThey don\u2019t vet anyone properly.\u201D\n- \u201CPaid for leads\u2026 got nothing back.\u201D\n- \u201CWe got scammed... But he had glowing reviews.\u201D\n- \u201CLeads get sent to 10 or 12 tradespeople at the same time.\u201D\n- \u201CIt\u2019s complete pot luck!\u201D\n- \u201CCancellation was not possible due to the 12-month contract.\u201D\n\n"}<strong>This is why we built BookATrade.</strong>{""}
+                {"- \u201CSpent \u00A33000 for 0 calls!\u201D\n- \u201CThey don\u2019t vet anyone properly.\u201D\n- \u201CPaid for leads\u2026 got nothing back.\u201D\n- \u201CWe got scammed... But he had glowing reviews.\u201D\n- \u201CLeads get sent to 10 or 12 tradespeople at the same time.\u201D\n- \u201CIt\u2019s complete pot luck!\u201D\n- \u201CCancellation was not possible due to the 12-month contract.\u201D\n\n"}<strong>That's why we built BookATrade.</strong>{""}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
