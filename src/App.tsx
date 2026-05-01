@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import HomeRedirect from "@/components/HomeRedirect";
 import Analytics from "@/components/Analytics";
+import ScrollToTop from "@/components/ScrollToTop";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import ForgotPassword from "@/pages/ForgotPassword";
@@ -56,6 +57,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Analytics />
           <Routes>
             <Route path="/" element={<HomeRedirect />} />
