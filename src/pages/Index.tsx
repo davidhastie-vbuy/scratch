@@ -54,7 +54,7 @@ const Index = () => {
                 Fed Up Of Being<br />
                 <span className="block text-primary drop-shadow-lg">Let Down?</span>
               </h2>
-              <p className="mt-6 leading-relaxed max-w-lg animate-fade-in stagger-2 opacity-0 text-lg text-primary-foreground" data-section="hero-intro">
+              <p className="mt-6 leading-relaxed max-w-none animate-fade-in stagger-2 opacity-0 text-lg text-primary-foreground" data-section="hero-intro">
                 <span className="block"><b data-label="hero-customers">Customers:</b> Find trusted local tradespeople in a few simple steps.</span>
                 <span className="block"><b data-label="hero-providers">Providers:</b> No more paying for leads. Just real jobs with guarateed payment.</span>
               </p>
