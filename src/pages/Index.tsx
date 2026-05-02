@@ -246,7 +246,7 @@ const Index = () => {
               <h3 className="font-display text-2xl font-extrabold text-foreground sm:text-3xl lg:text-4xl leading-tight">
                 You Stay In Control The Whole Time
               </h3>
-              <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line font-bold">
+              <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line">
                 {"Customers: \n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can update or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
               </p>
             </div>
