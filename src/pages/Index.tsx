@@ -55,7 +55,7 @@ const Index = () => {
                 <span className="block text-primary drop-shadow-lg">Let Down?</span>
               </h2>
               <p className="mt-6 leading-relaxed max-w-none animate-fade-in stagger-2 opacity-0 text-lg text-primary-foreground" data-section="hero-intro">
-                <span className="block"><b data-label="hero-customers">Customers:</b> Find trusted local tradespeople in a few simple steps.</span>
+                <span className="block"><b data-label="hero-customers">Customers:</b> Find trusted local trades without the hit-and-miss or being bombarded</span>
                 <span className="block"><b data-label="hero-providers">Providers:</b> No more paying for leads. Just real jobs with guarateed payment.</span>
               </p>
               <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-primary-foreground/70 animate-fade-in stagger-4 opacity-0">
@@ -113,7 +113,7 @@ const Index = () => {
                 Why People Often Don't Trust A Trader! 
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- can be completely hit and miss\n- too much competition for jobs\n- customers bombarded with quotes\n- providers pay for cold or dead leads\n \nWe know your pain. So we fixed it:\n- jobs matched to fewer local providers\n- details are never shared unless you say so\n- no more paying for leads, only guaranteed jobs\n- full transparency and independent oversight"}
+                {"- Can be completely hit and miss.\n- Too much competition for jobs.\n- Customers bombarded with quotes.\n- Providers pay for cold or dead leads.\n\nWe know your pain. So we fixed it:\n\n- Jobs matched to fewer local providers.\n- Details are never shared unless you say so.\n- No more paying for leads, only guaranteed jobs.\n- Full transparency and independent oversight."}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
