@@ -113,7 +113,9 @@ const Index = () => {
                 Why People Often Don't Trust A Trader! 
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- Can be completely hit and miss.\n- Too much competition for jobs.\n- Customers bombarded with quotes.\n- Providers pay for cold or dead leads.\n\nWe know your pain. So we fixed it:\n\n- Jobs matched to fewer local providers.\n- Details are never shared unless you say so.\n- No more paying for leads, only guaranteed jobs.\n- Full transparency and independent oversight."}
+                {"- Can be completely hit and miss.\n- Too much competition for jobs.\n- Customers bombarded with quotes.\n- Providers pay for cold or dead leads.\n\n"}
+                <strong>We know your pain. So we fixed it:</strong>
+                {"\n\n- Jobs matched to fewer local providers.\n- Details are never shared unless you say so.\n- No more paying for leads, only guaranteed jobs.\n- Full transparency and independent oversight."}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
@@ -247,7 +249,8 @@ const Index = () => {
                 You Stay In Control The Whole Time
               </h3>
               <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line">
-                {"Customers: \n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can update or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
+                <strong>Customers:</strong>
+                {" \n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can update or remove your job at any time.\n- No commitment until you’re ready.\n- You only release payment when you’re completely satisfied"}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
@@ -281,7 +284,8 @@ const Index = () => {
                 Built For Jobs, Not Leads
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"Providers: \n- No upfront or hidden costs.\n- No monthly fees.\n- No paying for leads.\n- Jobs ONLY available to a few providers.\n- You don’t start work until funds are in place.\n- No contracts tying you in."}
+                <strong>Providers:</strong>
+                {" \n- No upfront or hidden costs.\n- No monthly fees.\n- No paying for leads.\n- Jobs ONLY available to a few providers.\n- You don’t start work until funds are in place.\n- No contracts tying you in."}
               </p>
             </div>
           </div>
