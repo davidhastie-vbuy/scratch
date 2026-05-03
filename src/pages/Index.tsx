@@ -89,7 +89,7 @@ const Index = () => {
           {[
             { value: "13+", label: "Job Categories Available" },
             { value: "3", label: "Max Quotes Per Job" },
-            { value: "100%", label: "Vetted tradespeople" },
+            { value: "100%", label: "Vetted Tradespeople" },
             { value: "24/7", label: "Support available" },
           ].map((stat) => (
             <div key={stat.label} className="group">
