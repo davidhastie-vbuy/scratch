@@ -88,7 +88,7 @@ const Index = () => {
         <div className="container relative grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
             { value: "13+", label: "Job Categories Available" },
-            { value: "3", label: "Max quotes per job" },
+            { value: "3", label: "Max Quotes Per Job" },
             { value: "100%", label: "Vetted tradespeople" },
             { value: "24/7", label: "Support available" },
           ].map((stat) => (
