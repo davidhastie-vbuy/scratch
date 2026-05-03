@@ -90,7 +90,7 @@ const Index = () => {
             { value: "13+", label: "Job Categories Available" },
             { value: "3", label: "Max Quotes Per Job" },
             { value: "100%", label: "Vetted Tradespeople" },
-            { value: "24/7", label: "Support available" },
+            { value: "24/7", label: "Support Available" },
           ].map((stat) => (
             <div key={stat.label} className="group">
               <div className="font-display text-3xl md:text-4xl font-extrabold text-primary drop-shadow-md group-hover:scale-110 transition-transform duration-300">{stat.value}</div>
