@@ -113,7 +113,7 @@ const Index = () => {
                 Why People Often Don't Trust A Trader! 
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- It can be completely hit and miss.\n- There's too much competition for jobs.\n- Customers are bombarded with quotes.\n- Providers pay upfront for cold or dead leads.\n\n"}
+                {"- Jobs get sent to too many providers.\n- Customers get bombarded with calls and quotes.\n- Providers pay upfront for leads that go nowhere.\n\n"}
                 <strong>We know your pain. So we've fixed it:</strong>
                 {"\n\n- Jobs are matched to a few local providers.\n- Details are never shared unless you say so.\n- No more paying for leads, only guaranteed jobs.\n- Full transparency and independent oversight."}
               </p>
