@@ -285,7 +285,7 @@ const Index = () => {
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
                 <strong>Providers:</strong>
-                {" \n- No upfront or hidden costs.\n- No monthly fees.\n- No paying for leads.\n- Jobs ONLY available to a few providers.\n- You don’t start work until funds are in place.\n- No contracts tying you in."}
+                {"\n- No upfront or hidden costs.\n- No monthly fees.\n- No paying for job leads.\n- Jobs ONLY available to a few providers.\n- You don’t start working until funds are in place.\n- No contracts tying you in."}
               </p>
             </div>
           </div>
@@ -335,7 +335,7 @@ const Index = () => {
                   Guaranteed, <span className="text-primary drop-shadow-md">Local Jobs</span>
                 </h3>
                 <p className="mt-4 text-primary-foreground/70 leading-relaxed whitespace-pre-line text-lg font-medium">
-                  {"Join today and see how we work. No upfront costs. No monthly fees.\nNo paying for leads. No commitment. Only pay us when you get paid."}
+                  {"Join today and see how we work. No upfront costs. No monthly fees.\nNo paying for job leads. No commitment. Only pay us when you get paid."}
                 </p>
                 <Button size="lg" asChild className="mt-8 text-base sm:text-lg font-extrabold h-auto min-h-14 sm:min-h-16 py-3 px-6 sm:px-12 w-full sm:w-auto max-w-full shadow-2xl shadow-primary/50 hover:shadow-2xl hover:shadow-primary/60 border-2 border-primary-foreground/20 rounded-2xl transition-all duration-300 hover:scale-105 text-center whitespace-normal">
                   <Link to="/signup" className="flex items-center justify-center gap-2">
