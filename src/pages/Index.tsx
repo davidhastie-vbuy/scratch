@@ -147,7 +147,7 @@ const Index = () => {
                 step: "1",
                 icon: <MailPlus className="h-6 w-6" />,
                 title: "Post Your Job Once",
-                desc: "Describe what you need, add photos and/or video, and we'll match you with the right tradespeople in your area.",
+                desc: "Describe what you need, add photos and/or videos, and we'll match you with the right tradespeople local to your area.",
               },
               {
                 step: "2",
