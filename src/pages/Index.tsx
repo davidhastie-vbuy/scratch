@@ -200,7 +200,7 @@ const Index = () => {
                 step: "1",
                 icon: <BellRing className="h-6 w-6" />,
                 title: "No Spam",
-                desc: "All providers excel in their field.\nSo we limit the numbers\nto avoid confusion and overwhelm.",
+                desc: "Your personal details are never shared.\nYou stay in control.\nNo bombardment or unwanted calls.",
               },
               {
                 step: "2",
