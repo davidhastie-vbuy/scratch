@@ -212,7 +212,7 @@ const Index = () => {
                 step: "3",
                 icon: <CircleArrowDown className="h-6 w-6" />,
                 title: "Less Competition",
-                desc: "All providers excel in their field.\nSo we limit the numbers\nand avoid confusion.",
+                desc: "All providers excel in their field.\nSo we limit the numbers\nto avoid confusion and overwhelm.",
               },
             ].map((item) => (
               <div
