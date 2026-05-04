@@ -114,7 +114,7 @@ const Index = () => {
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
                 {"- Can be completely hit and miss.\n- Too much competition for jobs.\n- Customers bombarded with quotes.\n- Providers pay for cold or dead leads.\n\n"}
-                <strong>We know your pain. So we fixed it:</strong>
+                <strong>We know your pain. So we've fixed it:</strong>
                 {"\n\n- Jobs matched to fewer local providers.\n- Details are never shared unless you say so.\n- No more paying for leads, only guaranteed jobs.\n- Full transparency and independent oversight."}
               </p>
             </div>
