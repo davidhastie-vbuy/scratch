@@ -188,10 +188,10 @@ const Index = () => {
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-3 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-none shadow-none opacity-0"></span>
             <h3 className="font-display text-3xl md:text-4xl font-extrabold text-foreground">
-              Need Work Done? Why Us & Why Now?
+              Need Work Done?&nbsp;<br />Why Us & Why Now?
             </h3>
             <p className="mt-3 max-w-lg mx-auto text-lg whitespace-pre-line text-secondary-foreground">
-              {"Most platforms are hit and miss with no guarantees.\nThey lack transparency and accountability.\nBookATrade is built to fix that."}
+              {"Most platforms are completely hit and miss with no guarantees.\nThey lack transparency and accountability.\nBookATrade is built to fix that."}
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
@@ -200,7 +200,7 @@ const Index = () => {
                 step: "1",
                 icon: <BellRing className="h-6 w-6" />,
                 title: "No Spam",
-                desc: "Your personal details are\nnever shared with any providers.\nYou stay in complete control.",
+                desc: "Your personal details are\nnever shared with any providers by us.\nYou stay in complete control.",
               },
               {
                 step: "2",
