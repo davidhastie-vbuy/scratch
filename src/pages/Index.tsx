@@ -113,7 +113,9 @@ const Index = () => {
                 Why People Often Don't Trust A Trader! 
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- Every provider is vetted before they can join, so no cowboys or time wasters.\n- Full transparency and oversight from start to finish."}
+                {"- Jobs get sent to too many providers.\n- Customers get bombarded with calls and quotes.\n- Providers pay upfront for leads that go nowhere.\n\n"}
+                <strong>We know exactly what keeps going wrong. So we've fixed it:</strong>
+                {"\n\n- Every provider is vetted before they can join, so no cowboys or time wasters.\n- Full transparency and oversight from start to finish."}
               </p>
             </div>
             <div className="order-1 md:order-2 relative group">
