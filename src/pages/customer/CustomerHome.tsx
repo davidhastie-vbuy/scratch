@@ -5,6 +5,7 @@ import { UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PlusCircle, Briefcase, MessageSquare, Users, Heart, HelpCircle, ArrowRight, ClipboardList, CheckCircle2, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import RecommendProvider from "@/components/RecommendProvider";
 
 const getGreeting = () => {
   const h = new Date().getHours();
