@@ -81,7 +81,7 @@ const HomeAuthPanel = () => {
       last_name: lastName,
       postcode: formatPostcode(postcode),
     };
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: { emailRedirectTo: window.location.origin, data: metadata },
@@ -89,6 +89,9 @@ const HomeAuthPanel = () => {
     if (error) {
       toast({ title: "Signup failed", description: error.message, variant: "destructive" });
     } else {
+      if (signUpData.user?.id) {
+        submitRecommendation(signUpData.user.id, email);
+      }
       toast({ title: "Check your email", description: "We've sent you a confirmation link to verify your account." });
       navigate("/login");
     }
