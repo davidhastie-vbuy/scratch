@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, User, MapPin, Home, Wrench, ArrowRight } from "lucide-react";
+import { Mail, Lock, User, MapPin, Home, Wrench, ArrowRight, ThumbsUp, ChevronDown, Camera, X } from "lucide-react";
 import { formatPostcode } from "@/lib/format-postcode";
 
 type Mode = "signup" | "signin";
@@ -28,6 +29,40 @@ const HomeAuthPanel = () => {
   const [lastName, setLastName] = useState("");
   const [postcode, setPostcode] = useState("");
 
+  // Optional recommendation
+  const [recOpen, setRecOpen] = useState(false);
+  const [recommendation, setRecommendation] = useState("");
+  const [recPhotos, setRecPhotos] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAddPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files).slice(0, 5 - recPhotos.length);
+      setRecPhotos((prev) => [...prev, ...newFiles].slice(0, 5));
+    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setRecPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const submitRecommendation = async (userId: string, userEmail: string) => {
+    if (!recommendation.trim() && recPhotos.length === 0) return;
+    try {
+      const formData = new FormData();
+      formData.append("user_id", userId);
+      formData.append("user_email", userEmail);
+      formData.append("customer_name", `${firstName} ${lastName}`.trim());
+      formData.append("customer_postcode", formatPostcode(postcode));
+      if (recommendation.trim()) formData.append("message", recommendation.trim());
+      recPhotos.forEach((photo) => formData.append("photos", photo));
+      await supabase.functions.invoke("submit-recommendation", { body: formData });
+    } catch (err) {
+      console.error("Failed to submit recommendation:", err);
+    }
+  };
+
   const handleRoleChange = (next: Role) => {
     setRole(next);
     if (next === "provider" && mode === "signup") {
@@ -46,7 +81,7 @@ const HomeAuthPanel = () => {
       last_name: lastName,
       postcode: formatPostcode(postcode),
     };
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: { emailRedirectTo: window.location.origin, data: metadata },
@@ -54,6 +89,9 @@ const HomeAuthPanel = () => {
     if (error) {
       toast({ title: "Signup failed", description: error.message, variant: "destructive" });
     } else {
+      if (signUpData.user?.id) {
+        submitRecommendation(signUpData.user.id, email);
+      }
       toast({ title: "Check your email", description: "We've sent you a confirmation link to verify your account." });
       navigate("/login");
     }
@@ -181,6 +219,76 @@ const HomeAuthPanel = () => {
                 <Input id="ha-pc" placeholder="SW1A 1AA" value={postcode} onChange={(e) => setPostcode(e.target.value)} className="pl-9 h-10" required maxLength={10} />
               </div>
               <p className="text-[11px] text-muted-foreground">Used to match you with local tradespeople.</p>
+            </div>
+
+            {/* Optional recommendation dropdown */}
+            <div className="rounded-xl border border-dashed border-primary/30 bg-accent/30">
+              <button
+                type="button"
+                onClick={() => setRecOpen((v) => !v)}
+                className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left"
+                aria-expanded={recOpen}
+              >
+                <span className="flex items-center gap-2 text-sm font-bold text-foreground">
+                  <ThumbsUp className="h-4 w-4 text-primary" />
+                  Recommend a Provider <span className="text-[11px] font-normal text-muted-foreground">(Optional)</span>
+                </span>
+                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${recOpen ? "rotate-180" : ""}`} />
+              </button>
+              {recOpen && (
+                <div className="space-y-2 px-3 pb-3">
+                  <Label htmlFor="ha-rec" className="text-[11px] leading-relaxed font-normal text-muted-foreground">
+                    Know a great tradesperson you've hired in the past? Tell us about your experience and the work they completed. You can also attach photos.
+                  </Label>
+                  <Textarea
+                    id="ha-rec"
+                    placeholder="e.g. I hired John from ABC Plumbing to fix a leak. He was professional, on time, and did a great job..."
+                    value={recommendation}
+                    onChange={(e) => setRecommendation(e.target.value)}
+                    maxLength={2000}
+                    className="min-h-[90px] text-sm"
+                  />
+                  <div className="flex flex-wrap items-center gap-2">
+                    {recPhotos.map((photo, i) => (
+                      <div key={i} className="relative group">
+                        <img
+                          src={URL.createObjectURL(photo)}
+                          alt={`Photo ${i + 1}`}
+                          className="h-14 w-14 rounded-lg object-cover border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePhoto(i)}
+                          className="absolute -top-1.5 -right-1.5 rounded-full bg-destructive text-destructive-foreground p-0.5"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {recPhotos.length < 5 && (
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex h-14 w-14 items-center justify-center rounded-lg border-2 border-dashed border-primary/30 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                      >
+                        <Camera className="h-5 w-5" />
+                      </button>
+                    )}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleAddPhotos}
+                      className="hidden"
+                    />
+                  </div>
+                  {recPhotos.length > 0 && (
+                    <p className="text-[11px] text-muted-foreground">{recPhotos.length}/5 photos attached</p>
+                  )}
+                  <p className="text-[11px] text-muted-foreground">Submitted with your account when you create it.</p>
+                </div>
+              )}
             </div>
             <Button type="submit" className="w-full h-11 font-bold shadow-md" disabled={loading || role === "provider"}>
               {loading ? "Creating account..." : "Create account"}
