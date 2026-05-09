@@ -29,6 +29,40 @@ const HomeAuthPanel = () => {
   const [lastName, setLastName] = useState("");
   const [postcode, setPostcode] = useState("");
 
+  // Optional recommendation
+  const [recOpen, setRecOpen] = useState(false);
+  const [recommendation, setRecommendation] = useState("");
+  const [recPhotos, setRecPhotos] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAddPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files).slice(0, 5 - recPhotos.length);
+      setRecPhotos((prev) => [...prev, ...newFiles].slice(0, 5));
+    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setRecPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const submitRecommendation = async (userId: string, userEmail: string) => {
+    if (!recommendation.trim() && recPhotos.length === 0) return;
+    try {
+      const formData = new FormData();
+      formData.append("user_id", userId);
+      formData.append("user_email", userEmail);
+      formData.append("customer_name", `${firstName} ${lastName}`.trim());
+      formData.append("customer_postcode", formatPostcode(postcode));
+      if (recommendation.trim()) formData.append("message", recommendation.trim());
+      recPhotos.forEach((photo) => formData.append("photos", photo));
+      await supabase.functions.invoke("submit-recommendation", { body: formData });
+    } catch (err) {
+      console.error("Failed to submit recommendation:", err);
+    }
+  };
+
   const handleRoleChange = (next: Role) => {
     setRole(next);
     if (next === "provider" && mode === "signup") {
