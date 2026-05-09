@@ -136,6 +136,9 @@ const CustomerHome = () => {
           })}
         </div>
       </div>
+
+      {/* Recommend a Provider */}
+      <RecommendProvider />
     </div>
   );
 };
