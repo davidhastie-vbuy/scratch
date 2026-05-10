@@ -113,7 +113,7 @@ const Index = () => {
                 Why People Often Don't Trust A Trader! 
               </h3>
               <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- “We got scammed... But he had glowing reviews.”\n- Customers get let down by unreliable trades.\n- Jobs get sent to too many providers.\n- Customers get bombarded with calls and quotes.\n- Providers pay upfront for leads that go nowhere.\n\n"}
+                {"- Customers get let down by unreliable trades.\n- “We got scammed... But he had glowing reviews.”\n- Jobs get sent to too many providers.\n- Customers get bombarded with calls and quotes.\n- Providers pay upfront for leads that go nowhere.\n\n"}
                 <strong>We know exactly what keeps going wrong.{"\n"}That's why we built BookATrade:</strong>
                 {"\n\n- Jobs are matched to a few local providers.\n- Your details are never shared unless you choose.\n- No more paying for leads, only guaranteed jobs.\n- Every provider is vetted before they can join, so no cowboys or time wasters.\n- Full transparency and oversight start to finish."}
               </p>
