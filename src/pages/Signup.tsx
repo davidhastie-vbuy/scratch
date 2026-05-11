@@ -197,6 +197,8 @@ const Signup = () => {
                   </RadioGroup>
                 </div>
 
+                <p className="text-center text-sm font-bold text-primary">No flooded inbox. No repeated phone calls.</p>
+
                 {/* Email & password */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>

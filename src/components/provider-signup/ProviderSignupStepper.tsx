@@ -250,6 +250,7 @@ const ProviderSignupStepper = () => {
             {step === 2 && "Where do you offer your services?"}
             {step === 3 && "Review your application before submitting"}
           </CardDescription>
+          <p className="mt-2 text-sm font-bold text-primary">No upfront costs or fees. No chasing payments.</p>
         </CardHeader>
         <CardContent>
           {step === 0 && <StepBusinessDetails form={form} updateForm={updateForm} errors={errors} />}
