@@ -184,6 +184,10 @@ const HomeAuthPanel = () => {
             )}
           </div>
 
+          {role === "customer" && (
+            <p className="text-center text-sm font-bold text-primary">No flooded inbox. No repeated phone calls.</p>
+          )}
+
           <form onSubmit={handleSignup} className="space-y-3">
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
