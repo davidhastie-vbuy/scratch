@@ -297,7 +297,7 @@ const Signup = () => {
                   <a href="/legal?audience=customer" target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:underline">Terms & Conditions</a>.
                 </p>
                 <Button type="submit" className="w-full h-11 font-bold shadow-md" disabled={loading}>
-                  {loading ? "Creating account..." : "Create account"}
+                  {loading ? "Creating account..." : "Unlock Dashboard"}
                 </Button>
                 <div className="relative w-full">
                   <div className="absolute inset-0 flex items-center">
@@ -318,7 +318,7 @@ const Signup = () => {
                 </Button>
                 <p className="text-center text-sm text-muted-foreground">
                   Already have an account?{" "}
-                  <Link to="/login" className="font-bold text-primary hover:underline">Sign in</Link>
+                  <Link to="/login" className="font-bold text-primary hover:underline">Sign In</Link>
                 </p>
               </CardFooter>
             </form>

@@ -130,7 +130,7 @@ const HomeAuthPanel = () => {
             mode === "signup" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          Create account
+          Unlock Dashboard
         </button>
         <button
           type="button"
@@ -139,7 +139,7 @@ const HomeAuthPanel = () => {
             mode === "signin" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          Sign in
+          Sign In
         </button>
       </div>
 
@@ -295,7 +295,7 @@ const HomeAuthPanel = () => {
               )}
             </div>
             <Button type="submit" className="w-full h-11 font-bold shadow-md" disabled={loading || role === "provider"}>
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? "Creating account..." : "Unlock Dashboard"}
               {!loading && <ArrowRight className="h-4 w-4" />}
             </Button>
             <div className="relative">
@@ -345,7 +345,7 @@ const HomeAuthPanel = () => {
             </div>
           </div>
           <Button type="submit" className="w-full h-11 font-bold shadow-md" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? "Signing in..." : "Sign In"}
           </Button>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
