@@ -82,10 +82,10 @@ const Login = () => {
             <h1 className="font-display text-3xl font-extrabold text-foreground">
               Book<span className="text-primary">A</span>Trade
             </h1>
-            <p className="mt-2 text-muted-foreground">Sign in to your account</p>
+            <p className="mt-2 text-muted-foreground">Sign In to your account</p>
           </div>
           <div className="hidden lg:block mb-8">
-            <h1 className="font-display text-2xl font-extrabold text-foreground">Sign in to your account</h1>
+            <h1 className="font-display text-2xl font-extrabold text-foreground">Sign In to your account</h1>
             <p className="mt-1 text-muted-foreground">Welcome back! Enter your credentials below.</p>
           </div>
 
@@ -149,7 +149,7 @@ const Login = () => {
               </CardContent>
               <CardFooter className="flex flex-col gap-3">
                 <Button type="submit" className="w-full h-11 font-bold shadow-md" disabled={loading}>
-                  {loading ? "Signing in..." : "Sign in"}
+                  {loading ? "Signing in..." : "Sign In"}
                 </Button>
                 <div className="relative w-full">
                   <div className="absolute inset-0 flex items-center">
