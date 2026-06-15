@@ -2,83 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,500;6..12,600;6..12,700&display=swap');
+/* Self-hosted Bauhaus display font — no render-blocking external request */
+@import url('./fonts/bauhaus.css');
 
 @layer base {
   :root {
-    --background: 25 50% 97%;
-    --foreground: 228 18% 14%;
+    /* ─── REBRAND PALETTE ─────────────────────────────── */
+    --background: 36 33% 95%;       /* #F7F4EF — warm parchment */
+    --foreground: 0 0% 15%;         /* #252525 — charcoal */
 
     --card: 0 0% 100%;
-    --card-foreground: 228 18% 14%;
+    --card-foreground: 0 0% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 228 18% 14%;
+    --popover-foreground: 0 0% 15%;
 
-    --primary: 25 95% 53%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 355 100% 35%;        /* #B00010 — deep crimson */
+    --primary-foreground: 36 33% 95%;
 
-    --secondary: 228 8% 93%;
-    --secondary-foreground: 228 18% 14%;
+    --secondary: 40 18% 77%;        /* #C5B79A — stone */
+    --secondary-foreground: 0 0% 15%;
 
-    --muted: 25 20% 95%;
-    --muted-foreground: 228 6% 49%;
+    --muted: 36 20% 93%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 25 60% 94%;
-    --accent-foreground: 228 18% 14%;
+    --accent: 355 40% 94%;          /* red-tinted accent */
+    --accent-foreground: 0 0% 15%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 228 10% 88%;
-    --input: 228 10% 88%;
-    --ring: 25 95% 53%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 355 100% 35%;
 
-    --radius: 0.5rem;
+    --radius: 0rem;                 /* Square edges — editorial aesthetic */
 
-    --sidebar-background: 228 18% 14%;
-    --sidebar-foreground: 228 8% 85%;
-    --sidebar-primary: 25 95% 53%;
+    /* ─── SIDEBAR ─────────────────────────────────────── */
+    --sidebar-background: 0 0% 15%;
+    --sidebar-foreground: 36 20% 85%;
+    --sidebar-primary: 355 100% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 228 18% 20%;
-    --sidebar-accent-foreground: 228 8% 85%;
-    --sidebar-border: 228 14% 22%;
-    --sidebar-ring: 25 95% 53%;
+    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent-foreground: 36 20% 85%;
+    --sidebar-border: 0 0% 22%;
+    --sidebar-ring: 355 100% 35%;
 
+    /* ─── STATUS ──────────────────────────────────────── */
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
+
+    /* ─── TRADE CATEGORY ACCENTS ──────────────────────── */
+    --trade-olive: 62 24% 53%;     /* Joiners */
+    --trade-orange: 22 78% 52%;    /* Kitchen Fitters */
+    --trade-lilac: 300 19% 66%;    /* Electricians */
+    --trade-cobalt: 216 56% 42%;   /* Painters */
+    --trade-aqua: 184 69% 39%;     /* Plumbers */
+    --trade-slate: 210 8% 38%;     /* Roofers */
+    --trade-forest: 148 33% 28%;   /* Landscapers */
+    --trade-stone: 40 25% 69%;     /* Tilers */
   }
 
   .dark {
-    --background: 228 18% 8%;
-    --foreground: 25 30% 95%;
+    --background: 0 0% 8%;
+    --foreground: 36 30% 95%;
 
-    --card: 228 18% 12%;
-    --card-foreground: 25 30% 95%;
+    --card: 0 0% 12%;
+    --card-foreground: 36 30% 95%;
 
-    --popover: 228 18% 12%;
-    --popover-foreground: 25 30% 95%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 36 30% 95%;
 
-    --primary: 25 95% 55%;
+    --primary: 355 100% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 228 14% 18%;
-    --secondary-foreground: 228 8% 85%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 36 20% 85%;
 
-    --muted: 228 14% 16%;
-    --muted-foreground: 228 6% 55%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 25 30% 18%;
-    --accent-foreground: 25 70% 70%;
+    --accent: 355 30% 18%;
+    --accent-foreground: 355 70% 70%;
 
     --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 228 14% 20%;
-    --input: 228 14% 20%;
-    --ring: 25 95% 55%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 355 100% 40%;
   }
 }
 
@@ -88,18 +102,25 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Nunito Sans', system-ui, sans-serif;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Manrope', system-ui, sans-serif;
+    font-family: 'Bauhaus', 'Arial Black', sans-serif;
   }
 }
 
 @layer utilities {
-  .hover-scale {
-    @apply transition-transform duration-200 hover:scale-105;
+  /* ─── EDITORIAL UTILITIES ───────────────────────────── */
+
+  /* Eyebrow label — small uppercase tracking */
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: hsl(var(--primary));
   }
 
   .hover-lift {
@@ -108,16 +129,12 @@
 
   .hover-lift:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 28px -8px hsl(228 18% 14% / 0.12);
+    box-shadow: 0 12px 28px -8px hsl(var(--foreground) / 0.12);
   }
 
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(25 95% 53%), hsl(25 95% 40%));
-  }
-
-  .glass-card {
-    @apply bg-card/80 backdrop-blur-sm border shadow-sm;
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7));
   }
 
   .section-divider {
@@ -127,7 +144,7 @@
   .section-divider::before {
     content: '';
     @apply absolute left-1/2 -translate-x-1/2 -top-px w-24 h-0.5 rounded-full;
-    background: linear-gradient(90deg, transparent, hsl(25 95% 53%), transparent);
+    background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
   }
 
   .stagger-1 { animation-delay: 0.1s; }
@@ -141,5 +158,17 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* ─── REDUCED MOTION ────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-slide-up,
+    .animate-float,
+    .animate-pulse-glow {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 }

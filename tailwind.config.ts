@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Nunito Sans', 'system-ui', 'sans-serif'],
-        display: ['Manrope', 'system-ui', 'sans-serif'],
+        sans: ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        display: ['Bauhaus', 'Arial Black', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -69,6 +69,17 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        /* Trade category accent colors */
+        trade: {
+          olive: "hsl(var(--trade-olive))",
+          orange: "hsl(var(--trade-orange))",
+          lilac: "hsl(var(--trade-lilac))",
+          cobalt: "hsl(var(--trade-cobalt))",
+          aqua: "hsl(var(--trade-aqua))",
+          slate: "hsl(var(--trade-slate))",
+          forest: "hsl(var(--trade-forest))",
+          stone: "hsl(var(--trade-stone))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -109,8 +120,8 @@ export default {
           "50%": { transform: "translateY(-6px)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 0 0 hsl(25 95% 53% / 0.4)" },
-          "50%": { boxShadow: "0 0 20px 4px hsl(25 95% 53% / 0.15)" },
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(355 100% 35% / 0.4)" },
+          "50%": { boxShadow: "0 0 20px 4px hsl(355 100% 35% / 0.15)" },
         },
       },
       animation: {
