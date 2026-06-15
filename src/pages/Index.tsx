@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import logo from "@/assets/bookatrade-logo.png";
+import logo from "@/assets/bookatrade-logo-black.png";
 import { useState } from "react";
 
 /* ── Image imports ───────────────────────────────────── */
@@ -13,7 +13,8 @@ import tradePlumbers from "@/assets/trade-plumbers.jpg";
 import tradeRoofers from "@/assets/trade-roofers.jpg";
 import tradeLandscapers from "@/assets/trade-landscapers.jpg";
 import tradeTilers from "@/assets/trade-tilers.jpg";
-import heroKitchen from "@/assets/trade-kitchen.jpg";
+import heroScrewdriver from "@/assets/hero-screwdriver.jpg";
+import campaignHammer from "@/assets/campaign-hammer.jpg";
 import projectBathroom from "@/assets/project-bathroom.jpg";
 import projectKitchenSage from "@/assets/project-kitchen-sage.jpg";
 import projectExterior from "@/assets/project-exterior.jpg";
@@ -62,11 +63,8 @@ const Index = () => {
       {/* ═══ 1. NAV ══════════════════════════════════════ */}
       <header className="border-b border-foreground/[0.07] bg-background sticky top-0 z-50">
         <div className="container flex h-[68px] items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2 group min-w-0 flex-shrink">
-            <img src={logo} alt="BOOKaTRADE logo" className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain transition-transform duration-300 group-hover:rotate-6" />
-            <span className="font-display text-base sm:text-xl font-extrabold text-foreground whitespace-nowrap tracking-tight">
-              BOOK<span className="text-primary">a</span>TRADE
-            </span>
+          <Link to="/" className="flex items-center group min-w-0 flex-shrink">
+            <img src={logo} alt="BOOKaTRADE" className="h-7 sm:h-9 flex-shrink-0 object-contain" />
           </Link>
           <nav className="hidden lg:flex items-center gap-8">
             <a href="#trades" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-colors">Find a Trade</a>
@@ -145,16 +143,15 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Right column — editorial visual */}
-          <div className="hidden lg:block relative overflow-hidden">
+          {/* Right column — editorial tool visual */}
+          <div className="hidden lg:flex bg-[#EAE5DE] items-center justify-center relative overflow-hidden">
             <img
-              src={heroKitchen}
-              alt="Premium kitchen installation by BOOKaTRADE tradespeople"
-              className="absolute inset-0 w-full h-full object-cover"
+              src={heroScrewdriver}
+              alt="Luxury screwdriver — editorial tool image"
+              className="max-w-[85%] max-h-[75%] object-contain drop-shadow-2xl"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-transparent" />
-            <p className="absolute bottom-9 left-12 text-[10px] tracking-[0.2em] uppercase text-white/60 z-10">
-              Kitchen Fitters — Heart of the Home.
+            <p className="absolute bottom-9 left-12 text-[10px] tracking-[0.2em] uppercase text-foreground/[0.35]">
+              Electricians — Find the Spark.
             </p>
           </div>
         </div>
@@ -311,8 +308,8 @@ const Index = () => {
             </Link>
           </div>
         </div>
-        <div className="hidden lg:block relative overflow-hidden aspect-[4/3]">
-          <img src={tradeJoiners} alt="Joiner craftsmanship" className="w-full h-full object-cover" />
+        <div className="hidden lg:flex items-center justify-center relative overflow-hidden">
+          <img src={campaignHammer} alt="Velvet hammer — joiner campaign visual" className="max-w-full max-h-[280px] object-contain" />
           <div className="absolute inset-0 bg-gradient-to-r from-trade-olive/40 to-transparent" />
         </div>
       </section>
