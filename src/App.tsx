@@ -49,6 +49,9 @@ import SupportPage from "@/pages/shared/SupportPage";
 import AdminDashboard from "@/pages/AdminDashboard";
 import LegalPage from "@/pages/LegalPage";
 
+// Public
+import TradeCategory from "@/pages/TradeCategory";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -67,6 +70,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/auth/confirm" element={<AuthConfirm />} />
+            <Route path="/trades/:slug" element={<TradeCategory />} />
 
             {/* Customer routes */}
             <Route

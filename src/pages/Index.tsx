@@ -1,445 +1,446 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield, ArrowRight, CheckCircle, Star, PhoneCall, Send, CircleArrowDown, Phone, Mail, Download, Zap, Award, Users, MailPlus, Repeat1, Paintbrush, BellRing, Infinity } from "lucide-react";
-import heroImage from "@/assets/hero-trades.jpg";
-import HomeAuthPanel from "@/components/HomeAuthPanel";
-import trustImage from "@/assets/trust-handshake.jpg";
-import qualityImage from "@/assets/quality-work.jpg";
-import peaceImage from "@/assets/peace-of-mind.jpg";
-import electricianImage from "@/assets/kitchen-electrics.jpg";
+import { Shield, ArrowRight, CheckCircle, Star, Menu } from "lucide-react";
 import logo from "@/assets/bookatrade-logo.png";
-import trustedPartnershipImage from "@/assets/trusted-partnership.jpg";
+import HomeAuthPanel from "@/components/HomeAuthPanel";
+import { useState } from "react";
+
+/* ── Trade tile data ─────────────────────────────────── */
+const TRADES = [
+  { slug: "joiners",         name: "Joiners",         tagline: "Made to Measure",          sub: "Wardrobes, staircases & bespoke fitted furniture",  mark: "J", bg: "bg-trade-olive" },
+  { slug: "kitchen-fitters", name: "Kitchen Fitters",  tagline: "Heart of the Home",         sub: "Designed for living, installed with precision",      mark: "K", bg: "bg-trade-orange" },
+  { slug: "electricians",    name: "Electricians",     tagline: "Find the Spark",            sub: "Powered by precision, wired for results",            mark: "E", bg: "bg-trade-lilac" },
+  { slug: "painters",        name: "Painters",         tagline: "Paint the Room",            sub: "Interior, exterior, wallpaper & feature walls",      mark: "P", bg: "bg-trade-cobalt" },
+  { slug: "plumbers",        name: "Plumbers",         tagline: "Keeping Life Flowing",      sub: "No leaks. No hassle. Trusted local plumbers",        mark: "P", bg: "bg-trade-aqua" },
+  { slug: "roofers",         name: "Roofers",          tagline: "The Roof Over Everything",  sub: "Protection starts at the top. Built to last",        mark: "R", bg: "bg-trade-slate" },
+  { slug: "landscapers",     name: "Landscapers",      tagline: "Bring the Outside to Life", sub: "Gardens that work beautifully, year-round",          mark: "L", bg: "bg-trade-forest" },
+  { slug: "tilers",          name: "Tilers",           tagline: "Every Detail Aligned",      sub: "Find skilled tilers who get the finish right",        mark: "T", bg: "bg-trade-stone" },
+];
+
+/* ── Review ticker data ──────────────────────────────── */
+const REVIEWS = [
+  { quote: "Incredible finish. Booked within the hour.", name: "Sarah M., London" },
+  { quote: "Found the perfect kitchen fitter. Seamless.", name: "James T., Manchester" },
+  { quote: "Trusted, local and exactly what we needed.",  name: "Priya K., Bristol" },
+  { quote: "Our joiner was brilliant. Made to measure, indeed.", name: "Tom W., Edinburgh" },
+];
+
+/* ── Recent works data ───────────────────────────────── */
+const WORKS = [
+  { tag: "Bathroom",  tagColor: "#80DDE5", title: "Teal Marble\nWet Room",        loc: "Manchester · Tiler + Plumber",  gradient: "from-[#1A5C66] to-[#0D2E33]" },
+  { tag: "Kitchen",   tagColor: "#C8CB82", title: "Sage Green\nKitchen",          loc: "London · Kitchen Fitter",       gradient: "from-[#7A8E4A] to-[#4A5830]" },
+  { tag: "Exterior",  tagColor: "#A0AEBC", title: "Full Roof\nReplacement",       loc: "Edinburgh · Roofer",            gradient: "from-[#3A4855] to-[#1C232A]" },
+  { tag: "Kitchen",   tagColor: "#F4A06A", title: "Warm Oak\nKitchen",            loc: "Bristol · Kitchen Fitter",       gradient: "from-[#C0865A] to-[#7A5030]" },
+  { tag: "Joinery",   tagColor: "#D4C8A8", title: "Bespoke\nFitted Study",        loc: "Leeds · Joiner",                gradient: "from-[#C5B79A] to-[#8A7A62]" },
+];
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <header className="border-b border-foreground/8 bg-background sticky top-0 z-50">
+
+      {/* ═══ 1. NAV ══════════════════════════════════════ */}
+      <header className="border-b border-foreground/[0.07] bg-background sticky top-0 z-50">
         <div className="container flex h-[68px] items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-2 group min-w-0 flex-shrink">
-            <img src={logo} alt="BookATrade logo" className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain transition-transform duration-300 group-hover:rotate-6" />
+            <img src={logo} alt="BOOKaTRADE logo" className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain transition-transform duration-300 group-hover:rotate-6" />
             <span className="font-display text-base sm:text-xl font-extrabold text-foreground whitespace-nowrap tracking-tight">
               BOOK<span className="text-primary">a</span>TRADE
             </span>
           </Link>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#how-it-works" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-opacity">How It Works</a>
-            <a href="#trades" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-opacity">Trades</a>
-            <a href="#for-providers" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-opacity">For Providers</a>
-            <Link to="/login" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-opacity">Sign In</Link>
+          <nav className="hidden lg:flex items-center gap-8">
+            <a href="#trades" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-colors">Find a Trade</a>
+            <Link to="/signup" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-colors">Post a Job</Link>
+            <a href="#recent-works" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-colors">Recent Works</a>
+            <a href="#for-providers" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-colors">For Trades</a>
           </nav>
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <Button variant="ghost" size="sm" asChild className="font-semibold hover:bg-foreground/5 transition-all px-3 sm:px-4 sm:h-10 hidden sm:inline-flex">
               <Link to="/login">Sign In</Link>
             </Button>
             <Button size="sm" asChild className="font-semibold bg-foreground text-background hover:bg-foreground/90 transition-all px-4 sm:px-6 sm:h-10 text-[11px] uppercase tracking-[0.12em]">
-              <Link to="/signup">Get Started</Link>
+              <Link to="/signup">Sign Up Free</Link>
+            </Button>
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              <Menu className="h-5 w-5" />
             </Button>
           </div>
         </div>
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t border-foreground/[0.07] bg-background px-6 py-4 space-y-3">
+            <a href="#trades" className="block text-sm text-foreground/70" onClick={() => setMobileMenuOpen(false)}>Find a Trade</a>
+            <Link to="/signup" className="block text-sm text-foreground/70" onClick={() => setMobileMenuOpen(false)}>Post a Job</Link>
+            <a href="#recent-works" className="block text-sm text-foreground/70" onClick={() => setMobileMenuOpen(false)}>Recent Works</a>
+            <a href="#for-providers" className="block text-sm text-foreground/70" onClick={() => setMobileMenuOpen(false)}>For Trades</a>
+            <Link to="/login" className="block text-sm text-foreground/70" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+          </div>
+        )}
       </header>
 
-      {/* Hero Section — Editorial 2-column */}
+      {/* ═══ 2. HERO ═════════════════════════════════════ */}
       <section className="bg-background">
-        <div className="container py-16 md:py-0">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-0 items-center min-h-[75vh] lg:min-h-[88vh]">
-            {/* Left column */}
-            <div className="max-w-xl py-8 lg:py-20 animate-fade-in">
-              <p className="eyebrow mb-5">Craftsmanship Starts Here</p>
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] font-extrabold tracking-tight text-foreground leading-[0.93] mb-7">
-                Find the Right<br />
-                Trade.<br />
-                <span className="text-primary">First Time.</span>
-              </h1>
-              <p className="text-base text-foreground/60 leading-relaxed max-w-[380px] mb-10 animate-fade-in stagger-2 opacity-0">
-                Connect with trusted, vetted tradespeople for every home project. From small fixes to full transformations.
-              </p>
+        <div className="grid lg:grid-cols-2 min-h-[75vh] lg:min-h-[88vh]">
+          {/* Left column */}
+          <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-16 xl:px-20 py-16 lg:py-20 animate-fade-in">
+            <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-5">Craftsmanship Starts Here</p>
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] font-extrabold tracking-tight text-foreground leading-[0.93] mb-7">
+              Find the Right<br />Trade.<br />First Time.
+            </h1>
+            <p className="text-base leading-relaxed text-foreground/60 max-w-[380px] mb-10">
+              Connect with trusted, vetted tradespeople for every home project. From small fixes to full transformations.
+            </p>
 
-              {/* Search-like CTA bar */}
-              <div className="flex max-w-[500px] border border-foreground/14 shadow-lg shadow-foreground/7 bg-card overflow-hidden animate-fade-in stagger-3 opacity-0">
-                <input
-                  type="text"
-                  placeholder="What do you need done?"
-                  className="flex-1 px-4 py-3.5 text-sm bg-transparent outline-none text-foreground placeholder:text-foreground/38"
-                  readOnly
-                  onClick={() => window.location.href = '/signup'}
-                />
-                <div className="w-px bg-foreground/10 my-3" />
-                <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 px-5 text-[11px] uppercase tracking-[0.13em] font-bold h-auto">
-                  <Link to="/signup">Search</Link>
-                </Button>
-              </div>
-
-              {/* Trust pills */}
-              <div className="flex flex-wrap gap-5 mt-6 animate-fade-in stagger-4 opacity-0">
-                {["Vetted Tradespeople", "No Spam", "Limited Quotes Only"].map((pill) => (
-                  <span key={pill} className="flex items-center gap-2 text-[11px] text-foreground/50 tracking-wide">
-                    <span className="w-[5px] h-[5px] rounded-full bg-primary flex-shrink-0" />
-                    {pill}
-                  </span>
-                ))}
-              </div>
+            {/* Search bar */}
+            <div className="flex max-w-[500px] border-[1.5px] border-foreground/[0.14] shadow-[0_6px_28px_rgba(37,37,37,0.07)] bg-white overflow-hidden">
+              <input
+                type="text"
+                placeholder="What do you need done?"
+                className="flex-1 px-4 py-[15px] text-sm border-none outline-none font-sans text-foreground bg-transparent placeholder:text-foreground/[0.38]"
+                onFocus={() => navigate("/signup")}
+              />
+              <div className="w-px bg-foreground/10 my-[11px]" />
+              <input
+                type="text"
+                placeholder="Your postcode"
+                className="max-w-[140px] px-4 py-[15px] text-sm border-none outline-none font-sans text-foreground bg-transparent placeholder:text-foreground/[0.38]"
+                onFocus={() => navigate("/signup")}
+              />
+              <button
+                onClick={() => navigate("/signup")}
+                className="bg-primary text-white border-none px-6 text-[11px] tracking-[0.13em] uppercase font-bold font-sans cursor-pointer hover:bg-[#8d000d] transition-colors whitespace-nowrap"
+              >
+                Search
+              </button>
             </div>
 
-            {/* Right column — Auth Panel */}
-            <div className="w-full lg:h-full lg:flex lg:items-center lg:justify-center lg:bg-accent/60 lg:py-16 animate-fade-in stagger-3 opacity-0">
-              <div className="w-full max-w-md mx-auto lg:px-8">
-                <HomeAuthPanel />
+            {/* Trust pills */}
+            <div className="flex gap-7 mt-7 flex-wrap">
+              {["Vetted Tradespeople", "No Spam", "Limited Quotes Only"].map((pill) => (
+                <span key={pill} className="text-[11px] text-foreground/50 flex items-center gap-1.5 tracking-[0.04em]">
+                  <span className="w-[5px] h-[5px] rounded-full bg-primary flex-shrink-0" />
+                  {pill}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Right column — editorial visual */}
+          <div className="hidden lg:flex bg-[#EAE5DE] items-center justify-center relative overflow-hidden">
+            <div className="flex flex-col items-center justify-center w-full h-full p-16">
+              {/* Image placeholder — to be replaced with editorial tool photography */}
+              <div className="w-[280px] h-[400px] border border-foreground/[0.08] bg-foreground/[0.03] flex items-center justify-center">
+                <span className="font-display text-7xl text-foreground/[0.08] select-none">B<span className="text-primary/20">a</span>T</span>
               </div>
             </div>
+            <p className="absolute bottom-9 left-12 text-[10px] tracking-[0.2em] uppercase text-foreground/[0.35]">
+              Electricians — Find the Spark.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="bg-foreground text-primary-foreground py-8 relative overflow-hidden border-y-4 border-primary/30">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(var(--primary) / 0.1) 20px, hsl(var(--primary) / 0.1) 21px)` }} />
+      {/* ═══ 3. REVIEW TICKER ════════════════════════════ */}
+      <div className="bg-background border-y border-foreground/[0.07] px-6 sm:px-10 lg:px-16 py-4 flex items-center gap-5 sm:gap-8 overflow-x-auto">
+        <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-primary whitespace-nowrap flex-shrink-0">Trusted Reviews</span>
+        {REVIEWS.map((r, i) => (
+          <div key={i} className="flex items-center gap-2.5 flex-shrink-0">
+            {i > 0 && <span className="text-foreground/[0.18] text-lg mr-2">·</span>}
+            <span className="text-primary text-[11px] tracking-[2px]">★★★★★</span>
+            <span className="text-xs italic text-foreground/65">"{r.quote}"</span>
+            <span className="text-[11px] text-foreground/[0.38]">— {r.name}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* ═══ 4. BROWSE BY TRADE ══════════════════════════ */}
+      <section id="trades">
+        <div className="px-6 sm:px-10 lg:px-20 pt-20 lg:pt-24 pb-10 lg:pb-12">
+          <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Browse by Trade</p>
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-foreground">
+            Every Home Project,<br />One Trusted Platform.
+          </h2>
         </div>
-        <div className="container relative grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div className="px-6 sm:px-10 lg:px-20 pb-20 lg:pb-24">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {TRADES.map((t) => (
+              <Link
+                key={t.slug}
+                to={`/trades/${t.slug}`}
+                className="group aspect-[3/4] relative overflow-hidden flex flex-col justify-end p-5 sm:p-6 transition-transform duration-300 hover:scale-[1.025]"
+              >
+                {/* Background */}
+                <div className={`absolute inset-0 ${t.bg} transition-transform duration-400 group-hover:scale-[1.06]`} />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/[0.42] z-[1]" />
+                {/* Decorative letter */}
+                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] z-[1] opacity-[0.14] font-display text-[96px] text-white pointer-events-none tracking-[-2px] select-none">
+                  {t.mark}
+                </span>
+                {/* Content */}
+                <div className="relative z-[2]">
+                  <p className="text-[9px] tracking-[0.18em] uppercase text-white/65 mb-1 font-sans">{t.tagline}</p>
+                  <h3 className="font-display text-xl sm:text-[22px] text-white leading-none">{t.name}</h3>
+                  <p className="text-[11px] text-white/[0.62] mt-1 leading-snug">{t.sub}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 5. HOW IT WORKS ═════════════════════════════ */}
+      <section id="how-it-works" className="bg-foreground px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
+        <p className="text-[11px] tracking-[0.22em] uppercase text-trade-stone font-semibold mb-3.5">How It Works</p>
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-white mb-14 lg:mb-16">
+          Create a Job in<br />Under 2 Minutes.
+        </h2>
+        <div className="grid lg:grid-cols-3">
           {[
-            { value: "13+", label: "Job Categories Available" },
-            { value: "3", label: "Max Quotes Per Job" },
-            { value: "100%", label: "Vetted Tradespeople" },
-            { value: "24/7", label: "Support Available" },
-          ].map((stat) => (
-            <div key={stat.label} className="group">
-              <div className="font-display text-3xl md:text-4xl font-extrabold text-primary drop-shadow-md group-hover:scale-110 transition-transform duration-300">{stat.value}</div>
-              <div className="mt-1 text-sm font-medium text-primary-foreground">{stat.label}</div>
+            { num: "01", title: "Post Your Job", copy: "Tell us what you need done, where and when. It takes under two minutes and there's no commitment required." },
+            { num: "02", title: "Compare Trusted Trades", copy: "Receive a limited number of quotes from vetted, reviewed tradespeople. No spam. No endless follow-up calls." },
+            { num: "03", title: "Book with Confidence", copy: "Review profiles, read verified local reviews, compare quotes — then book the right trade for your home." },
+          ].map((step, i) => (
+            <div
+              key={step.num}
+              className={`py-8 lg:py-0 ${i > 0 ? "lg:pl-12 border-t lg:border-t-0 lg:border-l" : ""} ${i < 2 ? "lg:pr-12 border-white/[0.1]" : ""}`}
+            >
+              <div className="font-display text-6xl lg:text-7xl text-primary leading-none mb-5 tracking-[-2px]">{step.num}</div>
+              <h3 className="text-[11px] tracking-[0.16em] uppercase text-white font-bold mb-3 font-sans">{step.title}</h3>
+              <p className="text-sm leading-relaxed text-white/50">{step.copy}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Why People Often Don't Trust A Trader */}
-      <section className="py-20 md:py-28 bg-background">
-        <div className="container">
-          <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
-            <div className="order-2 md:order-1">
-              <p className="eyebrow mb-5">The Problem</p>
-              <h3 className="font-display text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl leading-tight">
-                Why People Often Don't Trust A Trader!
-              </h3>
-              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                {"- Customers get let down by unreliable trades.\n- \u201CWe got scammed... But he had glowing reviews.\u201D\n- Jobs get sent to too many providers.\n- Customers get bombarded with calls and quotes.\n- Providers pay upfront for leads that go nowhere.\n\n"}
-                <strong>We know exactly what keeps going wrong.{"\n"}That's why we built BookATrade:</strong>
-                {"\n\n- Jobs are matched to a few local providers.\n- Your details are never shared unless you choose.\n- No more paying for leads, only guaranteed jobs.\n- Every provider is vetted before they can join, so no cowboys or time wasters.\n- Full transparency and oversight start to finish."}
-              </p>
-            </div>
-            <div className="order-1 md:order-2 relative group">
-              <img
-                src={peaceImage}
-                alt="Tradesperson discussing work with a happy homeowner"
-                className="relative shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-center transition-transform duration-500 group-hover:scale-[1.02] border border-border/50"
-              />
-            </div>
+      {/* ═══ 6. RECENT WORKS ═════════════════════════════ */}
+      <section id="recent-works" className="bg-background px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
+        <div className="flex justify-between items-end mb-10 lg:mb-12">
+          <div>
+            <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Recent Works</p>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-foreground">
+              Beautiful Homes.<br />Skilled Hands.
+            </h2>
           </div>
+          <Link to="/signup" className="hidden sm:inline-block text-[11px] tracking-[0.13em] uppercase text-foreground/55 border-b border-current pb-0.5 font-semibold font-sans hover:opacity-100 transition-opacity">
+            View All Projects →
+          </Link>
         </div>
-      </section>
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-24 md:py-32 bg-foreground text-primary-foreground">
-        <div className="container">
-          <div className="mb-16">
-            <p className="eyebrow !text-secondary mb-4">How It Works</p>
-            <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground leading-[0.97]">
-              Create a Job in<br />Under 2 Minutes.
-            </h3>
-          </div>
-          <div className="grid md:grid-cols-3 max-w-5xl">
-            {[
-              {
-                step: "01",
-                icon: <MailPlus className="h-6 w-6" />,
-                title: "Post Your Job Once",
-                desc: "Describe what you need, add photos and/or videos, and we'll match you with the right tradespeople local to your area.",
-              },
-              {
-                step: "02",
-                icon: <Repeat1 className="h-6 w-6" />,
-                title: "Tailored Job Matching",
-                desc: "Each job receives quotes from a small number of highly trusted local providers. No spam for anyone.",
-              },
-              {
-                step: "03",
-                icon: <Infinity className="h-6 w-6" />,
-                title: "Clear From Start To Finish",
-                desc: "Jobs, quotes, communication, and payments all handled in one place.\nClear, simple, and under your control.",
-              },
-            ].map((item, i) => (
-              <div
-                key={item.step}
-                className={`group py-10 md:py-0 ${i < 2 ? "border-b md:border-b-0 md:border-r border-primary-foreground/10" : ""} ${i > 0 ? "md:pl-12" : ""} ${i < 2 ? "md:pr-12" : ""}`}
-              >
-                <div className="font-display text-6xl lg:text-7xl font-extrabold text-primary leading-none mb-5 tracking-tight">
-                  {item.step}
-                </div>
-                <h4 className="text-[11px] uppercase tracking-[0.16em] font-bold text-primary-foreground mb-3">{item.title}</h4>
-                <p className="text-sm text-primary-foreground/50 leading-relaxed whitespace-pre-line">{item.desc}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.45fr_1fr_1fr] gap-2.5">
+          {WORKS.map((w, i) => (
+            <div
+              key={i}
+              className={`group relative overflow-hidden cursor-pointer ${i === 0 ? "sm:row-span-2" : ""}`}
+            >
+              {/* Gradient placeholder for project image */}
+              <div className={`w-full bg-gradient-to-br ${w.gradient} transition-transform duration-400 group-hover:scale-[1.04] ${i === 0 ? "aspect-[3/4] h-full" : "aspect-square"}`} />
+              {/* Overlay */}
+              <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pt-9 bg-gradient-to-t from-foreground/70 to-transparent">
+                <span
+                  className="inline-block text-[9px] tracking-[0.16em] uppercase border px-2 py-0.5 mb-1.5 font-sans"
+                  style={{ borderColor: w.tagColor + "66", color: w.tagColor }}
+                >
+                  {w.tag}
+                </span>
+                <h3 className="font-display text-lg text-white leading-[1.05] whitespace-pre-line">{w.title}</h3>
+                <p className="text-[11px] text-white/50 mt-1 font-sans">{w.loc}</p>
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ 7. WHY BOOKATRADE ═══════════════════════════ */}
+      <section className="bg-background px-6 sm:px-10 lg:px-20 pb-20 lg:pb-24">
+        <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Why BOOKaTRADE</p>
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-foreground mb-10 lg:mb-12">
+          Find Trusted.<br />Book Right.
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 border border-foreground/[0.09]">
+          {[
+            { title: "No Spam",          copy: "We limit the number of quotes per job so tradespeople compete on quality, not volume. No endless calls.",              barColor: "bg-primary" },
+            { title: "Vetted Providers",  copy: "Every tradesperson on BOOKaTRADE is reviewed, checked and verified before they can quote on your job.",               barColor: "bg-trade-olive" },
+            { title: "Local Reviews",     copy: "Real reviews from real homeowners in your area. Compare with confidence before you commit to anything.",               barColor: "bg-foreground" },
+            { title: "Secure & Simple",   copy: "Post your job in under two minutes. Safe, straightforward, built around how homeowners actually work.",                barColor: "bg-trade-stone" },
+          ].map((cell, i) => (
+            <div key={i} className={`p-8 lg:p-10 ${i < 3 ? "border-b sm:border-b lg:border-b-0 lg:border-r border-foreground/[0.09]" : ""} ${i % 2 === 0 ? "sm:border-r lg:border-r" : "sm:border-r-0 lg:border-r"} ${i === 3 ? "lg:border-r-0" : ""}`}>
+              <div className={`w-9 h-0.5 ${cell.barColor} mb-6`} />
+              <h3 className="text-xs tracking-[0.12em] uppercase font-bold text-foreground mb-2.5 font-sans">{cell.title}</h3>
+              <p className="text-[13px] leading-relaxed text-foreground/[0.58]">{cell.copy}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ 8. CAMPAIGN BANNER — JOINERS ════════════════ */}
+      <section className="bg-trade-olive grid lg:grid-cols-2 items-center px-6 sm:px-10 lg:px-20 py-20 lg:py-24 gap-12 lg:gap-20">
+        <div>
+          <p className="text-[10px] tracking-[0.2em] uppercase text-white/55 font-semibold mb-4 font-sans">Joiners</p>
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(52px,5.5vw,86px)] text-white leading-[0.9] tracking-tight mb-5">
+            MADE TO<br />MEASURE.
+          </h2>
+          <p className="text-[15px] leading-relaxed text-white/65 max-w-[360px] mb-10">
+            The perfect fit starts with the right joiner. Bespoke furniture, fitted wardrobes, staircases and more.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/trades/joiners" className="inline-block bg-white text-foreground px-8 py-3.5 text-[11px] tracking-[0.14em] uppercase font-bold font-sans hover:bg-foreground hover:text-white transition-colors">
+              Find a Joiner
+            </Link>
+            <Link to="/signup" className="inline-block bg-transparent text-white px-8 py-3 text-[11px] tracking-[0.14em] uppercase font-bold font-sans border-[1.5px] border-white/45 hover:border-white hover:bg-white/[0.08] transition-all">
+              Sign Up
+            </Link>
+          </div>
+        </div>
+        <div className="hidden lg:flex items-center justify-center">
+          {/* Image placeholder — to be replaced with joiner campaign photography */}
+          <div className="w-[320px] h-[280px] border border-white/[0.14] bg-white/[0.05] flex items-center justify-center">
+            <span className="font-display text-6xl text-white/[0.12] select-none">J</span>
           </div>
         </div>
       </section>
 
-      {/* Why Us */}
-      <section id="trades" className="py-20 md:py-28 bg-background">
-        <div className="container">
-          <div className="mb-16">
-            <p className="eyebrow mb-4">Why BOOKaTRADE</p>
-            <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-[0.97]">
-              Need Work Done?<br />Why Us &amp; Why Now?
-            </h3>
-            <p className="mt-4 max-w-lg text-lg whitespace-pre-line text-muted-foreground">
-              {"Most platforms are completely hit and miss with no guarantees.\nThey lack transparency and accountability.\nBookATrade is built to fix that."}
+      {/* ═══ 9. INSPIRATION GRID ═════════════════════════ */}
+      <section className="bg-foreground px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
+        <p className="text-[11px] tracking-[0.22em] uppercase text-trade-stone font-semibold">Inspiration</p>
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-white mt-3.5 mb-10 lg:mb-12">
+          From Vision<br />to Reality.
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          {[
+            { type: "Landscaping",    title: "Bring the Outside to Life",    gradient: "from-[#2F5E3E] to-[#142A1C]" },
+            { type: "Kitchen Fitting", title: "Every Piece Has Its Place",   gradient: "from-[#D4601A] to-[#8A3A00]" },
+            { type: "Bathroom",       title: "Smooth Starts Here",           gradient: "from-[#1E9DA8] to-[#0D5A60]" },
+          ].map((card, i) => (
+            <div key={i} className="group relative overflow-hidden cursor-pointer">
+              <div className={`w-full aspect-[4/5] bg-gradient-to-br ${card.gradient} transition-transform duration-400 group-hover:scale-[1.04]`} />
+              <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-12 bg-gradient-to-t from-black/[0.62] to-transparent">
+                <p className="text-[9px] tracking-[0.18em] uppercase text-white/55 mb-1 font-sans">{card.type}</p>
+                <p className="font-display text-xl text-white leading-[1.05]">{card.title}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ 10. PROVIDER CTA ════════════════════════════ */}
+      <section id="for-providers" className="bg-primary grid lg:grid-cols-2 items-center px-6 sm:px-10 lg:px-20 py-20 lg:py-24 gap-12 lg:gap-20">
+        <div>
+          <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 font-semibold mb-4 font-sans">For Trade Professionals</p>
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(40px,4.2vw,68px)] text-white leading-[0.92] tracking-tight mb-5">
+            Better Jobs.<br />Better Customers.<br />Less Noise.
+          </h2>
+          <p className="text-[15px] leading-relaxed text-white/65 max-w-[400px] mb-9">
+            Grow your pipeline without chasing dead leads. BOOKaTRADE connects you with homeowners who are ready to book — not just browsing.
+          </p>
+          <ul className="grid grid-cols-2 gap-3 mb-10 list-none">
+            {["Quality local leads", "Verified reviews", "Limited quotes per job", "No cold canvassing", "Job management tools", "Payment confidence"].map((ben) => (
+              <li key={ben} className="text-[13px] text-white/75 flex items-center gap-2">
+                <span className="w-3.5 h-[1.5px] bg-white/40 flex-shrink-0" />
+                {ben}
+              </li>
+            ))}
+          </ul>
+          <Link to="/signup" className="inline-block bg-white text-foreground px-8 py-3.5 text-[11px] tracking-[0.14em] uppercase font-bold font-sans hover:bg-foreground hover:text-white transition-colors">
+            Join as a Trade
+          </Link>
+        </div>
+        <div className="hidden lg:flex items-center justify-center">
+          {/* Image placeholder — to be replaced with tool set photography */}
+          <div className="w-[340px] h-[340px] border border-white/[0.14] bg-white/[0.05] flex items-center justify-center">
+            <span className="font-display text-6xl text-white/[0.12] select-none">T</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ 11. SIGN UP CTA ═════════════════════════════ */}
+      <section className="bg-background px-6 sm:px-10 lg:px-20 py-20 lg:py-24 flex flex-col items-center text-center">
+        <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold">Get Started Today</p>
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(40px,4.5vw,72px)] text-foreground leading-[0.95] tracking-tight max-w-[640px] mt-3.5 mb-5">
+          Beautiful Homes Need Skilled Hands.
+        </h2>
+        <p className="text-base text-foreground/[0.52] max-w-[420px] leading-relaxed mb-10">
+          Post your first job free. Find trusted tradespeople without the guesswork.
+        </p>
+        <div className="flex max-w-[520px] w-full border-[1.5px] border-foreground/[0.13] shadow-[0_4px_24px_rgba(37,37,37,0.07)] overflow-hidden bg-white">
+          <input
+            type="email"
+            placeholder="Enter your email address"
+            className="flex-1 px-5 py-4 text-sm border-none outline-none font-sans bg-transparent"
+            onFocus={() => navigate("/signup")}
+          />
+          <button
+            onClick={() => navigate("/signup")}
+            className="bg-foreground text-white border-none px-7 text-[11px] tracking-[0.14em] uppercase font-bold font-sans cursor-pointer hover:bg-primary transition-colors whitespace-nowrap"
+          >
+            Post a Job Free
+          </button>
+        </div>
+        <p className="mt-3.5 text-[11px] text-foreground/30 tracking-[0.04em]">Free to post. No commitment. No spam.</p>
+      </section>
+
+      {/* ═══ 12. FOOTER ══════════════════════════════════ */}
+      <footer className="bg-foreground px-6 sm:px-10 lg:px-20 pt-20 pb-10">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-10 lg:gap-14 pb-14 border-b border-white/[0.09] mb-10">
+          {/* Brand */}
+          <div>
+            <Link to="/" className="font-display text-xl text-white font-bold tracking-tight block mb-3.5">
+              BOOK<span className="text-primary">a</span>TRADE
+            </Link>
+            <p className="text-[13px] leading-relaxed text-white/[0.42] max-w-[250px]">
+              Connecting homes with trusted tradespeople across the UK. Find the right trade, first time.
             </p>
-          </div>
-          <div className="grid md:grid-cols-3 max-w-5xl border border-foreground/9">
-            {[
-              {
-                icon: <BellRing className="h-6 w-6" />,
-                title: "No Spam",
-                desc: "Your personal details are never shared.\nYou stay in control.\nNo bombardment or unwanted calls.",
-                barColor: "bg-primary",
-              },
-              {
-                icon: <Repeat1 className="h-6 w-6" />,
-                title: "No Repeating Yourself",
-                desc: "Post your job requirements once.\nAdd photos and videos.\nProviders know exactly what you need",
-                barColor: "bg-trade-olive",
-              },
-              {
-                icon: <CircleArrowDown className="h-6 w-6" />,
-                title: "Less Competition",
-                desc: "All providers excel in their field.\nSo we limit the numbers\nto avoid confusion and overwhelm.",
-                barColor: "bg-foreground",
-              },
-            ].map((item, i) => (
-              <div
-                key={item.title}
-                className={`group p-10 transition-all duration-300 hover-lift ${i < 2 ? "border-b md:border-b-0 md:border-r border-foreground/9" : ""}`}
-              >
-                <div className={`w-9 h-0.5 ${item.barColor} mb-6`} />
-                <h4 className="text-xs uppercase tracking-[0.12em] font-bold text-foreground mb-2.5">{item.title}</h4>
-                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Features with Images */}
-      <section className="py-20 md:py-28 bg-background">
-        <div className="container space-y-20 md:space-y-32">
-          {/* Feature 1 - You Stay In Control */}
-          <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
-            <div className="order-2 md:order-1">
-              <p className="eyebrow mb-5">For Customers</p>
-              <h3 className="font-display text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl leading-tight">
-                You Stay In Control The Whole Time
-              </h3>
-              <p className="mt-4 leading-relaxed font-sans text-muted-foreground text-lg whitespace-pre-line">
-                <strong>Customers:</strong>
-                {" \n- Your personal details are safe. We never share your information.\n- You choose who to speak to and work with.\n- You can ignore, accept, or decline any quote.\n- You can update or remove your job at any time.\n- No commitment until you're ready.\n- You only release payment when you're completely satisfied"}
-              </p>
-            </div>
-            <div className="order-1 md:order-2 relative group">
-              <img
-                src={trustImage}
-                alt="Customer greeting a trusted tradesperson"
-                className="relative shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-center transition-transform duration-500 group-hover:scale-[1.02] border border-border/50"
-              />
-            </div>
-          </div>
-
-          {/* Feature 2 - Built For Jobs */}
-          <div className="grid gap-10 md:gap-16 md:grid-cols-2 items-center">
-            <div className="relative group">
-              <img
-                src={qualityImage}
-                alt="Professional roofer performing quality work on a residential roof"
-                className="relative shadow-2xl shadow-foreground/15 w-full aspect-[4/3] object-cover object-top transition-transform duration-500 group-hover:scale-[1.02] border border-border/50"
-              />
-            </div>
-            <div>
-              <p className="eyebrow mb-5">For Providers</p>
-              <h3 className="font-display text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl leading-tight">
-                Built For Jobs, Not Leads
-              </h3>
-              <p className="mt-4 text-muted-foreground leading-relaxed text-lg whitespace-pre-line">
-                <strong>Providers:</strong>
-                {"\n- No upfront or hidden costs.\n- No monthly fees.\n- No paying for job leads.\n- Jobs ONLY available to a few providers.\n- You don't start working until funds are in place.\n- No contracts tying you in."}
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* For Tradespeople CTA — Red bg (editorial) */}
-      <section id="for-providers" className="py-24 md:py-32 bg-primary">
-        <div className="container">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div className="text-center md:text-left flex flex-col items-center md:items-start w-full">
-              <p className="text-[10px] tracking-[0.2em] uppercase font-semibold text-primary-foreground/50 mb-5">For Trade Professionals</p>
-              <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground leading-[0.92]">
-                Guaranteed,<br /><span className="text-primary-foreground">Local Jobs</span>
-              </h3>
-              <p className="mt-5 text-primary-foreground/65 leading-relaxed whitespace-pre-line text-base max-w-[400px] mb-8">
-                {"Join today and see how we work. No upfront costs. No monthly fees.\nNo paying for job leads. No commitment. Only pay us when you get paid."}
-              </p>
-              {/* Benefits grid */}
-              <ul className="grid grid-cols-2 gap-3 mb-10 w-full max-w-md">
-                {["Quality local leads", "Verified reviews", "Limited quotes per job", "No cold canvassing", "Job management tools", "Payment confidence"].map((ben) => (
-                  <li key={ben} className="text-sm text-primary-foreground/75 flex items-center gap-2">
-                    <span className="w-3.5 h-px bg-primary-foreground/40 flex-shrink-0" />
-                    {ben}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-wrap gap-3">
-                <Button size="lg" variant="secondary" asChild className="text-sm font-bold h-12 px-8 uppercase tracking-[0.14em] transition-all duration-300 hover:scale-105">
-                  <Link to="/signup">Join as a Trade</Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild className="text-sm font-bold bg-transparent border border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 hover:border-primary-foreground/60 h-12 px-8 uppercase tracking-[0.14em] transition-all duration-300 hover:scale-105">
-                  <Link to="/signup">Learn More</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: <Users className="h-6 w-6" />, label: "Real Local Jobs" },
-                { icon: <Shield className="h-6 w-6" />, label: "Verified Badge" },
-                { icon: <Star className="h-6 w-6" />, label: "Build Reviews" },
-                { icon: <Zap className="h-6 w-6" />, label: "Full Transparency" },
-              ].map((item) => (
-                <div key={item.label} className="flex flex-col items-center gap-3 bg-primary-foreground/5 border border-primary-foreground/15 p-6 text-center transition-all duration-300 hover:bg-primary-foreground/10 hover:border-primary-foreground/30 hover:-translate-y-1">
-                  <div className="text-primary-foreground p-3 bg-primary-foreground/10 border border-primary-foreground/15">{item.icon}</div>
-                  <span className="text-sm font-semibold text-primary-foreground">{item.label}</span>
-                </div>
+            <div className="flex gap-2.5 mt-5">
+              {[{ label: "in" }, { label: "ig" }, { label: "fb" }].map((s) => (
+                <a key={s.label} href="#" className="w-[34px] h-[34px] border border-white/[0.18] flex items-center justify-center text-[11px] text-white/45 font-sans hover:border-white/55 hover:text-white transition-colors">
+                  {s.label}
+                </a>
               ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Electrician Feature / Recommend Section */}
-      <section className="py-20 md:py-28 bg-background">
-        <div className="container">
-          <div className="relative overflow-hidden shadow-2xl border border-border/50">
-            <img
-              src={electricianImage}
-              alt="Professional electrician working with customer supervision"
-              className="w-full h-[28rem] sm:h-80 object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/70 sm:via-foreground/40 to-foreground/40 sm:to-transparent" />
-            <div className="absolute inset-0 flex items-center">
-              <div className="container">
-                <div className="max-w-md">
-                  <p className="eyebrow !text-secondary mb-4">Community</p>
-                  <h3 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-primary-foreground leading-tight">
-                    Had a great experience with a local provider? <span className="text-primary block whitespace-pre-line">Tell us about them!</span>
-                  </h3>
-                  <p className="mt-2 text-primary-foreground/80 text-sm whitespace-pre-line font-sans md:text-lg font-medium">
-                    {"Have your say in which providers are on the platform.\nOnly trusted, recommended providers make it in.\nHelp out the community; have your say."}
-                  </p>
-                  <Button size="lg" asChild className="mt-6 text-sm font-bold h-12 px-8 uppercase tracking-[0.14em] shadow-2xl shadow-primary/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary/60">
-                    <Link to="/signup" className="flex items-center justify-center gap-2">
-                      <span>Recommend A Provider</span>
-                      <ArrowRight className="h-5 w-5 flex-shrink-0" />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
+          {/* Find a Trade */}
+          <div>
+            <h4 className="text-[10px] tracking-[0.16em] uppercase text-white/[0.35] font-semibold mb-5 font-sans">Find a Trade</h4>
+            <ul className="space-y-2.5">
+              {TRADES.map((t) => (
+                <li key={t.slug}>
+                  <Link to={`/trades/${t.slug}`} className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">{t.name}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          {/* Platform */}
+          <div>
+            <h4 className="text-[10px] tracking-[0.16em] uppercase text-white/[0.35] font-semibold mb-5 font-sans">Platform</h4>
+            <ul className="space-y-2.5">
+              {["How It Works", "Post a Job", "Recent Works", "Reviews", "Trust & Safety"].map((link) => (
+                <li key={link}>
+                  <Link to="/signup" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">{link}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          {/* For Trades */}
+          <div>
+            <h4 className="text-[10px] tracking-[0.16em] uppercase text-white/[0.35] font-semibold mb-5 font-sans">For Trades</h4>
+            <ul className="space-y-2.5">
+              {["Join as a Provider", "How It Works", "Pricing", "Help Centre", "Contact Us"].map((link) => (
+                <li key={link}>
+                  <Link to="/signup" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">{link}</Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      </section>
-
-      {/* Final CTA — Red bg */}
-      <section className="relative py-24 md:py-32 overflow-hidden bg-background">
-        <div className="container relative z-10 text-center flex flex-col items-center">
-          <p className="eyebrow mb-4">Get Started Today</p>
-          <h3 className="font-display text-3xl font-bold text-foreground sm:text-4xl md:text-5xl lg:text-6xl leading-[0.95] max-w-2xl">
-            Beautiful Homes Need Skilled Hands.
-          </h3>
-          <p className="mt-5 max-w-md mx-auto text-base text-foreground/52 leading-relaxed">
-            Post your first job free. Find trusted tradespeople without the guesswork.
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-[11px] text-white/[0.28]">
+            © {new Date().getFullYear()} BOOKaTRADE Ltd. All rights reserved.
           </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center sm:items-center">
-            <Button size="lg" asChild className="text-sm font-bold h-12 px-10 uppercase tracking-[0.14em] shadow-xl hover:shadow-2xl transition-all hover:scale-105">
-              <Link to="/signup" className="flex items-center justify-center gap-2">
-                <span>See How It Works</span>
-                <ArrowRight className="h-5 w-5 flex-shrink-0" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild className="text-sm font-bold border border-foreground/14 text-foreground hover:bg-foreground/5 h-12 px-10 uppercase tracking-[0.14em] transition-all duration-300 hover:scale-105">
-              <Link to="/login">Sign In</Link>
-            </Button>
-          </div>
-          <p className="mt-4 text-[11px] text-foreground/30 tracking-wide">Free to post. No commitment. No spam.</p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-foreground text-primary-foreground py-16 md:py-20">
-        <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 pb-12 border-b border-primary-foreground/9 mb-10">
-            {/* Brand */}
-            <div>
-              <Link to="/" className="flex items-center gap-2 mb-4">
-                <img src={logo} alt="BookATrade logo" className="h-10 w-10 object-contain" />
-                <span className="font-display text-lg font-extrabold text-primary-foreground">
-                  BOOK<span className="text-primary">a</span>TRADE
-                </span>
-              </Link>
-              <p className="text-sm text-primary-foreground/42 leading-relaxed max-w-[250px]">
-                Connecting homes with trusted tradespeople across the UK. Find the right trade, first time.
-              </p>
-            </div>
-            {/* Find a Trade */}
-            <div>
-              <h4 className="text-[10px] tracking-[0.16em] uppercase text-primary-foreground/35 font-semibold mb-5">Find a Trade</h4>
-              <ul className="space-y-2.5">
-                {["Joiners", "Kitchen Fitters", "Electricians", "Painters", "Plumbers", "Roofers", "Landscapers", "Tilers"].map((trade) => (
-                  <li key={trade}>
-                    <Link to="/signup" className="text-sm text-primary-foreground/58 hover:text-primary-foreground transition-colors">{trade}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {/* Platform */}
-            <div>
-              <h4 className="text-[10px] tracking-[0.16em] uppercase text-primary-foreground/35 font-semibold mb-5">Platform</h4>
-              <ul className="space-y-2.5">
-                {["How It Works", "Post a Job", "Reviews", "Trust & Safety"].map((link) => (
-                  <li key={link}>
-                    <Link to="/signup" className="text-sm text-primary-foreground/58 hover:text-primary-foreground transition-colors">{link}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {/* For Trades */}
-            <div>
-              <h4 className="text-[10px] tracking-[0.16em] uppercase text-primary-foreground/35 font-semibold mb-5">For Trades</h4>
-              <ul className="space-y-2.5">
-                {["Join as a Provider", "How It Works", "Help Centre", "Contact Us"].map((link) => (
-                  <li key={link}>
-                    <Link to="/signup" className="text-sm text-primary-foreground/58 hover:text-primary-foreground transition-colors">{link}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-[11px] text-primary-foreground/28">
-              © {new Date().getFullYear()} BOOKaTRADE Ltd. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6 text-[11px] text-primary-foreground/28">
-              <Link to="/legal?audience=customer" className="hover:text-primary-foreground/65 transition-colors">Privacy Policy</Link>
-              <Link to="/legal?audience=customer" className="hover:text-primary-foreground/65 transition-colors">Terms of Use</Link>
-              <Link to="/login" className="hover:text-primary-foreground/65 transition-colors">Sign In</Link>
-            </div>
+          <div className="flex items-center gap-6 text-[11px] text-white/[0.28]">
+            <Link to="/legal?audience=customer" className="hover:text-white/65 transition-colors">Privacy Policy</Link>
+            <Link to="/legal?audience=customer" className="hover:text-white/65 transition-colors">Terms of Use</Link>
+            <Link to="/login" className="hover:text-white/65 transition-colors">Sign In</Link>
           </div>
         </div>
       </footer>
