@@ -287,16 +287,16 @@ const ProviderPortfolio = () => {
             <Label className="mb-2 block text-sm font-medium">Banner Image</Label>
             {bannerUrl ? (
               <div className="relative group">
-                <img src={bannerUrl} alt="Banner" className="w-full h-40 object-cover rounded-lg" />
+                <img src={bannerUrl} alt="Banner" className="w-full h-40 object-cover" />
                 <button type="button" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner}
-                  className="absolute bottom-2 right-2 flex h-8 items-center gap-1.5 px-3 rounded-md bg-background/80 text-foreground text-xs hover:bg-background border">
+                  className="absolute bottom-2 right-2 flex h-8 items-center gap-1.5 px-3 bg-background/80 text-foreground text-xs hover:bg-background border">
                   {uploadingBanner ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
                   Change
                 </button>
               </div>
             ) : (
               <button type="button" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner}
-                className="w-full h-32 rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/40 transition-colors">
+                className="w-full h-32 border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/40 transition-colors">
                 {uploadingBanner ? <Loader2 className="h-6 w-6 animate-spin" /> : <Upload className="h-6 w-6" />}
                 <span className="text-sm">Upload banner (max 5MB)</span>
                 <span className="text-xs">Recommended: 1200 × 400px</span>
@@ -413,11 +413,11 @@ const ProviderPortfolio = () => {
                     <img
                       src={img.file_url}
                       alt={img.caption || img.file_name}
-                      className="rounded-md w-full h-28 object-cover"
+                      className="w-full h-28 object-cover"
                     />
                     <button
                       onClick={() => deleteImage(img.id)}
-                      className="absolute top-1 right-1 hidden group-hover:flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-destructive-foreground"
+                      className="absolute top-1 right-1 hidden group-hover:flex h-6 w-6 items-center justify-center bg-destructive text-destructive-foreground"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>

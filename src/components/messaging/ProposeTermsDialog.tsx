@@ -135,7 +135,7 @@ const ProposeTermsDialog = ({ open, onClose, onSubmit, defaults, lockPrice }: Pr
             </div>
           )}
 
-          <div className="flex items-start gap-2 rounded-lg border border-border p-3">
+          <div className="flex items-start gap-2 border border-border p-3">
             <Checkbox
               id="accept-terms"
               checked={termsAccepted}

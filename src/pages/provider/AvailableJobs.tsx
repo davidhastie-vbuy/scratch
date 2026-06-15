@@ -146,7 +146,7 @@ const AvailableJobs = () => {
                 return (
                   <button
                     key={m.id}
-                    className="relative shrink-0 w-20 h-16 rounded-md overflow-hidden border bg-muted hover:ring-2 hover:ring-primary transition-all"
+                    className="relative shrink-0 w-20 h-16 overflow-hidden border bg-muted hover:ring-2 hover:ring-primary transition-all"
                     onClick={(e) => {
                       e.stopPropagation();
                       setLightbox({ jobId: job.id, index: i });
@@ -155,7 +155,7 @@ const AvailableJobs = () => {
                     {m.file_type.startsWith("video") ? (
                       <div className="flex items-center justify-center h-full bg-muted">
                         <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                        <span className="absolute bottom-0.5 right-0.5 text-[9px] bg-black/60 text-white px-1 rounded">▶</span>
+                        <span className="absolute bottom-0.5 right-0.5 text-[9px] bg-black/60 text-white px-1">▶</span>
                       </div>
                     ) : (
                       <img src={url} alt={m.file_name} className="w-full h-full object-cover" />

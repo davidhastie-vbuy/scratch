@@ -221,7 +221,7 @@ const ProviderJobDetail = () => {
           if (custProfile?.email) {
             const catLabel = job.category ? job.category.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()) : "N/A";
             const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#ffffff;">
-              <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #1a1a2e;"><h1 style="margin:0;font-size:22px;color:#1a1a2e;">BookATrade</h1></div>
+              <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #252525;"><h1 style="margin:0;font-size:22px;color:#252525;">BOOKaTRADE</h1></div>
               <div style="padding:24px 0;">
                 <p style="font-size:15px;color:#333;">Hi ${custProfile.first_name || "there"},</p>
                 <p style="font-size:15px;color:#333;">${provProfile?.business_name || "The provider"} has requested to cancel a job. Your confirmation is required before the job can be cancelled.</p>
@@ -233,13 +233,13 @@ const ProviderJobDetail = () => {
                 </div>
                 <p style="font-size:14px;color:#555;">Please log in to review the request and accept or decline the cancellation.</p>
                 <div style="text-align:center;padding:16px 0;">
-                  <a href="${getSiteUrl()}/dashboard/jobs/${jobId}" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">Review Request</a>
+                  <a href="${getSiteUrl()}/dashboard/jobs/${jobId}" style="display:inline-block;background-color:#252525;color:#F7F4EF;text-decoration:none;padding:12px 28px;border-radius:0;font-size:15px;font-weight:bold;">Review Request</a>
                 </div>
               </div>
-              <div style="text-align:center;padding-top:16px;border-top:1px solid #eee;"><p style="font-size:12px;color:#aaa;margin:0;">&copy; BookATrade. All rights reserved.</p></div>
+              <div style="text-align:center;padding-top:16px;border-top:1px solid #eee;"><p style="font-size:12px;color:#aaa;margin:0;">&copy; BOOKaTRADE. All rights reserved.</p></div>
             </div>`;
             await supabase.functions.invoke("send-provider-email", {
-              body: { to: custProfile.email, subject: `BookATrade: Cancellation requested for "${job.title}"`, html },
+              body: { to: custProfile.email, subject: `BOOKaTRADE: Cancellation requested for "${job.title}"`, html },
             });
           }
         } catch (e) { console.error("Failed to send cancellation notification:", e); }
@@ -282,7 +282,7 @@ const ProviderJobDetail = () => {
               <div className="flex justify-between"><span className="text-muted-foreground">Category</span><span>{catName}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span>{job.full_postcode ?? job.postcode_district}</span></div>
             </div>
-            <div className="rounded-lg border border-muted bg-muted/30 p-4 text-sm space-y-2">
+            <div className="-lg border border-muted bg-muted/30 p-4 text-sm space-y-2">
               <p className="font-medium">This job has been awarded to another provider</p>
               <p className="text-muted-foreground">Unfortunately, your quote was not selected for this job. The customer chose a different provider.</p>
               <p className="text-muted-foreground">Don't be discouraged — keep quoting on jobs that match your skills and area.</p>
@@ -313,7 +313,7 @@ const ProviderJobDetail = () => {
         return (
           <>
             {urgentActions.length > 0 && (
-              <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+              <div className="flex items-start gap-3 border border-destructive/30 bg-destructive/5 p-4">
                 <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-sm text-destructive">Action Required</p>
@@ -324,7 +324,7 @@ const ProviderJobDetail = () => {
               </div>
             )}
             {infoActions.length > 0 && (
-              <div className="flex items-start gap-3 rounded-lg border border-amber-300/30 bg-amber-50 dark:bg-amber-950/20 p-4">
+              <div className="flex items-start gap-3 border border-amber-300/30 bg-amber-50 dark:bg-amber-950/20 p-4">
                 <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-sm text-amber-700 dark:text-amber-400">Attention Needed</p>
@@ -365,7 +365,7 @@ const ProviderJobDetail = () => {
             {(job as any).access_notes && ["accepted", "in_progress", "completed"].includes(job.status) && (
               <div className="flex flex-col gap-1">
                 <span className="text-muted-foreground">Access notes</span>
-                <span className="whitespace-pre-wrap rounded-md bg-muted/50 p-2 text-sm">{(job as any).access_notes}</span>
+                <span className="whitespace-pre-wrap bg-muted/50 p-2 text-sm">{(job as any).access_notes}</span>
               </div>
             )}
             <div className="flex justify-between"><span className="text-muted-foreground">Timeline</span><span>{job.timeline || "—"}</span></div>
@@ -412,11 +412,11 @@ const ProviderJobDetail = () => {
                 const url = mediaUrls[m.file_url];
                 if (!url) return null;
                 return m.file_type.startsWith("image") ? (
-                  <button key={m.id} onClick={() => setLightboxIndex(i)} className="rounded-md overflow-hidden hover:ring-2 hover:ring-primary transition-all">
+                  <button key={m.id} onClick={() => setLightboxIndex(i)} className="-md overflow-hidden hover:ring-2 hover:ring-primary transition-all">
                     <img src={url} alt={m.file_name} className="w-full h-24 object-cover" />
                   </button>
                 ) : (
-                  <button key={m.id} onClick={() => setLightboxIndex(i)} className="relative rounded-md overflow-hidden hover:ring-2 hover:ring-primary transition-all bg-muted h-24 flex items-center justify-center">
+                  <button key={m.id} onClick={() => setLightboxIndex(i)} className="relative overflow-hidden hover:ring-2 hover:ring-primary transition-all bg-muted h-24 flex items-center justify-center">
                     <video src={url} className="w-full h-24 object-cover" />
                     <span className="absolute bottom-1 right-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded">▶ Video</span>
                   </button>

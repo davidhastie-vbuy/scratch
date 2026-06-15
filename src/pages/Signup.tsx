@@ -143,7 +143,7 @@ const Signup = () => {
       <div className="flex-1 flex items-center justify-center bg-background px-4 py-8 overflow-auto">
         <div className="w-full max-w-md animate-fade-in">
           <div className="mb-8 text-center lg:hidden">
-            <img src={logo} alt="BookATrade logo" className="mx-auto h-16 w-16 mb-3" />
+            <img src={logo} alt="BOOKaTRADE" className="mx-auto h-16 w-16 mb-3" />
             <h1 className="font-display text-3xl font-extrabold text-foreground">
               BOOK<span className="text-primary">a</span>TRADE
             </h1>
@@ -157,7 +157,7 @@ const Signup = () => {
           <Card className="shadow-lg border-0 ring-1 ring-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-display">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <div className="flex h-8 w-8 items-center justify-center bg-primary/10">
                   <UserPlus className="h-4 w-4 text-primary" />
                 </div>
                 Get started
@@ -174,7 +174,7 @@ const Signup = () => {
                       <RadioGroupItem value="customer" id="customer" className="peer sr-only" />
                       <Label
                         htmlFor="customer"
-                        className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-muted p-4 transition-all duration-200 hover:bg-accent hover:border-primary/30 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:shadow-md"
+                        className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-accent hover:border-primary/30 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:shadow-md"
                       >
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent">
                           <Home className="h-5 w-5 text-primary" />
@@ -187,7 +187,7 @@ const Signup = () => {
                       <RadioGroupItem value="provider" id="provider" className="peer sr-only" />
                       <Label
                         htmlFor="provider"
-                        className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-muted p-4 transition-all duration-200 hover:bg-accent hover:border-primary/30 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:shadow-md"
+                        className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-accent hover:border-primary/30 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:shadow-md"
                       >
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent">
                           <Wrench className="h-5 w-5 text-primary" />
@@ -241,7 +241,7 @@ const Signup = () => {
                 </div>
 
                 {/* Optional recommendation */}
-                <div className="space-y-2 rounded-xl border border-dashed border-primary/20 bg-accent/30 p-4">
+                <div className="space-y-2 border border-dashed border-primary/20 bg-accent/30 p-4">
                   <Label htmlFor="recommendation" className="text-sm leading-relaxed font-normal text-muted-foreground">
                     If you would like to recommend a tradesperson you have hired in the past, please tell us about your experience and the work they completed for you. You can also attach photos. <span className="italic">(Optional)</span>
                   </Label>
@@ -259,7 +259,7 @@ const Signup = () => {
                         <img
                           src={URL.createObjectURL(photo)}
                           alt={`Photo ${i + 1}`}
-                          className="h-16 w-16 rounded-lg object-cover border"
+                          className="h-16 w-16 object-cover border"
                         />
                         <button
                           type="button"
@@ -274,7 +274,7 @@ const Signup = () => {
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-primary/30 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                        className="flex h-16 w-16 items-center justify-center border-2 border-dashed border-primary/30 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                       >
                         <Camera className="h-5 w-5" />
                       </button>

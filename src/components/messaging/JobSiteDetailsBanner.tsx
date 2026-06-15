@@ -23,7 +23,7 @@ const JobSiteDetailsBanner = ({
 
   if (variant === "customer") {
     return (
-      <div className="mx-3 my-2 flex items-center gap-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">
+      <div className="mx-3 my-2 flex items-center gap-2 border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">
         <MapPin className="h-3.5 w-3.5 shrink-0" />
         <span>Your job address has been shared with the provider</span>
       </div>
@@ -31,7 +31,7 @@ const JobSiteDetailsBanner = ({
   }
 
   return (
-    <div className="mx-3 my-2 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 px-3 py-2.5 space-y-1.5">
+    <div className="mx-3 my-2 border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 px-3 py-2.5 space-y-1.5">
       {jobAddress && (
         <div className="flex items-start gap-2 text-sm text-blue-900 dark:text-blue-100">
           <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-500 dark:text-blue-400" />

@@ -84,7 +84,7 @@ const StepReviewSubmit = ({ form, tradeCategories, agreements, onAgreementsChang
       </Section>
 
       {/* Agreement checkboxes */}
-      <div className="space-y-3 rounded-lg border border-border p-4">
+      <div className="space-y-3 border border-border p-4">
         <h3 className="text-sm font-semibold text-foreground">Agreements</h3>
 
         <div className="flex items-start gap-2">

@@ -60,7 +60,7 @@ const QuoteBanner = ({ jobId, providerUserId, showProviderLink = true }: QuoteBa
         {showProviderLink && quote.businessName && quote.providerUserId && (
           <button
             onClick={() => navigate(`/dashboard/providers/${quote.providerUserId}`)}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-xs font-semibold"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-xs font-semibold"
           >
             <Building2 className="h-3.5 w-3.5" />
             View {quote.businessName}

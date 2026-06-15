@@ -335,7 +335,7 @@ const ProviderProfile = () => {
                 <AvatarFallback className="text-lg">{initials}</AvatarFallback>
               </Avatar>
               <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground hover:bg-primary/90">
+                className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center border-2 border-background bg-primary text-primary-foreground hover:bg-primary/90">
                 {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
               </button>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
@@ -403,7 +403,7 @@ const ProviderProfile = () => {
           </div>
 
           {profile.pending_trade_category && (
-            <div className="rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+            <div className="border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
               <div className="flex items-start gap-2">
                 <Clock className="mt-0.5 h-4 w-4 text-amber-600" />
                 <div>
@@ -451,7 +451,7 @@ const ProviderProfile = () => {
 
             {/* Pending additional */}
             {profile.pending_additional_categories && profile.pending_additional_categories.length > 0 && (
-              <div className="rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+              <div className="border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
                 <div className="flex items-start gap-2">
                   <Clock className="mt-0.5 h-4 w-4 text-amber-600" />
                   <div>
@@ -526,7 +526,7 @@ const ProviderProfile = () => {
 
           {/* Pending change banner */}
           {hasPendingAreas && (
-            <div className="rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
+            <div className="border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/30">
               <div className="flex items-start gap-2">
                 <Clock className="mt-0.5 h-4 w-4 text-amber-600" />
                 <div>
@@ -601,7 +601,7 @@ const ProviderProfile = () => {
           {documents.length > 0 ? (
             <div className="space-y-2">
               {documents.map(doc => (
-                <div key={doc.id} className="flex items-center gap-3 rounded-md border border-border bg-muted/30 px-3 py-2 text-sm">
+                <div key={doc.id} className="flex items-center gap-3 border border-border bg-muted/30 px-3 py-2 text-sm">
                   <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <span className="flex-1 truncate">{doc.file_name}</span>
                   <span className="shrink-0 text-xs text-muted-foreground">{formatFileSize(doc.file_size)}</span>

@@ -210,7 +210,7 @@ const SupportPage = () => {
           <p className="text-sm text-muted-foreground">{viewing?.description}</p>
           <div className="flex-1 overflow-y-auto space-y-3 py-2">
             {ticketMessages.map(m => (
-              <div key={m.id} className={`rounded-lg px-3 py-2 text-sm ${m.sender_user_id === user!.id ? "bg-primary/10 ml-8" : "bg-muted mr-8"}`}>
+              <div key={m.id} className={`-lg px-3 py-2 text-sm ${m.sender_user_id === user!.id ? "bg-primary/10 ml-8" : "bg-muted mr-8"}`}>
                 <p>{m.body}</p>
                 <p className="text-[10px] text-muted-foreground mt-1">
                   {m.sender_user_id === user!.id ? "You" : "Support"} · {new Date(m.created_at).toLocaleString()}

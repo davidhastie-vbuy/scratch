@@ -107,7 +107,7 @@ const AdminRecommendations = () => {
                     const url = getPhotoUrl(path);
                     if (!url) {
                       return (
-                        <div key={i} className="h-24 w-24 rounded-md border bg-muted flex items-center justify-center">
+                        <div key={i} className="h-24 w-24 border bg-muted flex items-center justify-center">
                           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                         </div>
                       );
@@ -117,7 +117,7 @@ const AdminRecommendations = () => {
                         <img
                           src={url}
                           alt={`Recommendation photo ${i + 1}`}
-                          className="h-24 w-24 rounded-md object-cover border hover:ring-2 hover:ring-primary transition-all"
+                          className="h-24 w-24 object-cover border hover:ring-2 hover:ring-primary transition-all"
                         />
                       </a>
                     );

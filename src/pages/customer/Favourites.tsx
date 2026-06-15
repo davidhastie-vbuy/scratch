@@ -77,7 +77,7 @@ const Favourites = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">My Favourites</h1>
+        <h1 className="font-display text-2xl font-bold">My Favourites</h1>
         <p className="text-sm text-muted-foreground mt-1">Providers you've worked with and saved for future jobs.</p>
       </div>
 

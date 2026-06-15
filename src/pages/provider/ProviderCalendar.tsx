@@ -95,13 +95,13 @@ const ProviderCalendar = () => {
                 const isToday = isSameDay(day, new Date());
                 const isCurrentMonth = isSameMonth(day, currentDate);
                 return (
-                  <div key={day.toISOString()} className={`min-h-[80px] border rounded-sm p-1 ${isCurrentMonth ? "bg-card" : "bg-muted/30"} ${isToday ? "ring-2 ring-primary" : ""}`}>
+                  <div key={day.toISOString()} className={`min-h-[80px] border p-1 ${isCurrentMonth ? "bg-card" : "bg-muted/30"} ${isToday ? "ring-2 ring-primary" : ""}`}>
                     <div className={`text-xs font-medium mb-1 ${isCurrentMonth ? "" : "text-muted-foreground"}`}>{format(day, "d")}</div>
                     <div className="space-y-0.5">
                       {dayJobs.slice(0, 3).map(j => (
                         <div
                           key={j.id}
-                          className={`text-[10px] rounded px-1 py-0.5 truncate cursor-pointer ${statusColor(j.status)}`}
+                          className={`text-[10px] px-1 py-0.5 truncate cursor-pointer ${statusColor(j.status)}`}
                           onClick={() => navigate(`/provider/jobs/${j.id}`)}
                         >
                           {j.title}

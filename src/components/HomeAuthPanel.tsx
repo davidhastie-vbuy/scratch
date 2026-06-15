@@ -273,7 +273,7 @@ const HomeAuthPanel = () => {
                         <img
                           src={URL.createObjectURL(photo)}
                           alt={`Photo ${i + 1}`}
-                          className="h-14 w-14 rounded-lg object-cover border"
+                          className="h-14 w-14 object-cover border"
                         />
                         <button
                           type="button"
@@ -288,7 +288,7 @@ const HomeAuthPanel = () => {
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex h-14 w-14 items-center justify-center rounded-lg border-2 border-dashed border-primary/30 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                        className="flex h-14 w-14 items-center justify-center border-2 border-dashed border-primary/30 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                       >
                         <Camera className="h-5 w-5" />
                       </button>

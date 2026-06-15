@@ -23,7 +23,7 @@ const AdminDashboard = () => {
         <div className="container flex h-14 sm:h-16 items-center justify-between px-3 sm:px-6">
           <div className="flex items-center gap-2 min-w-0">
             <Shield className="h-5 w-5 text-sidebar-primary shrink-0" />
-            <h1 className="font-display text-base sm:text-xl font-bold truncate">Book A Trade Admin</h1>
+            <h1 className="font-display text-base sm:text-xl font-bold truncate">BOOKaTRADE Admin</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <NotificationBell />

@@ -148,7 +148,7 @@ const AdminProviderSlots = () => {
                 : "No active provider slots to display."}
             </p>
           ) : (
-            <div className="border rounded-lg overflow-x-auto">
+            <div className="border overflow-x-auto">
               <table className="w-full text-sm min-w-[600px]">
                 <thead>
                   <tr className="border-b bg-muted/50">

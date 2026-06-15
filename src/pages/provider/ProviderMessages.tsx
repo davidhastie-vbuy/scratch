@@ -58,23 +58,23 @@ const sendProposalEmail = async (
     }
 
     const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#ffffff;">`
-      + `<div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #1a1a2e;">`
-      + `<h1 style="margin:0;font-size:22px;color:#1a1a2e;">BookATrade</h1>`
+      + `<div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #252525;">`
+      + `<h1 style="margin:0;font-size:22px;color:#252525;">BOOKaTRADE</h1>`
       + `</div>`
       + `<div style="padding:24px 0;">`
       + `<p style="font-size:15px;color:#333;">Hi ${firstName},</p>`
       + actionHtml
       + `<div style="text-align:center;padding:16px 0;">`
-      + `<a href="${siteUrl}" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">Log in to BookATrade</a>`
+      + `<a href="${siteUrl}" style="display:inline-block;background-color:#252525;color:#F7F4EF;text-decoration:none;padding:12px 28px;border-radius:0;font-size:15px;font-weight:bold;">Log in to BOOKaTRADE</a>`
       + `</div>`
       + `</div>`
       + `<div style="text-align:center;padding-top:16px;border-top:1px solid #eee;">`
-      + `<p style="font-size:12px;color:#aaa;margin:0;">&copy; BookATrade. All rights reserved.</p>`
+      + `<p style="font-size:12px;color:#aaa;margin:0;">&copy; BOOKaTRADE. All rights reserved.</p>`
       + `</div>`
       + `</div>`;
 
     await supabase.functions.invoke("send-provider-email", {
-      body: { to: customerProfile.email, subject: `BookATrade: ${subjectLine}`, html },
+      body: { to: customerProfile.email, subject: `BOOKaTRADE: ${subjectLine}`, html },
     });
   } catch (err) {
     console.error("Failed to send proposal action email:", err);
@@ -434,7 +434,7 @@ const ProviderMessages = () => {
   return (
     <div className="flex gap-4 h-[calc(100vh-12rem)] overflow-hidden">
       <div className={cn(
-        "w-full md:w-72 shrink-0 border rounded-lg overflow-y-auto",
+        "w-full md:w-72 shrink-0 border overflow-y-auto",
         selected ? "hidden md:block" : "block"
       )}>
         <div className="p-3 border-b"><h3 className="font-semibold text-sm">Conversations</h3></div>
@@ -475,7 +475,7 @@ const ProviderMessages = () => {
       </div>
 
       <div className={cn(
-        "flex-1 flex flex-col border rounded-lg min-w-0",
+        "flex-1 flex flex-col border min-w-0",
         selected ? "flex" : "hidden md:flex"
       )}>
         {!selected ? (
@@ -543,7 +543,7 @@ const ProviderMessages = () => {
                   const isPending = meta?.status === "pending";
                   return (
                     <div key={m.id} className="flex justify-center">
-                      <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm max-w-[85%] space-y-2">
+                      <div className="-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm max-w-[85%] space-y-2">
                         <p className="text-center font-medium text-destructive">🚫 Cancellation Request</p>
                         <p className="text-center text-muted-foreground text-xs">{m.body}</p>
                         {isPending && !isProviderInitiated && (
@@ -596,7 +596,7 @@ const ProviderMessages = () => {
                 if ((m as any).message_type === "admin" || ((m as any).message_type === "system" && typeof m.body === "string" && m.body.startsWith("⚖️"))) {
                   return (
                     <div key={m.id} className="flex justify-center">
-                      <div className="max-w-[80%] rounded-lg px-4 py-3 text-sm bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 break-words overflow-hidden">
+                      <div className="max-w-[80%] px-4 py-3 text-sm bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 break-words overflow-hidden">
                         <p className="font-semibold text-xs text-blue-600 dark:text-blue-400 mb-1">Admin – Dispute Update</p>
                         <p>{m.body.replace(/^⚖️\s*Admin\s*\(Dispute\):\s*/, "")}</p>
                         <p className="text-[10px] mt-1 text-blue-500 dark:text-blue-400">
@@ -609,7 +609,7 @@ const ProviderMessages = () => {
                 if ((m as any).message_type === "system") {
                   return (
                     <div key={m.id} className="flex justify-center">
-                      <div className="bg-muted/50 rounded-lg px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
+                      <div className="bg-muted/50 px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
                         {m.body}
                       </div>
                     </div>
@@ -617,7 +617,7 @@ const ProviderMessages = () => {
                 }
                 return (
                   <div key={m.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[70%] rounded-lg px-3 py-2 text-sm break-words overflow-hidden ${isOwn ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                    <div className={`max-w-[70%] px-3 py-2 text-sm break-words overflow-hidden ${isOwn ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                       <p>{m.body}</p>
                       <MessageAttachments messageId={m.id} attachments={attachmentMap[m.id] || []} />
                       <p className={`text-[10px] mt-1 ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>

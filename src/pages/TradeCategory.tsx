@@ -349,7 +349,7 @@ const Header = () => (
       <Link to="/" className="flex items-center gap-2 group min-w-0 flex-shrink">
         <img
           src={logo}
-          alt="BookATrade logo"
+          alt="BOOKaTRADE"
           className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain transition-transform duration-300 group-hover:rotate-6"
         />
         <span className="font-display text-base sm:text-xl font-extrabold text-foreground whitespace-nowrap tracking-tight">
@@ -391,7 +391,7 @@ const Footer = () => (
         {/* Brand */}
         <div>
           <Link to="/" className="flex items-center gap-2 mb-4">
-            <img src={logo} alt="BookATrade logo" className="h-10 w-10 object-contain" />
+            <img src={logo} alt="BOOKaTRADE" className="h-10 w-10 object-contain" />
             <span className="font-display text-lg font-extrabold text-primary-foreground">
               BOOK<span className="text-primary">a</span>TRADE
             </span>

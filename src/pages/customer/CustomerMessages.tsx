@@ -61,7 +61,7 @@ const sendProviderActionEmail = async (
     let headingColor = "";
 
     if (action === "accepted") {
-      subject = `BookATrade: ${customerName} accepted your proposal for "${jobTitle}"`;
+      subject = `BOOKaTRADE: ${customerName} accepted your proposal for "${jobTitle}"`;
       heading = "🎉 Proposal Accepted!";
       body = `<strong>${customerName}</strong> has accepted your proposed terms for "<strong>${jobTitle}</strong>". Please log in to set up the milestones and payment schedule so the job can get started.`;
       ctaLabel = "Set Up Milestones";
@@ -69,7 +69,7 @@ const sendProviderActionEmail = async (
       borderColor = "#22863a";
       headingColor = "#22863a";
     } else if (action === "declined") {
-      subject = `BookATrade: Your proposal for "${jobTitle}" was declined`;
+      subject = `BOOKaTRADE: Your proposal for "${jobTitle}" was declined`;
       heading = "Proposal Declined";
       body = `<strong>${customerName}</strong> has declined your proposed terms for "<strong>${jobTitle}</strong>". Log in to message them and discuss the job further.`;
       ctaLabel = "Message Customer";
@@ -77,7 +77,7 @@ const sendProviderActionEmail = async (
       borderColor = "#d29922";
       headingColor = "#d29922";
     } else {
-      subject = `BookATrade: ${customerName} sent a counter-offer on "${jobTitle}"`;
+      subject = `BOOKaTRADE: ${customerName} sent a counter-offer on "${jobTitle}"`;
       heading = "New Counter-Offer Received";
       body = `<strong>${customerName}</strong> has sent a counter-offer on "<strong>${jobTitle}</strong>". Log in to review the updated terms and continue the discussion.`;
       ctaLabel = "Review Counter-Offer";
@@ -87,21 +87,21 @@ const sendProviderActionEmail = async (
     }
 
     const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#ffffff;">
-      <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #1a1a2e;">
-        <h1 style="margin:0;font-size:22px;color:#1a1a2e;">BookATrade</h1>
+      <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #252525;">
+        <h1 style="margin:0;font-size:22px;color:#252525;">BOOKaTRADE</h1>
       </div>
       <div style="padding:24px 0;">
         <p style="font-size:15px;color:#333;">Hi ${providerFirst},</p>
-        <div style="background:#f4f4f8;border-left:4px solid ${borderColor};padding:16px;margin:16px 0;border-radius:4px;">
+        <div style="background:#f4f4f8;border-left:4px solid ${borderColor};padding:16px;margin:16px 0;border-radius:0;">
           <p style="margin:0 0 8px;font-weight:bold;font-size:16px;color:${headingColor};">${heading}</p>
           <p style="margin:0;font-size:14px;color:#555;">${body}</p>
         </div>
         <div style="text-align:center;padding:16px 0;">
-          <a href="${ctaLink}" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">${ctaLabel}</a>
+          <a href="${ctaLink}" style="display:inline-block;background-color:#252525;color:#F7F4EF;text-decoration:none;padding:12px 28px;border-radius:0;font-size:15px;font-weight:bold;">${ctaLabel}</a>
         </div>
       </div>
       <div style="text-align:center;padding-top:16px;border-top:1px solid #eee;">
-        <p style="font-size:12px;color:#aaa;margin:0;">&copy; BookATrade. All rights reserved.</p>
+        <p style="font-size:12px;color:#aaa;margin:0;">&copy; BOOKaTRADE. All rights reserved.</p>
       </div>
     </div>`;
 
@@ -520,7 +520,7 @@ const CustomerMessages = () => {
     <div className="flex gap-4 h-[calc(100vh-12rem)] overflow-hidden">
       {/* Conversation list - hidden on mobile when a chat is selected */}
       <div className={cn(
-        "w-full md:w-72 shrink-0 border rounded-lg overflow-y-auto",
+        "w-full md:w-72 shrink-0 border overflow-y-auto",
         selected ? "hidden md:block" : "block"
       )}>
         <div className="p-3 border-b"><h3 className="font-semibold text-sm">Conversations</h3></div>
@@ -562,7 +562,7 @@ const CustomerMessages = () => {
 
       {/* Chat area - full width on mobile when selected */}
       <div className={cn(
-        "flex-1 flex flex-col border rounded-lg min-w-0",
+        "flex-1 flex flex-col border min-w-0",
         selected ? "flex" : "hidden md:flex"
       )}>
         {!selected ? (
@@ -618,7 +618,7 @@ const CustomerMessages = () => {
                   const isPending = meta?.status === "pending";
                   return (
                     <div key={m.id} className="flex justify-center">
-                      <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm max-w-[85%] space-y-2">
+                      <div className="border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm max-w-[85%] space-y-2">
                         <p className="text-center font-medium text-destructive">🚫 Cancellation Request</p>
                         <p className="text-center text-muted-foreground text-xs">{m.body}</p>
                         {isPending && isProviderInitiated && (
@@ -672,7 +672,7 @@ const CustomerMessages = () => {
                 if ((m as any).message_type === "admin" || ((m as any).message_type === "system" && typeof m.body === "string" && m.body.startsWith("⚖️"))) {
                   return (
                     <div key={m.id} className="flex justify-center">
-                      <div className="max-w-[80%] rounded-lg px-4 py-3 text-sm bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 break-words overflow-hidden">
+                      <div className="max-w-[80%] px-4 py-3 text-sm bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 break-words overflow-hidden">
                         <p className="font-semibold text-xs text-blue-600 dark:text-blue-400 mb-1">Admin – Dispute Update</p>
                         <p>{m.body.replace(/^⚖️\s*Admin\s*\(Dispute\):\s*/, "")}</p>
                         <p className="text-[10px] mt-1 text-blue-500 dark:text-blue-400">
@@ -685,7 +685,7 @@ const CustomerMessages = () => {
                 if ((m as any).message_type === "system") {
                   return (
                     <div key={m.id} className="flex justify-center">
-                      <div className="bg-muted/50 rounded-lg px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
+                      <div className="bg-muted/50 px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
                         {transformAcceptedMessageForCustomer(m.body)}
                       </div>
                     </div>
@@ -694,7 +694,7 @@ const CustomerMessages = () => {
 
                 return (
                   <div key={m.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[70%] rounded-lg px-3 py-2 text-sm break-words overflow-hidden ${isOwn ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                    <div className={`max-w-[70%] px-3 py-2 text-sm break-words overflow-hidden ${isOwn ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                       <p>{m.body}</p>
                       <MessageAttachments messageId={m.id} attachments={attachmentMap[m.id] || []} />
                       <p className={`text-[10px] mt-1 ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>

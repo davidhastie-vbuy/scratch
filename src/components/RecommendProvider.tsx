@@ -93,7 +93,7 @@ const RecommendProvider = () => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="space-y-2 rounded-xl border border-dashed border-primary/20 bg-accent/30 p-4">
+          <div className="space-y-2 border border-dashed border-primary/20 bg-accent/30 p-4">
             <Label htmlFor="recommendation" className="text-sm leading-relaxed font-normal text-muted-foreground">
               If you would like to recommend a tradesperson you have hired in the past, please tell us about your experience and the work they completed for you. You can also attach photos. <span className="italic">(Optional)</span>
             </Label>
@@ -111,7 +111,7 @@ const RecommendProvider = () => {
                   <img
                     src={URL.createObjectURL(photo)}
                     alt={`Photo ${i + 1}`}
-                    className="h-16 w-16 rounded-lg object-cover border"
+                    className="h-16 w-16 object-cover border"
                   />
                   <button
                     type="button"
@@ -126,7 +126,7 @@ const RecommendProvider = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-primary/30 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                  className="flex h-16 w-16 items-center justify-center border-2 border-dashed border-primary/30 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                 >
                   <Camera className="h-5 w-5" />
                 </button>

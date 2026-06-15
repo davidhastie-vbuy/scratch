@@ -710,7 +710,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh, refreshKey }: WorkTrackerPro
               {disputeFiles.length > 0 && (
                 <div className="flex gap-2 mt-2 overflow-x-auto">
                   {disputeFiles.map((f, i) => (
-                    <div key={i} className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+                    <div key={i} className="relative shrink-0 w-16 h-16 overflow-hidden border bg-muted">
                       {f.isVideo ? (
                         <div className="flex items-center justify-center h-full"><Film className="h-6 w-6 text-muted-foreground" /></div>
                       ) : (
@@ -765,7 +765,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh, refreshKey }: WorkTrackerPro
                   {escalateFiles.length > 0 && (
                     <div className="flex gap-2 mt-2 overflow-x-auto">
                       {escalateFiles.map((f, i) => (
-                        <div key={i} className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+                        <div key={i} className="relative shrink-0 w-16 h-16 overflow-hidden border bg-muted">
                           {f.isVideo ? (
                             <div className="flex items-center justify-center h-full"><Film className="h-6 w-6 text-muted-foreground" /></div>
                           ) : (
@@ -824,7 +824,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh, refreshKey }: WorkTrackerPro
                   {escalateFiles.length > 0 && (
                     <div className="flex gap-2 mt-2 overflow-x-auto">
                       {escalateFiles.map((f, i) => (
-                        <div key={i} className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+                        <div key={i} className="relative shrink-0 w-16 h-16 overflow-hidden border bg-muted">
                           {f.isVideo ? (
                             <div className="flex items-center justify-center h-full"><Film className="h-6 w-6 text-muted-foreground" /></div>
                           ) : (
@@ -1077,7 +1077,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh, refreshKey }: WorkTrackerPro
                               <p className="text-sm font-medium">Payment required for this milestone</p>
                               <p className="text-xs text-muted-foreground">Pay before this stage of work begins. Funds are held securely and released when you accept the milestone.</p>
                               {isFirstPayment && (
-                                <div className="flex items-start gap-2 rounded-lg border border-border p-3">
+                                <div className="flex items-start gap-2 border border-border p-3">
                                   <Checkbox
                                     id={`wt-accept-terms-${m.id}`}
                                     checked={termsAccepted}

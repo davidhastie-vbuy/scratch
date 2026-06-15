@@ -79,7 +79,7 @@ const Login = () => {
       <div className="flex-1 flex items-center justify-center bg-background px-4 py-8">
         <div className="w-full max-w-md animate-fade-in">
           <div className="mb-8 text-center lg:hidden">
-            <img src={logo} alt="BookATrade logo" className="mx-auto h-16 w-16 mb-3" />
+            <img src={logo} alt="BOOKaTRADE" className="mx-auto h-16 w-16 mb-3" />
             <h1 className="font-display text-3xl font-extrabold text-foreground">
               BOOK<span className="text-primary">a</span>TRADE
             </h1>
@@ -91,7 +91,7 @@ const Login = () => {
           </div>
 
           {emailConfirmed && (
-            <div className="mb-6 rounded-lg border border-primary/30 bg-primary/5 p-5 text-center animate-scale-in">
+            <div className="mb-6 border border-primary/30 bg-primary/5 p-5 text-center animate-scale-in">
               <div className="mb-2 text-3xl">✅</div>
               <h2 className="text-lg font-semibold text-foreground">Email confirmed — thank you!</h2>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ const Login = () => {
           <Card className="shadow-lg border-0 ring-1 ring-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-display">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <div className="flex h-8 w-8 items-center justify-center bg-primary/10">
                   <LogIn className="h-4 w-4 text-primary" />
                 </div>
                 Welcome back

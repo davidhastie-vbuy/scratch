@@ -325,7 +325,7 @@ const PostJob = () => {
                 <Label>Additional notes (optional)</Label>
                 <Textarea value={form.additionalNotes} onChange={(e) => setForm(f => ({ ...f, additionalNotes: e.target.value }))} maxLength={1000} rows={4} placeholder="Any access details, parking info, pet considerations…" />
               </div>
-              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+              <div className="-lg border border-border bg-muted/30 p-4 space-y-2">
                 <h4 className="font-semibold text-sm">Review your details</h4>
                 <div className="text-sm space-y-1 text-muted-foreground">
                   <p><strong>Title:</strong> {form.title}</p>
@@ -347,7 +347,7 @@ const PostJob = () => {
               <div className="space-y-2">
                 <Label>Upload photos/videos <span className="text-muted-foreground text-xs">(PNG, JPG, MP4 — max 10MB each, up to 10 files)</span></Label>
                 <div
-                  className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                  className="border-2 border-dashed p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
                   onClick={() => document.getElementById("file-input")?.click()}
                 >
                   <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
@@ -359,7 +359,7 @@ const PostJob = () => {
                 <div className="space-y-2">
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                     {files.map((f, i) => (
-                      <div key={i} className="relative group rounded-lg border overflow-hidden bg-muted/30 aspect-square">
+                      <div key={i} className="relative group border overflow-hidden bg-muted/30 aspect-square">
                         {f.type.startsWith("video") ? (
                           <video
                             src={URL.createObjectURL(f)}

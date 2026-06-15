@@ -64,7 +64,7 @@ export const StagedFilePreview = ({ stagedFiles, setStagedFiles }: { stagedFiles
   return (
     <div className="flex gap-2 px-3 pt-2 overflow-x-auto">
       {stagedFiles.map((f, i) => (
-        <div key={i} className="relative shrink-0 w-16 h-16 rounded-md overflow-hidden border bg-muted">
+        <div key={i} className="relative shrink-0 w-16 h-16 overflow-hidden border bg-muted">
           {f.isVideo ? (
             <div className="flex items-center justify-center h-full"><Film className="h-6 w-6 text-muted-foreground" /></div>
           ) : (

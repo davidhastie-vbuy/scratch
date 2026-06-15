@@ -374,7 +374,7 @@ const ProviderPublicPage = () => {
                         key={img.id}
                         src={img.file_url}
                         alt={img.caption || img.file_name}
-                        className="rounded-md w-full h-28 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                        className="-md w-full h-28 object-cover cursor-pointer hover:opacity-90 transition-opacity"
                         onClick={() => setLightboxImg(img.file_url)}
                       />
                     ))}
@@ -407,7 +407,7 @@ const ProviderPublicPage = () => {
       {/* Lightbox */}
       <Dialog open={!!lightboxImg} onOpenChange={() => setLightboxImg(null)}>
         <DialogContent className="max-w-3xl p-2">
-          {lightboxImg && <img src={lightboxImg} alt="Project" className="w-full rounded-md" />}
+          {lightboxImg && <img src={lightboxImg} alt="Project" className="w-full" />}
         </DialogContent>
       </Dialog>
 

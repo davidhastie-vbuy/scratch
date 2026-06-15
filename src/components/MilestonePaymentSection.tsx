@@ -90,7 +90,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
       </p>
 
       {isFirstPayment && (
-        <div className="flex items-start gap-2 rounded-lg border border-border p-3">
+        <div className="flex items-start gap-2 border border-border p-3">
           <Checkbox
             id="accept-payment-terms"
             checked={termsAccepted}
@@ -114,7 +114,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
           const isNext = nextUnpaid?.id === m.id;
 
           return (
-            <div key={m.id} className="flex items-center justify-between rounded-lg border p-3 text-sm">
+            <div key={m.id} className="flex items-center justify-between border p-3 text-sm">
               <div className="flex items-center gap-2">
                 {paid ? (
                   <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />

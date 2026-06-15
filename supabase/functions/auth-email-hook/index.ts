@@ -36,163 +36,124 @@ function getUserName(user: AuthEmailPayload["user"]): string {
   return user.user_metadata?.full_name || user.user_metadata?.first_name || "";
 }
 
-function generateSignupEmail(name: string, confirmUrl: string): { subject: string; html: string } {
-  const greeting = name ? `Hi ${name},` : "Hi,";
-  return {
-    subject: "BookATrade — Please confirm your email address",
-    html: `
-<!DOCTYPE html>
+/* ══════════════════════════════════════════════════════════
+   BOOKaTRADE Email Shell
+   Design system: Charcoal #252525, Red #B00010, Parchment #F7F4EF
+   Square edges (no border-radius), Helvetica Neue / Arial
+══════════════════════════════════════════════════════════ */
+function emailShell(content: string): string {
+  return `<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="background-color:#ffffff;font-family:'Manrope',Arial,sans-serif;margin:0;padding:0;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
-    <tr><td align="center" style="padding:40px 20px;">
+<body style="background-color:#F7F4EF;font-family:'Helvetica Neue',Arial,sans-serif;margin:0;padding:0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F7F4EF;">
+    <tr><td align="center" style="padding:48px 20px 40px;">
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
-        <tr><td style="padding-bottom:30px;text-align:center;">
-          <span style="font-size:24px;font-weight:700;color:#1e293b;">Book<span style="color:#f97316;">A</span>Trade</span>
+        <!-- Header -->
+        <tr><td style="padding-bottom:36px;text-align:center;">
+          <span style="font-size:22px;font-weight:800;color:#252525;letter-spacing:-0.5px;">BOOK<span style="color:#B00010;">a</span>TRADE</span>
         </td></tr>
-        <tr><td style="padding-bottom:20px;">
-          <h1 style="font-size:22px;font-weight:bold;color:#1e293b;margin:0 0 20px;">${greeting}</h1>
-          <p style="font-size:15px;color:#55575d;line-height:1.6;margin:0 0 16px;">
-            Thanks for signing up to BookATrade! Please confirm your email address by clicking the button below.
+        <!-- Content card -->
+        <tr><td style="background-color:#ffffff;padding:40px 36px;">
+          ${content}
+        </td></tr>
+        <!-- Footer -->
+        <tr><td style="padding-top:28px;text-align:center;">
+          <p style="font-size:11px;color:#252525;opacity:0.35;margin:0;letter-spacing:0.08em;text-transform:uppercase;">
+            © ${new Date().getFullYear()} BOOKaTRADE Ltd. All rights reserved.
           </p>
-        </td></tr>
-        <tr><td align="center" style="padding:10px 0 30px;">
-          <a href="${confirmUrl}" target="_blank" style="display:inline-block;background-color:#f97316;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:12px 32px;border-radius:8px;">
-            Confirm Email Address
-          </a>
-        </td></tr>
-        <tr><td>
-          <p style="font-size:13px;color:#55575d;line-height:1.5;margin:0 0 16px;">
-            If you didn't create an account with BookATrade, you can safely ignore this email.
+          <p style="font-size:11px;color:#252525;opacity:0.25;margin:8px 0 0;">
+            Connecting homes with trusted tradespeople across the UK.
           </p>
-          <p style="font-size:13px;color:#999999;margin:20px 0 0;">— The BookATrade Team</p>
         </td></tr>
       </table>
     </td></tr>
   </table>
 </body>
-</html>`,
+</html>`;
+}
+
+function ctaButton(text: string, url: string): string {
+  return `<a href="${url}" target="_blank" style="display:inline-block;background-color:#252525;color:#F7F4EF;font-size:12px;font-weight:700;text-decoration:none;padding:14px 36px;letter-spacing:0.1em;text-transform:uppercase;font-family:'Helvetica Neue',Arial,sans-serif;">${text}</a>`;
+}
+
+function generateSignupEmail(name: string, confirmUrl: string): { subject: string; html: string } {
+  const greeting = name ? `Hi ${name},` : "Hi,";
+  return {
+    subject: "BOOKaTRADE — Please confirm your email address",
+    html: emailShell(`
+          <h1 style="font-size:20px;font-weight:700;color:#252525;margin:0 0 20px;letter-spacing:-0.3px;">${greeting}</h1>
+          <p style="font-size:15px;color:#252525;opacity:0.6;line-height:1.65;margin:0 0 24px;">
+            Thanks for signing up to BOOKaTRADE. Please confirm your email address by clicking the button below.
+          </p>
+          <div style="text-align:center;padding:8px 0 28px;">
+            ${ctaButton("Confirm Email Address", confirmUrl)}
+          </div>
+          <p style="font-size:13px;color:#252525;opacity:0.45;line-height:1.5;margin:0 0 16px;">
+            If you didn't create an account with BOOKaTRADE, you can safely ignore this email.
+          </p>
+          <p style="font-size:13px;color:#252525;opacity:0.3;margin:20px 0 0;">— The BOOKaTRADE Team</p>
+    `),
   };
 }
 
 function generateRecoveryEmail(name: string, confirmUrl: string): { subject: string; html: string } {
   const greeting = name ? `Hi ${name},` : "Hi,";
   return {
-    subject: "BookATrade — Reset your password",
-    html: `
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="background-color:#ffffff;font-family:'Manrope',Arial,sans-serif;margin:0;padding:0;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
-    <tr><td align="center" style="padding:40px 20px;">
-      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
-        <tr><td style="padding-bottom:30px;text-align:center;">
-          <span style="font-size:24px;font-weight:700;color:#1e293b;">Book<span style="color:#f97316;">A</span>Trade</span>
-        </td></tr>
-        <tr><td style="padding-bottom:20px;">
-          <h1 style="font-size:22px;font-weight:bold;color:#1e293b;margin:0 0 20px;">${greeting}</h1>
-          <p style="font-size:15px;color:#55575d;line-height:1.6;margin:0 0 16px;">
+    subject: "BOOKaTRADE — Reset your password",
+    html: emailShell(`
+          <h1 style="font-size:20px;font-weight:700;color:#252525;margin:0 0 20px;letter-spacing:-0.3px;">${greeting}</h1>
+          <p style="font-size:15px;color:#252525;opacity:0.6;line-height:1.65;margin:0 0 24px;">
             We received a request to reset your password. Click the button below to choose a new one.
           </p>
-        </td></tr>
-        <tr><td align="center" style="padding:10px 0 30px;">
-          <a href="${confirmUrl}" target="_blank" style="display:inline-block;background-color:#f97316;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:12px 32px;border-radius:8px;">
-            Reset Password
-          </a>
-        </td></tr>
-        <tr><td>
-          <p style="font-size:13px;color:#55575d;line-height:1.5;margin:0 0 16px;">
+          <div style="text-align:center;padding:8px 0 28px;">
+            ${ctaButton("Reset Password", confirmUrl)}
+          </div>
+          <p style="font-size:13px;color:#252525;opacity:0.45;line-height:1.5;margin:0 0 16px;">
             If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.
           </p>
-          <p style="font-size:13px;color:#999999;margin:20px 0 0;">— The BookATrade Team</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`,
+          <p style="font-size:13px;color:#252525;opacity:0.3;margin:20px 0 0;">— The BOOKaTRADE Team</p>
+    `),
   };
 }
 
 function generateMagicLinkEmail(name: string, confirmUrl: string): { subject: string; html: string } {
   const greeting = name ? `Hi ${name},` : "Hi,";
   return {
-    subject: "BookATrade — Your login link",
-    html: `
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="background-color:#ffffff;font-family:'Manrope',Arial,sans-serif;margin:0;padding:0;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
-    <tr><td align="center" style="padding:40px 20px;">
-      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
-        <tr><td style="padding-bottom:30px;text-align:center;">
-          <span style="font-size:24px;font-weight:700;color:#1e293b;">Book<span style="color:#f97316;">A</span>Trade</span>
-        </td></tr>
-        <tr><td style="padding-bottom:20px;">
-          <h1 style="font-size:22px;font-weight:bold;color:#1e293b;margin:0 0 20px;">${greeting}</h1>
-          <p style="font-size:15px;color:#55575d;line-height:1.6;margin:0 0 16px;">
-            Click the button below to log in to your BookATrade account.
+    subject: "BOOKaTRADE — Your login link",
+    html: emailShell(`
+          <h1 style="font-size:20px;font-weight:700;color:#252525;margin:0 0 20px;letter-spacing:-0.3px;">${greeting}</h1>
+          <p style="font-size:15px;color:#252525;opacity:0.6;line-height:1.65;margin:0 0 24px;">
+            Click the button below to log in to your BOOKaTRADE account.
           </p>
-        </td></tr>
-        <tr><td align="center" style="padding:10px 0 30px;">
-          <a href="${confirmUrl}" target="_blank" style="display:inline-block;background-color:#f97316;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:12px 32px;border-radius:8px;">
-            Log In
-          </a>
-        </td></tr>
-        <tr><td>
-          <p style="font-size:13px;color:#55575d;line-height:1.5;margin:0 0 16px;">
+          <div style="text-align:center;padding:8px 0 28px;">
+            ${ctaButton("Log In", confirmUrl)}
+          </div>
+          <p style="font-size:13px;color:#252525;opacity:0.45;line-height:1.5;margin:0 0 16px;">
             If you didn't request this link, you can safely ignore this email.
           </p>
-          <p style="font-size:13px;color:#999999;margin:20px 0 0;">— The BookATrade Team</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`,
+          <p style="font-size:13px;color:#252525;opacity:0.3;margin:20px 0 0;">— The BOOKaTRADE Team</p>
+    `),
   };
 }
 
 function generateEmailChangeEmail(name: string, confirmUrl: string): { subject: string; html: string } {
   const greeting = name ? `Hi ${name},` : "Hi,";
   return {
-    subject: "BookATrade — Confirm your email change",
-    html: `
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="background-color:#ffffff;font-family:'Manrope',Arial,sans-serif;margin:0;padding:0;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;">
-    <tr><td align="center" style="padding:40px 20px;">
-      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
-        <tr><td style="padding-bottom:30px;text-align:center;">
-          <span style="font-size:24px;font-weight:700;color:#1e293b;">Book<span style="color:#f97316;">A</span>Trade</span>
-        </td></tr>
-        <tr><td style="padding-bottom:20px;">
-          <h1 style="font-size:22px;font-weight:bold;color:#1e293b;margin:0 0 20px;">${greeting}</h1>
-          <p style="font-size:15px;color:#55575d;line-height:1.6;margin:0 0 16px;">
+    subject: "BOOKaTRADE — Confirm your email change",
+    html: emailShell(`
+          <h1 style="font-size:20px;font-weight:700;color:#252525;margin:0 0 20px;letter-spacing:-0.3px;">${greeting}</h1>
+          <p style="font-size:15px;color:#252525;opacity:0.6;line-height:1.65;margin:0 0 24px;">
             Please confirm your email address change by clicking the button below.
           </p>
-        </td></tr>
-        <tr><td align="center" style="padding:10px 0 30px;">
-          <a href="${confirmUrl}" target="_blank" style="display:inline-block;background-color:#f97316;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;padding:12px 32px;border-radius:8px;">
-            Confirm Email Change
-          </a>
-        </td></tr>
-        <tr><td>
-          <p style="font-size:13px;color:#55575d;line-height:1.5;margin:0 0 16px;">
+          <div style="text-align:center;padding:8px 0 28px;">
+            ${ctaButton("Confirm Email Change", confirmUrl)}
+          </div>
+          <p style="font-size:13px;color:#252525;opacity:0.45;line-height:1.5;margin:0 0 16px;">
             If you didn't request this change, please contact our support team immediately.
           </p>
-          <p style="font-size:13px;color:#999999;margin:20px 0 0;">— The BookATrade Team</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`,
+          <p style="font-size:13px;color:#252525;opacity:0.3;margin:20px 0 0;">— The BOOKaTRADE Team</p>
+    `),
   };
 }
 
@@ -242,7 +203,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "BookATrade <support@bookatrade.io>",
+        from: "BOOKaTRADE <support@bookatrade.io>",
         to: [user.email],
         subject: emailContent.subject,
         html: emailContent.html,

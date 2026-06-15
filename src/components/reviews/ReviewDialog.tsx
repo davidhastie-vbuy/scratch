@@ -157,7 +157,7 @@ const ReviewDialog = ({
           ))}
 
           {avgRating && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
+            <div className="flex items-center gap-2 p-3 bg-muted/50">
               <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
               <span className="font-semibold">{avgRating}</span>
               <span className="text-sm text-muted-foreground">overall rating</span>

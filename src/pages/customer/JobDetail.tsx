@@ -353,11 +353,11 @@ const JobDetail = () => {
           if (providerProfile?.email && pp?.email_notifications_enabled !== false) {
             const catLabel = job.category ? job.category.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()) : "N/A";
             const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#ffffff;">
-              <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #1a1a2e;"><h1 style="margin:0;font-size:22px;color:#1a1a2e;">BookATrade</h1></div>
+              <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #252525;"><h1 style="margin:0;font-size:22px;color:#252525;">BOOKaTRADE</h1></div>
               <div style="padding:24px 0;">
                 <p style="font-size:15px;color:#333;">Hi ${pp.contact_first_name || "there"},</p>
                 <p style="font-size:15px;color:#333;">The customer has requested to cancel a job you are working on. Your confirmation is required before the job can be cancelled.</p>
-                <div style="background:#f4f4f8;border-left:4px solid #cb2431;padding:16px;margin:16px 0;border-radius:4px;">
+                <div style="background:#f4f4f8;border-left:4px solid #cb2431;padding:16px;margin:16px 0;border-radius:0;">
                   <p style="margin:0 0 8px;font-weight:bold;font-size:15px;color:#cb2431;">Cancellation Request</p>
                   <p style="margin:0 0 6px;font-size:14px;color:#555;"><strong>Job:</strong> ${job.title}</p>
                   <p style="margin:0 0 6px;font-size:14px;color:#555;"><strong>Category:</strong> ${catLabel}</p>
@@ -365,13 +365,13 @@ const JobDetail = () => {
                 </div>
                 <p style="font-size:14px;color:#555;">Please log in to review the request and accept or decline the cancellation.</p>
                 <div style="text-align:center;padding:16px 0;">
-                  <a href="${getSiteUrl()}/provider/messages" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">Review Request</a>
+                  <a href="${getSiteUrl()}/provider/messages" style="display:inline-block;background-color:#252525;color:#F7F4EF;text-decoration:none;padding:12px 28px;border-radius:0;font-size:15px;font-weight:bold;">Review Request</a>
                 </div>
               </div>
-              <div style="text-align:center;padding-top:16px;border-top:1px solid #eee;"><p style="font-size:12px;color:#aaa;margin:0;">&copy; BookATrade. All rights reserved.</p></div>
+              <div style="text-align:center;padding-top:16px;border-top:1px solid #eee;"><p style="font-size:12px;color:#aaa;margin:0;">&copy; BOOKaTRADE. All rights reserved.</p></div>
             </div>`;
             await supabase.functions.invoke("send-provider-email", {
-              body: { to: providerProfile.email, subject: `BookATrade: Cancellation requested for "${job.title}"`, html },
+              body: { to: providerProfile.email, subject: `BOOKaTRADE: Cancellation requested for "${job.title}"`, html },
             });
           }
         } catch (e) { console.error("Failed to send cancellation email:", e); }
@@ -597,7 +597,7 @@ const JobDetail = () => {
         return (
           <>
             {urgentActions.length > 0 && (
-              <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+              <div className="flex items-start gap-3 border border-destructive/30 bg-destructive/5 p-4">
                 <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-sm text-destructive">Action Required</p>
@@ -608,7 +608,7 @@ const JobDetail = () => {
               </div>
             )}
             {infoActions.length > 0 && (
-              <div className="flex items-start gap-3 rounded-lg border border-amber-300/30 bg-amber-50 dark:bg-amber-950/20 p-4">
+              <div className="flex items-start gap-3 border border-amber-300/30 bg-amber-50 dark:bg-amber-950/20 p-4">
                 <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-sm text-amber-700 dark:text-amber-400">Attention Needed</p>
@@ -654,7 +654,7 @@ const JobDetail = () => {
                       const url = mediaUrls[m.file_url];
                       if (!url) return null;
                       return (
-                        <div key={m.id} className="relative group rounded-lg border overflow-hidden bg-muted/30 aspect-square">
+                        <div key={m.id} className="relative group border overflow-hidden bg-muted/30 aspect-square">
                           {m.file_type.startsWith("image") ? (
                             <img src={url} alt={m.file_name} className="h-full w-full object-cover" />
                           ) : (
@@ -663,7 +663,7 @@ const JobDetail = () => {
                           <button
                             type="button"
                             onClick={() => setMediaToDelete(prev => [...prev, m.id])}
-                            className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -676,7 +676,7 @@ const JobDetail = () => {
                 {newFiles.length > 0 && (
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                     {newFiles.map((f, i) => (
-                      <div key={i} className="relative group rounded-lg border overflow-hidden bg-muted/30 aspect-square border-dashed border-primary/40">
+                      <div key={i} className="relative group border overflow-hidden bg-muted/30 aspect-square border-dashed border-primary/40">
                         {f.type.startsWith("video") ? (
                           <video src={URL.createObjectURL(f)} className="h-full w-full object-cover" muted playsInline preload="metadata" />
                         ) : (
@@ -685,7 +685,7 @@ const JobDetail = () => {
                         <button
                           type="button"
                           onClick={() => setNewFiles(prev => prev.filter((_, j) => j !== i))}
-                          className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="h-3 w-3" />
                         </button>
@@ -698,7 +698,7 @@ const JobDetail = () => {
                 )}
                 {/* Upload button */}
                 <div
-                  className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                  className="border-2 border-dashed p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
                   onClick={() => document.getElementById("edit-file-input")?.click()}
                 >
                   <Upload className="mx-auto h-6 w-6 text-muted-foreground mb-1" />
@@ -778,9 +778,9 @@ const JobDetail = () => {
                 const url = mediaUrls[m.file_url];
                 if (!url) return null;
                 return m.file_type.startsWith("image") ? (
-                  <img key={m.id} src={url} alt={m.file_name} className="rounded-md w-full h-24 object-cover" />
+                  <img key={m.id} src={url} alt={m.file_name} className="w-full h-24 object-cover" />
                 ) : (
-                  <video key={m.id} src={url} className="rounded-md w-full h-24 object-cover" controls />
+                  <video key={m.id} src={url} className="w-full h-24 object-cover" controls />
                 );
               })}
             </div>
@@ -803,7 +803,7 @@ const JobDetail = () => {
               const jobAwarded = ["accepted", "in_progress", "completed"].includes(job.status);
               const visibleQuotes = jobAwarded ? quotes.filter(q => q.status === "accepted") : quotes;
               return visibleQuotes.map(q => (
-                <div key={q.id} className="rounded-lg border p-4 space-y-2">
+                <div key={q.id} className="border p-4 space-y-2">
                   {providerNames[q.provider_user_id] && (
                     <p className="text-sm font-medium">{providerNames[q.provider_user_id]}</p>
                   )}
@@ -862,7 +862,7 @@ const JobDetail = () => {
           <CardContent className="space-y-4">
             {/* Show info banner for accepted jobs without any payments yet */}
             {job.status === "accepted" && escrowPayments.filter(p => p.status === "held" || p.status === "released").length === 0 && (
-              <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 text-sm space-y-1">
+              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3 text-sm space-y-1">
                 <p className="font-medium flex items-center gap-1.5 text-amber-800 dark:text-amber-200">
                   <AlertTriangle className="h-4 w-4" /> Payment required to confirm job
                 </p>
@@ -1059,7 +1059,7 @@ const JobDetail = () => {
                   if ((m as any).message_type === "admin" || ((m as any).message_type === "system" && typeof m.body === "string" && m.body.startsWith("⚖️"))) {
                     return (
                       <div key={m.id} className="flex justify-center">
-                        <div className="max-w-[80%] rounded-lg px-4 py-3 text-sm bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 break-words overflow-hidden">
+                        <div className="max-w-[80%] px-4 py-3 text-sm bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 break-words overflow-hidden">
                           <p className="font-semibold text-xs text-blue-600 dark:text-blue-400 mb-1">Admin – Dispute Update</p>
                           <p>{m.body.replace(/^⚖️\s*Admin\s*\(Dispute\):\s*/, "")}</p>
                           <p className="text-[10px] mt-1 text-blue-500 dark:text-blue-400">
@@ -1072,7 +1072,7 @@ const JobDetail = () => {
                   if ((m as any).message_type === "system") {
                     return (
                       <div key={m.id} className="flex justify-center">
-                        <div className="bg-muted/50 rounded-lg px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
+                        <div className="bg-muted/50 px-4 py-2 text-xs text-muted-foreground text-center max-w-[80%]">
                           {transformAcceptedMessageForCustomer(m.body)}
                         </div>
                       </div>
@@ -1080,7 +1080,7 @@ const JobDetail = () => {
                   }
                   return (
                     <div key={m.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[70%] rounded-lg px-3 py-2 text-sm break-words overflow-hidden ${isOwn ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                      <div className={`max-w-[70%] px-3 py-2 text-sm break-words overflow-hidden ${isOwn ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                         <p>{m.body}</p>
                         <p className={`text-[10px] mt-1 ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
                           {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}

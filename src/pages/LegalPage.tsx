@@ -49,7 +49,7 @@ const LegalPage = () => {
           <Link to={isHub ? "/signup" : `/legal?audience=${audience}`} className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <h1 className="font-display text-xl font-bold text-foreground">BookATrade</h1>
+          <h1 className="font-display text-xl font-bold text-foreground">BOOKaTRADE</h1>
         </div>
       </header>
       <main className="container max-w-3xl py-8 px-4">
@@ -65,7 +65,7 @@ const LegalPage = () => {
                 <Link
                   key={p.slug}
                   to={`/legal/${p.slug}?audience=${audience}`}
-                  className="flex items-start gap-3 rounded-lg border border-border p-4 hover:bg-muted/50 transition-colors"
+                  className="flex items-start gap-3 border border-border p-4 hover:bg-muted/50 transition-colors"
                 >
                   <FileText className="h-5 w-5 mt-0.5 text-primary shrink-0" />
                   <div>

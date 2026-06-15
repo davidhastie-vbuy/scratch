@@ -142,7 +142,7 @@ const ProviderHome = () => {
               return (
                 <Card key={s.label} className="relative overflow-hidden">
                   <CardContent className="p-4 flex items-center gap-3">
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent ${s.color}`}>
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center bg-accent ${s.color}`}>
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
@@ -170,7 +170,7 @@ const ProviderHome = () => {
                   >
                     <CardHeader className="pb-2">
                       <CardTitle className="flex items-center gap-2.5 text-base">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-accent text-primary">
                           <Icon className="h-4.5 w-4.5" />
                         </div>
                         <span className="flex-1">{a.label}</span>

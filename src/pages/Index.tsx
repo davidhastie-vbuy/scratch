@@ -1,8 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield, ArrowRight, CheckCircle, Star, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import logo from "@/assets/bookatrade-logo.png";
-import HomeAuthPanel from "@/components/HomeAuthPanel";
 import { useState } from "react";
 
 /* ── Trade tile data ─────────────────────────────────── */
