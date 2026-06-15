@@ -135,13 +135,13 @@ const HomeAuthPanel = () => {
   };
 
   return (
-    <div className="w-full rounded-2xl border-2 border-primary-foreground/20 bg-card/95 backdrop-blur-md shadow-2xl shadow-foreground/40 p-5 sm:p-6">
+    <div className="w-full border-2 border-primary-foreground/20 bg-card/95 backdrop-blur-md shadow-2xl shadow-foreground/40 p-5 sm:p-6">
       {/* Mode toggle */}
-      <div className="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+      <div className="mb-5 grid grid-cols-2 gap-1 bg-muted p-1">
         <button
           type="button"
           onClick={() => setMode("signup")}
-          className={`rounded-lg py-2 text-sm font-bold transition-all ${
+          className={`py-2 text-sm font-bold transition-all ${
             mode === "signup" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -150,7 +150,7 @@ const HomeAuthPanel = () => {
         <button
           type="button"
           onClick={() => setMode("signin")}
-          className={`rounded-lg py-2 text-sm font-bold transition-all ${
+          className={`py-2 text-sm font-bold transition-all ${
             mode === "signin" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -167,7 +167,7 @@ const HomeAuthPanel = () => {
               <button
                 type="button"
                 onClick={() => handleRoleChange("customer")}
-                className={`flex items-center justify-center gap-2 rounded-xl border-2 p-3 text-sm font-bold transition-all ${
+                className={`flex items-center justify-center gap-2 border-2 p-3 text-sm font-bold transition-all ${
                   role === "customer"
                     ? "border-primary bg-primary/5 text-foreground shadow-sm"
                     : "border-muted bg-card text-muted-foreground hover:border-primary/30"
@@ -179,7 +179,7 @@ const HomeAuthPanel = () => {
               <button
                 type="button"
                 onClick={() => handleRoleChange("provider")}
-                className={`flex items-center justify-center gap-2 rounded-xl border-2 p-3 text-sm font-bold transition-all ${
+                className={`flex items-center justify-center gap-2 border-2 p-3 text-sm font-bold transition-all ${
                   role === "provider"
                     ? "border-primary bg-primary/5 text-foreground shadow-sm"
                     : "border-muted bg-card text-muted-foreground hover:border-primary/30"
@@ -241,7 +241,7 @@ const HomeAuthPanel = () => {
             </div>
 
             {/* Optional recommendation dropdown */}
-            <div className="rounded-xl border border-dashed border-primary/30 bg-accent/30">
+            <div className="border border-dashed border-primary/30 bg-accent/30">
               <button
                 type="button"
                 onClick={() => setRecOpen((v) => !v)}

@@ -85,7 +85,7 @@ const ResetPassword = () => {
         <div className="mb-8 text-center">
           <img src={logo} alt="BookATrade logo" className="mx-auto h-16 w-16 mb-3" />
           <h1 className="font-display text-3xl font-extrabold text-foreground">
-            Book<span className="text-primary">A</span>Trade
+            BOOK<span className="text-primary">a</span>TRADE
           </h1>
         </div>
 

@@ -118,18 +118,20 @@ const Signup = () => {
     <div className="flex min-h-screen">
       {/* Left panel - branding */}
       <div className="hidden lg:flex lg:w-5/12 bg-foreground text-primary-foreground relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(25 95% 53% / 0.15) 20px, hsl(25 95% 53% / 0.15) 21px)' }} />
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(355 100% 35% / 0.15) 20px, hsl(355 100% 35% / 0.15) 21px)' }} />
         <div className="relative z-10 text-center p-12 max-w-md">
-          <img src={logo} alt="BookATrade logo" className="mx-auto h-28 w-28 mb-8 animate-float rounded-full" />
-          <h2 className="font-display text-3xl font-extrabold mb-4">
-            Join Book<span className="text-primary">A</span>Trade
+          <h1 className="font-display text-4xl font-bold mb-4 tracking-tight">
+            BOOK<span className="text-primary">a</span>TRADE
+          </h1>
+          <h2 className="font-display text-2xl font-bold mb-4">
+            Join the Platform
           </h2>
           <p className="text-primary-foreground/60 leading-relaxed text-2xl font-bold whitespace-pre-line">
             {"Stop Guessing.\nStart hiring with confidence.\nNo spam calls. No chasing.\nNever feel let down again."}
           </p>
           <div className="mt-8 flex justify-center gap-3">
             {["Vetted Providers Only", "No Hidden Costs", "You Stay In Control"].map((tag) => (
-              <span key={tag} className="rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold text-primary">
+              <span key={tag} className="border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold text-primary uppercase tracking-wider">
                 {tag}
               </span>
             ))}
@@ -143,7 +145,7 @@ const Signup = () => {
           <div className="mb-8 text-center lg:hidden">
             <img src={logo} alt="BookATrade logo" className="mx-auto h-16 w-16 mb-3" />
             <h1 className="font-display text-3xl font-extrabold text-foreground">
-              Book<span className="text-primary">A</span>Trade
+              BOOK<span className="text-primary">a</span>TRADE
             </h1>
             <p className="mt-2 text-muted-foreground">Create your account</p>
           </div>

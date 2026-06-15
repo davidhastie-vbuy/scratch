@@ -59,7 +59,7 @@ const AuthConfirm = () => {
       <div className="w-full max-w-md text-center animate-fade-in">
         <img src={logo} alt="BookATrade" className="mx-auto h-16 w-16 mb-6" />
         <h1 className="font-display text-2xl font-extrabold text-foreground mb-2">
-          Book<span className="text-primary">A</span>Trade
+          BOOK<span className="text-primary">a</span>TRADE
         </h1>
 
         {status === "loading" && (

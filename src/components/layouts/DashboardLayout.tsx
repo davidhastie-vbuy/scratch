@@ -1,13 +1,11 @@
 import { ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home, Wrench, Shield } from "lucide-react";
+import { LogOut } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/bookatrade-logo.png";
-import logoDark from "@/assets/bookatrade-logo-dark.jpeg";
 
 interface NavItem {
   label: string;
@@ -33,9 +31,8 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 flex-col bg-foreground text-primary-foreground">
         <Link to={dashboardPath} className="flex h-16 items-center gap-2.5 border-b border-primary-foreground/10 px-4 hover:opacity-80 transition-opacity">
-          <img src={logoDark} alt="BookATrade logo" className="h-9 w-auto object-contain" />
-          <span className="font-display text-lg font-extrabold">
-            Book<span className="text-primary">A</span>Trade
+          <span className="font-display text-lg font-bold tracking-tight">
+            BOOK<span className="text-primary">a</span>TRADE
           </span>
         </Link>
         <nav className="flex-1 space-y-1 p-3">
@@ -46,7 +43,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
               end
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                  "flex items-center gap-3 px-3 py-2.5 text-xs font-medium uppercase tracking-wider transition-all duration-200",
                   isActive
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "text-primary-foreground/60 hover:bg-primary-foreground/10 hover:text-primary-foreground"
@@ -77,9 +74,11 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
           <div className="flex h-16 items-center justify-between gap-2 px-3 md:px-6">
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <Link to={dashboardPath} className="md:hidden flex items-center shrink-0 hover:opacity-80 transition-opacity">
-                <img src={logo} alt="BookATrade logo" className="h-7 w-auto object-contain" />
+                <span className="font-display text-sm font-bold tracking-tight">
+                  BOOK<span className="text-primary">a</span>TRADE
+                </span>
               </Link>
-              <h1 className="font-display text-sm sm:text-xl font-extrabold truncate min-w-0">{title}</h1>
+              <h1 className="font-display text-sm sm:text-xl font-bold truncate min-w-0">{title}</h1>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               <NotificationBell />
@@ -99,7 +98,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
                 end
                 className={({ isActive }) =>
                   cn(
-                    "flex flex-col items-center gap-0.5 whitespace-nowrap px-2 py-2 text-[10px] font-semibold border-b-2 transition-colors min-w-[3.5rem]",
+                    "flex flex-col items-center gap-0.5 whitespace-nowrap px-2 py-2 text-[10px] font-semibold border-b-2 transition-colors min-w-[3.5rem] uppercase tracking-wider",
                     isActive
                       ? "border-primary text-primary"
                       : "border-transparent text-muted-foreground"
