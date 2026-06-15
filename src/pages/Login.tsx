@@ -55,13 +55,13 @@ const Login = () => {
       {/* Left panel - branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-foreground text-primary-foreground relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(355 100% 35% / 0.15) 20px, hsl(355 100% 35% / 0.15) 21px)' }} />
-          <div className="relative z-10 text-center p-12 max-w-md">
-            <h1 className="font-display text-4xl font-bold mb-4 tracking-tight">
-              BOOK<span className="text-primary">a</span>TRADE
-            </h1>
-            <h2 className="font-display text-2xl font-bold mb-4">
-              Welcome Back
-            </h2>
+        <div className="relative z-10 text-center p-12 max-w-md">
+          <h1 className="font-display text-4xl font-bold mb-4 tracking-tight">
+            BOOK<span className="text-primary">a</span>TRADE
+          </h1>
+          <h2 className="font-display text-2xl font-bold mb-4">
+            Welcome Back
+          </h2>
           <p className="text-primary-foreground/60 text-lg leading-relaxed">
             Vetted tradespeople. Guaranteed payments. Peace of mind for every job.
           </p>

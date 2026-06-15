@@ -13,7 +13,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, ArrowRight, Upload, X, CheckCircle2, Loader2, Info } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { categoryQuestionnaires } from "@/lib/category-questionnaires";
 import { extractPostcodeDistrict, formatPostcode } from "@/lib/format-postcode";
