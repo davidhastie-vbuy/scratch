@@ -15,6 +15,7 @@ import tradeLandscapers from "@/assets/trade-landscapers.jpg";
 import tradeTilers from "@/assets/trade-tilers.jpg";
 import heroScrewdriver from "@/assets/hero-screwdriver.jpg";
 import campaignHammer from "@/assets/campaign-hammer.jpg";
+import brandTapeMeasure from "@/assets/brand-tape-measure.png";
 import projectBathroom from "@/assets/project-bathroom.jpg";
 import projectKitchenSage from "@/assets/project-kitchen-sage.jpg";
 import projectExterior from "@/assets/project-exterior.jpg";
@@ -102,7 +103,7 @@ const Index = () => {
           {/* Left column */}
           <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-16 xl:px-20 py-16 lg:py-20 animate-fade-in">
             <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-5">Craftsmanship Starts Here</p>
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] font-extrabold tracking-tight text-foreground leading-[0.93] mb-7">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] font-extrabold tracking-tight text-foreground leading-[1.05] mb-7">
               Find the Right<br />Trade.<br />First Time.
             </h1>
             <p className="text-base leading-relaxed text-foreground/60 max-w-[380px] mb-10">
@@ -144,13 +145,14 @@ const Index = () => {
           </div>
 
           {/* Right column — editorial tool visual */}
-          <div className="hidden lg:flex bg-[#EAE5DE] items-center justify-center relative overflow-hidden">
+          <div className="hidden lg:block relative overflow-hidden">
             <img
               src={heroScrewdriver}
               alt="Luxury screwdriver — editorial tool image"
-              className="max-w-[85%] max-h-[75%] object-contain drop-shadow-2xl"
+              className="absolute inset-0 w-full h-full object-cover"
             />
-            <p className="absolute bottom-9 left-12 text-[10px] tracking-[0.2em] uppercase text-foreground/[0.35]">
+            <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-foreground/10 to-transparent" />
+            <p className="absolute bottom-9 left-12 text-[10px] tracking-[0.2em] uppercase text-white/70 z-10">
               Electricians — Find the Spark.
             </p>
           </div>
@@ -174,7 +176,7 @@ const Index = () => {
       <section id="trades">
         <div className="px-6 sm:px-10 lg:px-20 pt-20 lg:pt-24 pb-10 lg:pb-12">
           <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Browse by Trade</p>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-foreground">
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-foreground">
             Every Home Project,<br />One Trusted Platform.
           </h2>
         </div>
@@ -209,7 +211,7 @@ const Index = () => {
       {/* ═══ 5. HOW IT WORKS ═════════════════════════════ */}
       <section id="how-it-works" className="bg-foreground px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
         <p className="text-[11px] tracking-[0.22em] uppercase text-trade-stone font-semibold mb-3.5">How It Works</p>
-        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-white mb-14 lg:mb-16">
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-white mb-14 lg:mb-16">
           Create a Job in<br />Under 2 Minutes.
         </h2>
         <div className="grid lg:grid-cols-3">
@@ -235,7 +237,7 @@ const Index = () => {
         <div className="flex justify-between items-end mb-10 lg:mb-12">
           <div>
             <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Recent Works</p>
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-foreground">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-foreground">
               Beautiful Homes.<br />Skilled Hands.
             </h2>
           </div>
@@ -270,7 +272,7 @@ const Index = () => {
       {/* ═══ 7. WHY BOOKATRADE ═══════════════════════════ */}
       <section className="bg-background px-6 sm:px-10 lg:px-20 pb-20 lg:pb-24">
         <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Why BOOKaTRADE</p>
-        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-foreground mb-10 lg:mb-12">
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-foreground mb-10 lg:mb-12">
           Find Trusted.<br />Book Right.
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 border border-foreground/[0.09]">
@@ -290,13 +292,15 @@ const Index = () => {
       </section>
 
       {/* ═══ 8. CAMPAIGN BANNER — JOINERS ════════════════ */}
-      <section className="bg-trade-olive grid lg:grid-cols-2 items-center px-6 sm:px-10 lg:px-20 py-20 lg:py-24 gap-12 lg:gap-20">
-        <div>
+      <section className="relative overflow-hidden">
+        <img src={campaignHammer} alt="Velvet hammer — joiner campaign visual" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
+        <div className="relative z-10 px-6 sm:px-10 lg:px-20 py-20 lg:py-28">
           <p className="text-[10px] tracking-[0.2em] uppercase text-white/55 font-semibold mb-4 font-sans">Joiners</p>
-          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(52px,5.5vw,86px)] text-white leading-[0.9] tracking-tight mb-5">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(52px,5.5vw,86px)] text-white leading-[1.05] tracking-tight mb-5">
             MADE TO<br />MEASURE.
           </h2>
-          <p className="text-[15px] leading-relaxed text-white/65 max-w-[360px] mb-10">
+          <p className="text-[15px] leading-relaxed text-white/70 max-w-[360px] mb-10">
             The perfect fit starts with the right joiner. Bespoke furniture, fitted wardrobes, staircases and more.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -308,16 +312,12 @@ const Index = () => {
             </Link>
           </div>
         </div>
-        <div className="hidden lg:flex items-center justify-center relative overflow-hidden">
-          <img src={campaignHammer} alt="Velvet hammer — joiner campaign visual" className="max-w-full max-h-[280px] object-contain" />
-          <div className="absolute inset-0 bg-gradient-to-r from-trade-olive/40 to-transparent" />
-        </div>
       </section>
 
       {/* ═══ 9. INSPIRATION GRID ═════════════════════════ */}
       <section className="bg-foreground px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
         <p className="text-[11px] tracking-[0.22em] uppercase text-trade-stone font-semibold">Inspiration</p>
-        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[0.97] tracking-tight text-white mt-3.5 mb-10 lg:mb-12">
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-white mt-3.5 mb-10 lg:mb-12">
           From Vision<br />to Reality.
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -338,13 +338,15 @@ const Index = () => {
       </section>
 
       {/* ═══ 10. PROVIDER CTA ════════════════════════════ */}
-      <section id="for-providers" className="bg-primary grid lg:grid-cols-2 items-center px-6 sm:px-10 lg:px-20 py-20 lg:py-24 gap-12 lg:gap-20">
-        <div>
+      <section id="for-providers" className="relative overflow-hidden">
+        <img src={brandTapeMeasure} alt="BOOKaTRADE branded tape measure" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/75 via-foreground/50 to-foreground/20" />
+        <div className="relative z-10 px-6 sm:px-10 lg:px-20 py-20 lg:py-28 max-w-3xl">
           <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 font-semibold mb-4 font-sans">For Trade Professionals</p>
-          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(40px,4.2vw,68px)] text-white leading-[0.92] tracking-tight mb-5">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(40px,4.2vw,68px)] text-white leading-[1.05] tracking-tight mb-5">
             Better Jobs.<br />Better Customers.<br />Less Noise.
           </h2>
-          <p className="text-[15px] leading-relaxed text-white/65 max-w-[400px] mb-9">
+          <p className="text-[15px] leading-relaxed text-white/70 max-w-[400px] mb-9">
             Grow your pipeline without chasing dead leads. BOOKaTRADE connects you with homeowners who are ready to book — not just browsing.
           </p>
           <ul className="grid grid-cols-2 gap-3 mb-10 list-none">
@@ -358,12 +360,6 @@ const Index = () => {
           <Link to="/signup" className="inline-block bg-white text-foreground px-8 py-3.5 text-[11px] tracking-[0.14em] uppercase font-bold font-sans hover:bg-foreground hover:text-white transition-colors">
             Join as a Trade
           </Link>
-        </div>
-        <div className="hidden lg:flex items-center justify-center">
-          {/* Image placeholder — to be replaced with tool set photography */}
-          <div className="w-[340px] h-[340px] border border-white/[0.14] bg-white/[0.05] flex items-center justify-center">
-            <span className="font-display text-6xl text-white/[0.12] select-none">T</span>
-          </div>
         </div>
       </section>
 
