@@ -4,16 +4,35 @@ import { Menu } from "lucide-react";
 import logo from "@/assets/bookatrade-logo.png";
 import { useState } from "react";
 
+/* ── Image imports ───────────────────────────────────── */
+import tradeJoiners from "@/assets/trade-joiners.jpg";
+import tradeKitchen from "@/assets/trade-kitchen.jpg";
+import tradeElectricians from "@/assets/trade-electricians.jpg";
+import tradePainters from "@/assets/trade-painters.jpg";
+import tradePlumbers from "@/assets/trade-plumbers.jpg";
+import tradeRoofers from "@/assets/trade-roofers.jpg";
+import tradeLandscapers from "@/assets/trade-landscapers.jpg";
+import tradeTilers from "@/assets/trade-tilers.jpg";
+import heroKitchen from "@/assets/trade-kitchen.jpg";
+import projectBathroom from "@/assets/project-bathroom.jpg";
+import projectKitchenSage from "@/assets/project-kitchen-sage.jpg";
+import projectExterior from "@/assets/project-exterior.jpg";
+import projectKitchenWarm from "@/assets/project-kitchen-warm.jpg";
+import projectJoinery from "@/assets/project-joinery.jpg";
+import heroGarden from "@/assets/hero-garden.png";
+import projectKitchenDark from "@/assets/project-kitchen-dark.jpg";
+import projectBathroomGreen from "@/assets/project-bathroom-green.jpg";
+
 /* ── Trade tile data ─────────────────────────────────── */
 const TRADES = [
-  { slug: "joiners",         name: "Joiners",         tagline: "Made to Measure",          sub: "Wardrobes, staircases & bespoke fitted furniture",  mark: "J", bg: "bg-trade-olive" },
-  { slug: "kitchen-fitters", name: "Kitchen Fitters",  tagline: "Heart of the Home",         sub: "Designed for living, installed with precision",      mark: "K", bg: "bg-trade-orange" },
-  { slug: "electricians",    name: "Electricians",     tagline: "Find the Spark",            sub: "Powered by precision, wired for results",            mark: "E", bg: "bg-trade-lilac" },
-  { slug: "painters",        name: "Painters",         tagline: "Paint the Room",            sub: "Interior, exterior, wallpaper & feature walls",      mark: "P", bg: "bg-trade-cobalt" },
-  { slug: "plumbers",        name: "Plumbers",         tagline: "Keeping Life Flowing",      sub: "No leaks. No hassle. Trusted local plumbers",        mark: "P", bg: "bg-trade-aqua" },
-  { slug: "roofers",         name: "Roofers",          tagline: "The Roof Over Everything",  sub: "Protection starts at the top. Built to last",        mark: "R", bg: "bg-trade-slate" },
-  { slug: "landscapers",     name: "Landscapers",      tagline: "Bring the Outside to Life", sub: "Gardens that work beautifully, year-round",          mark: "L", bg: "bg-trade-forest" },
-  { slug: "tilers",          name: "Tilers",           tagline: "Every Detail Aligned",      sub: "Find skilled tilers who get the finish right",        mark: "T", bg: "bg-trade-stone" },
+  { slug: "joiners",         name: "Joiners",         tagline: "Made to Measure",          sub: "Wardrobes, staircases & bespoke fitted furniture",  mark: "J", bg: "bg-trade-olive",   img: tradeJoiners },
+  { slug: "kitchen-fitters", name: "Kitchen Fitters",  tagline: "Heart of the Home",         sub: "Designed for living, installed with precision",      mark: "K", bg: "bg-trade-orange",  img: tradeKitchen },
+  { slug: "electricians",    name: "Electricians",     tagline: "Find the Spark",            sub: "Powered by precision, wired for results",            mark: "E", bg: "bg-trade-lilac",   img: tradeElectricians },
+  { slug: "painters",        name: "Painters",         tagline: "Paint the Room",            sub: "Interior, exterior, wallpaper & feature walls",      mark: "P", bg: "bg-trade-cobalt",  img: tradePainters },
+  { slug: "plumbers",        name: "Plumbers",         tagline: "Keeping Life Flowing",      sub: "No leaks. No hassle. Trusted local plumbers",        mark: "P", bg: "bg-trade-aqua",    img: tradePlumbers },
+  { slug: "roofers",         name: "Roofers",          tagline: "The Roof Over Everything",  sub: "Protection starts at the top. Built to last",        mark: "R", bg: "bg-trade-slate",   img: tradeRoofers },
+  { slug: "landscapers",     name: "Landscapers",      tagline: "Bring the Outside to Life", sub: "Gardens that work beautifully, year-round",          mark: "L", bg: "bg-trade-forest",  img: tradeLandscapers },
+  { slug: "tilers",          name: "Tilers",           tagline: "Every Detail Aligned",      sub: "Find skilled tilers who get the finish right",        mark: "T", bg: "bg-trade-stone",   img: tradeTilers },
 ];
 
 /* ── Review ticker data ──────────────────────────────── */
@@ -26,11 +45,11 @@ const REVIEWS = [
 
 /* ── Recent works data ───────────────────────────────── */
 const WORKS = [
-  { tag: "Bathroom",  tagColor: "#80DDE5", title: "Teal Marble\nWet Room",        loc: "Manchester · Tiler + Plumber",  gradient: "from-[#1A5C66] to-[#0D2E33]" },
-  { tag: "Kitchen",   tagColor: "#C8CB82", title: "Sage Green\nKitchen",          loc: "London · Kitchen Fitter",       gradient: "from-[#7A8E4A] to-[#4A5830]" },
-  { tag: "Exterior",  tagColor: "#A0AEBC", title: "Full Roof\nReplacement",       loc: "Edinburgh · Roofer",            gradient: "from-[#3A4855] to-[#1C232A]" },
-  { tag: "Kitchen",   tagColor: "#F4A06A", title: "Warm Oak\nKitchen",            loc: "Bristol · Kitchen Fitter",       gradient: "from-[#C0865A] to-[#7A5030]" },
-  { tag: "Joinery",   tagColor: "#D4C8A8", title: "Bespoke\nFitted Study",        loc: "Leeds · Joiner",                gradient: "from-[#C5B79A] to-[#8A7A62]" },
+  { tag: "Bathroom",  tagColor: "#80DDE5", title: "Teal Marble\nWet Room",        loc: "Manchester · Tiler + Plumber",  img: projectBathroom },
+  { tag: "Kitchen",   tagColor: "#C8CB82", title: "Sage Green\nKitchen",          loc: "London · Kitchen Fitter",       img: projectKitchenSage },
+  { tag: "Exterior",  tagColor: "#A0AEBC", title: "Full Roof\nReplacement",       loc: "Edinburgh · Roofer",            img: projectExterior },
+  { tag: "Kitchen",   tagColor: "#F4A06A", title: "Warm Oak\nKitchen",            loc: "Bristol · Kitchen Fitter",       img: projectKitchenWarm },
+  { tag: "Joinery",   tagColor: "#D4C8A8", title: "Bespoke\nFitted Study",        loc: "Leeds · Joiner",                img: projectJoinery },
 ];
 
 const Index = () => {
@@ -127,15 +146,15 @@ const Index = () => {
           </div>
 
           {/* Right column — editorial visual */}
-          <div className="hidden lg:flex bg-[#EAE5DE] items-center justify-center relative overflow-hidden">
-            <div className="flex flex-col items-center justify-center w-full h-full p-16">
-              {/* Image placeholder — to be replaced with editorial tool photography */}
-              <div className="w-[280px] h-[400px] border border-foreground/[0.08] bg-foreground/[0.03] flex items-center justify-center">
-                <span className="font-display text-7xl text-foreground/[0.08] select-none">B<span className="text-primary/20">a</span>T</span>
-              </div>
-            </div>
-            <p className="absolute bottom-9 left-12 text-[10px] tracking-[0.2em] uppercase text-foreground/[0.35]">
-              Electricians — Find the Spark.
+          <div className="hidden lg:block relative overflow-hidden">
+            <img
+              src={heroKitchen}
+              alt="Premium kitchen installation by BOOKaTRADE tradespeople"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-transparent" />
+            <p className="absolute bottom-9 left-12 text-[10px] tracking-[0.2em] uppercase text-white/60 z-10">
+              Kitchen Fitters — Heart of the Home.
             </p>
           </div>
         </div>
@@ -170,10 +189,10 @@ const Index = () => {
                 to={`/trades/${t.slug}`}
                 className="group aspect-[3/4] relative overflow-hidden flex flex-col justify-end p-5 sm:p-6 transition-transform duration-300 hover:scale-[1.025]"
               >
-                {/* Background */}
-                <div className={`absolute inset-0 ${t.bg} transition-transform duration-400 group-hover:scale-[1.06]`} />
+                {/* Background image */}
+                <img src={t.img} alt={t.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-400 group-hover:scale-[1.06]" />
                 {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/[0.42] z-[1]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent z-[1]" />
                 {/* Decorative letter */}
                 <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] z-[1] opacity-[0.14] font-display text-[96px] text-white pointer-events-none tracking-[-2px] select-none">
                   {t.mark}
@@ -233,8 +252,8 @@ const Index = () => {
               key={i}
               className={`group relative overflow-hidden cursor-pointer ${i === 0 ? "sm:row-span-2" : ""}`}
             >
-              {/* Gradient placeholder for project image */}
-              <div className={`w-full bg-gradient-to-br ${w.gradient} transition-transform duration-400 group-hover:scale-[1.04] ${i === 0 ? "aspect-[3/4] h-full" : "aspect-square"}`} />
+              {/* Project image */}
+              <img src={w.img} alt={w.title.replace('\n', ' ')} className={`w-full object-cover transition-transform duration-400 group-hover:scale-[1.04] ${i === 0 ? "aspect-[3/4] h-full" : "aspect-square"}`} />
               {/* Overlay */}
               <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pt-9 bg-gradient-to-t from-foreground/70 to-transparent">
                 <span
@@ -292,11 +311,9 @@ const Index = () => {
             </Link>
           </div>
         </div>
-        <div className="hidden lg:flex items-center justify-center">
-          {/* Image placeholder — to be replaced with joiner campaign photography */}
-          <div className="w-[320px] h-[280px] border border-white/[0.14] bg-white/[0.05] flex items-center justify-center">
-            <span className="font-display text-6xl text-white/[0.12] select-none">J</span>
-          </div>
+        <div className="hidden lg:block relative overflow-hidden aspect-[4/3]">
+          <img src={tradeJoiners} alt="Joiner craftsmanship" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-trade-olive/40 to-transparent" />
         </div>
       </section>
 
@@ -308,12 +325,12 @@ const Index = () => {
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {[
-            { type: "Landscaping",    title: "Bring the Outside to Life",    gradient: "from-[#2F5E3E] to-[#142A1C]" },
-            { type: "Kitchen Fitting", title: "Every Piece Has Its Place",   gradient: "from-[#D4601A] to-[#8A3A00]" },
-            { type: "Bathroom",       title: "Smooth Starts Here",           gradient: "from-[#1E9DA8] to-[#0D5A60]" },
+            { type: "Landscaping",    title: "Bring the Outside to Life",    img: heroGarden },
+            { type: "Kitchen Fitting", title: "Every Piece Has Its Place",   img: projectKitchenDark },
+            { type: "Bathroom",       title: "Smooth Starts Here",           img: projectBathroomGreen },
           ].map((card, i) => (
             <div key={i} className="group relative overflow-hidden cursor-pointer">
-              <div className={`w-full aspect-[4/5] bg-gradient-to-br ${card.gradient} transition-transform duration-400 group-hover:scale-[1.04]`} />
+              <img src={card.img} alt={card.title} className="w-full aspect-[4/5] object-cover transition-transform duration-400 group-hover:scale-[1.04]" />
               <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-12 bg-gradient-to-t from-black/[0.62] to-transparent">
                 <p className="text-[9px] tracking-[0.18em] uppercase text-white/55 mb-1 font-sans">{card.type}</p>
                 <p className="font-display text-xl text-white leading-[1.05]">{card.title}</p>
