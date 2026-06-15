@@ -103,7 +103,7 @@ const Index = () => {
           {/* Left column */}
           <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-16 xl:px-20 py-16 lg:py-20 animate-fade-in">
             <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-5">Craftsmanship Starts Here</p>
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] font-extrabold tracking-tight text-foreground leading-[1.05] mb-7">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] font-extrabold tracking-tight text-foreground leading-[1.4] mb-7">
               Find the Right<br />Trade.<br />First Time.
             </h1>
             <p className="text-base leading-relaxed text-foreground/60 max-w-[380px] mb-10">
@@ -176,7 +176,7 @@ const Index = () => {
       <section id="trades">
         <div className="px-6 sm:px-10 lg:px-20 pt-20 lg:pt-24 pb-10 lg:pb-12">
           <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Browse by Trade</p>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-foreground">
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-foreground">
             Every Home Project,<br />One Trusted Platform.
           </h2>
         </div>
@@ -192,10 +192,6 @@ const Index = () => {
                 <img src={t.img} alt={t.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-400 group-hover:scale-[1.06]" />
                 {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent z-[1]" />
-                {/* Decorative letter */}
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] z-[1] opacity-[0.14] font-display text-[96px] text-white pointer-events-none tracking-[-2px] select-none">
-                  {t.mark}
-                </span>
                 {/* Content */}
                 <div className="relative z-[2]">
                   <p className="text-[9px] tracking-[0.18em] uppercase text-white/65 mb-1 font-sans">{t.tagline}</p>
@@ -211,7 +207,7 @@ const Index = () => {
       {/* ═══ 5. HOW IT WORKS ═════════════════════════════ */}
       <section id="how-it-works" className="bg-foreground px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
         <p className="text-[11px] tracking-[0.22em] uppercase text-trade-stone font-semibold mb-3.5">How It Works</p>
-        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-white mb-14 lg:mb-16">
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-white mb-14 lg:mb-16">
           Create a Job in<br />Under 2 Minutes.
         </h2>
         <div className="grid lg:grid-cols-3">
@@ -237,7 +233,7 @@ const Index = () => {
         <div className="flex justify-between items-end mb-10 lg:mb-12">
           <div>
             <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Recent Works</p>
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-foreground">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-foreground">
               Beautiful Homes.<br />Skilled Hands.
             </h2>
           </div>
@@ -261,7 +257,7 @@ const Index = () => {
                 >
                   {w.tag}
                 </span>
-                <h3 className="font-display text-lg text-white leading-[1.05] whitespace-pre-line">{w.title}</h3>
+                <h3 className="font-display text-lg text-white leading-[1.4] whitespace-pre-line">{w.title}</h3>
                 <p className="text-[11px] text-white/50 mt-1 font-sans">{w.loc}</p>
               </div>
             </div>
@@ -272,7 +268,7 @@ const Index = () => {
       {/* ═══ 7. WHY BOOKATRADE ═══════════════════════════ */}
       <section className="bg-background px-6 sm:px-10 lg:px-20 pb-20 lg:pb-24">
         <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Why BOOKaTRADE</p>
-        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-foreground mb-10 lg:mb-12">
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-foreground mb-10 lg:mb-12">
           Find Trusted.<br />Book Right.
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 border border-foreground/[0.09]">
@@ -297,7 +293,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
         <div className="relative z-10 px-6 sm:px-10 lg:px-20 py-20 lg:py-28">
           <p className="text-[10px] tracking-[0.2em] uppercase text-white/55 font-semibold mb-4 font-sans">Joiners</p>
-          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(52px,5.5vw,86px)] text-white leading-[1.05] tracking-tight mb-5">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(52px,5.5vw,86px)] text-white leading-[1.4] tracking-tight mb-5">
             MADE TO<br />MEASURE.
           </h2>
           <p className="text-[15px] leading-relaxed text-white/70 max-w-[360px] mb-10">
@@ -317,7 +313,7 @@ const Index = () => {
       {/* ═══ 9. INSPIRATION GRID ═════════════════════════ */}
       <section className="bg-foreground px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
         <p className="text-[11px] tracking-[0.22em] uppercase text-trade-stone font-semibold">Inspiration</p>
-        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.05] tracking-tight text-white mt-3.5 mb-10 lg:mb-12">
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-white mt-3.5 mb-10 lg:mb-12">
           From Vision<br />to Reality.
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -330,7 +326,7 @@ const Index = () => {
               <img src={card.img} alt={card.title} className="w-full aspect-[4/5] object-cover transition-transform duration-400 group-hover:scale-[1.04]" />
               <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-12 bg-gradient-to-t from-black/[0.62] to-transparent">
                 <p className="text-[9px] tracking-[0.18em] uppercase text-white/55 mb-1 font-sans">{card.type}</p>
-                <p className="font-display text-xl text-white leading-[1.05]">{card.title}</p>
+                <p className="font-display text-xl text-white leading-[1.4]">{card.title}</p>
               </div>
             </div>
           ))}
@@ -343,7 +339,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-foreground/75 via-foreground/50 to-foreground/20" />
         <div className="relative z-10 px-6 sm:px-10 lg:px-20 py-20 lg:py-28 max-w-3xl">
           <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 font-semibold mb-4 font-sans">For Trade Professionals</p>
-          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(40px,4.2vw,68px)] text-white leading-[1.05] tracking-tight mb-5">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(40px,4.2vw,68px)] text-white leading-[1.4] tracking-tight mb-5">
             Better Jobs.<br />Better Customers.<br />Less Noise.
           </h2>
           <p className="text-[15px] leading-relaxed text-white/70 max-w-[400px] mb-9">
