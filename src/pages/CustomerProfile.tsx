@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Camera, Loader2 } from "lucide-react";
+import { Save, Camera, Loader2, Star } from "lucide-react";
 import { formatPostcode } from "@/lib/format-postcode";
+import ReviewsList from "@/components/reviews/ReviewsList";
+import ScoreBadge from "@/components/reviews/ScoreBadge";
 
 interface ProfileData {
   first_name: string;
@@ -33,6 +35,7 @@ const CustomerProfile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [providerReviews, setProviderReviews] = useState<any[]>([]);
 
   useEffect(() => {
     if (user) fetchProfile();
@@ -52,6 +55,26 @@ const CustomerProfile = () => {
         postcode: data.postcode ?? "", avatar_url: data.avatar_url ?? "",
       });
     }
+
+    // Fetch reviews from providers (where this customer is the reviewee)
+    const { data: revs } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("reviewee_user_id", user!.id)
+      .eq("reviewer_role", "provider")
+      .order("created_at", { ascending: false });
+    const enriched = [];
+    for (const r of (revs as any[]) ?? []) {
+      const { data: jb } = await supabase.from("jobs").select("title").eq("id", r.job_id).single();
+      const { data: pp } = await supabase.from("provider_profiles").select("business_name").eq("user_id", r.reviewer_user_id).maybeSingle();
+      enriched.push({
+        ...r,
+        job_title: jb?.title ?? "Job",
+        reviewer_name: pp?.business_name ?? "Provider",
+      });
+    }
+    setProviderReviews(enriched);
+
     setLoading(false);
   };
 
@@ -109,7 +132,10 @@ const CustomerProfile = () => {
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
             </div>
             <div>
-              <p className="font-medium">{profile.first_name} {profile.last_name}</p>
+              <div className="flex items-center gap-2">
+                <p className="font-medium">{profile.first_name} {profile.last_name}</p>
+                <ScoreBadge userId={user!.id} role="customer" />
+              </div>
               <p className="text-sm text-muted-foreground">{profile.email}</p>
             </div>
           </div>
@@ -131,6 +157,26 @@ const CustomerProfile = () => {
           </form>
         </CardContent>
       </Card>
+
+      {/* Reviews from Providers */}
+      {providerReviews.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" /> Reviews from Providers
+            </CardTitle>
+            <CardDescription>How providers rated their experience working with you</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ReviewsList
+              reviews={providerReviews}
+              showReviewerName={true}
+              showJobTitle={true}
+              reviewDirection="provider_to_customer"
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

@@ -88,7 +88,7 @@ CREATE TRIGGER update_portfolio_projects_updated_at
   EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Create storage bucket for portfolio images
-INSERT INTO storage.buckets (id, name, public) VALUES ('portfolio-images', 'portfolio-images', true);
+INSERT INTO storage.buckets (id, name, public) VALUES ('portfolio-images', 'portfolio-images', true) ON CONFLICT (id) DO NOTHING;
 
 -- Storage policies for portfolio images
 CREATE POLICY "Anyone authenticated can view portfolio images"

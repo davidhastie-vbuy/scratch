@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -117,11 +117,33 @@ interface MessageAttachmentsProps {
 export const MessageAttachments = ({ attachments }: MessageAttachmentsProps) => {
   const [urls, setUrls] = useState<Record<string, string>>({});
 
-  const getSignedUrl = async (filePath: string) => {
-    if (urls[filePath]) return;
-    const { data } = await supabase.storage.from("chat-attachments").createSignedUrl(filePath, 3600);
-    if (data?.signedUrl) setUrls(prev => ({ ...prev, [filePath]: data.signedUrl }));
-  };
+  useEffect(() => {
+    if (!attachments || attachments.length === 0) return;
+
+    const fetchUrls = async () => {
+      const paths = attachments
+        .map(a => a.file_url)
+        .filter(p => !urls[p]);
+
+      if (paths.length === 0) return;
+
+      const { data } = await supabase.storage
+        .from("chat-attachments")
+        .createSignedUrls(paths, 3600);
+
+      if (data) {
+        const newUrls: Record<string, string> = {};
+        data.forEach(item => {
+          if (item.signedUrl && item.path) {
+            newUrls[item.path] = item.signedUrl;
+          }
+        });
+        setUrls(prev => ({ ...prev, ...newUrls }));
+      }
+    };
+
+    fetchUrls();
+  }, [attachments]);
 
   if (!attachments || attachments.length === 0) return null;
 
@@ -132,7 +154,6 @@ export const MessageAttachments = ({ attachments }: MessageAttachmentsProps) => 
         const url = urls[a.file_url];
 
         if (!url) {
-          getSignedUrl(a.file_url);
           return (
             <div key={i} className="w-32 h-24 rounded bg-muted flex items-center justify-center">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />

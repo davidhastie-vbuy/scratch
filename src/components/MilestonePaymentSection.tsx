@@ -149,6 +149,7 @@ const MilestonePaymentSection = ({ jobId, agreedPrice, escrowPayments, onPayment
                           onPaymentComplete();
                         } else if (!error && data?.expired > 0) {
                           toast({ title: "Payment not completed", description: "The checkout session expired. Please try paying again." });
+                          fetchMilestones();
                           onPaymentComplete();
                         } else if (!error) {
                           toast({ title: "Still processing", description: "Payment not yet confirmed. Please try again shortly." });

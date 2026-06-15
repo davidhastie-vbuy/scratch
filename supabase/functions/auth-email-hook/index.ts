@@ -23,15 +23,13 @@ interface AuthEmailPayload {
   };
 }
 
-const SITE_URL = "https://bookatrade.io";
+// TODO: Change back to "https://bookatrade.io" once the domain is pointed to Cloud Run
+const SITE_URL = Deno.env.get("SITE_URL") || "https://bookatrade-204505856132.europe-west2.run.app";
 
 function buildConfirmationUrl(emailData: AuthEmailPayload["email_data"]): string {
-  if (emailData.confirmation_url) {
-    return emailData.confirmation_url;
-  }
   const tokenHash = emailData.token_hash || "";
   const type = emailData.email_action_type === "signup" ? "signup" : emailData.email_action_type;
-  return `${SITE_URL}/auth/confirm?token_hash=${tokenHash}&type=${type}`;
+  return `${SITE_URL}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=${encodeURIComponent(type)}`;
 }
 
 function getUserName(user: AuthEmailPayload["user"]): string {

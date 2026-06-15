@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOKaTRADE — Find the Right Trade. First Time.</title>
+  <!--
+    FONTS:
+    - Display / Logo: Belline Agatha (commercial licence required — using Fredoka One as stand-in)
+    - UI / Body:      Helvetica Neue (system stack)
+  -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+
+    /* ─── DESIGN TOKENS ──────────────────────────────── */
+    :root {
+      --white:    #F7F4EF;
+      --charcoal: #252525;
+      --red:      #B00010;
+      --stone:    #C5B79A;
+      --olive:    #A5A76A;
+      --orange:   #E46F25;
+      --lilac:    #B89AB8;
+      --cobalt:   #2F5DA8;
+      --aqua:     #1E9DA8;
+      --slate:    #58616A;
+      --forest:   #2F5E3E;
+
+      --display: 'Fredoka One', 'Arial Black', sans-serif;
+      --body:    'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--charcoal);
+      font-family: var(--body);
+      overflow-x: hidden;
+    }
+
+    /* ─── UTILITY ────────────────────────────────────── */
+    .label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--red);
+      font-family: var(--body);
+    }
+
+    /* ─── NAV ────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--white);
+      border-bottom: 1px solid rgba(37,37,37,0.08);
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 60px;
+    }
+
+    .logo {
+      font-family: var(--display);
+      font-size: 21px;
+      color: var(--charcoal);
+      text-decoration: none;
+      letter-spacing: 0;
+    }
+    .logo em {
+      font-style: normal;
+      color: var(--red);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--charcoal);
+      text-decoration: none;
+      opacity: 0.6;
+      transition: opacity .2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+
+    .nav-cta {
+      background: var(--charcoal) !important;
+      color: var(--white) !important;
+      opacity: 1 !important;
+      padding: 9px 22px;
+      font-size: 11px !important;
+      letter-spacing: 0.12em !important;
+    }
+
+    /* ─── HERO ───────────────────────────────────────── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 88vh;
+      background: var(--white);
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 64px 80px 80px;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--red);
+      font-weight: 600;
+      margin-bottom: 22px;
+    }
+
+    .hero-h1 {
+      font-family: var(--display);
+      font-size: clamp(52px, 5.8vw, 92px);
+      line-height: 0.93;
+      letter-spacing: -1px;
+      color: var(--charcoal);
+      margin-bottom: 28px;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--charcoal);
+      opacity: 0.6;
+      max-width: 380px;
+      margin-bottom: 48px;
+    }
+
+    .search-wrap {
+      display: flex;
+      max-width: 500px;
+      border: 1.5px solid rgba(37,37,37,0.14);
+      box-shadow: 0 6px 28px rgba(37,37,37,0.07);
+      background: white;
+      overflow: hidden;
+    }
+
+    .search-wrap input {
+      flex: 1;
+      padding: 15px 18px;
+      font-size: 14px;
+      border: none;
+      outline: none;
+      font-family: var(--body);
+      color: var(--charcoal);
+      background: transparent;
+    }
+    .search-wrap input::placeholder { color: rgba(37,37,37,0.38); }
+
+    .search-div {
+      width: 1px;
+      background: rgba(37,37,37,0.1);
+      margin: 11px 0;
+    }
+
+    .search-btn {
+      background: var(--red);
+      color: white;
+      border: none;
+      padding: 0 26px;
+      font-size: 11px;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-family: var(--body);
+      cursor: pointer;
+      transition: background .2s;
+      white-space: nowrap;
+    }
+    .search-btn:hover { background: #8d000d; }
+
+    .hero-trust {
+      display: flex;
+      gap: 28px;
+      margin-top: 28px;
+    }
+    .trust-pill {
+      font-size: 11px;
+      color: var(--charcoal);
+      opacity: 0.5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.04em;
+    }
+    .trust-pill::before {
+      content: '';
+      display: block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+
+    /* Hero Right — editorial tool panel */
+    .hero-right {
+      background: #EAE5DE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-right-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 60px;
+    }
+
+    .hero-tool-label {
+      position: absolute;
+      bottom: 36px;
+      left: 48px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(37,37,37,0.35);
+    }
+
+    /* ─── REVIEW TICKER ──────────────────────────────── */
+    .ticker {
+      background: var(--white);
+      border-top: 1px solid rgba(37,37,37,0.07);
+      border-bottom: 1px solid rgba(37,37,37,0.07);
+      padding: 16px 60px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      overflow: hidden;
+    }
+    .ticker-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--red);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .ticker-sep { color: rgba(37,37,37,0.18); font-size: 18px; flex-shrink: 0; }
+    .tick-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .tick-stars { color: var(--red); font-size: 11px; letter-spacing: 2px; }
+    .tick-quote { font-size: 12px; font-style: italic; color: var(--charcoal); opacity: 0.65; }
+    .tick-name  { font-size: 11px; color: var(--charcoal); opacity: 0.38; }
+
+    /* ─── SECTION SCAFFOLDING ────────────────────────── */
+    .sec-head {
+      padding: 88px 80px 48px;
+    }
+    .sec-head .label { margin-bottom: 14px; display: block; }
+    .sec-h2 {
+      font-family: var(--display);
+      font-size: clamp(36px, 3.6vw, 58px);
+      line-height: 0.97;
+      letter-spacing: -0.5px;
+      color: var(--charcoal);
+    }
+
+    /* ─── TRADE TILES ────────────────────────────────── */
+    .trades-wrap { padding: 0 80px 88px; }
+    .trades-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .trade-tile {
+      aspect-ratio: 3/4;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 24px 20px;
+      transition: transform .35s ease;
+    }
+    .trade-tile:hover { transform: scale(1.025); }
+
+    .tile-bg {
+      position: absolute;
+      inset: 0;
+      transition: transform .4s ease;
+    }
+    .trade-tile:hover .tile-bg { transform: scale(1.06); }
+
+    /* gradient overlay */
+    .trade-tile::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, transparent 40%, rgba(0,0,0,0.42) 100%);
+      z-index: 1;
+    }
+
+    .tile-body {
+      position: relative;
+      z-index: 2;
+    }
+    .tile-tagline {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 5px;
+      font-family: var(--body);
+    }
+    .tile-name {
+      font-family: var(--display);
+      font-size: 22px;
+      color: white;
+      line-height: 1;
+    }
+    .tile-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.62);
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    /* per-trade bg colours */
+    .t-joiners    .tile-bg { background: var(--olive); }
+    .t-kitchen    .tile-bg { background: var(--orange); }
+    .t-electric   .tile-bg { background: var(--lilac); }
+    .t-painters   .tile-bg { background: var(--cobalt); }
+    .t-plumbers   .tile-bg { background: var(--aqua); }
+    .t-roofers    .tile-bg { background: var(--slate); }
+    .t-landscape  .tile-bg { background: var(--forest); }
+    .t-tilers     .tile-bg { background: var(--stone); }
+
+    /* decorative texture mark per tile */
+    .tile-mark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      z-index: 1;
+      opacity: 0.14;
+      font-family: var(--display);
+      font-size: 96px;
+      color: white;
+      pointer-events: none;
+      letter-spacing: -2px;
+    }
+
+    /* ─── HOW IT WORKS ───────────────────────────────── */
+    .how-sec {
+      background: var(--charcoal);
+      padding: 96px 80px;
+    }
+    .how-sec .label { color: var(--stone); margin-bottom: 14px; display: block; }
+    .how-sec .sec-h2 { color: var(--white); margin-bottom: 64px; }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .how-step {
+      padding-right: 52px;
+      border-right: 1px solid rgba(247,244,239,0.1);
+    }
+    .how-step:not(:first-child) { padding-left: 52px; padding-right: 52px; }
+    .how-step:last-child { border-right: none; padding-right: 0; }
+
+    .step-num {
+      font-family: var(--display);
+      font-size: 72px;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 20px;
+      letter-spacing: -2px;
+    }
+    .step-title {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--white);
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-family: var(--body);
+    }
+    .step-copy {
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(247,244,239,0.5);
+    }
+
+    /* ─── RECENT WORKS ───────────────────────────────── */
+    .works-sec {
+      padding: 96px 80px;
+      background: var(--white);
+    }
+    .works-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 44px;
+    }
+    .view-all {
+      font-size: 11px;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      opacity: 0.55;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 2px;
+      font-weight: 600;
+      font-family: var(--body);
+      transition: opacity .2s;
+    }
+    .view-all:hover { opacity: 1; }
+
+    .works-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 10px;
+    }
+    .work-card {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .work-card:first-child { grid-row: span 2; }
+    .work-card:first-child .work-img { aspect-ratio: 3/4; height: 100%; }
+
+    .work-img {
+      width: 100%;
+      aspect-ratio: 1;
+      display: block;
+      transition: transform .4s ease;
+    }
+    .work-card:hover .work-img { transform: scale(1.04); }
+
+    .work-over {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 36px 22px 22px;
+      background: linear-gradient(transparent, rgba(37,37,37,0.7));
+    }
+    .work-tag {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 3px 8px;
+      margin-bottom: 7px;
+      font-family: var(--body);
+    }
+    .work-title {
+      font-family: var(--display);
+      font-size: 18px;
+      color: white;
+      line-height: 1.05;
+    }
+    .work-loc {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+      font-family: var(--body);
+    }
+
+    /* project placeholder bg colours */
+    .bg-teal    { background: linear-gradient(150deg,#1A5C66 0%,#0D2E33 100%); }
+    .bg-olive   { background: linear-gradient(150deg,#7A8E4A 0%,#4A5830 100%); }
+    .bg-warm    { background: linear-gradient(150deg,#C0865A 0%,#7A5030 100%); }
+    .bg-dark    { background: linear-gradient(150deg,#3A4855 0%,#1C232A 100%); }
+    .bg-stone   { background: linear-gradient(150deg,#C5B79A 0%,#8A7A62 100%); }
+
+    /* ─── WHY BOOKATRADE ─────────────────────────────── */
+    .why-sec {
+      padding: 0 80px 96px;
+    }
+    .why-sec .sec-h2 { margin-bottom: 48px; }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 1px solid rgba(37,37,37,0.09);
+    }
+    .why-cell {
+      padding: 44px 36px;
+      border-right: 1px solid rgba(37,37,37,0.09);
+    }
+    .why-cell:last-child { border-right: none; }
+
+    .why-bar {
+      width: 36px;
+      height: 2px;
+      background: var(--red);
+      margin-bottom: 24px;
+    }
+    .why-title {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--charcoal);
+      margin-bottom: 10px;
+      font-family: var(--body);
+    }
+    .why-copy {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--charcoal);
+      opacity: 0.58;
+    }
+
+    /* ─── CAMPAIGN BANNER – OLIVE ────────────────────── */
+    .campaign {
+      background: var(--olive);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 96px 80px;
+      gap: 80px;
+    }
+    .campaign-eye {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(247,244,239,0.55);
+      font-weight: 600;
+      margin-bottom: 18px;
+      font-family: var(--body);
+    }
+    .campaign-h {
+      font-family: var(--display);
+      font-size: clamp(52px, 5.5vw, 86px);
+      color: var(--white);
+      line-height: 0.9;
+      letter-spacing: -1.5px;
+      margin-bottom: 22px;
+    }
+    .campaign-p {
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(247,244,239,0.65);
+      max-width: 360px;
+      margin-bottom: 40px;
+    }
+    .btn-solid {
+      display: inline-block;
+      background: var(--white);
+      color: var(--charcoal);
+      padding: 14px 32px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-family: var(--body);
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: background .2s, color .2s;
+      margin-right: 14px;
+    }
+    .btn-solid:hover { background: var(--charcoal); color: var(--white); }
+
+    .btn-ghost {
+      display: inline-block;
+      background: transparent;
+      color: var(--white);
+      padding: 13px 32px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-family: var(--body);
+      text-decoration: none;
+      cursor: pointer;
+      border: 1.5px solid rgba(247,244,239,0.45);
+      transition: border-color .2s, background .2s;
+    }
+    .btn-ghost:hover { border-color: white; background: rgba(255,255,255,0.08); }
+
+    .campaign-vis {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ─── INSPIRATION GRID ───────────────────────────── */
+    .inspo-sec {
+      background: var(--charcoal);
+      padding: 96px 80px;
+    }
+    .inspo-sec .label { color: var(--stone); }
+    .inspo-sec .sec-h2 { color: var(--white); margin-top: 14px; margin-bottom: 48px; }
+
+    .inspo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .inspo-card {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .inspo-card-img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      transition: transform .4s ease;
+    }
+    .inspo-card:hover .inspo-card-img { transform: scale(1.04); }
+    .inspo-over {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 48px 24px 24px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.62));
+    }
+    .inspo-type {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 5px;
+      font-family: var(--body);
+    }
+    .inspo-title {
+      font-family: var(--display);
+      font-size: 21px;
+      color: white;
+      line-height: 1.05;
+    }
+
+    .bg-forest  { background: linear-gradient(150deg,#2F5E3E 0%,#142A1C 100%); }
+    .bg-orange  { background: linear-gradient(150deg,#D4601A 0%,#8A3A00 100%); }
+    .bg-aqua    { background: linear-gradient(150deg,#1E9DA8 0%,#0D5A60 100%); }
+
+    /* ─── TRADE PROVIDER ─────────────────────────────── */
+    .provider {
+      background: var(--red);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 96px 80px;
+      gap: 80px;
+    }
+    .provider-eye {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(247,244,239,0.5);
+      font-weight: 600;
+      margin-bottom: 18px;
+      font-family: var(--body);
+    }
+    .provider-h {
+      font-family: var(--display);
+      font-size: clamp(40px, 4.2vw, 68px);
+      color: var(--white);
+      line-height: 0.92;
+      letter-spacing: -0.5px;
+      margin-bottom: 22px;
+    }
+    .provider-p {
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(247,244,239,0.65);
+      max-width: 400px;
+      margin-bottom: 36px;
+    }
+    .provider-bens {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+      margin-bottom: 40px;
+    }
+    .pben {
+      font-size: 13px;
+      color: rgba(247,244,239,0.75);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pben::before {
+      content: '';
+      display: block;
+      width: 14px;
+      height: 1.5px;
+      background: rgba(247,244,239,0.4);
+      flex-shrink: 0;
+    }
+
+    .provider-vis {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .prov-box {
+      width: 340px;
+      height: 340px;
+      border: 1px solid rgba(247,244,239,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(247,244,239,0.05);
+    }
+
+    /* ─── SIGNUP CTA ─────────────────────────────────── */
+    .signup-sec {
+      background: var(--white);
+      padding: 100px 80px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .signup-h {
+      font-family: var(--display);
+      font-size: clamp(40px, 4.5vw, 72px);
+      color: var(--charcoal);
+      line-height: 0.95;
+      letter-spacing: -1px;
+      max-width: 640px;
+      margin: 14px 0 20px;
+    }
+    .signup-sub {
+      font-size: 16px;
+      color: var(--charcoal);
+      opacity: 0.52;
+      max-width: 420px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+    .signup-row {
+      display: flex;
+      max-width: 520px;
+      width: 100%;
+      border: 1.5px solid rgba(37,37,37,0.13);
+      box-shadow: 0 4px 24px rgba(37,37,37,0.07);
+      overflow: hidden;
+      background: white;
+    }
+    .signup-row input {
+      flex: 1;
+      padding: 16px 20px;
+      font-size: 14px;
+      border: none;
+      outline: none;
+      font-family: var(--body);
+      background: transparent;
+    }
+    .signup-row button {
+      background: var(--charcoal);
+      color: var(--white);
+      border: none;
+      padding: 0 28px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-family: var(--body);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .2s;
+    }
+    .signup-row button:hover { background: var(--red); }
+    .signup-note {
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--charcoal);
+      opacity: 0.3;
+      letter-spacing: 0.04em;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────── */
+    footer {
+      background: var(--charcoal);
+      padding: 80px 80px 40px;
+    }
+    .ft-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 56px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid rgba(247,244,239,0.09);
+      margin-bottom: 40px;
+    }
+    .ft-brand .logo { color: var(--white); display: block; margin-bottom: 14px; }
+    .ft-brand p {
+      font-size: 13px;
+      line-height: 1.65;
+      color: rgba(247,244,239,0.42);
+      max-width: 250px;
+    }
+    .ft-socials {
+      display: flex;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .ft-soc {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(247,244,239,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: rgba(247,244,239,0.45);
+      text-decoration: none;
+      font-family: var(--body);
+      transition: border-color .2s, color .2s;
+    }
+    .ft-soc:hover { border-color: rgba(247,244,239,0.55); color: var(--white); }
+
+    .ft-col h4 {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(247,244,239,0.35);
+      margin-bottom: 20px;
+      font-family: var(--body);
+      font-weight: 600;
+    }
+    .ft-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .ft-col a {
+      font-size: 13px;
+      color: rgba(247,244,239,0.58);
+      text-decoration: none;
+      font-family: var(--body);
+      transition: color .2s;
+    }
+    .ft-col a:hover { color: var(--white); }
+
+    .ft-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ft-bottom p { font-size: 11px; color: rgba(247,244,239,0.28); }
+    .ft-legal { display: flex; gap: 22px; }
+    .ft-legal a {
+      font-size: 11px;
+      color: rgba(247,244,239,0.28);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .ft-legal a:hover { color: rgba(247,244,239,0.65); }
+
+    /* ─── RESPONSIVE ─────────────────────────────────── */
+    @media (max-width: 1100px) {
+      nav { padding: 0 28px; }
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-right { display: none; }
+      .hero-left { padding: 60px 28px; }
+      .trades-wrap, .works-sec, .why-sec, .campaign, .inspo-sec,
+      .provider, .signup-sec, footer { padding-left: 28px; padding-right: 28px; }
+      .sec-head { padding: 60px 28px 36px; }
+      .how-sec { padding: 60px 28px; }
+      .trades-grid { grid-template-columns: repeat(2, 1fr); }
+      .how-grid { grid-template-columns: 1fr; gap: 0; }
+      .how-step {
+        border-right: none;
+        border-bottom: 1px solid rgba(247,244,239,0.1);
+        padding: 32px 0 !important;
+      }
+      .how-step:last-child { border-bottom: none; }
+      .works-grid { grid-template-columns: 1fr 1fr; }
+      .works-grid .work-card:first-child { grid-row: auto; }
+      .works-grid .work-card:first-child .work-img { aspect-ratio: 1; height: auto; }
+      .why-grid { grid-template-columns: 1fr 1fr; }
+      .campaign { grid-template-columns: 1fr; }
+      .campaign-vis { display: none; }
+      .inspo-grid { grid-template-columns: 1fr; }
+      .provider { grid-template-columns: 1fr; }
+      .provider-vis { display: none; }
+      .ft-top { grid-template-columns: 1fr 1fr; gap: 36px; }
+    }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .trades-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .works-grid { grid-template-columns: 1fr; }
+      .why-grid { grid-template-columns: 1fr; }
+      .why-cell { border-right: none; border-bottom: 1px solid rgba(37,37,37,0.09); }
+      .why-cell:last-child { border-bottom: none; }
+      .ticker { gap: 18px; }
+      .tick-item:nth-child(n+5) { display: none; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     NAV
+══════════════════════════════════════════════════════ -->
+<nav>
+  <a href="#" class="logo">BOOK<em>a</em>TRADE</a>
+  <ul class="nav-links">
+    <li><a href="#">Find a Trade</a></li>
+    <li><a href="#">Post a Job</a></li>
+    <li><a href="#">Recent Works</a></li>
+    <li><a href="#">For Trades</a></li>
+    <li><a href="#" class="nav-cta">Sign Up Free</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">Craftsmanship Starts Here</p>
+    <h1 class="hero-h1">Find the Right<br>Trade.<br>First Time.</h1>
+    <p class="hero-sub">Connect with trusted, vetted tradespeople for every home project. From small fixes to full transformations.</p>
+
+    <div class="search-wrap">
+      <input type="text" placeholder="What do you need done?" />
+      <div class="search-div"></div>
+      <input type="text" placeholder="Your location" style="max-width:150px;" />
+      <button class="search-btn">Search</button>
+    </div>
+
+    <div class="hero-trust">
+      <span class="trust-pill">Vetted Tradespeople</span>
+      <span class="trust-pill">No Spam</span>
+      <span class="trust-pill">Limited Quotes Only</span>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-right-inner">
+      <!--
+        PRODUCTION NOTE:
+        Replace this SVG placeholder with the luxury screwdriver photograph
+        (white/neutral background, editorial still-life treatment).
+        Recommended: the beige-and-red multi-bit screwdriver, angled portrait.
+      -->
+      <svg width="300" height="440" viewBox="0 0 300 440" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Luxury screwdriver — editorial tool image">
+        <!-- Handle body – cream -->
+        <ellipse cx="150" cy="178" rx="46" ry="78" fill="#E5D8C8"/>
+        <!-- Red croc-leather accent -->
+        <path d="M118 132 Q150 105 182 132 Q182 215 150 252 Q118 215 118 132Z" fill="#B00010" opacity="0.82"/>
+        <!-- Grip collar -->
+        <rect x="118" y="252" width="64" height="16" rx="8" fill="#888"/>
+        <!-- Top cap red dome -->
+        <ellipse cx="150" cy="100" rx="30" ry="22" fill="#B00010"/>
+        <ellipse cx="150" cy="92" rx="28" ry="16" fill="#c8001a"/>
+        <!-- Rivet details on cap -->
+        <circle cx="136" cy="100" r="3" fill="#8d0010"/>
+        <circle cx="164" cy="100" r="3" fill="#8d0010"/>
+        <!-- Shaft -->
+        <rect x="144" y="268" width="12" height="128" rx="6" fill="#707070"/>
+        <!-- Bit tip – Phillips -->
+        <polygon points="143,396 157,396 154,424 146,424" fill="#555"/>
+        <line x1="150" y1="396" x2="150" y2="424" stroke="#444" stroke-width="1.5"/>
+        <line x1="143" y1="410" x2="157" y2="410" stroke="#444" stroke-width="1.5"/>
+        <!-- Bit set – right side -->
+        <rect x="184" y="310" width="9" height="34" rx="3.5" fill="#707070" transform="rotate(-14 184 310)"/>
+        <rect x="198" y="325" width="9" height="30" rx="3.5" fill="#606060" transform="rotate(-9 198 325)"/>
+        <rect x="212" y="336" width="9" height="26" rx="3.5" fill="#707070" transform="rotate(-4 212 336)"/>
+        <rect x="225" y="342" width="9" height="24" rx="3.5" fill="#606060" transform="rotate(1 225 342)"/>
+        <rect x="238" y="345" width="9" height="22" rx="3.5" fill="#707070" transform="rotate(5 238 345)"/>
+      </svg>
+    </div>
+    <p class="hero-tool-label">Electricians — Find the Spark.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     REVIEW TICKER
+══════════════════════════════════════════════════════ -->
+<div class="ticker">
+  <span class="ticker-label">Trusted Reviews</span>
+  <span class="ticker-sep">·</span>
+  <div class="tick-item">
+    <span class="tick-stars">★★★★★</span>
+    <span class="tick-quote">"Incredible finish. Booked within the hour."</span>
+    <span class="tick-name">— Sarah M., London</span>
+  </div>
+  <span class="ticker-sep">·</span>
+  <div class="tick-item">
+    <span class="tick-stars">★★★★★</span>
+    <span class="tick-quote">"Found the perfect kitchen fitter. Seamless."</span>
+    <span class="tick-name">— James T., Manchester</span>
+  </div>
+  <span class="ticker-sep">·</span>
+  <div class="tick-item">
+    <span class="tick-stars">★★★★★</span>
+    <span class="tick-quote">"Trusted, local and exactly what we needed."</span>
+    <span class="tick-name">— Priya K., Bristol</span>
+  </div>
+  <span class="ticker-sep">·</span>
+  <div class="tick-item">
+    <span class="tick-stars">★★★★★</span>
+    <span class="tick-quote">"Our joiner was brilliant. Made to measure, indeed."</span>
+    <span class="tick-name">— Tom W., Edinburgh</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     BROWSE BY TRADE
+══════════════════════════════════════════════════════ -->
+<div class="sec-head">
+  <span class="label">Browse by Trade</span>
+  <h2 class="sec-h2">Every Home Project,<br>One Trusted Platform.</h2>
+</div>
+<div class="trades-wrap">
+  <div class="trades-grid">
+
+    <div class="trade-tile t-joiners">
+      <div class="tile-bg"></div>
+      <span class="tile-mark">J</span>
+      <div class="tile-body">
+        <p class="tile-tagline">Made to Measure</p>
+        <h3 class="tile-name">Joiners</h3>
+        <p class="tile-sub">Wardrobes, staircases &amp; bespoke fitted furniture</p>
+      </div>
+    </div>
+
+    <div class="trade-tile t-kitchen">
+      <div class="tile-bg"></div>
+      <span class="tile-mark">K</span>
+      <div class="tile-body">
+        <p class="tile-tagline">Heart of the Home</p>
+        <h3 class="tile-name">Kitchen Fitters</h3>
+        <p class="tile-sub">Designed for living, installed with precision</p>
+      </div>
+    </div>
+
+    <div class="trade-tile t-electric">
+      <div class="tile-bg"></div>
+      <span class="tile-mark">E</span>
+      <div class="tile-body">
+        <p class="tile-tagline">Find the Spark</p>
+        <h3 class="tile-name">Electricians</h3>
+        <p class="tile-sub">Powered by precision, wired for results</p>
+      </div>
+    </div>
+
+    <div class="trade-tile t-painters">
+      <div class="tile-bg"></div>
+      <span class="tile-mark">P</span>
+      <div class="tile-body">
+        <p class="tile-tagline">Paint the Room</p>
+        <h3 class="tile-name">Painters</h3>
+        <p class="tile-sub">Interior, exterior, wallpaper &amp; feature walls</p>
+      </div>
+    </div>
+
+    <div class="trade-tile t-plumbers">
+      <div class="tile-bg"></div>
+      <span class="tile-mark">P</span>
+      <div class="tile-body">
+        <p class="tile-tagline">Keeping Life Flowing</p>
+        <h3 class="tile-name">Plumbers</h3>
+        <p class="tile-sub">No leaks. No hassle. Trusted local plumbers</p>
+      </div>
+    </div>
+
+    <div class="trade-tile t-roofers">
+      <div class="tile-bg"></div>
+      <span class="tile-mark">R</span>
+      <div class="tile-body">
+        <p class="tile-tagline">The Roof Over Everything</p>
+        <h3 class="tile-name">Roofers</h3>
+        <p class="tile-sub">Protection starts at the top. Built to last</p>
+      </div>
+    </div>
+
+    <div class="trade-tile t-landscape">
+      <div class="tile-bg"></div>
+      <span class="tile-mark">L</span>
+      <div class="tile-body">
+        <p class="tile-tagline">Bring the Outside to Life</p>
+        <h3 class="tile-name">Landscapers</h3>
+        <p class="tile-sub">Gardens that work beautifully, year-round</p>
+      </div>
+    </div>
+
+    <div class="trade-tile t-tilers">
+      <div class="tile-bg"></div>
+      <span class="tile-mark">T</span>
+      <div class="tile-body">
+        <p class="tile-tagline">Every Detail Aligned</p>
+        <h3 class="tile-name">Tilers</h3>
+        <p class="tile-sub">Find skilled tilers who get the finish right</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════════════════════ -->
+<section class="how-sec">
+  <span class="label">How It Works</span>
+  <h2 class="sec-h2">Create a Job in<br>Under 2 Minutes.</h2>
+  <div class="how-grid">
+    <div class="how-step">
+      <div class="step-num">01</div>
+      <h3 class="step-title">Post Your Job</h3>
+      <p class="step-copy">Tell us what you need done, where and when. It takes under two minutes and there's no commitment required.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">02</div>
+      <h3 class="step-title">Compare Trusted Trades</h3>
+      <p class="step-copy">Receive a limited number of quotes from vetted, reviewed tradespeople. No spam. No endless follow-up calls.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">03</div>
+      <h3 class="step-title">Book with Confidence</h3>
+      <p class="step-copy">Review profiles, read verified local reviews, compare quotes — then book the right trade for your home.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     RECENT WORKS
+══════════════════════════════════════════════════════ -->
+<section class="works-sec">
+  <div class="works-head">
+    <div>
+      <span class="label" style="display:block;margin-bottom:14px;">Recent Works</span>
+      <h2 class="sec-h2">Beautiful Homes.<br>Skilled Hands.</h2>
+    </div>
+    <a href="#" class="view-all">View All Projects →</a>
+  </div>
+
+  <div class="works-grid">
+    <!--
+      PRODUCTION NOTE: Replace bg colour divs with <img> tags pointing to
+      actual project photography. The teal bathroom and sage kitchen
+      images supplied are perfect for the first two slots.
+    -->
+    <div class="work-card">
+      <div class="work-img bg-teal"></div>
+      <div class="work-over">
+        <span class="work-tag" style="border-color:var(--aqua);color:#80DDE5;">Bathroom</span>
+        <h3 class="work-title">Teal Marble<br>Wet Room</h3>
+        <p class="work-loc">Manchester · Tiler + Plumber</p>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="work-img bg-olive"></div>
+      <div class="work-over">
+        <span class="work-tag" style="border-color:var(--olive);color:#C8CB82;">Kitchen</span>
+        <h3 class="work-title">Sage Green<br>Kitchen</h3>
+        <p class="work-loc">London · Kitchen Fitter</p>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="work-img bg-dark"></div>
+      <div class="work-over">
+        <span class="work-tag" style="border-color:var(--slate);color:#A0AEBC;">Exterior</span>
+        <h3 class="work-title">Full Roof<br>Replacement</h3>
+        <p class="work-loc">Edinburgh · Roofer</p>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="work-img bg-warm"></div>
+      <div class="work-over">
+        <span class="work-tag" style="border-color:var(--orange);color:#F4A06A;">Kitchen</span>
+        <h3 class="work-title">Warm Oak<br>Kitchen</h3>
+        <p class="work-loc">Bristol · Kitchen Fitter</p>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="work-img bg-stone"></div>
+      <div class="work-over">
+        <span class="work-tag">Joinery</span>
+        <h3 class="work-title">Bespoke<br>Fitted Study</h3>
+        <p class="work-loc">Leeds · Joiner</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     WHY BOOKATRADE
+══════════════════════════════════════════════════════ -->
+<section class="why-sec">
+  <span class="label" style="display:block;margin-bottom:14px;">Why BOOKaTRADE</span>
+  <h2 class="sec-h2">Find Trusted.<br>Book Right.</h2>
+  <br>
+  <div class="why-grid">
+    <div class="why-cell">
+      <div class="why-bar"></div>
+      <h3 class="why-title">No Spam</h3>
+      <p class="why-copy">We limit the number of quotes per job so tradespeople compete on quality, not volume. No endless calls.</p>
+    </div>
+    <div class="why-cell">
+      <div class="why-bar" style="background:var(--olive)"></div>
+      <h3 class="why-title">Vetted Providers</h3>
+      <p class="why-copy">Every tradesperson on BOOKaTRADE is reviewed, checked and verified before they can quote on your job.</p>
+    </div>
+    <div class="why-cell">
+      <div class="why-bar" style="background:var(--charcoal)"></div>
+      <h3 class="why-title">Local Reviews</h3>
+      <p class="why-copy">Real reviews from real homeowners in your area. Compare with confidence before you commit to anything.</p>
+    </div>
+    <div class="why-cell">
+      <div class="why-bar" style="background:var(--stone)"></div>
+      <h3 class="why-title">Secure &amp; Simple</h3>
+      <p class="why-copy">Post your job in under two minutes. Safe, straightforward, built around how homeowners actually work.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     CAMPAIGN BANNER – JOINERS / OLIVE
+══════════════════════════════════════════════════════ -->
+<section class="campaign">
+  <div>
+    <p class="campaign-eye">Joiners</p>
+    <h2 class="campaign-h">MADE TO<br>MEASURE.</h2>
+    <p class="campaign-p">The perfect fit starts with the right joiner. Bespoke furniture, fitted wardrobes, staircases and more.</p>
+    <a href="#" class="btn-solid">Find a Joiner</a>
+    <a href="#" class="btn-ghost">Sign Up</a>
+  </div>
+  <div class="campaign-vis">
+    <!--
+      PRODUCTION NOTE: Replace with the velvet olive hammer image supplied.
+      The full-bleed olive hammer photograph works perfectly here.
+    -->
+    <svg width="280" height="240" viewBox="0 0 280 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Velvet hammer — joiner campaign visual">
+      <!-- Hammer head block – olive velvet texture -->
+      <rect x="18" y="68" width="88" height="112" rx="14" fill="#8B9E50"/>
+      <rect x="18" y="80" width="30" height="88" rx="8" fill="#7E9040" opacity="0.7"/>
+      <!-- Claw curve -->
+      <path d="M106 74 Q128 50 118 36 Q110 46 102 58Z" fill="#8B9E50"/>
+      <!-- Handle – quilted velvet sausage -->
+      <rect x="88" y="96" width="170" height="56" rx="28" fill="#8B9E50"/>
+      <!-- Quilted bumps along handle -->
+      <circle cx="116" cy="124" r="9" fill="#7E9040" opacity="0.55"/>
+      <circle cx="142" cy="124" r="9" fill="#7E9040" opacity="0.55"/>
+      <circle cx="168" cy="124" r="9" fill="#7E9040" opacity="0.55"/>
+      <circle cx="194" cy="124" r="9" fill="#7E9040" opacity="0.55"/>
+      <circle cx="220" cy="124" r="9" fill="#7E9040" opacity="0.55"/>
+      <circle cx="246" cy="124" r="9" fill="#7E9040" opacity="0.55"/>
+      <!-- End knob -->
+      <ellipse cx="258" cy="124" rx="10" ry="18" fill="#96AC5A"/>
+      <!-- Rivet button -->
+      <circle cx="80" cy="124" r="11" fill="#D4C4A0"/>
+      <circle cx="80" cy="124" r="7" fill="#C5B79A"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     INSPIRATION GRID
+══════════════════════════════════════════════════════ -->
+<section class="inspo-sec">
+  <span class="label">Inspiration</span>
+  <h2 class="sec-h2">From Vision<br>to Reality.</h2>
+  <div class="inspo-grid">
+    <!--
+      PRODUCTION NOTE: Each card bg should be replaced with a real project photo.
+      Cards 1–3 map to: Garden / Landscaping, Kitchen, Bathroom.
+    -->
+    <div class="inspo-card">
+      <div class="inspo-card-img bg-forest"></div>
+      <div class="inspo-over">
+        <p class="inspo-type">Landscaping</p>
+        <p class="inspo-title">Bring the Outside to Life</p>
+      </div>
+    </div>
+    <div class="inspo-card">
+      <div class="inspo-card-img bg-orange"></div>
+      <div class="inspo-over">
+        <p class="inspo-type">Kitchen Fitting</p>
+        <p class="inspo-title">Every Piece Has Its Place</p>
+      </div>
+    </div>
+    <div class="inspo-card">
+      <div class="inspo-card-img bg-aqua"></div>
+      <div class="inspo-over">
+        <p class="inspo-type">Bathroom</p>
+        <p class="inspo-title">Smooth Starts Here</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     TRADE PROVIDER CTA
+══════════════════════════════════════════════════════ -->
+<section class="provider">
+  <div>
+    <p class="provider-eye">For Trade Professionals</p>
+    <h2 class="provider-h">Better Jobs.<br>Better Customers.<br>Less Noise.</h2>
+    <p class="provider-p">Grow your pipeline without chasing dead leads. BOOKaTRADE connects you with homeowners who are ready to book — not just browsing.</p>
+    <ul class="provider-bens">
+      <li class="pben">Quality local leads</li>
+      <li class="pben">Verified reviews</li>
+      <li class="pben">Limited quotes per job</li>
+      <li class="pben">No cold canvassing</li>
+      <li class="pben">Job management tools</li>
+      <li class="pben">Payment confidence</li>
+    </ul>
+    <a href="#" class="btn-solid">Join as a Trade</a>
+  </div>
+  <div class="provider-vis">
+    <!--
+      PRODUCTION NOTE: Replace with the gold-and-leather luxury tool set photograph
+      (Burberry-style layout with pliers, hammer, saw, tape measure, plunger).
+      Dark/neutral background works best against the red section.
+    -->
+    <div class="prov-box">
+      <svg width="240" height="280" viewBox="0 0 240 280" fill="none" xmlns="http://www.w3.org/2000/svg" opacity="0.55" aria-label="Luxury tool set">
+        <!-- Pliers -->
+        <path d="M30 28 L72 58 L82 48 L40 18Z" fill="#C5B79A" stroke="#C5B79A"/>
+        <line x1="54" y1="44" x2="130" y2="84" stroke="#C5B79A" stroke-width="9" stroke-linecap="round"/>
+        <line x1="64" y1="34" x2="140" y2="74" stroke="#D4C8A8" stroke-width="9" stroke-linecap="round"/>
+        <!-- Screwdriver -->
+        <rect x="20" y="110" width="200" height="12" rx="6" fill="#C5B79A"/>
+        <rect x="185" y="104" width="36" height="24" rx="6" fill="#B89AB8" opacity="0.75"/>
+        <!-- Hammer -->
+        <rect x="12" y="152" width="65" height="26" rx="8" fill="#C5B79A"/>
+        <rect x="56" y="147" width="125" height="13" rx="6.5" fill="#B0A080"/>
+        <!-- Tape measure -->
+        <rect x="76" y="202" width="50" height="40" rx="20" fill="#C5B79A"/>
+        <circle cx="101" cy="222" r="13" fill="#A09070"/>
+        <!-- Plunger -->
+        <ellipse cx="30" cy="245" rx="18" ry="10" fill="#C5B79A" opacity="0.8"/>
+        <line x1="30" y1="235" x2="30" y2="205" stroke="#B0A080" stroke-width="6" stroke-linecap="round"/>
+        <!-- Saw -->
+        <line x1="12" y1="272" x2="228" y2="272" stroke="#C5B79A" stroke-width="3"/>
+        <path d="M12 272 L12 284 Q26 276 40 284 Q54 276 68 284 Q82 276 96 284 Q110 276 124 284 Q138 276 152 284 Q166 276 180 284 Q194 276 208 284 Q222 276 228 284 L228 272Z" fill="#C5B79A" opacity="0.5"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     SIGN UP CTA
+══════════════════════════════════════════════════════ -->
+<section class="signup-sec">
+  <span class="label">Get Started Today</span>
+  <h2 class="signup-h">Beautiful Homes Need Skilled Hands.</h2>
+  <p class="signup-sub">Post your first job free. Find trusted tradespeople without the guesswork.</p>
+  <div class="signup-row">
+    <input type="email" placeholder="Enter your email address" />
+    <button>Post a Job Free</button>
+  </div>
+  <p class="signup-note">Free to post. No commitment. No spam.</p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════ -->
+<footer>
+  <div class="ft-top">
+    <div class="ft-brand">
+      <a href="#" class="logo">BOOK<em>a</em>TRADE</a>
+      <p>Connecting homes with trusted tradespeople across the UK. Find the right trade, first time.</p>
+      <div class="ft-socials">
+        <a href="#" class="ft-soc">in</a>
+        <a href="#" class="ft-soc">ig</a>
+        <a href="#" class="ft-soc">fb</a>
+      </div>
+    </div>
+    <div class="ft-col">
+      <h4>Find a Trade</h4>
+      <ul>
+        <li><a href="#">Joiners</a></li>
+        <li><a href="#">Kitchen Fitters</a></li>
+        <li><a href="#">Electricians</a></li>
+        <li><a href="#">Painters</a></li>
+        <li><a href="#">Plumbers</a></li>
+        <li><a href="#">Roofers</a></li>
+        <li><a href="#">Landscapers</a></li>
+        <li><a href="#">Tilers</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="#">How It Works</a></li>
+        <li><a href="#">Post a Job</a></li>
+        <li><a href="#">Recent Works</a></li>
+        <li><a href="#">Reviews</a></li>
+        <li><a href="#">Trust &amp; Safety</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>For Trades</h4>
+      <ul>
+        <li><a href="#">Join as a Provider</a></li>
+        <li><a href="#">How It Works</a></li>
+        <li><a href="#">Pricing</a></li>
+        <li><a href="#">Help Centre</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <p>© 2026 BOOKaTRADE Ltd. All rights reserved.</p>
+    <div class="ft-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Cookie Settings</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

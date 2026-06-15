@@ -18,7 +18,22 @@ const RecommendProvider = () => {
 
   const handleAddPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles = Array.from(e.target.files).slice(0, 5 - recPhotos.length);
+      const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+      const maxSize = 5 * 1024 * 1024;
+      const incoming = Array.from(e.target.files);
+      const valid: File[] = [];
+      for (const file of incoming) {
+        if (!allowedTypes.includes(file.type)) {
+          toast({ title: "Invalid file type", description: `${file.name} is not a supported image format (PNG, JPG, WebP).`, variant: "destructive" });
+          continue;
+        }
+        if (file.size > maxSize) {
+          toast({ title: "File too large", description: `${file.name} exceeds the 5MB limit.`, variant: "destructive" });
+          continue;
+        }
+        valid.push(file);
+      }
+      const newFiles = valid.slice(0, 5 - recPhotos.length);
       setRecPhotos((prev) => [...prev, ...newFiles].slice(0, 5));
     }
     if (fileInputRef.current) fileInputRef.current.value = "";

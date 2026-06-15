@@ -20,7 +20,7 @@ ON public.customer_recommendations FOR DELETE
 USING (is_admin());
 
 -- Public bucket so admin can access photo URLs
-INSERT INTO storage.buckets (id, name, public) VALUES ('recommendation-photos', 'recommendation-photos', true);
+INSERT INTO storage.buckets (id, name, public) VALUES ('recommendation-photos', 'recommendation-photos', true) ON CONFLICT (id) DO NOTHING;
 
 -- Anyone can view (public bucket)
 CREATE POLICY "Public can view recommendation photos"

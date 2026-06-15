@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from "react";
+import { getSiteUrl } from "@/lib/site-url";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +11,7 @@ import ScoreBadge from "@/components/reviews/ScoreBadge";
 import ProposalCard from "@/components/messaging/ProposalCard";
 import ProposeTermsDialog from "@/components/messaging/ProposeTermsDialog";
 import QuoteBanner from "@/components/messaging/QuoteBanner";
+import JobSiteDetailsBanner from "@/components/messaging/JobSiteDetailsBanner";
 import { AttachmentButton, StagedFilePreview, MessageAttachments, uploadAttachments, type StagedFile } from "@/components/messaging/ChatAttachments";
 import { cn } from "@/lib/utils";
 import { dispatchMessageUnreadUpdated, isUnreadMessageType, UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
@@ -36,7 +38,7 @@ const sendProposalEmail = async (
 
     const providerName = providerProfile?.business_name || "A provider";
     const firstName = customerProfile.first_name?.trim() || "there";
-    const siteUrl = "https://bookatrade.lovable.app";
+    const siteUrl = getSiteUrl();
 
     let subjectLine = "";
     let actionHtml = "";
@@ -84,7 +86,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; agreed_price?: number; updated_at?: string; milestones_confirmed?: boolean; provider_id?: string | null };
+  jobs?: { title?: string; status?: string; agreed_price?: number; updated_at?: string; milestones_confirmed?: boolean; provider_id?: string | null; job_address?: string | null; job_phone?: string | null; access_notes?: string | null };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
@@ -116,7 +118,7 @@ const ProviderMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title, status, updated_at, agreed_price, milestones_confirmed, provider_id)")
+      .select("*, jobs(title, status, updated_at, agreed_price, milestones_confirmed, provider_id, job_address, job_phone, access_notes)")
       .eq("provider_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -504,6 +506,13 @@ const ProviderMessages = () => {
               ) : null}
             </div>
             <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} showProviderLink={false} />
+            <JobSiteDetailsBanner
+              jobAddress={selected.jobs?.job_address}
+              jobPhone={selected.jobs?.job_phone}
+              accessNotes={selected.jobs?.access_notes}
+              jobStatus={selected.jobs?.status}
+              variant="provider"
+            />
             <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3">
               {messages.map(m => {
                 const isOwn = m.sender_user_id === user!.id;

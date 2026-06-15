@@ -76,7 +76,7 @@ serve(async (req) => {
 
     if (customerProfile?.email) {
       const customerName = customerProfile.first_name || "there";
-      const origin = req.headers.get("origin") || "https://bookatrade.lovable.app";
+      const origin = req.headers.get("origin") || "https://bookatrade.io";
       const jobLink = `${origin}/dashboard/jobs/${job_id}`;
 
       const html = `

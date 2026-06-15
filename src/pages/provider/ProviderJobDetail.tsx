@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getSiteUrl } from "@/lib/site-url";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,7 @@ import MediaLightbox from "@/components/MediaLightbox";
 import QuestionnaireAnswers from "@/components/QuestionnaireAnswers";
 import ReviewDialog from "@/components/reviews/ReviewDialog";
 import CancellationRequestBanner from "@/components/CancellationRequestBanner";
+import ScoreBadge from "@/components/reviews/ScoreBadge";
 import { format } from "date-fns";
 
 const ProviderJobDetail = () => {
@@ -181,6 +183,11 @@ const ProviderJobDetail = () => {
 
   const hasConfirmedPayment = escrowPayments.some(p => p.status === "held" || p.status === "released");
 
+  const totalPaidOrHeld = escrowPayments
+    .filter(p => p.status === 'held' || p.status === 'released')
+    .reduce((sum, p) => sum + Number(p.amount), 0);
+  const fullyPaid = job?.agreed_price && totalPaidOrHeld >= Number(job.agreed_price);
+
   const handleCancelJob = async () => {
     setCancellingJob(true);
     if (!hasConfirmedPayment) {
@@ -226,7 +233,7 @@ const ProviderJobDetail = () => {
                 </div>
                 <p style="font-size:14px;color:#555;">Please log in to review the request and accept or decline the cancellation.</p>
                 <div style="text-align:center;padding:16px 0;">
-                  <a href="https://bookatrade.lovable.app/dashboard/jobs/${jobId}" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">Review Request</a>
+                  <a href="${getSiteUrl()}/dashboard/jobs/${jobId}" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">Review Request</a>
                 </div>
               </div>
               <div style="text-align:center;padding-top:16px;border-top:1px solid #eee;"><p style="font-size:12px;color:#aaa;margin:0;">&copy; BookATrade. All rights reserved.</p></div>
@@ -300,22 +307,42 @@ const ProviderJobDetail = () => {
         <CancellationRequestBanner jobId={jobId!} role="provider" onResolved={fetchAll} />
       )}
 
-      {jobActions.length > 0 && (
-        <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-          <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold text-sm text-destructive">Action Required</p>
-            {jobActions.map((a, i) => (
-              <p key={i} className="text-sm text-muted-foreground mt-0.5">• {a.label}</p>
-            ))}
-          </div>
-        </div>
-      )}
+      {jobActions.length > 0 && (() => {
+        const urgentActions = jobActions.filter(a => a.type === 'payment' || a.type === 'setup');
+        const infoActions = jobActions.filter(a => a.type === 'review' || a.type === 'complete');
+        return (
+          <>
+            {urgentActions.length > 0 && (
+              <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+                <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-sm text-destructive">Action Required</p>
+                  {urgentActions.map((a, i) => (
+                    <p key={i} className="text-sm text-muted-foreground mt-0.5 cursor-pointer hover:text-destructive transition-colors" onClick={() => document.getElementById(a.type === 'setup' ? 'milestone-setup-section' : 'work-tracker-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>• {a.label}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+            {infoActions.length > 0 && (
+              <div className="flex items-start gap-3 rounded-lg border border-amber-300/30 bg-amber-50 dark:bg-amber-950/20 p-4">
+                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-sm text-amber-700 dark:text-amber-400">Attention Needed</p>
+                  {infoActions.map((a, i) => (
+                    <p key={i} className="text-sm text-muted-foreground mt-0.5 cursor-pointer hover:text-amber-700 dark:hover:text-amber-300 transition-colors" onClick={() => document.getElementById(a.type === 'review' ? 'review-section' : 'work-tracker-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>• {a.label}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
             <CardTitle className="text-lg sm:text-xl">{job.title}</CardTitle>
+            <ScoreBadge userId={job.customer_user_id} role="customer" />
             <Badge className="self-start">{job.status.replace("_", " ")}</Badge>
           </div>
         </CardHeader>
@@ -481,20 +508,24 @@ const ProviderJobDetail = () => {
 
       {/* Milestone Setup - shown when job is accepted but milestones not yet confirmed */}
       {existingQuote?.status === "accepted" && job.status === "accepted" && !(job as any).milestones_confirmed && job.agreed_price && (
-        <MilestoneSetup
+        <div id="milestone-setup-section">
+          <MilestoneSetup
           jobId={jobId!}
           agreedPrice={Number(job.agreed_price)}
           scheduledStart={job.scheduled_start}
           scheduledEnd={job.scheduled_end}
           onConfirmed={fetchAll}
         />
+        </div>
       )}
 
       {/* Work Tracker */}
-      <WorkTracker jobId={jobId!} job={job} role="provider" onRefresh={fetchAll} />
+      <div id="work-tracker-section">
+        <WorkTracker jobId={jobId!} job={job} role="provider" onRefresh={fetchAll} />
+      </div>
 
       {/* Schedule - visible when provider's quote was accepted */}
-      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && !allMilestonesCompleted && (
+      {existingQuote?.status === "accepted" && ["accepted", "in_progress"].includes(job.status) && !allMilestonesCompleted && !fullyPaid && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -540,7 +571,7 @@ const ProviderJobDetail = () => {
       )}
       {/* Review section for completed jobs */}
       {job.status === "completed" && job.provider_id === user?.id && (
-        <Card>
+        <Card id="review-section">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Star className="h-4 w-4" /> Leave a Review

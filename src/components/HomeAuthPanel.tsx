@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +36,22 @@ const HomeAuthPanel = () => {
 
   const handleAddPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles = Array.from(e.target.files).slice(0, 5 - recPhotos.length);
+      const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+      const maxSize = 5 * 1024 * 1024;
+      const incoming = Array.from(e.target.files);
+      const valid: File[] = [];
+      for (const file of incoming) {
+        if (!allowedTypes.includes(file.type)) {
+          toast({ title: "Invalid file type", description: `${file.name} is not a supported image format (PNG, JPG, WebP).`, variant: "destructive" });
+          continue;
+        }
+        if (file.size > maxSize) {
+          toast({ title: "File too large", description: `${file.name} exceeds the 5MB limit.`, variant: "destructive" });
+          continue;
+        }
+        valid.push(file);
+      }
+      const newFiles = valid.slice(0, 5 - recPhotos.length);
       setRecPhotos((prev) => [...prev, ...newFiles].slice(0, 5));
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -111,11 +125,12 @@ const HomeAuthPanel = () => {
   };
 
   const handleGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
     });
-    if (result?.error) {
-      toast({ title: "Google sign-in failed", description: String(result.error), variant: "destructive" });
+    if (error) {
+      toast({ title: "Google sign-in failed", description: error.message, variant: "destructive" });
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,11 +19,18 @@ interface ReviewDialogProps {
   onReviewSubmitted?: () => void;
 }
 
-const ratingLabels = {
+const customerRatingLabels: Record<string, string> = {
   communication: "Communication",
   quality: "Quality of Work",
   value: "Value for Money",
   reliability: "Reliability & Punctuality",
+};
+
+const providerRatingLabels: Record<string, string> = {
+  communication: "Communication & Clarity",
+  payment_timeliness: "Payment Timeliness",
+  site_preparation: "Site Access & Preparation",
+  overall_experience: "Overall Experience",
 };
 
 const StarRating = ({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) => {
@@ -68,29 +75,50 @@ const ReviewDialog = ({
   onReviewSubmitted,
 }: ReviewDialogProps) => {
   const { toast } = useToast();
-  const [communication, setCommunication] = useState(0);
-  const [quality, setQuality] = useState(0);
-  const [value, setValue] = useState(0);
-  const [reliability, setReliability] = useState(0);
+
+  const ratingLabels = reviewerRole === "provider" ? providerRatingLabels : customerRatingLabels;
+  const keys = useMemo(() => Object.keys(ratingLabels), [reviewerRole]);
+
+  const initRatings = () => Object.fromEntries(keys.map(k => [k, 0]));
+  const [ratings, setRatings] = useState<Record<string, number>>(initRatings);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const allRated = communication > 0 && quality > 0 && value > 0 && reliability > 0;
-  const avgRating = allRated ? ((communication + quality + value + reliability) / 4).toFixed(1) : null;
+  // Reset when dialog opens with potentially different role
+  const handleOpenChange = (next: boolean) => {
+    if (next) {
+      setRatings(initRatings());
+      setComment("");
+    }
+    onOpenChange(next);
+  };
+
+  const allRated = keys.every(k => ratings[k] > 0);
+  const ratingValues = keys.map(k => ratings[k]);
+  const avgRating = allRated ? (ratingValues.reduce((s, v) => s + v, 0) / ratingValues.length).toFixed(1) : null;
 
   const handleSubmit = async () => {
     if (!allRated) return;
     setSubmitting(true);
+
+    // Map dynamic keys back to the DB columns — customer role uses original columns,
+    // provider role stores in the same columns for DB compatibility
+    const columnMap: Record<string, string> = reviewerRole === "provider"
+      ? { communication: "communication_rating", payment_timeliness: "quality_rating", site_preparation: "value_rating", overall_experience: "reliability_rating" }
+      : { communication: "communication_rating", quality: "quality_rating", value: "value_rating", reliability: "reliability_rating" };
+
+    const ratingsPayload: Record<string, number> = {};
+    for (const key of keys) {
+      const col = columnMap[key];
+      if (col) ratingsPayload[col] = ratings[key];
+    }
 
     const { error } = await supabase.from("reviews").insert({
       job_id: jobId,
       reviewer_user_id: reviewerUserId,
       reviewee_user_id: revieweeUserId,
       reviewer_role: reviewerRole,
-      communication_rating: communication,
-      quality_rating: quality,
-      value_rating: value,
-      reliability_rating: reliability,
+      ...ratingsPayload,
       comment: comment.trim() || null,
     } as any);
 
@@ -102,14 +130,14 @@ const ReviewDialog = ({
       }
     } else {
       toast({ title: "Review submitted!", description: "Thank you for your feedback." });
-      onOpenChange(false);
+      handleOpenChange(false);
       onReviewSubmitted?.();
     }
     setSubmitting(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Leave a Review</DialogTitle>
@@ -119,10 +147,14 @@ const ReviewDialog = ({
         </DialogHeader>
 
         <div className="space-y-4">
-          <StarRating label={ratingLabels.communication} value={communication} onChange={setCommunication} />
-          <StarRating label={ratingLabels.quality} value={quality} onChange={setQuality} />
-          <StarRating label={ratingLabels.value} value={value} onChange={setValue} />
-          <StarRating label={ratingLabels.reliability} value={reliability} onChange={setReliability} />
+          {keys.map(key => (
+            <StarRating
+              key={key}
+              label={ratingLabels[key]}
+              value={ratings[key]}
+              onChange={v => setRatings(prev => ({ ...prev, [key]: v }))}
+            />
+          ))}
 
           {avgRating && (
             <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
@@ -154,3 +186,4 @@ const ReviewDialog = ({
 };
 
 export default ReviewDialog;
+

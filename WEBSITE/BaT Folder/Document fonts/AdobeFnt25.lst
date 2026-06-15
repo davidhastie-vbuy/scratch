@@ -1,0 +1,331 @@
+%!Adobe-FontList 1.25
+%Locale:0x409
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Invalid
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/AdobeFnt25.lst
+FileLength:7440
+FileModTime:803231393
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Bauhaus-Bold
+FamilyName:Bauhaus
+StyleName:Bold
+MenuName:Bauhaus
+StyleBits:2
+WeightClass:7
+WidthClass:5
+AngleClass:0
+FullName:Bauhaus Bold
+WritingScript:Roman
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/BauhausBold.ttf
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:50212
+FileModTime:665726456
+NameArray:0,Mac,4,Bauhaus Bold
+NameArray:0,Win,1,Bauhaus
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Bauhaus-Regular
+FamilyName:Bauhaus
+StyleName:Regular
+MenuName:Bauhaus
+StyleBits:0
+WeightClass:400
+WidthClass:5
+AngleClass:0
+FullName:Bauhaus Regular
+WritingScript:Roman
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/BauhausRegular.ttf
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:52788
+FileModTime:665726456
+NameArray:0,Mac,4,Bauhaus Regular
+NameArray:0,Win,1,Bauhaus
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:FuturaCyrillic-Bold
+FamilyName:Futura PT
+StyleName:Bold
+MenuName:Futura Cyrillic Bold
+StyleBits:0
+WeightClass:700
+WidthClass:5
+AngleClass:0
+FullName:Futura Cyrillic Bold
+FamilyNameNative:
+StyleNameNative:Bold
+FullNameNative:
+WritingScript:Cyrillic
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/FuturaCyrillicBold.ttf
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:67832
+FileModTime:665726458
+NameArray:0,Mac,4,Futura Cyrillic Bold
+NameArray:0,Win,1,Futura Cyrillic Bold
+NameArray:0,Win,16,Futura PT
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:FuturaCyrillicBook
+FamilyName:Futura PT
+StyleName:Book
+MenuName:Futura Cyrillic Book
+StyleBits:0
+WeightClass:400
+WidthClass:5
+AngleClass:0
+FullName:Futura Cyrillic Book
+FamilyNameNative:
+StyleNameNative:Book
+FullNameNative:
+WritingScript:Cyrillic
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/FuturaCyrillicBook.ttf
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:64136
+FileModTime:665726458
+NameArray:0,Mac,4,Futura Cyrillic Book
+NameArray:0,Win,1,Futura Cyrillic Book
+NameArray:0,Win,16,Futura PT
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:FuturaCyrillic-Demi
+FamilyName:Futura PT
+StyleName:Demi
+MenuName:Futura Cyrillic Demi
+StyleBits:0
+WeightClass:500
+WidthClass:5
+AngleClass:0
+FullName:Futura Cyrillic Demi
+FamilyNameNative:
+StyleNameNative:Demi
+FullNameNative:
+WritingScript:Cyrillic
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/FuturaCyrillicDemi.ttf
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:66224
+FileModTime:665726458
+NameArray:0,Mac,4,Futura Cyrillic Demi
+NameArray:0,Win,1,Futura Cyrillic Demi
+NameArray:0,Win,16,Futura PT
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:FuturaCyrillicHeavy
+FamilyName:Futura PT
+StyleName:Heavy
+MenuName:Futura Cyrillic Heavy
+StyleBits:0
+WeightClass:600
+WidthClass:5
+AngleClass:0
+FullName:Futura Cyrillic Heavy
+FamilyNameNative:
+StyleNameNative:Heavy
+FullNameNative:
+WritingScript:Cyrillic
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/FuturaCyrillicHeavy.ttf
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:65112
+FileModTime:665726458
+NameArray:0,Mac,4,Futura Cyrillic Heavy
+NameArray:0,Win,1,Futura Cyrillic Heavy
+NameArray:0,Win,16,Futura PT
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:FuturaCyrillicMedium
+FamilyName:Futura PT
+StyleName:Medium
+MenuName:Futura Cyrillic Medium
+StyleBits:0
+WeightClass:450
+WidthClass:5
+AngleClass:0
+FullName:Futura Cyrillic Medium
+FamilyNameNative:
+StyleNameNative:Medium
+FullNameNative:
+WritingScript:Cyrillic
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/FuturaCyrillicMedium.ttf
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:66700
+FileModTime:665726458
+NameArray:0,Mac,4,Futura Cyrillic Medium
+NameArray:0,Win,1,Futura Cyrillic Medium
+NameArray:0,Win,16,Futura PT
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Futura-Bold
+FamilyName:Futura
+StyleName:Bold
+MenuName:Futura
+StyleBits:2
+WeightClass:700
+WidthClass:5
+AngleClass:0
+FullName:Futura Bold
+WritingScript:Roman
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/Futura.ttc
+TTCOffset:612
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:487620
+FileModTime:793683692
+NameArray:0,Mac,4,Futura Bold
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Futura-CondensedExtraBold
+FamilyName:Futura
+StyleName:Condensed ExtraBold
+MenuName:Futura
+StyleBits:2
+WeightClass:800
+WidthClass:3
+AngleClass:0
+FullName:Futura Condensed ExtraBold
+WritingScript:Roman
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/Futura.ttc
+TTCOffset:1196
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:487620
+FileModTime:793683692
+NameArray:0,Mac,4,Futura Condensed ExtraBold
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Futura-CondensedMedium
+FamilyName:Futura
+StyleName:Condensed Medium
+MenuName:Futura
+StyleBits:0
+WeightClass:500
+WidthClass:3
+AngleClass:0
+FullName:Futura Condensed Medium
+WritingScript:Roman
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/Futura.ttc
+TTCOffset:912
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:487620
+FileModTime:793683692
+NameArray:0,Mac,4,Futura Condensed Medium
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Futura-Medium
+FamilyName:Futura
+StyleName:Medium
+MenuName:Futura
+StyleBits:0
+WeightClass:500
+WidthClass:5
+AngleClass:0
+FullName:Futura Medium
+WritingScript:Roman
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/Futura.ttc
+TTCOffset:44
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:487620
+FileModTime:793683692
+NameArray:0,Mac,4,Futura Medium
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:Futura-MediumItalic
+FamilyName:Futura
+StyleName:Medium Italic
+MenuName:Futura
+StyleBits:1
+WeightClass:500
+WidthClass:5
+AngleClass:1
+FullName:Futura Medium Italic
+WritingScript:Roman
+OutlineFileName:/Users/hayleyharvey/Library/CloudStorage/Dropbox/6. YASH/WEB BRANDING/WESBITE/BaT Folder/Document fonts/Futura.ttc
+TTCOffset:328
+DataFormat:sfntData
+hasSVG:no
+hasSBIX:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:487620
+FileModTime:793683692
+NameArray:0,Mac,4,Futura Medium Italic
+%EndFont
+

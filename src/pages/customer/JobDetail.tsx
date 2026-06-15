@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { getSiteUrl } from "@/lib/site-url";
 import { transformAcceptedMessageForCustomer } from "@/lib/message-transform";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -364,7 +365,7 @@ const JobDetail = () => {
                 </div>
                 <p style="font-size:14px;color:#555;">Please log in to review the request and accept or decline the cancellation.</p>
                 <div style="text-align:center;padding:16px 0;">
-                  <a href="https://bookatrade.lovable.app/provider/messages" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">Review Request</a>
+                  <a href="${getSiteUrl()}/provider/messages" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:bold;">Review Request</a>
                 </div>
               </div>
               <div style="text-align:center;padding-top:16px;border-top:1px solid #eee;"><p style="font-size:12px;color:#aaa;margin:0;">&copy; BookATrade. All rights reserved.</p></div>
@@ -568,7 +569,9 @@ const JobDetail = () => {
   }, [chatConvId]);
 
   const isActiveJob = !!job && ["accepted", "in_progress"].includes(job.status);
-  const { actions: jobActionsMap } = useJobActions(isActiveJob && job ? [job.id] : [], "customer", user?.id);
+  // refreshKey ensures the action banner re-evaluates after escrow status changes (e.g. pending → held)
+  const escrowRefreshKey = escrowPayments.map(p => `${p.id}:${p.status}`).join(",");
+  const { actions: jobActionsMap } = useJobActions(isActiveJob && job ? [job.id] : [], "customer", user?.id, escrowRefreshKey.length);
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!job) return <p className="text-muted-foreground">Job not found.</p>;
@@ -588,17 +591,36 @@ const JobDetail = () => {
         <CancellationRequestBanner jobId={jobId!} role="customer" onResolved={fetchAll} />
       )}
 
-      {jobActions.length > 0 && (
-        <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-          <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold text-sm text-destructive">Action Required</p>
-            {jobActions.map((a, i) => (
-              <p key={i} className="text-sm text-muted-foreground mt-0.5">• {a.label}</p>
-            ))}
-          </div>
-        </div>
-      )}
+      {jobActions.length > 0 && (() => {
+        const urgentActions = jobActions.filter(a => a.type === 'payment' || a.type === 'setup');
+        const infoActions = jobActions.filter(a => a.type === 'review' || a.type === 'complete');
+        return (
+          <>
+            {urgentActions.length > 0 && (
+              <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+                <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-sm text-destructive">Action Required</p>
+                  {urgentActions.map((a, i) => (
+                    <p key={i} className="text-sm text-muted-foreground mt-0.5 cursor-pointer hover:text-destructive transition-colors" onClick={() => document.getElementById(a.type === 'payment' ? 'payment-section' : 'milestone-setup-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>• {a.label}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+            {infoActions.length > 0 && (
+              <div className="flex items-start gap-3 rounded-lg border border-amber-300/30 bg-amber-50 dark:bg-amber-950/20 p-4">
+                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-sm text-amber-700 dark:text-amber-400">Attention Needed</p>
+                  {infoActions.map((a, i) => (
+                    <p key={i} className="text-sm text-muted-foreground mt-0.5 cursor-pointer hover:text-amber-700 dark:hover:text-amber-300 transition-colors" onClick={() => document.getElementById(a.type === 'review' ? 'work-tracker-section' : 'payment-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>• {a.label}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       <Card>
         <CardHeader>
@@ -831,7 +853,7 @@ const JobDetail = () => {
 
       {/* Payment Section - visible when milestones are confirmed */}
       {["accepted", "in_progress"].includes(job.status) && job.agreed_price && (job as any).milestones_confirmed && (
-        <Card>
+        <Card id="payment-section">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <CreditCard className="h-4 w-4" /> Payments
@@ -880,7 +902,9 @@ const JobDetail = () => {
       )}
 
       {/* Work Tracker */}
-      <WorkTracker jobId={jobId!} job={job} role="customer" onRefresh={fetchAll} />
+      <div id="work-tracker-section">
+        <WorkTracker jobId={jobId!} job={job} role="customer" onRefresh={fetchAll} refreshKey={escrowRefreshKey.length} />
+      </div>
 
       {/* Review section for completed jobs */}
       {job.status === "completed" && job.provider_id && (
@@ -1120,6 +1144,28 @@ const JobDetail = () => {
           setEditSiteDialog(false);
           toast({ title: "Site details updated" });
           fetchAll();
+
+          // Notify provider about address change
+          try {
+            const { data: conv } = await supabase
+              .from("conversations")
+              .select("id")
+              .eq("job_id", jobId!)
+              .eq("customer_user_id", user!.id)
+              .eq("provider_user_id", job.provider_id)
+              .maybeSingle();
+
+            if (conv?.id) {
+              await supabase.from("messages").insert({
+                conversation_id: conv.id,
+                sender_user_id: user!.id,
+                body: `📍 Job site details have been updated.\n\nAddress: ${details.job_address}${details.access_notes ? `\nAccess notes: ${details.access_notes}` : ''}`,
+                message_type: "system",
+              } as any);
+            }
+          } catch (e) {
+            console.error("Failed to notify provider about address change:", e);
+          }
         }}
       />
 

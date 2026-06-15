@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
@@ -11,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, ArrowRight, Upload, X, CheckCircle2, Loader2, Info } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { categoryQuestionnaires } from "@/lib/category-questionnaires";
 import { extractPostcodeDistrict, formatPostcode } from "@/lib/format-postcode";
@@ -54,6 +57,13 @@ const PostJob = () => {
     }
   }, [user]);
   const [files, setFiles] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{
+    phase: 'creating' | 'uploading' | 'done';
+    currentFile: number;
+    totalFiles: number;
+    currentFileName: string;
+    completedFiles: number[];
+  } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const questionnaireFields = form.category ? (categoryQuestionnaires[form.category] || []) : [];
@@ -96,12 +106,15 @@ const PostJob = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Filter out empty questionnaire answers
       const filteredAnswers = Object.fromEntries(
         Object.entries(questionnaireAnswers).filter(([_, v]) => v && v.trim())
       );
 
-      // Create job
+      // Phase 1: Create job
+      if (files.length > 0) {
+        setUploadProgress({ phase: 'creating', currentFile: 0, totalFiles: files.length, currentFileName: '', completedFiles: [] });
+      }
+
       const { data: job, error: jobErr } = await supabase
         .from("jobs")
         .insert({
@@ -119,12 +132,23 @@ const PostJob = () => {
 
       if (jobErr) throw jobErr;
 
-      // Upload files
+      // Phase 2: Upload files with progress
       if (job && files.length > 0) {
-        for (const file of files) {
+        const completed: number[] = [];
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          setUploadProgress({
+            phase: 'uploading',
+            currentFile: i + 1,
+            totalFiles: files.length,
+            currentFileName: file.name,
+            completedFiles: [...completed],
+          });
           const path = `${user!.id}/${job.id}/${Date.now()}-${file.name}`;
           const { error: upErr } = await supabase.storage.from("job-media").upload(path, file);
-          if (!upErr) {
+          if (upErr) {
+            toast({ title: "Upload failed", description: `Failed to upload ${file.name}: ${upErr.message}`, variant: "destructive" });
+          } else {
             await supabase.from("job_media").insert({
               job_id: job.id,
               user_id: user!.id,
@@ -134,13 +158,16 @@ const PostJob = () => {
               file_size: file.size,
             } as any);
           }
+          completed.push(i);
         }
+        setUploadProgress({ phase: 'done', currentFile: files.length, totalFiles: files.length, currentFileName: '', completedFiles: completed });
       }
 
       setSubmitted(true);
     } catch (err: any) {
       toast({ title: "Failed to post job", description: err.message, variant: "destructive" });
     }
+    setUploadProgress(null);
     setLoading(false);
   };
 
@@ -373,21 +400,65 @@ const PostJob = () => {
             </>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between">
-          {step > 0 ? (
-            <Button variant="outline" onClick={() => setStep(s => s - 1)}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
-            </Button>
-          ) : <div />}
-          {step < totalSteps - 1 ? (
-            <Button onClick={() => { if (validate(contentStep)) setStep(s => s + 1); }}>
-              {hasQuestionnaire && contentStep === 0 ? "Next" : "Next"} <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button onClick={handleSubmit} disabled={loading}>
-              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Posting...</> : "Post Job"}
-            </Button>
+        <CardFooter className="flex flex-col gap-3">
+          {uploadProgress && (
+            <div className="w-full space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">
+                  {uploadProgress.phase === 'creating' && 'Creating job…'}
+                  {uploadProgress.phase === 'uploading' && `Uploading ${uploadProgress.currentFileName}`}
+                  {uploadProgress.phase === 'done' && 'Upload complete!'}
+                </span>
+                {uploadProgress.phase === 'uploading' && (
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {uploadProgress.currentFile}/{uploadProgress.totalFiles}
+                  </span>
+                )}
+              </div>
+              <Progress
+                value={uploadProgress.phase === 'creating' ? 5 : uploadProgress.phase === 'done' ? 100 : (uploadProgress.completedFiles.length / uploadProgress.totalFiles) * 100}
+                className="h-2"
+              />
+              {uploadProgress.phase === 'uploading' && files.length > 1 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {files.map((f, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border",
+                        uploadProgress.completedFiles.includes(i)
+                          ? "bg-primary/10 text-primary border-primary/20"
+                          : uploadProgress.currentFile === i + 1
+                          ? "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 animate-pulse"
+                          : "bg-muted text-muted-foreground border-transparent"
+                      )}
+                    >
+                      {uploadProgress.completedFiles.includes(i) && (
+                        <CheckCircle2 className="h-3 w-3" />
+                      )}
+                      <span className="truncate max-w-[80px]">{f.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
+          <div className="flex justify-between w-full">
+            {step > 0 ? (
+              <Button variant="outline" onClick={() => setStep(s => s - 1)} disabled={loading}>
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back
+              </Button>
+            ) : <div />}
+            {step < totalSteps - 1 ? (
+              <Button onClick={() => { if (validate(contentStep)) setStep(s => s + 1); }}>
+                Next <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button onClick={handleSubmit} disabled={loading}>
+                {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {uploadProgress ? 'Uploading…' : 'Posting…'}</> : "Post Job"}
+              </Button>
+            )}
+          </div>
         </CardFooter>
       </Card>
     </div>

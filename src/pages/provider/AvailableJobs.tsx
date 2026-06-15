@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Briefcase, Mail, ImageIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import MediaLightbox from "@/components/MediaLightbox";
+import ScoreBadge from "@/components/reviews/ScoreBadge";
 
 const AvailableJobs = () => {
   const { user } = useAuth();
@@ -124,6 +125,7 @@ const AvailableJobs = () => {
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
               <CardTitle className="text-base">{job.title}</CardTitle>
+              <ScoreBadge userId={job.customer_user_id} role="customer" />
               {(showInvitedBadge || job._invited) && (
                 <Badge variant="default" className="gap-1 text-xs">
                   <Mail className="h-3 w-3" /> Invited

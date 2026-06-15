@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getSiteUrl } from "@/lib/site-url";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -136,8 +137,8 @@ const CancellationRequestBanner = ({ jobId, role, onResolved }: Props) => {
       if (info && info.otherEmail && info.emailEnabled) {
         const otherRole = role === "customer" ? "provider" : "customer";
         const ctaUrl = otherRole === "provider"
-          ? `https://bookatrade.lovable.app/provider/jobs/${jobId}`
-          : `https://bookatrade.lovable.app/dashboard/jobs/${jobId}`;
+          ? `${getSiteUrl()}/provider/jobs/${jobId}`
+          : `${getSiteUrl()}/dashboard/jobs/${jobId}`;
         await sendCancellationEmail(
           info.otherEmail,
           info.otherName,
@@ -177,8 +178,8 @@ const CancellationRequestBanner = ({ jobId, role, onResolved }: Props) => {
       if (info && info.otherEmail && info.emailEnabled) {
         const otherRole = role === "customer" ? "provider" : "customer";
         const ctaUrl = otherRole === "provider"
-          ? `https://bookatrade.lovable.app/provider/jobs/${jobId}`
-          : `https://bookatrade.lovable.app/dashboard/jobs/${jobId}`;
+          ? `${getSiteUrl()}/provider/jobs/${jobId}`
+          : `${getSiteUrl()}/dashboard/jobs/${jobId}`;
         await sendCancellationEmail(
           info.otherEmail,
           info.otherName,

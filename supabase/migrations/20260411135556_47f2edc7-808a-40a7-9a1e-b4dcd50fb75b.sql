@@ -1,1 +1,1 @@
-DROP POLICY "Authenticated users can view active provider documents" ON public.provider_documents;
+DROP POLICY IF EXISTS "Authenticated users can view active provider documents" ON public.provider_documents;

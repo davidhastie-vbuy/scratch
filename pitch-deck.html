@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookATrade — Investor Deck</title>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,500;6..12,600;6..12,700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════
+       DESIGN TOKENS — Matching BookATrade Platform
+       ═══════════════════════════════════════════════ */
+    :root {
+      --primary: #F97316;
+      --primary-light: #FB923C;
+      --primary-dark: #C2410C;
+      --primary-glow: rgba(249, 115, 22, 0.15);
+      --navy: #1D2033;
+      --navy-light: #282C42;
+      --navy-lighter: #353A54;
+      --navy-muted: #6B7094;
+      --surface: #FDFAF7;
+      --surface-card: #FFFFFF;
+      --text-primary: #1D2033;
+      --text-secondary: #6B7094;
+      --text-on-dark: #E8E4DF;
+      --text-on-dark-muted: #9B97A0;
+      --border: #E5E1DC;
+      --success: #22C55E;
+      --radius: 0.5rem;
+      --font-body: 'Nunito Sans', system-ui, sans-serif;
+      --font-display: 'Manrope', system-ui, sans-serif;
+    }
+
+    /* ═══════════════════════════════════════
+       RESET & BASE
+       ═══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: var(--navy);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    /* ═══════════════════════════════════════
+       SLIDE ENGINE
+       ═══════════════════════════════════════ */
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 80px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(60px);
+      transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 0s 0.55s;
+      overflow: hidden;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 0s 0s;
+    }
+
+    .slide.prev {
+      transform: translateX(-60px);
+    }
+
+    /* Staggered child animations */
+    .slide.active .anim {
+      animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    .slide.active .anim:nth-child(1) { animation-delay: 0.1s; }
+    .slide.active .anim:nth-child(2) { animation-delay: 0.2s; }
+    .slide.active .anim:nth-child(3) { animation-delay: 0.3s; }
+    .slide.active .anim:nth-child(4) { animation-delay: 0.4s; }
+    .slide.active .anim:nth-child(5) { animation-delay: 0.5s; }
+    .slide.active .anim:nth-child(6) { animation-delay: 0.6s; }
+    .slide.active .anim:nth-child(7) { animation-delay: 0.7s; }
+    .slide.active .anim:nth-child(8) { animation-delay: 0.8s; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════
+       SLIDE THEMES
+       ═══════════════════════════════════════ */
+    .slide--dark {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+      color: var(--text-on-dark);
+    }
+
+    .slide--light {
+      background: var(--surface);
+      color: var(--text-primary);
+    }
+
+    .slide--gradient {
+      background: linear-gradient(135deg, var(--navy) 0%, #1a1530 40%, var(--navy-light) 100%);
+      color: var(--text-on-dark);
+    }
+
+    .slide--orange {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #FFFFFF;
+    }
+
+    /* ═══════════════════════════════════════
+       TYPOGRAPHY UTILITIES
+       ═══════════════════════════════════════ */
+    .headline-xl {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .headline-lg {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .headline-md {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 700;
+    }
+
+    .body-lg {
+      font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .body-md {
+      font-size: clamp(0.95rem, 1.4vw, 1.125rem);
+      line-height: 1.6;
+    }
+
+    .label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .text-orange { color: var(--primary); }
+    .text-muted { color: var(--text-secondary); }
+    .text-muted-dark { color: var(--text-on-dark-muted); }
+
+    /* ═══════════════════════════════════════
+       LAYOUT UTILITIES
+       ═══════════════════════════════════════ */
+    .slide-content {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .flex-col { display: flex; flex-direction: column; }
+    .flex-row { display: flex; align-items: center; }
+    .gap-sm { gap: 12px; }
+    .gap-md { gap: 20px; }
+    .gap-lg { gap: 32px; }
+    .gap-xl { gap: 48px; }
+
+    /* ═══════════════════════════════════════
+       COMPONENT STYLES
+       ═══════════════════════════════════════ */
+    .card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px -8px rgba(29, 32, 51, 0.12);
+    }
+
+    .card--dark {
+      background: var(--navy-lighter);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: var(--text-on-dark);
+    }
+
+    .card--dark:hover {
+      box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .stat-label-dark {
+      color: var(--text-on-dark-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: var(--font-display);
+    }
+
+    .badge--orange {
+      background: var(--primary-glow);
+      color: var(--primary);
+    }
+
+    .badge--outline {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-on-dark-muted);
+    }
+
+    .divider {
+      width: 60px;
+      height: 3px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--primary-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .icon-circle--dark {
+      background: rgba(249, 115, 22, 0.12);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar__fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      transition: width 1s ease;
+    }
+
+    /* Logo in header */
+    .logo-wordmark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: white;
+    }
+
+    .logo-wordmark img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+
+    .logo-wordmark span.a { color: var(--primary); }
+
+    /* Hero image styling */
+    .hero-image {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 16px;
+      box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* Decorative elements */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    .glow-orb--orange {
+      background: var(--primary);
+      width: 300px;
+      height: 300px;
+    }
+
+    .glow-orb--blue {
+      background: #3B82F6;
+      width: 200px;
+      height: 200px;
+    }
+
+    /* Step flow */
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* Timeline */
+    .timeline-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .timeline-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--primary);
+      flex-shrink: 0;
+      margin-top: 6px;
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+    }
+
+    .timeline-dot--future {
+      background: var(--navy-lighter);
+      border: 2px solid var(--navy-muted);
+      box-shadow: none;
+    }
+
+    /* Use of funds bar chart */
+    .fund-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .fund-bar__label {
+      width: 160px;
+      text-align: right;
+      font-weight: 600;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .fund-bar__track {
+      flex: 1;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .fund-bar__fill {
+      height: 100%;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: white;
+      font-family: var(--font-display);
+    }
+
+    .fund-bar__fill--primary { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+    .fund-bar__fill--navy { background: linear-gradient(90deg, var(--navy-lighter), var(--navy-muted)); }
+    .fund-bar__fill--success { background: linear-gradient(90deg, #22C55E, #4ADE80); }
+
+    /* ═══════════════════════════════════════
+       NAVIGATION
+       ═══════════════════════════════════════ */
+    .nav {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(29, 32, 51, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 8px 16px;
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+    }
+
+    .nav__dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .nav__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      padding: 0;
+    }
+
+    .nav__dot.active {
+      background: var(--primary);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    .nav__btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: transparent;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav__btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .nav__counter {
+      color: var(--text-on-dark-muted);
+      font-size: 0.75rem;
+      font-family: var(--font-display);
+      font-weight: 600;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════
+       SLIDE-SPECIFIC DECORATION
+       ═══════════════════════════════════════ */
+    .slide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1100px;
+      position: absolute;
+      top: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0 40px;
+    }
+
+    .competitor-row {
+      display: grid;
+      grid-template-columns: 140px repeat(3, 1fr);
+      gap: 2px;
+      font-size: 0.85rem;
+    }
+
+    .competitor-row > div {
+      padding: 10px 14px;
+    }
+
+    .competitor-header {
+      background: var(--navy-lighter);
+      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      color: var(--text-on-dark-muted);
+    }
+
+    .competitor-header:first-child { border-radius: 8px 0 0 0; }
+    .competitor-header:last-child { border-radius: 0 8px 0 0; }
+
+    .competitor-cell {
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .competitor-cell--highlight {
+      background: rgba(249, 115, 22, 0.08);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* CTA button */
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(249, 115, 22, 0.4);
+    }
+
+    .cta-btn--outline {
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: none;
+    }
+
+    .cta-btn--outline:hover {
+      border-color: var(--primary);
+      box-shadow: none;
+    }
+
+    /* ═══════════════════════════════════════
+       EDIT MODE
+       ═══════════════════════════════════════ */
+    .edit-toolbar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(29, 32, 51, 0.92);
+      backdrop-filter: blur(16px);
+      padding: 8px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 200;
+      font-family: var(--font-display);
+      transition: all 0.3s ease;
+    }
+
+    .edit-toolbar__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.75);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .edit-toolbar__btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+    }
+
+    .edit-toolbar__btn--active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .edit-toolbar__btn--active:hover {
+      background: var(--primary-light);
+    }
+
+    .edit-toolbar__btn--download {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.3);
+      color: #4ADE80;
+    }
+
+    .edit-toolbar__btn--download:hover {
+      background: rgba(34, 197, 94, 0.25);
+      color: #86EFAC;
+    }
+
+    .edit-toolbar__btn--reset {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: rgba(239, 68, 68, 0.7);
+    }
+
+    .edit-toolbar__btn--reset:hover {
+      background: rgba(239, 68, 68, 0.12);
+      color: #F87171;
+    }
+
+    .edit-toolbar__divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .edit-toolbar__status {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.4);
+      padding: 0 4px;
+      transition: all 0.3s ease;
+    }
+
+    .edit-toolbar__status--saved {
+      color: #4ADE80;
+    }
+
+    /* Editable element styles */
+    body.edit-mode [data-editable] {
+      outline: 2px dashed rgba(249, 115, 22, 0.35);
+      outline-offset: 4px;
+      border-radius: 4px;
+      cursor: text;
+      transition: outline-color 0.2s ease;
+      min-height: 1em;
+    }
+
+    body.edit-mode [data-editable]:hover {
+      outline-color: rgba(249, 115, 22, 0.6);
+    }
+
+    body.edit-mode [data-editable]:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 4px;
+      background: rgba(249, 115, 22, 0.04);
+    }
+
+    /* Dark slide editable focus */
+    body.edit-mode .slide--dark [data-editable]:focus,
+    body.edit-mode .slide--gradient [data-editable]:focus,
+    body.edit-mode .slide--orange [data-editable]:focus {
+      background: rgba(249, 115, 22, 0.08);
+    }
+
+    /* Edit mode indicator pulse */
+    body.edit-mode .edit-toolbar {
+      border-color: rgba(249, 115, 22, 0.3);
+      box-shadow: 0 0 20px rgba(249, 115, 22, 0.1);
+    }
+
+    /* ═══════════════════════════════════════
+       PRINT / PDF EXPORT
+       ═══════════════════════════════════════ */
+    @media print {
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      html {
+        width: 100%;
+        height: auto;
+      }
+
+      body {
+        width: 100%;
+        height: auto;
+        overflow: visible !important;
+        background: white !important;
+      }
+
+      .deck {
+        width: 100%;
+        height: auto;
+        position: static;
+      }
+
+      .nav, .edit-toolbar { display: none !important; }
+
+      .slide {
+        position: relative !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        display: flex !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        box-sizing: border-box !important;
+        padding: 36px 52px !important;
+        page-break-after: always;
+        break-after: page;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        overflow: hidden !important;
+      }
+
+      .slide:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+
+      .slide .anim {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      .glow-orb { display: none !important; }
+
+      [data-editable] {
+        outline: none !important;
+      }
+
+      /* Force background colors on themed slides */
+      .slide--dark {
+        background: linear-gradient(135deg, #1D2033 0%, #282C42 100%) !important;
+      }
+
+      .slide--gradient {
+        background: linear-gradient(135deg, #1D2033 0%, #1a1530 40%, #282C42 100%) !important;
+      }
+
+      .slide--light {
+        background: #FDFAF7 !important;
+      }
+
+      .slide--orange {
+        background: linear-gradient(135deg, #F97316 0%, #C2410C 100%) !important;
+      }
+
+      .card--dark {
+        background: #353A54 !important;
+      }
+
+      .card {
+        background: #FFFFFF !important;
+      }
+
+      .icon-circle {
+        background: rgba(249, 115, 22, 0.15) !important;
+      }
+
+      .icon-circle--dark {
+        background: rgba(249, 115, 22, 0.12) !important;
+      }
+
+      .step-number {
+        background: #F97316 !important;
+      }
+
+      .badge--orange {
+        background: rgba(249, 115, 22, 0.15) !important;
+      }
+
+      .competitor-header {
+        background: #353A54 !important;
+      }
+
+      .competitor-cell--highlight {
+        background: rgba(249, 115, 22, 0.08) !important;
+      }
+
+      .progress-bar {
+        background: rgba(255, 255, 255, 0.08) !important;
+      }
+
+      .progress-bar__fill {
+        background: linear-gradient(90deg, #F97316, #FB923C) !important;
+      }
+
+      .fund-bar__track {
+        background: rgba(255, 255, 255, 0.06) !important;
+      }
+
+      .fund-bar__fill--primary {
+        background: linear-gradient(90deg, #F97316, #FB923C) !important;
+      }
+
+      .fund-bar__fill--navy {
+        background: linear-gradient(90deg, #353A54, #6B7094) !important;
+      }
+
+      .fund-bar__fill--success {
+        background: linear-gradient(90deg, #22C55E, #4ADE80) !important;
+      }
+
+      .timeline-dot {
+        background: #F97316 !important;
+      }
+
+      .divider {
+        background: linear-gradient(90deg, #F97316, #C2410C) !important;
+      }
+
+      @page {
+        size: landscape;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 1 — TITLE
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--gradient active" data-slide="0">
+    <div class="glow-orb glow-orb--orange" style="top: -100px; right: -80px;"></div>
+    <div class="glow-orb glow-orb--blue" style="bottom: -60px; left: 10%;"></div>
+
+    <div class="split">
+      <div class="flex-col gap-lg anim">
+        <div class="logo-wordmark">
+          <img src="/favicon.png" alt="BookATrade Logo">
+          <span>Book<span class="a">A</span>Trade</span>
+        </div>
+        <h1 class="headline-xl" style="margin-top: 8px;">
+          Find Trusted<br>Local <span class="text-orange">Tradespeople</span>
+        </h1>
+        <p class="body-lg" style="color: var(--text-on-dark-muted); max-width: 440px;">
+          The UK's modern marketplace connecting homeowners with verified tradespeople — backed by milestone escrow, real reviews, and intelligent matching.
+        </p>
+        <div class="flex-row gap-sm" style="margin-top: 8px;">
+          <span class="badge badge--orange">Pre-Seed</span>
+          <span class="badge badge--outline">£100K Raise</span>
+        </div>
+      </div>
+      <div class="anim" style="text-align: center;">
+        <img src="hero_handshake.png" alt="Homeowner meeting tradesperson" class="hero-image" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 2 — THE PROBLEM
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--dark" data-slide="1">
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">The Problem</span>
+        <h2 class="headline-lg" style="margin-top: 12px;">Finding a reliable tradesperson is broken</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="grid-3 anim">
+        <div class="card card--dark">
+          <div class="icon-circle icon-circle--dark">😤</div>
+          <h3 class="headline-md" style="margin-top: 16px; font-size: 1.2rem;">No Trust</h3>
+          <p class="body-md text-muted-dark" style="margin-top: 8px;">
+            Homeowners rely on word-of-mouth or unverified listings. 73% worry about hiring a "cowboy builder."
+          </p>
+        </div>
+        <div class="card card--dark">
+          <div class="icon-circle icon-circle--dark">💸</div>
+          <h3 class="headline-md" style="margin-top: 16px; font-size: 1.2rem;">No Payment Safety</h3>
+          <p class="body-md text-muted-dark" style="margin-top: 8px;">
+            Homeowners pay upfront and hope for the best. No structured way to release payment tied to actual progress.
+          </p>
+        </div>
+        <div class="card card--dark">
+          <div class="icon-circle icon-circle--dark">📋</div>
+          <h3 class="headline-md" style="margin-top: 16px; font-size: 1.2rem;">No Transparency</h3>
+          <p class="body-md text-muted-dark" style="margin-top: 8px;">
+            Quotes arrive via text or WhatsApp. No way to compare, no milestone tracking, no dispute resolution.
+          </p>
+        </div>
+      </div>
+      <p class="body-md text-muted-dark anim" style="text-align: center; max-width: 680px; margin: 0 auto;">
+        For <strong style="color: var(--text-on-dark);">tradespeople</strong>, the problem is equally painful: expensive leads from incumbents, high no-show rates, and no way to showcase verified work history.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 3 — THE SOLUTION
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--light" data-slide="2">
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">The Solution</span>
+        <h2 class="headline-lg" style="margin-top: 12px; color: var(--navy);">BookATrade: Trust Built In</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="grid-2 anim">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div>
+            <h4 style="font-family: var(--font-display); font-weight: 700;">Post a Job</h4>
+            <p class="body-md text-muted" style="margin-top: 4px;">Describe work needed, select a trade category, set your postcode. Takes 60 seconds.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div>
+            <h4 style="font-family: var(--font-display); font-weight: 700;">Get Matched Quotes</h4>
+            <p class="body-md text-muted" style="margin-top: 4px;">Up to 3 verified local providers are notified. Compare structured quotes side-by-side.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div>
+            <h4 style="font-family: var(--font-display); font-weight: 700;">Message & Hire</h4>
+            <p class="body-md text-muted" style="margin-top: 4px;">Built-in messaging. View portfolios, reviews, and certifications. Accept a quote with one tap.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div>
+            <h4 style="font-family: var(--font-display); font-weight: 700;">Escrow Milestones</h4>
+            <p class="body-md text-muted" style="margin-top: 4px;">Payments split into milestones. Funds held in escrow, released only when work is approved.</p>
+          </div>
+        </div>
+      </div>
+      <div class="anim" style="text-align: center; margin-top: 8px;">
+        <p class="body-md" style="color: var(--navy-muted); font-style: italic;">
+          "It's like Deliveroo for home improvement — but with the payment protection of an escrow service."
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 4 — HOW IT WORKS (VISUAL)
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--dark" data-slide="3">
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">Platform Features</span>
+        <h2 class="headline-lg" style="margin-top: 12px;">Everything a homeowner and tradesperson need</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="grid-3 anim">
+        <div class="card card--dark" style="text-align: center;">
+          <div style="font-size: 2rem;">🏠</div>
+          <h4 style="margin-top: 12px; font-family: var(--font-display);">Job Posting</h4>
+          <p class="body-md text-muted-dark" style="margin-top: 6px; font-size: 0.85rem;">13 trade categories, photo uploads, postcode matching</p>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div style="font-size: 2rem;">📊</div>
+          <h4 style="margin-top: 12px; font-family: var(--font-display);">Quote Comparison</h4>
+          <p class="body-md text-muted-dark" style="margin-top: 6px; font-size: 0.85rem;">Structured quotes with line items, up to 3 per job</p>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div style="font-size: 2rem;">💬</div>
+          <h4 style="margin-top: 12px; font-family: var(--font-display);">Real-Time Messaging</h4>
+          <p class="body-md text-muted-dark" style="margin-top: 6px; font-size: 0.85rem;">Supabase Realtime powered, with email notifications</p>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div style="font-size: 2rem;">🔒</div>
+          <h4 style="margin-top: 12px; font-family: var(--font-display);">Escrow Payments</h4>
+          <p class="body-md text-muted-dark" style="margin-top: 6px; font-size: 0.85rem;">Milestone-based via Stripe, funds released on approval</p>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div style="font-size: 2rem;">⭐</div>
+          <h4 style="margin-top: 12px; font-family: var(--font-display);">Reviews & Ratings</h4>
+          <p class="body-md text-muted-dark" style="margin-top: 6px; font-size: 0.85rem;">Verified reviews tied to completed, paid work only</p>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div style="font-size: 2rem;">✅</div>
+          <h4 style="margin-top: 12px; font-family: var(--font-display);">Admin Verification</h4>
+          <p class="body-md text-muted-dark" style="margin-top: 6px; font-size: 0.85rem;">Manual provider approval, ID checks, certification review</p>
+        </div>
+      </div>
+      <div class="grid-3 anim" style="margin-top: 4px;">
+        <div class="card card--dark" style="text-align: center;">
+          <div style="font-size: 2rem;">📅</div>
+          <h4 style="margin-top: 12px; font-family: var(--font-display);">Provider Calendar</h4>
+          <p class="body-md text-muted-dark" style="margin-top: 6px; font-size: 0.85rem;">Availability management and job scheduling</p>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div style="font-size: 2rem;">📸</div>
+          <h4 style="margin-top: 12px; font-family: var(--font-display);">Portfolio Showcase</h4>
+          <p class="body-md text-muted-dark" style="margin-top: 6px; font-size: 0.85rem;">Photo galleries of past work with project descriptions</p>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div style="font-size: 2rem;">❤️</div>
+          <h4 style="margin-top: 12px; font-family: var(--font-display);">Favourites</h4>
+          <p class="body-md text-muted-dark" style="margin-top: 6px; font-size: 0.85rem;">Save & rebook trusted tradespeople for future jobs</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 5 — MARKET OPPORTUNITY
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--gradient" data-slide="4">
+    <div class="glow-orb glow-orb--orange" style="bottom: -100px; right: 15%; opacity: 0.2;"></div>
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">Market Opportunity</span>
+        <h2 class="headline-lg" style="margin-top: 12px;">A £55 billion market ripe for disruption</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="grid-3 anim">
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number">£55B</div>
+          <div class="stat-label stat-label-dark" style="margin-top: 8px;">UK home repair &<br>improvement market</div>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number">3.5M</div>
+          <div class="stat-label stat-label-dark" style="margin-top: 8px;">Tradespeople<br>in the UK</div>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number">27M</div>
+          <div class="stat-label stat-label-dark" style="margin-top: 8px;">UK households that<br>need maintenance annually</div>
+        </div>
+      </div>
+      <div class="grid-2 anim" style="margin-top: 4px;">
+        <div class="card card--dark">
+          <h4 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 12px;">Why now?</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
+            <li class="body-md text-muted-dark">🏗️ Post-pandemic renovation boom continuing</li>
+            <li class="body-md text-muted-dark">📱 Consumer expectation of app-first services</li>
+            <li class="body-md text-muted-dark">💳 Stripe/escrow infrastructure now mature</li>
+            <li class="body-md text-muted-dark">🤖 AI matching opportunity for postcode + trade</li>
+          </ul>
+        </div>
+        <div class="card card--dark">
+          <h4 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 12px;">TAM → SAM → SOM</h4>
+          <div class="flex-col gap-sm">
+            <div>
+              <div class="flex-row" style="justify-content: space-between;">
+                <span class="body-md text-muted-dark">TAM — UK Home Services</span>
+                <span class="body-md" style="font-weight: 700;">£55B</span>
+              </div>
+              <div class="progress-bar" style="margin-top: 6px;"><div class="progress-bar__fill" style="width: 100%;"></div></div>
+            </div>
+            <div>
+              <div class="flex-row" style="justify-content: space-between;">
+                <span class="body-md text-muted-dark">SAM — Online-booked trades</span>
+                <span class="body-md" style="font-weight: 700;">£4.2B</span>
+              </div>
+              <div class="progress-bar" style="margin-top: 6px;"><div class="progress-bar__fill" style="width: 38%;"></div></div>
+            </div>
+            <div>
+              <div class="flex-row" style="justify-content: space-between;">
+                <span class="body-md text-muted-dark">SOM — Year 3 target</span>
+                <span class="body-md" style="font-weight: 700;">£12M</span>
+              </div>
+              <div class="progress-bar" style="margin-top: 6px;"><div class="progress-bar__fill" style="width: 8%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 6 — COMPETITIVE LANDSCAPE
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--dark" data-slide="5">
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">Competitive Landscape</span>
+        <h2 class="headline-lg" style="margin-top: 12px;">Incumbents left the door wide open</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="anim" style="width: 100%; overflow: hidden; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+        <div class="competitor-row">
+          <div class="competitor-header">Feature</div>
+          <div class="competitor-header" style="text-align: center;">Checkatrade /<br>MyBuilder</div>
+          <div class="competitor-header" style="text-align: center;">Bark /<br>Rated People</div>
+          <div class="competitor-header" style="text-align: center; color: var(--primary);">Book<span style="color: var(--primary);">A</span>Trade</div>
+        </div>
+        <div class="competitor-row">
+          <div class="competitor-cell" style="font-weight: 600;">Escrow Payments</div>
+          <div class="competitor-cell" style="text-align: center;">❌</div>
+          <div class="competitor-cell" style="text-align: center;">❌</div>
+          <div class="competitor-cell competitor-cell--highlight" style="text-align: center;">✅ Milestone</div>
+        </div>
+        <div class="competitor-row">
+          <div class="competitor-cell" style="font-weight: 600;">Verified Reviews</div>
+          <div class="competitor-cell" style="text-align: center;">⚠️ Self-report</div>
+          <div class="competitor-cell" style="text-align: center;">⚠️ Unverified</div>
+          <div class="competitor-cell competitor-cell--highlight" style="text-align: center;">✅ Payment-linked</div>
+        </div>
+        <div class="competitor-row">
+          <div class="competitor-cell" style="font-weight: 600;">In-App Messaging</div>
+          <div class="competitor-cell" style="text-align: center;">❌ → Phone</div>
+          <div class="competitor-cell" style="text-align: center;">❌ → Email</div>
+          <div class="competitor-cell competitor-cell--highlight" style="text-align: center;">✅ Real-time</div>
+        </div>
+        <div class="competitor-row">
+          <div class="competitor-cell" style="font-weight: 600;">Work Tracking</div>
+          <div class="competitor-cell" style="text-align: center;">❌</div>
+          <div class="competitor-cell" style="text-align: center;">❌</div>
+          <div class="competitor-cell competitor-cell--highlight" style="text-align: center;">✅ Milestones</div>
+        </div>
+        <div class="competitor-row">
+          <div class="competitor-cell" style="font-weight: 600;">Provider Cost</div>
+          <div class="competitor-cell" style="text-align: center;">£120+/mo</div>
+          <div class="competitor-cell" style="text-align: center;">£5–15/lead</div>
+          <div class="competitor-cell competitor-cell--highlight" style="text-align: center;">Free to join</div>
+        </div>
+        <div class="competitor-row">
+          <div class="competitor-cell" style="font-weight: 600; border-radius: 0 0 0 8px;">Admin Vetting</div>
+          <div class="competitor-cell" style="text-align: center;">Partial</div>
+          <div class="competitor-cell" style="text-align: center;">❌ None</div>
+          <div class="competitor-cell competitor-cell--highlight" style="text-align: center; border-radius: 0 0 8px 0;">✅ Manual review</div>
+        </div>
+      </div>
+      <p class="body-md text-muted-dark anim" style="text-align: center;">
+        Our moat: <strong style="color: white;">escrow payments + verified reviews</strong> — neither Checkatrade nor Bark offer payment protection.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 7 — BUSINESS MODEL
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--light" data-slide="6">
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">Business Model</span>
+        <h2 class="headline-lg" style="margin-top: 12px; color: var(--navy);">Commission on every completed job</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="split anim" style="max-width: 1100px;">
+        <div>
+          <div class="card" style="border-left: 4px solid var(--primary);">
+            <h3 style="font-family: var(--font-display); font-size: 1.3rem; color: var(--navy);">Revenue Model</h3>
+            <p class="body-md text-muted" style="margin-top: 12px;">
+              BookATrade charges a <strong style="color: var(--navy);">commission on each job payment</strong> processed through our milestone escrow system. Providers join for free — we only earn when they earn.
+            </p>
+            <div style="margin-top: 20px; padding: 16px; background: var(--primary-glow); border-radius: 10px;">
+              <div style="font-family: var(--font-display); font-weight: 800; font-size: 2rem; color: var(--primary);">3%-8%</div>
+              <div style="font-size: 0.85rem; color: var(--navy-muted); margin-top: 4px;">Platform commission per milestone payment</div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-col gap-md">
+          <div class="card">
+            <div class="flex-row gap-sm">
+              <div class="icon-circle">📈</div>
+              <div>
+                <h4 style="font-family: var(--font-display);">High LTV</h4>
+                <p class="body-md text-muted" style="font-size: 0.85rem;">Homeowners return 2–3× per year for different trades</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="flex-row gap-sm">
+              <div class="icon-circle">🔄</div>
+              <div>
+                <h4 style="font-family: var(--font-display);">Network Effects</h4>
+                <p class="body-md text-muted" style="font-size: 0.85rem;">More providers = faster quotes = more homeowners = more providers</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="flex-row gap-sm">
+              <div class="icon-circle">💎</div>
+              <div>
+                <h4 style="font-family: var(--font-display);">Future Revenue</h4>
+                <p class="body-md text-muted" style="font-size: 0.85rem;">Premium provider subscriptions, featured listings, insurance partnerships</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 8 — TRACTION
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--gradient" data-slide="7">
+    <div class="glow-orb glow-orb--orange" style="top: -80px; left: -60px; opacity: 0.25;"></div>
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">Traction & Validation</span>
+        <h2 class="headline-lg" style="margin-top: 12px;">Built, live, and processing real jobs</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="grid-4 anim">
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number">35</div>
+          <div class="stat-label stat-label-dark">Registered Users</div>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number">76</div>
+          <div class="stat-label stat-label-dark">Jobs Posted</div>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number">75</div>
+          <div class="stat-label stat-label-dark">Quotes Submitted</div>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number">£61</div>
+          <div class="stat-label stat-label-dark">Escrow Payments Processed</div>
+        </div>
+      </div>
+      <div class="grid-2 anim" style="margin-top: 8px;">
+        <div class="card card--dark">
+          <h4 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 16px;">What's built</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
+            <li class="body-md text-muted-dark">✅ Full React + TypeScript + Vite frontend</li>
+            <li class="body-md text-muted-dark">✅ Supabase backend (PostgreSQL, Auth, Realtime)</li>
+            <li class="body-md text-muted-dark">✅ 15 Edge Functions (email, payments, etc.)</li>
+            <li class="body-md text-muted-dark">✅ Stripe integration (test → live ready)</li>
+            <li class="body-md text-muted-dark">✅ Google Cloud Run deployment</li>
+            <li class="body-md text-muted-dark">✅ Google Analytics tracking</li>
+          </ul>
+        </div>
+        <div class="card card--dark">
+          <h4 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 16px;">Real users, real signal</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
+            <li class="body-md text-muted-dark">👤 5 real customers using the platform</li>
+            <li class="body-md text-muted-dark">🔧 1 verified provider (TW Joinery)</li>
+            <li class="body-md text-muted-dark">💬 436 messages exchanged</li>
+            <li class="body-md text-muted-dark">📋 130 milestones created</li>
+            <li class="body-md text-muted-dark">🌐 Live at bookatrade.io</li>
+            <li class="body-md text-muted-dark">🔐 Own all infrastructure (no vendor lock-in)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 9 — GO-TO-MARKET
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--dark" data-slide="8">
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">Go-to-Market Strategy</span>
+        <h2 class="headline-lg" style="margin-top: 12px;">Hyper-local, postcode by postcode</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="grid-2 anim">
+        <div class="flex-col gap-md">
+          <div class="card card--dark">
+            <h4 style="font-family: var(--font-display); color: var(--primary);">Phase 1 — Seed Market</h4>
+            <p class="body-md text-muted-dark" style="margin-top: 8px;">
+              Launch in 3–5 postcode districts. Door-to-door provider onboarding. Targeted Facebook/Google ads to homeowners in those postcodes. Goal: 50 providers, 200 homeowners.
+            </p>
+          </div>
+          <div class="card card--dark">
+            <h4 style="font-family: var(--font-display); color: var(--primary);">Phase 2 — Regional Expansion</h4>
+            <p class="body-md text-muted-dark" style="margin-top: 8px;">
+              Expand to full cities (e.g., Cardiff, Bristol, London boroughs). Referral incentives for both sides. Partnerships with trade associations and suppliers.
+            </p>
+          </div>
+          <div class="card card--dark">
+            <h4 style="font-family: var(--font-display); color: var(--primary);">Phase 3 — National Scale</h4>
+            <p class="body-md text-muted-dark" style="margin-top: 8px;">
+              National marketing campaigns. Insurance & warranty partnerships. Premium provider tiers. Mobile app launch (iOS + Android).
+            </p>
+          </div>
+        </div>
+        <div class="flex-col gap-md">
+          <div class="card card--dark" style="border: 1px solid rgba(249, 115, 22, 0.2);">
+            <h4 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 16px;">Acquisition Channels</h4>
+            <div class="flex-col gap-sm">
+              <div>
+                <div class="flex-row" style="justify-content: space-between;">
+                  <span class="body-md">Google Ads (local intent)</span>
+                  <span style="font-weight: 700; font-size: 0.85rem;">40%</span>
+                </div>
+                <div class="progress-bar" style="margin-top: 6px;"><div class="progress-bar__fill" style="width: 40%;"></div></div>
+              </div>
+              <div>
+                <div class="flex-row" style="justify-content: space-between;">
+                  <span class="body-md">Facebook/Instagram Ads</span>
+                  <span style="font-weight: 700; font-size: 0.85rem;">25%</span>
+                </div>
+                <div class="progress-bar" style="margin-top: 6px;"><div class="progress-bar__fill" style="width: 25%;"></div></div>
+              </div>
+              <div>
+                <div class="flex-row" style="justify-content: space-between;">
+                  <span class="body-md">Referral Programme</span>
+                  <span style="font-weight: 700; font-size: 0.85rem;">20%</span>
+                </div>
+                <div class="progress-bar" style="margin-top: 6px;"><div class="progress-bar__fill" style="width: 20%;"></div></div>
+              </div>
+              <div>
+                <div class="flex-row" style="justify-content: space-between;">
+                  <span class="body-md">SEO & Content</span>
+                  <span style="font-weight: 700; font-size: 0.85rem;">10%</span>
+                </div>
+                <div class="progress-bar" style="margin-top: 6px;"><div class="progress-bar__fill" style="width: 10%;"></div></div>
+              </div>
+              <div>
+                <div class="flex-row" style="justify-content: space-between;">
+                  <span class="body-md">Trade Partnerships</span>
+                  <span style="font-weight: 700; font-size: 0.85rem;">5%</span>
+                </div>
+                <div class="progress-bar" style="margin-top: 6px;"><div class="progress-bar__fill" style="width: 5%;"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 10 — THE ASK
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--gradient" data-slide="9">
+    <div class="glow-orb glow-orb--orange" style="top: 50%; right: -100px; opacity: 0.3;"></div>
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">The Ask</span>
+        <h2 class="headline-lg" style="margin-top: 12px;">Raising £100,000 to ignite growth</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="anim" style="width: 100%;">
+        <div class="flex-col gap-md" style="max-width: 750px; margin: 0 auto;">
+          <div class="fund-bar">
+            <div class="fund-bar__label">Marketing & Ads</div>
+            <div class="fund-bar__track">
+              <div class="fund-bar__fill fund-bar__fill--primary" style="width: 50%;">£50,000</div>
+            </div>
+          </div>
+          <div class="fund-bar">
+            <div class="fund-bar__label">Hiring</div>
+            <div class="fund-bar__track">
+              <div class="fund-bar__fill fund-bar__fill--navy" style="width: 25%;">£25,000</div>
+            </div>
+          </div>
+          <div class="fund-bar">
+            <div class="fund-bar__label">Product Dev</div>
+            <div class="fund-bar__track">
+              <div class="fund-bar__fill fund-bar__fill--success" style="width: 20%;">£20,000</div>
+            </div>
+          </div>
+          <div class="fund-bar">
+            <div class="fund-bar__label">Legal & Ops</div>
+            <div class="fund-bar__track">
+              <div class="fund-bar__fill fund-bar__fill--primary" style="width: 5%;">£5K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-3 anim" style="margin-top: 16px;">
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number" style="font-size: 2rem;">12 mo</div>
+          <div class="stat-label stat-label-dark">Runway</div>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number" style="font-size: 2rem;">500+</div>
+          <div class="stat-label stat-label-dark">Target Providers (Y1)</div>
+        </div>
+        <div class="card card--dark" style="text-align: center;">
+          <div class="stat-number" style="font-size: 2rem;">5,000+</div>
+          <div class="stat-label stat-label-dark">Target Homeowners (Y1)</div>
+        </div>
+      </div>
+      <p class="body-md text-muted-dark anim" style="text-align: center; max-width: 600px; margin: 0 auto;">
+        The platform is <strong style="color: white">built and live</strong>. This raise is purely about <strong style="color: var(--primary)">user acquisition</strong> and <strong style="color: var(--primary)">market penetration</strong>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 11 — ROADMAP
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--dark" data-slide="10">
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">Roadmap</span>
+        <h2 class="headline-lg" style="margin-top: 12px;">What £100K unlocks</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="grid-2 anim">
+        <div class="flex-col gap-lg">
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div>
+              <h4 style="font-family: var(--font-display);">Q3 2026 — Launch Sprint</h4>
+              <p class="body-md text-muted-dark" style="margin-top: 4px;">Stripe live payments, postcode matching algorithm, mobile-responsive polish, first 50 providers onboarded</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div>
+              <h4 style="font-family: var(--font-display);">Q4 2026 — Market Entry</h4>
+              <p class="body-md text-muted-dark" style="margin-top: 4px;">Paid acquisition campaigns in 5 postcode districts, referral programme live, 200+ homeowners</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot timeline-dot--future"></div>
+            <div>
+              <h4 style="font-family: var(--font-display);">Q1 2027 — Regional Scale</h4>
+              <p class="body-md text-muted-dark" style="margin-top: 4px;">Expand to 3+ cities, premium provider subscriptions, insurance partnerships, 1,000+ homeowners</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot timeline-dot--future"></div>
+            <div>
+              <h4 style="font-family: var(--font-display);">Q2 2027 — Series A Readiness</h4>
+              <p class="body-md text-muted-dark" style="margin-top: 4px;">Native mobile apps (iOS + Android), AI-powered matching, 5,000+ users, revenue demonstrating PMF</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex-col gap-md">
+          <div class="card card--dark" style="border: 1px solid rgba(249, 115, 22, 0.2);">
+            <h4 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 12px;">Key Milestones</h4>
+            <div class="flex-col gap-sm">
+              <div class="flex-row" style="justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                <span class="body-md text-muted-dark">100 active providers</span>
+                <span class="badge badge--outline">Month 4</span>
+              </div>
+              <div class="flex-row" style="justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                <span class="body-md text-muted-dark">£50K GMV processed</span>
+                <span class="badge badge--outline">Month 6</span>
+              </div>
+              <div class="flex-row" style="justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                <span class="body-md text-muted-dark">1,000 registered homeowners</span>
+                <span class="badge badge--outline">Month 9</span>
+              </div>
+              <div class="flex-row" style="justify-content: space-between; padding: 8px 0;">
+                <span class="body-md text-muted-dark">Series A conversations begin</span>
+                <span class="badge badge--outline">Month 12</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 12 — TEAM
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--light" data-slide="11">
+    <div class="slide-content">
+      <div class="anim">
+        <span class="label text-orange">The Team</span>
+        <h2 class="headline-lg" style="margin-top: 12px; color: var(--navy);">Two co-founders, one mission</h2>
+      </div>
+      <div class="divider anim"></div>
+      <div class="grid-2 anim">
+        <div class="card" style="text-align: center; padding: 36px;">
+          <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; font-family: var(--font-display); font-weight: 800;">JR</div>
+          <h3 style="font-family: var(--font-display); font-size: 1.3rem; color: var(--navy);">James Raiswell</h3>
+          <p style="color: var(--primary); font-weight: 600; font-size: 0.9rem; font-family: var(--font-display);">Co-Founder</p>
+          <p class="body-md text-muted" style="margin-top: 12px; font-size: 0.9rem;">
+            Strategy, product vision and customer experience. Hands-on knowledge of the trades industry and homeowner pain points.
+          </p>
+        </div>
+        <div class="card" style="text-align: center; padding: 36px;">
+          <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--navy-lighter)); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; font-family: var(--font-display); font-weight: 800;">DH</div>
+          <h3 style="font-family: var(--font-display); font-size: 1.3rem; color: var(--navy);">David Hastie</h3>
+          <p style="color: var(--primary); font-weight: 600; font-size: 0.9rem; font-family: var(--font-display);">Co-Founder</p>
+          <p class="body-md text-muted" style="margin-top: 12px; font-size: 0.9rem;">
+            Strategy, growth, and operations. Background in business development and investment rounds.
+          </p>
+        </div>
+      </div>
+      <div class="anim" style="text-align: center;">
+        <p class="body-md text-muted" style="max-width: 600px; margin: 0 auto;">
+          We're hiring: <strong style="color: var(--navy);">a CMO</strong> and <strong style="color: var(--navy);">a Head of Sales</strong> are our first two hires once funded.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       SLIDE 13 — CLOSING / CTA
+       ═══════════════════════════════════════ -->
+  <section class="slide slide--gradient" data-slide="12">
+    <div class="glow-orb glow-orb--orange" style="top: 30%; left: -100px; opacity: 0.3;"></div>
+    <div class="glow-orb glow-orb--blue" style="bottom: 20%; right: -60px; opacity: 0.15;"></div>
+
+    <div class="slide-content" style="text-align: center; align-items: center;">
+      <div class="anim">
+        <div class="logo-wordmark" style="justify-content: center; font-size: 1.5rem;">
+          <img src="/favicon.png" alt="BookATrade Logo" style="width: 44px; height: 44px;">
+          <span>Book<span class="a">A</span>Trade</span>
+        </div>
+      </div>
+      <h2 class="headline-xl anim" style="margin-top: 16px;">
+        Let's build trust into<br>every <span class="text-orange">trade</span>.
+      </h2>
+      <p class="body-lg text-muted-dark anim" style="max-width: 580px;">
+        The platform is live. The market is massive. We need fuel for growth. Join us in transforming how the UK hires tradespeople.
+      </p>
+      <div class="divider anim" style="margin: 0 auto;"></div>
+      <div class="flex-row gap-md anim">
+        <a href="https://bookatrade.io" target="_blank" class="cta-btn">
+          Visit bookatrade.io →
+        </a>
+        <a href="mailto:support@bookatrade.io" class="cta-btn cta-btn--outline">
+          Get in touch
+        </a>
+      </div>
+      <div class="flex-col gap-sm anim" style="margin-top: 16px;">
+        <p class="body-md text-muted-dark" style="font-size: 0.85rem;">
+          📧 support@bookatrade.io &nbsp;·&nbsp; 🌐 bookatrade.io
+        </p>
+        <p class="body-md text-muted-dark" style="font-size: 0.75rem; opacity: 0.6;">
+          Confidential — For intended recipients only
+        </p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     NAVIGATION BAR
+     ═══════════════════════════════════════ -->
+<nav class="nav" id="nav">
+  <button class="nav__btn" id="prevBtn" aria-label="Previous slide">◀</button>
+  <div class="nav__dots" id="dots"></div>
+  <button class="nav__btn" id="nextBtn" aria-label="Next slide">▶</button>
+  <div class="nav__counter" id="counter">1 / 13</div>
+</nav>
+
+<!-- Edit Toolbar -->
+<div class="edit-toolbar" id="editToolbar">
+  <button class="edit-toolbar__btn" id="editToggle" title="Toggle edit mode (Ctrl+E)">✏️ Edit</button>
+  <div class="edit-toolbar__divider"></div>
+  <button class="edit-toolbar__btn edit-toolbar__btn--download" id="pdfBtn" title="Save as PDF">📄 PDF</button>
+  <button class="edit-toolbar__btn edit-toolbar__btn--download" id="downloadBtn" title="Download as HTML" style="color: #60A5FA; background: rgba(96,165,250,0.12); border-color: rgba(96,165,250,0.25);">⬇ HTML</button>
+  <button class="edit-toolbar__btn edit-toolbar__btn--reset" id="resetBtn" title="Reset all edits">↺ Reset</button>
+  <span class="edit-toolbar__status" id="editStatus"></span>
+</div>
+
+<script>
+  (() => {
+    const slides = document.querySelectorAll('.slide');
+    const dotsContainer = document.getElementById('dots');
+    const counter = document.getElementById('counter');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let current = 0;
+    const total = slides.length;
+
+    // Build dots
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'nav__dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    }
+
+    function goTo(index) {
+      if (index < 0 || index >= total || index === current) return;
+
+      const direction = index > current ? 'next' : 'prev';
+
+      // Remove all states
+      slides.forEach(s => {
+        s.classList.remove('active', 'prev');
+      });
+
+      // Set previous slide direction
+      slides[current].classList.add(direction === 'next' ? 'prev' : '');
+
+      // Activate new slide
+      current = index;
+      slides[current].classList.add('active');
+
+      // Update dots
+      document.querySelectorAll('.nav__dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+
+      // Update counter
+      counter.textContent = `${current + 1} / ${total}`;
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+        e.preventDefault();
+        goTo(current + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        goTo(current - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        goTo(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        goTo(total - 1);
+      }
+    });
+
+    // Touch/swipe support
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].screenX - touchStartX;
+      const dy = e.changedTouches[0].screenY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        if (dx < 0) goTo(current + 1);
+        else goTo(current - 1);
+      }
+    }, { passive: true });
+  })();
+
+  /* ═══════════════════════════════════════
+     EDIT MODE ENGINE
+     ═══════════════════════════════════════ */
+  (() => {
+    const STORAGE_KEY = 'bat-pitch-deck-edits';
+    let isEditMode = false;
+    let saveTimeout = null;
+
+    const editToggle = document.getElementById('editToggle');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const editStatus = document.getElementById('editStatus');
+
+    // ── Tag all editable text elements ──
+    function tagEditableElements() {
+      const selectors = [
+        'h1', 'h2', 'h3', 'h4',
+        '.body-lg', '.body-md',
+        '.stat-number', '.stat-label', '.stat-label-dark',
+        '.label',
+        '.badge',
+        '.fund-bar__label', '.fund-bar__fill',
+        '.competitor-cell', '.competitor-header',
+        'li'
+      ];
+
+      let id = 0;
+      document.querySelectorAll('.slide').forEach(slide => {
+        slide.querySelectorAll(selectors.join(',')).forEach(el => {
+          // Skip elements that are purely structural
+          if (el.closest('.nav, .edit-toolbar')) return;
+          if (el.children.length > 0 && !el.querySelector('br, span, strong, em, a')) return;
+
+          if (!el.hasAttribute('data-editable')) {
+            el.setAttribute('data-editable', `e-${id++}`);
+          }
+        });
+      });
+    }
+
+    tagEditableElements();
+
+    // ── Toggle edit mode ──
+    function toggleEditMode(force) {
+      isEditMode = force !== undefined ? force : !isEditMode;
+      document.body.classList.toggle('edit-mode', isEditMode);
+
+      document.querySelectorAll('[data-editable]').forEach(el => {
+        if (isEditMode) {
+          el.setAttribute('contenteditable', 'true');
+          el.setAttribute('spellcheck', 'true');
+        } else {
+          el.removeAttribute('contenteditable');
+          el.removeAttribute('spellcheck');
+        }
+      });
+
+      editToggle.classList.toggle('edit-toolbar__btn--active', isEditMode);
+      editToggle.innerHTML = isEditMode ? '🎯 Editing' : '✏️ Edit';
+
+      if (isEditMode) {
+        showStatus('Click any text to edit', 2000);
+      } else {
+        saveEdits();
+        showStatus('Saved ✓', 1500);
+      }
+    }
+
+    editToggle.addEventListener('click', () => toggleEditMode());
+
+    // ── Ctrl+E shortcut ──
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'e') {
+        e.preventDefault();
+        toggleEditMode();
+      }
+      // Prevent slide navigation while editing
+      if (isEditMode && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+        if (document.activeElement && document.activeElement.hasAttribute('data-editable')) {
+          e.stopPropagation();
+        }
+      }
+    }, true);
+
+    // ── Auto-save on input ──
+    document.addEventListener('input', (e) => {
+      if (!e.target.hasAttribute || !e.target.hasAttribute('data-editable')) return;
+
+      if (saveTimeout) clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        saveEdits();
+        showStatus('Auto-saved ✓', 1200);
+      }, 800);
+    });
+
+    // ── Save edits to localStorage ──
+    function saveEdits() {
+      const edits = {};
+      document.querySelectorAll('[data-editable]').forEach(el => {
+        const key = el.getAttribute('data-editable');
+        edits[key] = el.innerHTML;
+      });
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(edits));
+      } catch (e) {
+        console.warn('Could not save edits:', e);
+      }
+    }
+
+    // ── Load edits from localStorage ──
+    function loadEdits() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const edits = JSON.parse(raw);
+        let applied = 0;
+        document.querySelectorAll('[data-editable]').forEach(el => {
+          const key = el.getAttribute('data-editable');
+          if (edits[key] !== undefined && edits[key] !== el.innerHTML) {
+            el.innerHTML = edits[key];
+            applied++;
+          }
+        });
+        if (applied > 0) {
+          showStatus(`Restored ${applied} edits`, 2000);
+        }
+      } catch (e) {
+        console.warn('Could not load edits:', e);
+      }
+    }
+
+    loadEdits();
+
+    // ── Reset all edits ──
+    resetBtn.addEventListener('click', () => {
+      if (!confirm('Reset all edits? This will revert all text changes to the original.')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    });
+
+    // ── Download edited HTML ──
+    downloadBtn.addEventListener('click', () => {
+      // Exit edit mode cleanly
+      if (isEditMode) toggleEditMode(false);
+
+      // Clone the document
+      const clone = document.documentElement.cloneNode(true);
+
+      // Remove edit artifacts
+      const toolbar = clone.querySelector('.edit-toolbar');
+      if (toolbar) toolbar.remove();
+
+      // Remove contenteditable and data-editable attributes
+      clone.querySelectorAll('[data-editable]').forEach(el => {
+        el.removeAttribute('contenteditable');
+        el.removeAttribute('spellcheck');
+        el.removeAttribute('data-editable');
+      });
+
+      // Remove edit-mode class from body
+      clone.querySelector('body').classList.remove('edit-mode');
+
+      // Remove the edit mode script block (everything after the nav script)
+      const scripts = clone.querySelectorAll('script');
+      // Keep only the nav/slide script
+
+      // Build the HTML string
+      const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+
+      // Download
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'BookATrade-Investor-Deck.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showStatus('Downloaded ✓', 2000);
+    });
+
+    // ── Status indicator ──
+    function showStatus(text, duration) {
+      editStatus.textContent = text;
+      editStatus.classList.add('edit-toolbar__status--saved');
+      if (duration) {
+        setTimeout(() => {
+          editStatus.textContent = '';
+          editStatus.classList.remove('edit-toolbar__status--saved');
+        }, duration);
+      }
+    }
+
+    // ── PDF Download ──
+    const pdfBtn = document.getElementById('pdfBtn');
+    pdfBtn.addEventListener('click', () => {
+      if (isEditMode) toggleEditMode(false);
+      showStatus('Opening print dialog — select "Save as PDF"', 3000);
+      // Small delay to let status show
+      setTimeout(() => window.print(), 200);
+    });
+  })();
+</script>
+
+</body>
+</html>

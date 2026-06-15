@@ -98,7 +98,7 @@ const ProviderPublicPage = () => {
     // Fetch reviews for this provider
     const { data: revs } = await supabase
       .from("reviews")
-      .select("*")
+      .select("*, provider_reply, provider_reply_at")
       .eq("reviewee_user_id", providerId!)
       .eq("reviewer_role", "customer")
       .order("created_at", { ascending: false });
@@ -394,7 +394,13 @@ const ProviderPublicPage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ReviewsList reviews={reviews} showReviewerName={true} showJobTitle={true} />
+          <ReviewsList
+            reviews={reviews}
+            showReviewerName={true}
+            showJobTitle={true}
+            canReplyAsProvider={user?.id === providerId ? providerId! : null}
+            onReplySubmitted={fetchProvider}
+          />
         </CardContent>
       </Card>
 

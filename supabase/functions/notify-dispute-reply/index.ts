@@ -75,7 +75,7 @@ serve(async (req) => {
     }
 
     // Send emails to both parties
-    const origin = req.headers.get("origin") || "https://bookatrade.lovable.app";
+    const origin = req.headers.get("origin") || "https://bookatrade.io";
     const jobLink = `${origin}/dashboard/jobs/${job_id}`;
 
     for (const userId of notifyUserIds) {

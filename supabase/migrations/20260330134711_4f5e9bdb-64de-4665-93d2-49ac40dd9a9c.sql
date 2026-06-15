@@ -39,7 +39,8 @@ WITH CHECK (
 
 -- Create the dispute-attachments storage bucket (private)
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('dispute-attachments', 'dispute-attachments', false);
+VALUES ('dispute-attachments', 'dispute-attachments', false)
+ON CONFLICT (id) DO NOTHING;
 
 -- Storage policies for dispute-attachments bucket
 CREATE POLICY "Users can upload dispute attachments"

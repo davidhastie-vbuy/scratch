@@ -41,7 +41,7 @@ const ScoreBadge = ({ userId, role, showPopup = true, className = "" }: ScoreBad
 
     const { data } = await supabase
       .from("reviews")
-      .select("*")
+      .select("*, provider_reply, provider_reply_at")
       .eq("reviewee_user_id", userId)
       .order("created_at", { ascending: false });
 

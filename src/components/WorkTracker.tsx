@@ -4,6 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +25,7 @@ interface WorkTrackerProps {
   job: any;
   role: "customer" | "provider";
   onRefresh?: () => void;
+  refreshKey?: number;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -32,7 +35,7 @@ const STATUS_COLORS: Record<string, string> = {
   flagged: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
 };
 
-const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
+const WorkTracker = ({ jobId, job, role, onRefresh, refreshKey }: WorkTrackerProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -138,7 +141,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   useEffect(() => {
     fetchMilestones();
-  }, [jobId]);
+  }, [jobId, refreshKey]);
 
   const fetchMilestones = async () => {
     const [msRes, paymentsRes, crRes] = await Promise.all([
@@ -375,6 +378,7 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   // Payment helpers
   const [processingPayment, setProcessingPayment] = useState<string | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const getPaymentForMilestone = (milestoneId: string) => {
     return escrowPayments.find((p) => p.milestone_id === milestoneId);
@@ -436,6 +440,11 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
 
   // Has ANY milestone payment been confirmed?
   const hasAnyConfirmedPayment = escrowPayments.some(
+    (p) => p.status === "held" || p.status === "released"
+  );
+
+  // Check if this is the first payment (no milestones paid yet)
+  const isFirstPayment = !escrowPayments.some(
     (p) => p.status === "held" || p.status === "released"
   );
 
@@ -1067,10 +1076,27 @@ const WorkTracker = ({ jobId, job, role, onRefresh }: WorkTrackerProps) => {
                             <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
                               <p className="text-sm font-medium">Payment required for this milestone</p>
                               <p className="text-xs text-muted-foreground">Pay before this stage of work begins. Funds are held securely and released when you accept the milestone.</p>
+                              {isFirstPayment && (
+                                <div className="flex items-start gap-2 rounded-lg border border-border p-3">
+                                  <Checkbox
+                                    id={`wt-accept-terms-${m.id}`}
+                                    checked={termsAccepted}
+                                    onCheckedChange={(checked) => setTermsAccepted(!!checked)}
+                                    className="mt-0.5"
+                                  />
+                                  <Label htmlFor={`wt-accept-terms-${m.id}`} className="text-xs font-normal leading-tight cursor-pointer">
+                                    I confirm I have read and agree to the{" "}
+                                    <a href="/legal?audience=customer" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Terms & Conditions</a>, including the{" "}
+                                    <a href="/legal/payment-terms?audience=customer" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Payment Terms</a>,{" "}
+                                    <a href="/legal/cancellation-policy?audience=customer" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Cancellation & Refund Policy</a>, and{" "}
+                                    <a href="/legal/dispute-resolution?audience=customer" target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline">Dispute Resolution Policy</a>.
+                                  </Label>
+                                </div>
+                              )}
                               <Button
                                 size="sm"
                                 onClick={() => payMilestone(m.id, Number(m.payment_amount))}
-                                disabled={processingPayment === m.id}
+                                disabled={processingPayment === m.id || (isFirstPayment && !termsAccepted)}
                               >
                                 {processingPayment === m.id ? (
                                   <Loader2 className="mr-1 h-3 w-3 animate-spin" />

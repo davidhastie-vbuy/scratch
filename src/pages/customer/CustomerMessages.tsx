@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from "react";
+import { getSiteUrl } from "@/lib/site-url";
 import { format } from "date-fns";
 import { transformAcceptedMessageForCustomer } from "@/lib/message-transform";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +14,7 @@ import ProposalCard from "@/components/messaging/ProposalCard";
 import NegotiateDialog from "@/components/messaging/NegotiateDialog";
 import AcceptanceDetailsDialog, { type AcceptanceDetails } from "@/components/messaging/AcceptanceDetailsDialog";
 import QuoteBanner from "@/components/messaging/QuoteBanner";
+import JobSiteDetailsBanner from "@/components/messaging/JobSiteDetailsBanner";
 import { AttachmentButton, StagedFilePreview, MessageAttachments, uploadAttachments, type StagedFile } from "@/components/messaging/ChatAttachments";
 import { cn } from "@/lib/utils";
 import { dispatchMessageUnreadUpdated, isUnreadMessageType, UNREAD_MESSAGE_TYPES } from "@/lib/message-unread";
@@ -48,7 +50,7 @@ const sendProviderActionEmail = async (
       : "The customer";
 
     const providerFirst = providerProfile.first_name || "there";
-    const siteUrl = "https://bookatrade.lovable.app";
+    const siteUrl = getSiteUrl();
 
     let subject = "";
     let heading = "";
@@ -116,7 +118,7 @@ interface ConversationWithUnread {
   job_id: string;
   provider_user_id: string;
   customer_user_id: string;
-  jobs?: { title?: string; status?: string; id?: string; updated_at?: string; provider_id?: string | null };
+  jobs?: { title?: string; status?: string; id?: string; updated_at?: string; provider_id?: string | null; job_address?: string | null; job_phone?: string | null; access_notes?: string | null };
   unreadCount: number;
   lastMessageBody: string | null;
   lastMessageAt: string | null;
@@ -148,7 +150,7 @@ const CustomerMessages = () => {
   const fetchConversations = async () => {
     const { data } = await supabase
       .from("conversations")
-      .select("*, jobs(title, status, id, updated_at, provider_id)")
+      .select("*, jobs(title, status, id, updated_at, provider_id, job_address, job_phone, access_notes)")
       .eq("customer_user_id", user!.id)
       .order("created_at", { ascending: false });
 
@@ -582,6 +584,13 @@ const CustomerMessages = () => {
               </div>
             </div>
             <QuoteBanner jobId={selected.job_id} providerUserId={selected.provider_user_id} />
+            <JobSiteDetailsBanner
+              jobAddress={selected.jobs?.job_address}
+              jobPhone={selected.jobs?.job_phone}
+              accessNotes={selected.jobs?.access_notes}
+              jobStatus={selected.jobs?.status}
+              variant="customer"
+            />
             <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3">
               {messages.map(m => {
                 const isOwn = m.sender_user_id === user!.id;
