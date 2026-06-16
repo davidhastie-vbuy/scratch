@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, ArrowLeft } from "lucide-react";
-import logo from "@/assets/bookatrade-logo.png";
+import logo from "@/assets/bookatrade-logo-black.png";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -35,10 +35,7 @@ const ForgotPassword = () => {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
       <div className="w-full max-w-md animate-fade-in">
         <div className="mb-8 text-center">
-          <img src={logo} alt="BOOKaTRADE" className="mx-auto h-16 w-16 mb-3" />
-          <h1 className="font-display text-3xl font-extrabold text-foreground">
-            BOOK<span className="text-primary">a</span>TRADE
-          </h1>
+          <img src={logo} alt="BOOKaTRADE" className="h-12 mx-auto mb-6" />
         </div>
 
         <Card className="shadow-lg border-0 ring-1 ring-border">

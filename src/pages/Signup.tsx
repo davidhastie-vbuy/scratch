@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Mail, Lock, User, MapPin, Camera, X, Home, Wrench } from "lucide-react";
 import { formatPostcode } from "@/lib/format-postcode";
 import ProviderSignupStepper from "@/components/provider-signup/ProviderSignupStepper";
-import logo from "@/assets/bookatrade-logo.png";
+import logo from "@/assets/bookatrade-logo-black.png";
 
 const Signup = () => {
   const [searchParams] = useSearchParams();
@@ -120,9 +120,7 @@ const Signup = () => {
       <div className="hidden lg:flex lg:w-5/12 bg-foreground text-primary-foreground relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(355 100% 35% / 0.15) 20px, hsl(355 100% 35% / 0.15) 21px)' }} />
         <div className="relative z-10 text-center p-12 max-w-md">
-          <h1 className="font-display text-4xl font-bold mb-4 tracking-tight">
-            BOOK<span className="text-primary">a</span>TRADE
-          </h1>
+          <img src={logo} alt="BOOKaTRADE" className="h-12 brightness-0 invert mb-4 mx-auto" />
           <h2 className="font-display text-2xl font-bold mb-4">
             Join the Platform
           </h2>
@@ -143,10 +141,7 @@ const Signup = () => {
       <div className="flex-1 flex items-center justify-center bg-background px-4 py-8 overflow-auto">
         <div className="w-full max-w-md animate-fade-in">
           <div className="mb-8 text-center lg:hidden">
-            <img src={logo} alt="BOOKaTRADE" className="mx-auto h-16 w-16 mb-3" />
-            <h1 className="font-display text-3xl font-extrabold text-foreground">
-              BOOK<span className="text-primary">a</span>TRADE
-            </h1>
+            <img src={logo} alt="BOOKaTRADE" className="h-10 mx-auto mb-3" />
             <p className="mt-2 text-muted-foreground">Create your account</p>
           </div>
           <div className="hidden lg:block mb-8">

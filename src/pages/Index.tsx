@@ -425,8 +425,8 @@ const Index = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-10 lg:gap-14 pb-14 border-b border-white/[0.09] mb-10">
           {/* Brand */}
           <div>
-            <Link to="/" className="font-display text-xl text-white font-bold tracking-tight block mb-3.5">
-              BOOK<span className="text-primary">a</span>TRADE
+            <Link to="/" className="block mb-3.5">
+              <img src={logo} alt="BOOKaTRADE" className="h-8 brightness-0 invert" />
             </Link>
             <p className="text-[13px] leading-relaxed text-white/[0.42] max-w-[250px]">
               Connecting homes with trusted tradespeople across the UK. Find the right trade, first time.

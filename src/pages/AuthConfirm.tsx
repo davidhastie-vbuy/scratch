@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/BOOKaTRADE-logo.png";
+import logo from "@/assets/bookatrade-logo-black.png";
 
 const AuthConfirm = () => {
   const [searchParams] = useSearchParams();
@@ -57,10 +57,7 @@ const AuthConfirm = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md text-center animate-fade-in">
-        <img src={logo} alt="BOOKaTRADE" className="mx-auto h-16 w-16 mb-6" />
-        <h1 className="font-display text-2xl font-extrabold text-foreground mb-2">
-          BOOK<span className="text-primary">a</span>TRADE
-        </h1>
+        <img src={logo} alt="BOOKaTRADE" className="h-12 mx-auto mb-6" />
 
         {status === "loading" && (
           <div className="mt-8 space-y-4">

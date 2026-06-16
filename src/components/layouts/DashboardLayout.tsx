@@ -6,6 +6,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/bookatrade-logo-black.png";
 
 interface NavItem {
   label: string;
@@ -30,10 +31,8 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 flex-col bg-foreground text-primary-foreground">
-        <Link to={dashboardPath} className="flex h-16 items-center gap-2.5 border-b border-primary-foreground/10 px-4 hover:opacity-80 transition-opacity">
-          <span className="font-display text-lg font-bold tracking-tight">
-            BOOK<span className="text-primary">a</span>TRADE
-          </span>
+        <Link to={dashboardPath} className="flex h-16 items-center border-b border-primary-foreground/10 px-4 hover:opacity-80 transition-opacity">
+          <img src={logo} alt="BOOKaTRADE" className="h-7 brightness-0 invert" />
         </Link>
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => (
@@ -74,9 +73,7 @@ const DashboardLayout = ({ children, title, navItems, roleBadge, statusBadge }: 
           <div className="flex h-16 items-center justify-between gap-2 px-3 md:px-6">
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <Link to={dashboardPath} className="md:hidden flex items-center shrink-0 hover:opacity-80 transition-opacity">
-                <span className="font-display text-sm font-bold tracking-tight">
-                  BOOK<span className="text-primary">a</span>TRADE
-                </span>
+                <img src={logo} alt="BOOKaTRADE" className="h-7" />
               </Link>
               <h1 className="font-display text-sm sm:text-xl font-bold truncate min-w-0">{title}</h1>
             </div>

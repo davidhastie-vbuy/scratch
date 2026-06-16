@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Shield, Star, Users } from "lucide-react";
-import logo from "@/assets/bookatrade-logo.png";
+import logo from "@/assets/bookatrade-logo-black.png";
 
 /* ─── TRADE DATA ─────────────────────────────────────────── */
 
@@ -346,15 +346,8 @@ const TradeCategory = () => {
 const Header = () => (
   <header className="border-b border-foreground/8 bg-background sticky top-0 z-50">
     <div className="container flex h-[68px] items-center justify-between gap-4">
-      <Link to="/" className="flex items-center gap-2 group min-w-0 flex-shrink">
-        <img
-          src={logo}
-          alt="BOOKaTRADE"
-          className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 object-contain transition-transform duration-300 group-hover:rotate-6"
-        />
-        <span className="font-display text-base sm:text-xl font-extrabold text-foreground whitespace-nowrap tracking-tight">
-          BOOK<span className="text-primary">a</span>TRADE
-        </span>
+      <Link to="/" className="flex items-center group min-w-0 flex-shrink">
+        <img src={logo} alt="BOOKaTRADE" className="h-8 flex-shrink-0 object-contain transition-transform duration-300 group-hover:scale-105" />
       </Link>
       <nav className="hidden md:flex items-center gap-8">
         <Link to="/trades/joiners" className="text-[11px] uppercase tracking-[0.1em] font-medium text-foreground/60 hover:text-foreground transition-opacity">
@@ -390,11 +383,8 @@ const Footer = () => (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 pb-12 border-b border-primary-foreground/9 mb-10">
         {/* Brand */}
         <div>
-          <Link to="/" className="flex items-center gap-2 mb-4">
-            <img src={logo} alt="BOOKaTRADE" className="h-10 w-10 object-contain" />
-            <span className="font-display text-lg font-extrabold text-primary-foreground">
-              BOOK<span className="text-primary">a</span>TRADE
-            </span>
+          <Link to="/" className="flex items-center mb-4">
+            <img src={logo} alt="BOOKaTRADE" className="h-8 brightness-0 invert" />
           </Link>
           <p className="text-sm text-primary-foreground/42 leading-relaxed max-w-[250px]">
             Connecting homes with trusted tradespeople across the UK. Find the right trade, first time.

@@ -7,8 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Mail, Lock } from "lucide-react";
-import logo from "@/assets/bookatrade-logo.png";
-import logoDark from "@/assets/bookatrade-logo-dark.jpeg";
+import logo from "@/assets/bookatrade-logo-black.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -56,9 +55,7 @@ const Login = () => {
       <div className="hidden lg:flex lg:w-1/2 bg-foreground text-primary-foreground relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(355 100% 35% / 0.15) 20px, hsl(355 100% 35% / 0.15) 21px)' }} />
         <div className="relative z-10 text-center p-12 max-w-md">
-          <h1 className="font-display text-4xl font-bold mb-4 tracking-tight">
-            BOOK<span className="text-primary">a</span>TRADE
-          </h1>
+          <img src={logo} alt="BOOKaTRADE" className="h-12 brightness-0 invert mb-4 mx-auto" />
           <h2 className="font-display text-2xl font-bold mb-4">
             Welcome Back
           </h2>
@@ -79,10 +76,7 @@ const Login = () => {
       <div className="flex-1 flex items-center justify-center bg-background px-4 py-8">
         <div className="w-full max-w-md animate-fade-in">
           <div className="mb-8 text-center lg:hidden">
-            <img src={logo} alt="BOOKaTRADE" className="mx-auto h-16 w-16 mb-3" />
-            <h1 className="font-display text-3xl font-extrabold text-foreground">
-              BOOK<span className="text-primary">a</span>TRADE
-            </h1>
+            <img src={logo} alt="BOOKaTRADE" className="h-10 mx-auto mb-3" />
             <p className="mt-2 text-muted-foreground">Sign In to your account</p>
           </div>
           <div className="hidden lg:block mb-8">
