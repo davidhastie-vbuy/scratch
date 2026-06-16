@@ -152,8 +152,8 @@ const Signup = () => {
           <Card className="shadow-lg border-0 ring-1 ring-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-display">
-                <div className="flex h-8 w-8 items-center justify-center bg-primary/10">
-                  <UserPlus className="h-4 w-4 text-primary" />
+                <div className="flex h-8 w-8 items-center justify-center" style={{ backgroundColor: 'rgba(107,127,94,0.1)' }}>
+                  <UserPlus className="h-4 w-4" style={{ color: '#6B7F5E' }} />
                 </div>
                 Get started
               </CardTitle>
@@ -169,10 +169,10 @@ const Signup = () => {
                       <RadioGroupItem value="customer" id="customer" className="peer sr-only" />
                       <Label
                         htmlFor="customer"
-                        className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-accent hover:border-primary/30 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:shadow-md"
+                        className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-[#6B7F5E]/5 hover:border-[#6B7F5E]/30 peer-data-[state=checked]:border-[#6B7F5E] peer-data-[state=checked]:bg-[#6B7F5E]/5 peer-data-[state=checked]:shadow-md"
                       >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent">
-                          <Home className="h-5 w-5 text-primary" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6B7F5E]/10">
+                          <Home className="h-5 w-5 text-[#6B7F5E]" />
                         </div>
                         <span className="font-bold">Customer</span>
                         <span className="text-xs text-muted-foreground">I need work done</span>
@@ -182,10 +182,10 @@ const Signup = () => {
                       <RadioGroupItem value="provider" id="provider" className="peer sr-only" />
                       <Label
                         htmlFor="provider"
-                        className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-accent hover:border-primary/30 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:shadow-md"
+                        className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-[#6B7F5E]/5 hover:border-[#6B7F5E]/30 peer-data-[state=checked]:border-[#6B7F5E] peer-data-[state=checked]:bg-[#6B7F5E]/5 peer-data-[state=checked]:shadow-md"
                       >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent">
-                          <Wrench className="h-5 w-5 text-primary" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6B7F5E]/10">
+                          <Wrench className="h-5 w-5 text-[#6B7F5E]" />
                         </div>
                         <span className="font-bold">Provider</span>
                         <span className="text-xs text-muted-foreground">I offer services</span>
@@ -194,7 +194,7 @@ const Signup = () => {
                   </RadioGroup>
                 </div>
 
-                <p className="text-center text-sm font-bold text-primary">No flooded inbox. No repeated phone calls.</p>
+                <p className="text-center text-sm font-bold text-[#6B7F5E]">No flooded inbox. No repeated phone calls.</p>
 
                 {/* Email & password */}
                 <div className="space-y-2">
@@ -291,9 +291,9 @@ const Signup = () => {
               <CardFooter className="flex flex-col gap-3">
                 <p className="text-xs text-muted-foreground text-center">
                   By creating an account, you agree to our{" "}
-                  <a href="/legal?audience=customer" target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:underline">Terms & Conditions</a>.
+                  <a href="/legal?audience=customer" target="_blank" rel="noopener noreferrer" className="font-bold text-[#6B7F5E] hover:underline">Terms & Conditions</a>.
                 </p>
-                <Button type="submit" className="w-full h-11 font-bold shadow-md" disabled={loading}>
+                <Button type="submit" className="w-full h-11 font-bold shadow-md bg-[#6B7F5E] hover:bg-[#5A6E4F] text-white" disabled={loading}>
                   {loading ? "Creating account..." : "Unlock Dashboard"}
                 </Button>
                 <div className="relative w-full">
@@ -315,7 +315,7 @@ const Signup = () => {
                 </Button>
                 <p className="text-center text-sm text-muted-foreground">
                   Already have an account?{" "}
-                  <Link to="/login" className="font-bold text-primary hover:underline">Sign In</Link>
+                  <Link to="/login" className="font-bold text-[#6B7F5E] hover:underline">Sign In</Link>
                 </p>
               </CardFooter>
             </form>
