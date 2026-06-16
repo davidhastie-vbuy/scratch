@@ -173,8 +173,8 @@ const ProviderSignupStepper = () => {
       <div className="w-full">
         <Card className="text-center">
           <CardContent className="pt-8 pb-8 space-y-4">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <CheckCircle2 className="h-8 w-8 text-primary" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#6B7F5E]/10">
+              <CheckCircle2 className="h-8 w-8 text-[#6B7F5E]" />
             </div>
             <h2 className="font-display text-2xl font-bold text-foreground">Application Submitted!</h2>
             <p className="text-muted-foreground">
@@ -184,20 +184,20 @@ const ProviderSignupStepper = () => {
               <h3 className="font-semibold text-sm text-foreground">What happens next?</h3>
               <div className="space-y-1.5 text-sm text-muted-foreground">
                 <div className="flex items-start gap-2">
-                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#6B7F5E]" />
                   <span>Check your email and verify your account by clicking the confirmation link.</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#6B7F5E]" />
                   <span>An admin will review your application. This usually takes 1–2 business days.</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#6B7F5E]" />
                   <span>Once approved, you'll be able to log in and start quoting on jobs in your area.</span>
                 </div>
               </div>
             </div>
-            <Button onClick={() => navigate("/login")} className="mt-4">
+            <Button onClick={() => navigate("/login")} className="mt-4 bg-[#6B7F5E] hover:bg-[#5A6E4F] text-white">
               Go to Login
             </Button>
           </CardContent>
@@ -209,35 +209,13 @@ const ProviderSignupStepper = () => {
   return (
     <div className="w-full">
       {/* Stepper */}
-      <div className="mb-6 flex items-center justify-between">
-        {STEPS.map((label, i) => (
-          <div key={label} className="flex flex-1 items-center">
-            <div className="flex flex-col items-center gap-1">
-              <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors ${
-                  i < step
-                    ? "bg-primary text-primary-foreground"
-                    : i === step
-                    ? "border-2 border-primary bg-background text-primary"
-                    : "border-2 border-muted text-muted-foreground"
-                }`}
-              >
-                {i < step ? <Check className="h-4 w-4" /> : i + 1}
-              </div>
-              <span className="hidden text-[10px] text-muted-foreground sm:block">{label}</span>
-            </div>
-            {i < STEPS.length - 1 && (
-              <div className={`mx-1 h-0.5 flex-1 ${i < step ? "bg-primary" : "bg-muted"}`} />
-            )}
-          </div>
-        ))}
-      </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5 text-primary" />
+            <UserPlus className="h-5 w-5 text-[#6B7F5E]" />
             {STEPS[step]}
+            <span className="ml-auto text-xs font-normal text-muted-foreground">Step {step + 1} of {STEPS.length}</span>
           </CardTitle>
           <CardDescription>
             {step === 0 && "Your business and contact information"}
@@ -245,7 +223,7 @@ const ProviderSignupStepper = () => {
             {step === 2 && "Where do you offer your services?"}
             {step === 3 && "Review your application before submitting"}
           </CardDescription>
-          <p className="mt-2 text-sm font-bold text-primary">No upfront costs or fees. No chasing payments.</p>
+          <p className="mt-2 text-sm font-bold text-[#6B7F5E]">No upfront costs or fees. No chasing payments.</p>
         </CardHeader>
         <CardContent>
           {step === 0 && <StepBusinessDetails form={form} updateForm={updateForm} errors={errors} />}
@@ -271,12 +249,12 @@ const ProviderSignupStepper = () => {
             <div />
           )}
           {step < STEPS.length - 1 ? (
-            <Button type="button" onClick={handleNext}>
+            <Button type="button" onClick={handleNext} className="bg-[#6B7F5E] hover:bg-[#5A6E4F] text-white">
               Next
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button type="button" onClick={handleSubmit} disabled={loading}>
+            <Button type="button" onClick={handleSubmit} disabled={loading} className="bg-[#6B7F5E] hover:bg-[#5A6E4F] text-white">
               {loading ? "Submitting..." : "Submit Application"}
             </Button>
           )}
