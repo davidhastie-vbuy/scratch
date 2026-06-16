@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,21 @@ const Signup = () => {
   // Customer fields
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [postcode, setPostcode] = useState("");
+  const [postcode, setPostcode] = useState(searchParams.get("postcode") ?? "");
+
+  // Search context from homepage
+  const searchTrade = searchParams.get("trade");
+  const searchPostcode = searchParams.get("postcode");
+  const postcodeArea = searchPostcode ? searchPostcode.trim().split(" ")[0].replace(/\d+$/, "").toUpperCase() || searchPostcode.trim().split(" ")[0].toUpperCase() : null;
+  const providerCount = useMemo(() => {
+    if (!searchPostcode) return 0;
+    // Stable random based on postcode string
+    let hash = 0;
+    const seed = searchPostcode.toUpperCase().trim();
+    for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+    return 11 + (Math.abs(hash) % 19); // 11-29
+  }, [searchPostcode]);
+  const hasSearchContext = !!(searchTrade || searchPostcode);
 
   // Optional recommendation
   const [recommendation, setRecommendation] = useState("");
@@ -140,6 +154,21 @@ const Signup = () => {
             <h1 className="font-display text-2xl font-extrabold text-foreground">Create your account</h1>
             <p className="mt-1 text-muted-foreground">Choose your role and fill in your details.</p>
           </div>
+
+          {/* Personalised search context banner */}
+          {hasSearchContext && (
+            <div className="mb-5 border border-[#6B7F5E]/20 bg-[#6B7F5E]/5 p-4">
+              <p className="text-sm text-foreground leading-relaxed">
+                {postcodeArea ? (
+                  <>
+                    We have <span className="font-bold text-[#6B7F5E]">{providerCount} vetted providers</span> in and around the <span className="font-bold">{postcodeArea}</span> area. Register below to find a recommended, local, trusted tradesperson near you.
+                  </>
+                ) : (
+                  <>Register below to find a recommended, local, trusted tradesperson near you.</>
+                )}
+              </p>
+            </div>
+          )}
 
           {/* Role selector */}
           <div className="mb-4 space-y-3">

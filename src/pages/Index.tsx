@@ -7,6 +7,7 @@ import logo from "@/assets/bookatrade-logo-black.png";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTradeCategories } from "@/hooks/use-trade-categories";
 
 /* ── Image imports ───────────────────────────────────── */
 import tradeJoiners from "@/assets/trade-joiners.jpg";
@@ -66,6 +67,9 @@ const Index = () => {
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
   const [signInLoading, setSignInLoading] = useState(false);
+  const { categories: tradeCategories } = useTradeCategories(true);
+  const [searchTrade, setSearchTrade] = useState("");
+  const [searchPostcode, setSearchPostcode] = useState("");
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,21 +148,33 @@ const Index = () => {
 
             {/* Search bar */}
             <div className="flex max-w-[500px] border-[1.5px] border-foreground/[0.14] shadow-[0_6px_28px_rgba(37,37,37,0.07)] bg-white overflow-hidden">
-              <input
-                type="text"
-                placeholder="What do you need done?"
-                className="flex-1 px-4 py-[15px] text-sm border-none outline-none font-sans text-foreground bg-transparent placeholder:text-foreground/[0.38]"
-                onFocus={() => navigate("/signup")}
-              />
+              <select
+                value={searchTrade}
+                onChange={(e) => setSearchTrade(e.target.value)}
+                className="flex-1 px-4 py-[15px] text-sm border-none outline-none font-sans text-foreground bg-transparent appearance-none cursor-pointer"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
+              >
+                <option value="">What do you need done?</option>
+                {tradeCategories.map((cat) => (
+                  <option key={cat.id} value={cat.slug}>{cat.name}</option>
+                ))}
+              </select>
               <div className="w-px bg-foreground/10 my-[11px]" />
               <input
                 type="text"
                 placeholder="Your postcode"
+                value={searchPostcode}
+                onChange={(e) => setSearchPostcode(e.target.value.toUpperCase())}
+                maxLength={8}
                 className="max-w-[140px] px-4 py-[15px] text-sm border-none outline-none font-sans text-foreground bg-transparent placeholder:text-foreground/[0.38]"
-                onFocus={() => navigate("/signup")}
               />
               <button
-                onClick={() => navigate("/signup")}
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  if (searchTrade) params.set('trade', searchTrade);
+                  if (searchPostcode.trim()) params.set('postcode', searchPostcode.trim());
+                  navigate(`/signup${params.toString() ? '?' + params.toString() : ''}`);
+                }}
                 className="bg-primary text-white border-none px-6 text-[11px] tracking-[0.13em] uppercase font-bold font-sans cursor-pointer hover:bg-[#8d000d] transition-colors whitespace-nowrap"
               >
                 Search
