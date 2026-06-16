@@ -3,6 +3,14 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Shield, Star, Users } from "lucide-react";
 import logo from "@/assets/bookatrade-logo-black.png";
+import tradeJoiners from "@/assets/trade-joiners.jpg";
+import tradeKitchen from "@/assets/trade-kitchen.jpg";
+import tradeElectricians from "@/assets/trade-electricians.jpg";
+import tradePainters from "@/assets/trade-painters.jpg";
+import tradePlumbers from "@/assets/trade-plumbers.jpg";
+import tradeRoofers from "@/assets/trade-roofers.jpg";
+import tradeLandscapers from "@/assets/trade-landscapers.jpg";
+import tradeTilers from "@/assets/trade-tilers.jpg";
 
 /* ─── TRADE DATA ─────────────────────────────────────────── */
 
@@ -16,6 +24,7 @@ const TRADES: Record<
     text: string;
     border: string;
     mark: string;
+    img: string;
   }
 > = {
   joiners: {
@@ -26,6 +35,7 @@ const TRADES: Record<
     text: "text-trade-olive",
     border: "border-trade-olive",
     mark: "J",
+    img: tradeJoiners,
   },
   "kitchen-fitters": {
     name: "Kitchen Fitters",
@@ -35,6 +45,7 @@ const TRADES: Record<
     text: "text-trade-orange",
     border: "border-trade-orange",
     mark: "K",
+    img: tradeKitchen,
   },
   electricians: {
     name: "Electricians",
@@ -44,6 +55,7 @@ const TRADES: Record<
     text: "text-trade-lilac",
     border: "border-trade-lilac",
     mark: "E",
+    img: tradeElectricians,
   },
   painters: {
     name: "Painters",
@@ -53,6 +65,7 @@ const TRADES: Record<
     text: "text-trade-cobalt",
     border: "border-trade-cobalt",
     mark: "P",
+    img: tradePainters,
   },
   plumbers: {
     name: "Plumbers",
@@ -62,6 +75,7 @@ const TRADES: Record<
     text: "text-trade-aqua",
     border: "border-trade-aqua",
     mark: "P",
+    img: tradePlumbers,
   },
   roofers: {
     name: "Roofers",
@@ -71,6 +85,7 @@ const TRADES: Record<
     text: "text-trade-slate",
     border: "border-trade-slate",
     mark: "R",
+    img: tradeRoofers,
   },
   landscapers: {
     name: "Landscapers",
@@ -80,6 +95,7 @@ const TRADES: Record<
     text: "text-trade-forest",
     border: "border-trade-forest",
     mark: "L",
+    img: tradeLandscapers,
   },
   tilers: {
     name: "Tilers",
@@ -89,6 +105,7 @@ const TRADES: Record<
     text: "text-trade-stone",
     border: "border-trade-stone",
     mark: "T",
+    img: tradeTilers,
   },
 };
 
@@ -153,13 +170,9 @@ const TradeCategory = () => {
       <Header />
 
       {/* ═══ Category Hero ═══ */}
-      <section className={cn("relative overflow-hidden", trade.bg)}>
-        {/* Bauhaus decorative mark */}
-        <div className="absolute -right-8 -top-8 sm:right-4 sm:top-4 select-none pointer-events-none">
-          <span className="font-display text-[12rem] sm:text-[16rem] md:text-[20rem] lg:text-[26rem] font-extrabold leading-none text-white/[0.07]">
-            {trade.mark}
-          </span>
-        </div>
+      <section className="relative overflow-hidden">
+        <img src={trade.img} alt={trade.name} className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/50 to-transparent" />
 
         <div className="container relative z-10 py-20 sm:py-28 md:py-36 lg:py-44">
           <p className="text-[10px] tracking-[0.2em] uppercase font-semibold text-white/50 mb-5">
@@ -189,9 +202,9 @@ const TradeCategory = () => {
       </section>
 
       {/* ═══ Featured Providers ═══ */}
-      <section className="py-20 md:py-28 bg-background">
+      <section className="py-12 md:py-16 bg-background">
         <div className="container">
-          <div className="mb-14">
+          <div className="mb-8">
             <p className="eyebrow mb-4">Trusted Professionals</p>
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-[0.95]">
               Featured {trade.name}
@@ -216,13 +229,8 @@ const TradeCategory = () => {
 
                 {/* Avatar placeholder */}
                 <div className="p-8 pb-6">
-                  <div className={cn(
-                    "w-16 h-16 flex items-center justify-center mb-5",
-                    trade.bg
-                  )}>
-                    <span className="font-display text-2xl font-extrabold text-white">
-                      {trade.mark}
-                    </span>
+                  <div className="w-16 h-16 overflow-hidden mb-5">
+                    <img src={trade.img} alt={trade.name} className="w-full h-full object-cover" />
                   </div>
 
                   <div className="space-y-3">
@@ -262,15 +270,9 @@ const TradeCategory = () => {
       </section>
 
       {/* ═══ Login Gate ═══ */}
-      <section className="py-20 md:py-28 bg-background">
+      <section className="py-10 md:py-14 bg-background">
         <div className="container">
           <div className="relative border border-foreground/8 bg-card overflow-hidden">
-            {/* Decorative corner mark */}
-            <div className="absolute -right-6 -bottom-6 select-none pointer-events-none opacity-[0.03]">
-              <span className="font-display text-[14rem] font-extrabold text-foreground leading-none">
-                {trade.mark}
-              </span>
-            </div>
 
             <div className="relative z-10 px-8 py-14 sm:px-14 sm:py-20 md:px-20 md:py-24 max-w-2xl mx-auto text-center">
               <p className="eyebrow mb-5">Local Professionals</p>
@@ -320,8 +322,8 @@ const TradeCategory = () => {
                       : "border-primary-foreground/8 hover:border-primary-foreground/25 hover:bg-primary-foreground/5"
                   )}
                 >
-                  <div className={cn("w-8 h-8 flex items-center justify-center flex-shrink-0", td.bg)}>
-                    <span className="font-display text-xs font-extrabold text-white">{td.mark}</span>
+                  <div className="w-10 h-10 overflow-hidden flex-shrink-0">
+                    <img src={td.img} alt={td.name} className="w-full h-full object-cover" />
                   </div>
                   <span className={cn(
                     "text-sm font-medium transition-colors",
