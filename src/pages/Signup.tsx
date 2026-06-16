@@ -107,14 +107,6 @@ const Signup = () => {
     }
   };
 
-  if (role === "provider") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
-        <ProviderSignupStepper />
-      </div>
-    );
-  }
-
   return (
     <div className="flex min-h-screen">
       {/* Left panel - branding */}
@@ -138,17 +130,57 @@ const Signup = () => {
       </div>
 
       {/* Right panel - form */}
-      <div className="flex-1 flex items-center justify-center bg-background px-4 py-8 overflow-auto">
-        <div className="w-full max-w-md animate-fade-in">
-          <div className="mb-8 text-center lg:hidden">
+      <div className="flex-1 flex items-start justify-center bg-background px-4 py-8 overflow-auto">
+        <div className="w-full max-w-xl animate-fade-in">
+          <div className="mb-6 text-center lg:hidden">
             <img src={logo} alt="BOOKaTRADE" className="h-10 mx-auto mb-3" />
             <p className="mt-2 text-muted-foreground">Create your account</p>
           </div>
-          <div className="hidden lg:block mb-8">
+          <div className="hidden lg:block mb-6">
             <h1 className="font-display text-2xl font-extrabold text-foreground">Create your account</h1>
             <p className="mt-1 text-muted-foreground">Choose your role and fill in your details.</p>
           </div>
 
+          {/* Role selector */}
+          <div className="mb-4 space-y-3">
+            <Label className="text-sm font-medium">I am a...</Label>
+            <RadioGroup value={role} onValueChange={(v) => setRole(v as "customer" | "provider")} className="flex gap-4">
+              <div className="flex-1">
+                <RadioGroupItem value="customer" id="customer" className="peer sr-only" />
+                <Label
+                  htmlFor="customer"
+                  className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-[#6B7F5E]/5 hover:border-[#6B7F5E]/30 peer-data-[state=checked]:border-[#6B7F5E] peer-data-[state=checked]:bg-[#6B7F5E]/5 peer-data-[state=checked]:shadow-md"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6B7F5E]/10">
+                    <Home className="h-5 w-5 text-[#6B7F5E]" />
+                  </div>
+                  <span className="font-bold">Customer</span>
+                  <span className="text-xs text-muted-foreground">I need work done</span>
+                </Label>
+              </div>
+              <div className="flex-1">
+                <RadioGroupItem value="provider" id="provider" className="peer sr-only" />
+                <Label
+                  htmlFor="provider"
+                  className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-[#6B7F5E]/5 hover:border-[#6B7F5E]/30 peer-data-[state=checked]:border-[#6B7F5E] peer-data-[state=checked]:bg-[#6B7F5E]/5 peer-data-[state=checked]:shadow-md"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6B7F5E]/10">
+                    <Wrench className="h-5 w-5 text-[#6B7F5E]" />
+                  </div>
+                  <span className="font-bold">Provider</span>
+                  <span className="text-xs text-muted-foreground">I offer services</span>
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Provider signup stepper */}
+          {role === "provider" && (
+            <ProviderSignupStepper />
+          )}
+
+          {/* Customer signup form */}
+          {isCustomer && (
           <Card className="shadow-lg border-0 ring-1 ring-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-display">
@@ -157,43 +189,10 @@ const Signup = () => {
                 </div>
                 Get started
               </CardTitle>
-              <CardDescription>Choose your role and fill in your details</CardDescription>
+              <CardDescription>Fill in your details to create an account</CardDescription>
             </CardHeader>
             <form onSubmit={handleCustomerSignup}>
               <CardContent className="space-y-4">
-                {/* Role selector */}
-                <div className="space-y-3">
-                  <Label>I am a...</Label>
-                  <RadioGroup value={role} onValueChange={(v) => setRole(v as "customer" | "provider")} className="flex gap-4">
-                    <div className="flex-1">
-                      <RadioGroupItem value="customer" id="customer" className="peer sr-only" />
-                      <Label
-                        htmlFor="customer"
-                        className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-[#6B7F5E]/5 hover:border-[#6B7F5E]/30 peer-data-[state=checked]:border-[#6B7F5E] peer-data-[state=checked]:bg-[#6B7F5E]/5 peer-data-[state=checked]:shadow-md"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6B7F5E]/10">
-                          <Home className="h-5 w-5 text-[#6B7F5E]" />
-                        </div>
-                        <span className="font-bold">Customer</span>
-                        <span className="text-xs text-muted-foreground">I need work done</span>
-                      </Label>
-                    </div>
-                    <div className="flex-1">
-                      <RadioGroupItem value="provider" id="provider" className="peer sr-only" />
-                      <Label
-                        htmlFor="provider"
-                        className="flex cursor-pointer flex-col items-center gap-2 border-2 border-muted p-4 transition-all duration-200 hover:bg-[#6B7F5E]/5 hover:border-[#6B7F5E]/30 peer-data-[state=checked]:border-[#6B7F5E] peer-data-[state=checked]:bg-[#6B7F5E]/5 peer-data-[state=checked]:shadow-md"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6B7F5E]/10">
-                          <Wrench className="h-5 w-5 text-[#6B7F5E]" />
-                        </div>
-                        <span className="font-bold">Provider</span>
-                        <span className="text-xs text-muted-foreground">I offer services</span>
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-
                 <p className="text-center text-sm font-bold text-[#6B7F5E]">No flooded inbox. No repeated phone calls.</p>
 
                 {/* Email & password */}
@@ -236,7 +235,7 @@ const Signup = () => {
                 </div>
 
                 {/* Optional recommendation */}
-                <div className="space-y-2 border border-dashed border-primary/20 bg-accent/30 p-4">
+                <div className="space-y-2 border border-dashed border-[#6B7F5E]/20 bg-accent/30 p-4">
                   <Label htmlFor="recommendation" className="text-sm leading-relaxed font-normal text-muted-foreground">
                     If you would like to recommend a tradesperson you have hired in the past, please tell us about your experience and the work they completed for you. You can also attach photos. <span className="italic">(Optional)</span>
                   </Label>
@@ -269,7 +268,7 @@ const Signup = () => {
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex h-16 w-16 items-center justify-center border-2 border-dashed border-primary/30 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                        className="flex h-16 w-16 items-center justify-center border-2 border-dashed border-[#6B7F5E]/30 text-muted-foreground hover:border-[#6B7F5E] hover:text-[#6B7F5E] transition-colors"
                       >
                         <Camera className="h-5 w-5" />
                       </button>
@@ -320,6 +319,7 @@ const Signup = () => {
               </CardFooter>
             </form>
           </Card>
+          )}
         </div>
       </div>
     </div>

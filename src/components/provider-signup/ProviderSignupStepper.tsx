@@ -170,7 +170,7 @@ const ProviderSignupStepper = () => {
   // Success screen
   if (submitted) {
     return (
-      <div className="w-full max-w-lg">
+      <div className="w-full">
         <Card className="text-center">
           <CardContent className="pt-8 pb-8 space-y-4">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -207,12 +207,7 @@ const ProviderSignupStepper = () => {
   }
 
   return (
-    <div className="w-full max-w-lg">
-      <div className="mb-8 text-center">
-        <h1 className="font-display text-3xl font-bold text-foreground">BOOKaTRADE</h1>
-        <p className="mt-2 text-muted-foreground">Provider Application</p>
-      </div>
-
+    <div className="w-full">
       {/* Stepper */}
       <div className="mb-6 flex items-center justify-between">
         {STEPS.map((label, i) => (
