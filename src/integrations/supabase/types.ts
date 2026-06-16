@@ -1023,6 +1023,7 @@ export type Database = {
           created_at: string
           email_notifications_enabled: boolean
           id: string
+          is_featured: boolean
           logo_url: string | null
           operating_areas: string[] | null
           pending_additional_categories: string[] | null
@@ -1054,6 +1055,7 @@ export type Database = {
           created_at?: string
           email_notifications_enabled?: boolean
           id?: string
+          is_featured?: boolean
           logo_url?: string | null
           operating_areas?: string[] | null
           pending_additional_categories?: string[] | null
@@ -1085,6 +1087,7 @@ export type Database = {
           created_at?: string
           email_notifications_enabled?: boolean
           id?: string
+          is_featured?: boolean
           logo_url?: string | null
           operating_areas?: string[] | null
           pending_additional_categories?: string[] | null
@@ -1438,6 +1441,7 @@ export type Database = {
           created_at: string | null
           email_notifications_enabled: boolean | null
           id: string | null
+          is_featured: boolean | null
           logo_url: string | null
           operating_areas: string[] | null
           public_bio: string | null
@@ -1458,6 +1462,7 @@ export type Database = {
           created_at?: string | null
           email_notifications_enabled?: boolean | null
           id?: string | null
+          is_featured?: boolean | null
           logo_url?: string | null
           operating_areas?: string[] | null
           public_bio?: string | null
@@ -1478,6 +1483,7 @@ export type Database = {
           created_at?: string | null
           email_notifications_enabled?: boolean | null
           id?: string | null
+          is_featured?: boolean | null
           logo_url?: string | null
           operating_areas?: string[] | null
           public_bio?: string | null

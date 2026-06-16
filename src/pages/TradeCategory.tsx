@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Shield, Star, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/bookatrade-logo-black.png";
 import tradeJoiners from "@/assets/trade-joiners.jpg";
 import tradeKitchen from "@/assets/trade-kitchen.jpg";
@@ -126,6 +128,22 @@ const TradeCategory = () => {
   const { slug } = useParams<{ slug: string }>();
   const trade = slug ? TRADES[slug] : undefined;
 
+  const [featuredProviders, setFeaturedProviders] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!slug) return;
+    const fetchFeatured = async () => {
+      const { data } = await supabase
+        .from('public_provider_profiles')
+        .select('id, user_id, business_name, public_bio, business_description, logo_url, banner_url, years_experience, trade_category')
+        .eq('trade_category', slug)
+        .eq('is_featured', true)
+        .limit(3);
+      setFeaturedProviders(data || []);
+    };
+    fetchFeatured();
+  }, [slug]);
+
   /* ── Not Found state ──────────────────────────────────── */
   if (!trade) {
     return (
@@ -214,31 +232,68 @@ const TradeCategory = () => {
             </p>
           </div>
 
-          {/* Provider placeholder grid */}
+          {/* Provider grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className={cn(
-                  "group relative overflow-hidden border border-foreground/8 transition-all duration-300 hover-lift",
-                  "bg-card"
-                )}
-              >
-                {/* Color accent bar */}
-                <div className={cn("h-1.5 w-full", trade.bg)} />
+            {/* Real provider cards */}
+            {featuredProviders.map((provider) => (
+              <Link key={provider.id} to={`/providers/${provider.id}`} className="block">
+                <div className="group relative overflow-hidden border border-foreground/8 transition-all duration-300 hover-lift bg-card">
+                  {/* Banner image or trade image fallback */}
+                  <div className="h-32 overflow-hidden">
+                    <img
+                      src={provider.banner_url || trade.img}
+                      alt={provider.business_name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-start gap-4 mb-3">
+                      {/* Logo */}
+                      {provider.logo_url ? (
+                        <img src={provider.logo_url} alt="" className="w-12 h-12 object-contain flex-shrink-0" />
+                      ) : (
+                        <div className={cn("w-12 h-12 flex items-center justify-center flex-shrink-0", trade.bg)}>
+                          <span className="font-display text-lg font-extrabold text-white">{trade.mark}</span>
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <h3 className="font-display text-base font-bold text-foreground truncate">{provider.business_name}</h3>
+                        {provider.years_experience && (
+                          <p className="text-xs text-muted-foreground">{provider.years_experience} experience</p>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                      {provider.public_bio || provider.business_description || 'Professional tradesperson ready to help.'}
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
+                        <Shield className="h-3 w-3" /> Vetted
+                      </span>
+                      <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
+                        <Users className="h-3 w-3" /> Verified
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
 
-                {/* Avatar placeholder */}
+            {/* Placeholder "coming soon" cards to fill up to 3 */}
+            {Array.from({ length: Math.max(0, 3 - featuredProviders.length) }).map((_, i) => (
+              <div
+                key={`placeholder-${i}`}
+                className="group relative overflow-hidden border border-foreground/8 transition-all duration-300 bg-card"
+              >
+                <div className={cn("h-1.5 w-full", trade.bg)} />
                 <div className="p-8 pb-6">
                   <div className="w-16 h-16 overflow-hidden mb-5">
                     <img src={trade.img} alt={trade.name} className="w-full h-full object-cover" />
                   </div>
-
                   <div className="space-y-3">
                     <div className="h-4 w-3/4 bg-foreground/6" />
                     <div className="h-3 w-1/2 bg-foreground/4" />
                   </div>
-
-                  {/* Star placeholders */}
                   <div className="flex items-center gap-1 mt-4">
                     {[1, 2, 3, 4, 5].map((s) => (
                       <Star key={s} className="h-3.5 w-3.5 fill-foreground/10 text-foreground/10" />
@@ -246,20 +301,14 @@ const TradeCategory = () => {
                     <span className="text-xs text-foreground/25 ml-1">—</span>
                   </div>
                 </div>
-
-                {/* Bottom */}
                 <div className="px-8 pb-8">
-                  <p className="text-sm text-muted-foreground/60 italic">
-                    Provider profiles coming soon
-                  </p>
+                  <p className="text-sm text-muted-foreground/60 italic">Provider profiles coming soon</p>
                   <div className="mt-5 flex items-center gap-3">
                     <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
-                      <Shield className="h-3 w-3" />
-                      Vetted
+                      <Shield className="h-3 w-3" /> Vetted
                     </span>
                     <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
-                      <Users className="h-3 w-3" />
-                      Verified
+                      <Users className="h-3 w-3" /> Verified
                     </span>
                   </div>
                 </div>

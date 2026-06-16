@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye, AlertTriangle, History, MessageSquare, Trash2, Bell } from "lucide-react";
+import { Search, Pencil, CheckCircle, XCircle, Clock, FileText, Download, Eye, AlertTriangle, History, MessageSquare, Trash2, Bell, Star } from "lucide-react";
 import DocumentViewer from "@/components/DocumentViewer";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -399,6 +399,7 @@ const AdminProviderList = () => {
                 <TableHead className="hidden sm:table-cell">Trade</TableHead>
                 <TableHead className="hidden md:table-cell">Submitted</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="w-[70px] text-center">Featured</TableHead>
                 <TableHead className="w-[180px] sm:w-[260px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -438,6 +439,26 @@ const AdminProviderList = () => {
                         <Icon className="h-3 w-3" />
                         {cfg.label}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        disabled={p.status !== "active"}
+                        onClick={async () => {
+                          await supabase.from('provider_profiles').update({ is_featured: !p.is_featured } as any).eq('id', p.id);
+                          toast({ title: p.is_featured ? "Provider unfeatured" : "Provider featured" });
+                          fetchProviders();
+                        }}
+                        title={p.status !== "active" ? "Only active providers can be featured" : p.is_featured ? "Remove from featured" : "Mark as featured"}
+                      >
+                        {p.is_featured ? (
+                          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                        ) : (
+                          <Star className="h-4 w-4 text-foreground/30" />
+                        )}
+                      </Button>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1 flex-wrap">
