@@ -32,7 +32,7 @@ const Signup = () => {
   // Search context from homepage
   const searchTrade = searchParams.get("trade");
   const searchPostcode = searchParams.get("postcode");
-  const postcodeArea = searchPostcode ? searchPostcode.trim().split(" ")[0].replace(/\d+$/, "").toUpperCase() || searchPostcode.trim().split(" ")[0].toUpperCase() : null;
+  const postcodeArea = searchPostcode ? searchPostcode.replace(/\s/g, '').slice(0, -3).toUpperCase() || searchPostcode.trim().toUpperCase() : null;
   const providerCount = useMemo(() => {
     if (!searchPostcode) return 0;
     // Stable random based on postcode string
