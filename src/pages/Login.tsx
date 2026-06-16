@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Mail, Lock } from "lucide-react";
 import logo from "@/assets/bookatrade-logo-black.png";
+import heroScrewdriver from "@/assets/hero-screwdriver.jpg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -52,19 +53,18 @@ const Login = () => {
   return (
     <div className="flex min-h-screen">
       {/* Left panel - branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-foreground text-primary-foreground relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(355 100% 35% / 0.15) 20px, hsl(355 100% 35% / 0.15) 21px)' }} />
-        <div className="relative z-10 text-center p-12 max-w-md">
-          <img src={logo} alt="BOOKaTRADE" className="h-12 brightness-0 invert mb-4 mx-auto" />
-          <h2 className="font-display text-2xl font-bold mb-4">
-            Welcome Back
-          </h2>
-          <p className="text-primary-foreground/60 text-lg leading-relaxed">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-end">
+        <img src={heroScrewdriver} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/40 to-foreground/20" />
+        <div className="relative z-10 p-12 pb-16 max-w-md">
+          <img src={logo} alt="BOOKaTRADE" className="h-10 brightness-0 invert mb-5" />
+          <h2 className="font-display text-3xl text-white mb-3">Welcome Back</h2>
+          <p className="text-white/60 text-sm leading-relaxed">
             Vetted tradespeople. Guaranteed payments. Peace of mind for every job.
           </p>
-          <div className="mt-8 flex justify-center gap-3">
+          <div className="mt-6 flex gap-3">
             {["Vetted", "Trusted", "Guaranteed"].map((tag) => (
-              <span key={tag} className="border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold text-primary uppercase tracking-wider">
+              <span key={tag} className="border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
                 {tag}
               </span>
             ))}

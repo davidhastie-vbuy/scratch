@@ -12,6 +12,7 @@ import { UserPlus, Mail, Lock, User, MapPin, Camera, X, Home, Wrench } from "luc
 import { formatPostcode } from "@/lib/format-postcode";
 import ProviderSignupStepper from "@/components/provider-signup/ProviderSignupStepper";
 import logo from "@/assets/bookatrade-logo-black.png";
+import tradeKitchen from "@/assets/trade-kitchen.jpg";
 
 const Signup = () => {
   const [searchParams] = useSearchParams();
@@ -117,19 +118,18 @@ const Signup = () => {
   return (
     <div className="flex min-h-screen">
       {/* Left panel - branding */}
-      <div className="hidden lg:flex lg:w-5/12 bg-foreground text-primary-foreground relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, hsl(355 100% 35% / 0.15) 20px, hsl(355 100% 35% / 0.15) 21px)' }} />
-        <div className="relative z-10 text-center p-12 max-w-md">
-          <img src={logo} alt="BOOKaTRADE" className="h-12 brightness-0 invert mb-4 mx-auto" />
-          <h2 className="font-display text-2xl font-bold mb-4">
-            Join the Platform
-          </h2>
-          <p className="text-primary-foreground/60 leading-relaxed text-2xl font-bold whitespace-pre-line">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-start">
+        <img src={tradeKitchen} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-foreground/80 via-foreground/50 to-foreground/30" />
+        <div className="relative z-10 p-12 pt-16 max-w-md">
+          <img src={logo} alt="BOOKaTRADE" className="h-10 brightness-0 invert mb-5" />
+          <h2 className="font-display text-3xl text-white mb-4">Join the Platform</h2>
+          <p className="text-white/60 text-base leading-relaxed whitespace-pre-line">
             {"Stop Guessing.\nStart hiring with confidence.\nNo spam calls. No chasing.\nNever feel let down again."}
           </p>
-          <div className="mt-8 flex justify-center gap-3">
+          <div className="mt-6 flex flex-wrap gap-2">
             {["Vetted Providers Only", "No Hidden Costs", "You Stay In Control"].map((tag) => (
-              <span key={tag} className="border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-bold text-primary uppercase tracking-wider">
+              <span key={tag} className="border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
                 {tag}
               </span>
             ))}
