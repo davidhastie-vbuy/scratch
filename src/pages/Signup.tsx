@@ -175,7 +175,7 @@ const Signup = () => {
           {projectsContext && !hasSearchContext && (
             <div className="mb-5 border border-[#6B7F5E]/20 bg-[#6B7F5E]/5 p-4">
               <p className="text-sm text-foreground leading-relaxed">
-                Please <span className="font-bold">register</span> or <span className="font-bold">login</span> to view the latest work from our vetted tradespeople.
+                Please <span className="font-bold">register</span> or <span className="font-bold">login</span> to view the latest work from recommended tradespeople near you.
               </p>
             </div>
           )}

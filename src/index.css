@@ -30,7 +30,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 15%;
 
-    --primary: 355 100% 35%;        /* #B00010 — deep crimson */
+    --primary: 138 15% 43%;            /* #6B7F5E — sage green */
     --primary-foreground: 36 33% 95%;
 
     --secondary: 40 18% 77%;        /* #C5B79A — stone */
@@ -39,7 +39,7 @@
     --muted: 36 20% 93%;
     --muted-foreground: 0 0% 40%;
 
-    --accent: 355 40% 94%;          /* red-tinted accent */
+    --accent: 138 15% 94%;             /* green-tinted accent */
     --accent-foreground: 0 0% 15%;
 
     --destructive: 0 72% 51%;
@@ -47,19 +47,19 @@
 
     --border: 0 0% 88%;
     --input: 0 0% 88%;
-    --ring: 355 100% 35%;
+    --ring: 138 15% 43%;              /* #6B7F5E — sage green for focus rings */
 
     --radius: 0rem;                 /* Square edges — editorial aesthetic */
 
     /* ─── SIDEBAR ─────────────────────────────────────── */
     --sidebar-background: 0 0% 15%;
     --sidebar-foreground: 36 20% 85%;
-    --sidebar-primary: 355 100% 35%;
+    --sidebar-primary: 138 15% 43%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 20%;
     --sidebar-accent-foreground: 36 20% 85%;
     --sidebar-border: 0 0% 22%;
-    --sidebar-ring: 355 100% 35%;
+    --sidebar-ring: 138 15% 43%;
 
     /* ─── STATUS ──────────────────────────────────────── */
     --success: 142 71% 45%;
@@ -88,7 +88,7 @@
     --popover: 0 0% 12%;
     --popover-foreground: 36 30% 95%;
 
-    --primary: 355 100% 40%;
+    --primary: 138 15% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 18%;
@@ -97,15 +97,15 @@
     --muted: 0 0% 16%;
     --muted-foreground: 0 0% 55%;
 
-    --accent: 355 30% 18%;
-    --accent-foreground: 355 70% 70%;
+    --accent: 138 15% 18%;
+    --accent-foreground: 138 20% 70%;
 
     --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 355 100% 40%;
+    --ring: 138 15% 50%;
   }
 }
 

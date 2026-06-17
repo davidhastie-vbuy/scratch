@@ -7,7 +7,7 @@ const contactDetails = [
     icon: Building2,
     label: "Company",
     value: "BOOKaTRADE Ltd.",
-    sublabel: "Registered in Scotland",
+    sublabel: "Registered in England",
   },
   {
     icon: Mail,
@@ -19,8 +19,8 @@ const contactDetails = [
   {
     icon: MapPin,
     label: "Address",
-    value: "Glasgow, Scotland",
-    sublabel: "United Kingdom",
+    value: "20 Wenlock Road, London",
+    sublabel: "N1 7GU, United Kingdom",
   },
 ];
 
@@ -150,19 +150,19 @@ export default function Contact() {
                 Location
               </p>
               <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-white">
-                Find Us in Glasgow
+                Find Us in London
               </h2>
             </div>
             <p className="text-[15px] leading-relaxed text-white/40 max-w-sm">
-              Based in Scotland's largest city — a vibrant hub for trade,
-              culture, and innovation.
+              Based in the heart of London — connecting tradespeople and
+              homeowners across the UK.
             </p>
           </div>
 
           <div className="relative w-full aspect-[16/7] min-h-[320px] bg-foreground/80 border border-white/[0.06] overflow-hidden">
             <iframe
-              title="BOOKaTRADE — Glasgow, Scotland"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d143515.92693574025!2d-4.371739471875001!3d55.86114895!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x488815562056ceeb%3A0x71e683b805ef511e!2sGlasgow!5e0!3m2!1sen!2suk!4v1689849288000"
+              title="BOOKaTRADE — London, United Kingdom"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2482.4!2d-0.0935!3d51.5309!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48761b5e3b5e3b5e%3A0x1234567890abcdef!2s20%20Wenlock%20Rd%2C%20London%20N1%207GU!5e0!3m2!1sen!2suk!4v1700000000000"
               className="absolute inset-0 w-full h-full border-0 grayscale contrast-[1.1] opacity-90"
               allowFullScreen
               loading="lazy"

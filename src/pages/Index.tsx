@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useTradeCategories } from "@/hooks/use-trade-categories";
 
 /* ── Image imports ───────────────────────────────────── */
-import tradeJoiners from "@/assets/trade-joiners.jpg";
 import tradeKitchen from "@/assets/trade-kitchen.jpg";
 import tradeElectricians from "@/assets/trade-electricians.jpg";
 import tradePainters from "@/assets/trade-painters.jpg";
@@ -31,7 +30,6 @@ import projectJoinery from "@/assets/project-joinery.jpg";
 
 /* ── Trade tile data ─────────────────────────────────── */
 const TRADES = [
-  { slug: "joiners",         name: "Joiners",         tagline: "Made to Measure",          sub: "Wardrobes, staircases & bespoke fitted furniture",  mark: "J", bg: "bg-trade-olive",   img: tradeJoiners },
   { slug: "kitchen-fitters", name: "Kitchen Fitters",  tagline: "Heart of the Home",         sub: "Designed for living, installed with precision",      mark: "K", bg: "bg-trade-orange",  img: tradeKitchen },
   { slug: "electricians",    name: "Electricians",     tagline: "Find the Spark",            sub: "Powered by precision, wired for results",            mark: "E", bg: "bg-trade-lilac",   img: tradeElectricians },
   { slug: "painters",        name: "Painters",         tagline: "Paint the Room",            sub: "Interior, exterior, wallpaper & feature walls",      mark: "P", bg: "bg-trade-cobalt",  img: tradePainters },
@@ -370,7 +368,7 @@ const Index = () => {
         <div className="relative z-10 px-6 sm:px-10 lg:px-20 py-20 lg:py-28 max-w-3xl">
           <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 font-semibold mb-4 font-sans">For Trade Professionals</p>
           <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(40px,4.2vw,68px)] text-white leading-[1.4] tracking-tight mb-5">
-            Stop Paying for Leads.<br />Real Jobs. Guaranteed Payment.
+            Stop Paying for Leads.<br />Real Jobs.<br />Guaranteed Payment.
           </h2>
           <p className="text-[15px] leading-relaxed text-white/70 max-w-[400px] mb-9">
             Grow your pipeline without chasing dead leads. BOOKaTRADE connects you with homeowners who are ready to book.

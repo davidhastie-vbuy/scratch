@@ -213,7 +213,7 @@ const TradeCategory = () => {
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild className="bg-transparent border border-white/30 text-white hover:bg-white/10 hover:border-white/50 font-bold h-12 px-8 text-[11px] uppercase tracking-[0.14em] transition-all duration-300">
-              <Link to="/signup">Join as {trade.name.endsWith("s") ? trade.name.slice(0, -1) : trade.name}</Link>
+              <Link to="/signup?role=provider">Join as {trade.name.endsWith("s") ? trade.name.slice(0, -1) : trade.name}</Link>
             </Button>
           </div>
         </div>
@@ -234,86 +234,131 @@ const TradeCategory = () => {
 
           {/* Provider grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Real provider cards */}
-            {featuredProviders.map((provider) => (
-              <Link key={provider.id} to={`/providers/${provider.id}`} className="block">
-                <div className="group relative overflow-hidden border border-foreground/8 transition-all duration-300 hover-lift bg-card">
-                  {/* Banner image or trade image fallback */}
-                  <div className="h-32 overflow-hidden">
-                    <img
-                      src={provider.banner_url || trade.img}
-                      alt={provider.business_name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-start gap-4 mb-3">
-                      {/* Logo */}
-                      {provider.logo_url ? (
-                        <img src={provider.logo_url} alt="" className="w-12 h-12 object-contain flex-shrink-0" />
-                      ) : (
-                        <div className={cn("w-12 h-12 flex items-center justify-center flex-shrink-0", trade.bg)}>
-                          <span className="font-display text-lg font-extrabold text-white">{trade.mark}</span>
+            {(() => {
+              const TEST_PROVIDERS: Record<string, { name: string; initials: string; bio: string; years: string; rating: number; reviews: number; color: string }[]> = {
+                joiners: [
+                  { name: "Highland Joinery Co.", initials: "HJ", bio: "Bespoke fitted furniture, staircases and wardrobes. Over 15 years crafting beautiful interiors.", years: "15+ years", rating: 4.9, reviews: 47, color: "bg-trade-olive" },
+                  { name: "McAllister Woodworks", initials: "MW", bio: "Custom kitchen units, shelving and built-in storage solutions. Quality craftsmanship guaranteed.", years: "12 years", rating: 4.7, reviews: 33, color: "bg-trade-forest" },
+                  { name: "Precision Timber Ltd", initials: "PT", bio: "Specialist in oak flooring, skirting boards and architectural timber features.", years: "8 years", rating: 4.8, reviews: 28, color: "bg-trade-stone" },
+                ],
+                "kitchen-fitters": [
+                  { name: "Urban Kitchen Design", initials: "UK", bio: "Complete kitchen installations from design to finish. German and Italian kitchen specialists.", years: "18 years", rating: 4.9, reviews: 62, color: "bg-trade-orange" },
+                  { name: "Brooks Kitchens & Bathrooms", initials: "BK", bio: "Family-run business specialising in modern and traditional kitchen refurbishments.", years: "10 years", rating: 4.6, reviews: 41, color: "bg-trade-stone" },
+                  { name: "Fitted Right Ltd", initials: "FR", bio: "Worktop templating, appliance fitting and full kitchen installations across the region.", years: "7 years", rating: 4.8, reviews: 19, color: "bg-trade-cobalt" },
+                ],
+                electricians: [
+                  { name: "Spark & Wire Electrical", initials: "SW", bio: "NICEIC registered. Domestic and commercial electrical work, rewiring and smart home installations.", years: "20+ years", rating: 4.9, reviews: 89, color: "bg-trade-lilac" },
+                  { name: "CityLight Electrics", initials: "CL", bio: "EV charger installations, consumer unit upgrades and full property rewires.", years: "11 years", rating: 4.7, reviews: 54, color: "bg-trade-cobalt" },
+                  { name: "PowerSafe Solutions", initials: "PS", bio: "Emergency electrician available 24/7. Fault finding, testing and certification specialists.", years: "14 years", rating: 4.8, reviews: 37, color: "bg-trade-aqua" },
+                ],
+                painters: [
+                  { name: "Brushstrokes Decorating", initials: "BD", bio: "Interior and exterior painting, wallpapering and feature wall specialists. Dulux Select Decorator.", years: "16 years", rating: 4.8, reviews: 73, color: "bg-trade-cobalt" },
+                  { name: "Premier Finish Painters", initials: "PF", bio: "High-end residential decorating. Farrow & Ball and Little Greene specialists.", years: "9 years", rating: 4.9, reviews: 31, color: "bg-trade-lilac" },
+                  { name: "Colour & Co.", initials: "CC", bio: "Commercial and residential painting services. Period property restoration and modern makeovers.", years: "12 years", rating: 4.6, reviews: 44, color: "bg-trade-stone" },
+                ],
+                plumbers: [
+                  { name: "FlowFix Plumbing", initials: "FF", bio: "Gas Safe registered. Boiler installations, central heating and bathroom plumbing.", years: "22 years", rating: 4.9, reviews: 96, color: "bg-trade-aqua" },
+                  { name: "AquaPro Services", initials: "AP", bio: "Leak detection, pipe repairs and full bathroom installations. Emergency callouts available.", years: "13 years", rating: 4.7, reviews: 58, color: "bg-trade-cobalt" },
+                  { name: "Heatwave Plumbing & Gas", initials: "HG", bio: "Underfloor heating, boiler servicing and power flushing specialists.", years: "8 years", rating: 4.8, reviews: 22, color: "bg-trade-forest" },
+                ],
+                roofers: [
+                  { name: "Apex Roofing Solutions", initials: "AR", bio: "Flat roofs, pitched roofs, slate and tile work. Full roof replacements and repairs.", years: "25+ years", rating: 4.9, reviews: 81, color: "bg-trade-slate" },
+                  { name: "StormShield Roofing", initials: "SS", bio: "Emergency roof repairs, chimney repointing and leadwork. Insurance work specialists.", years: "15 years", rating: 4.7, reviews: 49, color: "bg-trade-forest" },
+                  { name: "TopDeck Roofers", initials: "TD", bio: "GRP fibreglass roofing, fascias, soffits and gutter replacements.", years: "10 years", rating: 4.8, reviews: 35, color: "bg-trade-stone" },
+                ],
+                landscapers: [
+                  { name: "GreenScape Gardens", initials: "GS", bio: "Full garden design and landscaping. Patios, decking, fencing and planting schemes.", years: "14 years", rating: 4.9, reviews: 67, color: "bg-trade-forest" },
+                  { name: "Outdoor Living Co.", initials: "OL", bio: "Porcelain paving, composite decking and outdoor kitchens. Garden transformations.", years: "9 years", rating: 4.8, reviews: 42, color: "bg-trade-olive" },
+                  { name: "Stonecraft Landscapes", initials: "SL", bio: "Natural stone walling, driveways and water features. RHS-qualified designers.", years: "18 years", rating: 4.7, reviews: 55, color: "bg-trade-stone" },
+                ],
+                tilers: [
+                  { name: "Precision Tiling Co.", initials: "PT", bio: "Floor and wall tiling, mosaic work and underfloor heating installations.", years: "12 years", rating: 4.9, reviews: 51, color: "bg-trade-stone" },
+                  { name: "Metro Tile & Stone", initials: "MT", bio: "Large format porcelain, natural stone and wet room specialists. Commercial and domestic.", years: "15 years", rating: 4.8, reviews: 38, color: "bg-trade-aqua" },
+                  { name: "TileWorks Pro", initials: "TW", bio: "Bathroom and kitchen tiling, splashbacks and outdoor tiling. Mapei-certified installer.", years: "7 years", rating: 4.7, reviews: 24, color: "bg-trade-cobalt" },
+                ],
+              };
+
+              const providers = featuredProviders.length > 0
+                ? featuredProviders
+                : (TEST_PROVIDERS[slug!] || TEST_PROVIDERS.joiners).map((t, i) => ({
+                    id: `test-${i}`,
+                    business_name: t.name,
+                    logo_url: null,
+                    banner_url: null,
+                    public_bio: t.bio,
+                    years_experience: t.years,
+                    _initials: t.initials,
+                    _rating: t.rating,
+                    _reviews: t.reviews,
+                    _color: t.color,
+                    _isTest: true,
+                  }));
+
+              return providers.map((provider: any) => {
+                const isTest = provider._isTest;
+                const rating = isTest ? provider._rating : null;
+                const reviews = isTest ? provider._reviews : null;
+                const initials = isTest ? provider._initials : trade.mark;
+                const cardColor = isTest ? provider._color : trade.bg;
+
+                return (
+                  <div key={provider.id} className="group relative overflow-hidden border border-foreground/8 transition-all duration-300 hover-lift bg-card">
+                    {/* Banner */}
+                    <div className="h-36 overflow-hidden relative">
+                      <img
+                        src={provider.banner_url || trade.img}
+                        alt={provider.business_name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent" />
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-start gap-4 mb-3">
+                        {/* Logo / Initials */}
+                        {provider.logo_url ? (
+                          <img src={provider.logo_url} alt="" className="w-12 h-12 object-contain flex-shrink-0" />
+                        ) : (
+                          <div className={cn("w-12 h-12 flex items-center justify-center flex-shrink-0", cardColor)}>
+                            <span className="font-display text-sm font-extrabold text-white tracking-tight">{initials}</span>
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <h3 className="font-display text-base font-bold text-foreground truncate">{provider.business_name}</h3>
+                          {provider.years_experience && (
+                            <p className="text-xs text-muted-foreground">{provider.years_experience} experience</p>
+                          )}
                         </div>
-                      )}
-                      <div className="min-w-0">
-                        <h3 className="font-display text-base font-bold text-foreground truncate">{provider.business_name}</h3>
-                        {provider.years_experience && (
-                          <p className="text-xs text-muted-foreground">{provider.years_experience} experience</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                        {provider.public_bio || provider.business_description || 'Professional tradesperson ready to help.'}
+                      </p>
+                      {/* Rating */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star key={s} className={cn("h-3.5 w-3.5", rating && s <= Math.floor(rating) ? "fill-amber-400 text-amber-400" : "fill-foreground/10 text-foreground/10")} />
+                          ))}
+                        </div>
+                        {rating && (
+                          <span className="text-xs font-semibold text-foreground">{rating}</span>
+                        )}
+                        {reviews && (
+                          <span className="text-xs text-foreground/40">({reviews} reviews)</span>
                         )}
                       </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                      {provider.public_bio || provider.business_description || 'Professional tradesperson ready to help.'}
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
-                        <Shield className="h-3 w-3" /> Vetted
-                      </span>
-                      <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
-                        <Users className="h-3 w-3" /> Verified
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
+                          <Shield className="h-3 w-3" /> Vetted
+                        </span>
+                        <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
+                          <Users className="h-3 w-3" /> Verified
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-
-            {/* Placeholder "coming soon" cards to fill up to 3 */}
-            {Array.from({ length: Math.max(0, 3 - featuredProviders.length) }).map((_, i) => (
-              <div
-                key={`placeholder-${i}`}
-                className="group relative overflow-hidden border border-foreground/8 transition-all duration-300 bg-card"
-              >
-                <div className={cn("h-1.5 w-full", trade.bg)} />
-                <div className="p-8 pb-6">
-                  <div className="w-16 h-16 overflow-hidden mb-5">
-                    <img src={trade.img} alt={trade.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="space-y-3">
-                    <div className="h-4 w-3/4 bg-foreground/6" />
-                    <div className="h-3 w-1/2 bg-foreground/4" />
-                  </div>
-                  <div className="flex items-center gap-1 mt-4">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className="h-3.5 w-3.5 fill-foreground/10 text-foreground/10" />
-                    ))}
-                    <span className="text-xs text-foreground/25 ml-1">—</span>
-                  </div>
-                </div>
-                <div className="px-8 pb-8">
-                  <p className="text-sm text-muted-foreground/60 italic">Provider profiles coming soon</p>
-                  <div className="mt-5 flex items-center gap-3">
-                    <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
-                      <Shield className="h-3 w-3" /> Vetted
-                    </span>
-                    <span className="flex items-center gap-1.5 text-[10px] text-foreground/35 uppercase tracking-wider">
-                      <Users className="h-3 w-3" /> Verified
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+                );
+              });
+            })()}
           </div>
         </div>
       </section>
@@ -326,7 +371,7 @@ const TradeCategory = () => {
             <div className="relative z-10 px-8 py-14 sm:px-14 sm:py-20 md:px-20 md:py-24 max-w-2xl mx-auto text-center">
               <p className="eyebrow mb-5">Local Professionals</p>
               <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-[0.95] mb-5">
-                See {trade.name} in Your Area
+                Find {trade.name} in Your Area
               </h2>
               <p className="text-muted-foreground text-base sm:text-lg leading-relaxed max-w-md mx-auto mb-10">
                 Sign in to find trusted {trade.name.toLowerCase()} near you, read local reviews, and get quotes.
