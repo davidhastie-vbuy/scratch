@@ -19,7 +19,6 @@ import tradeLandscapers from "@/assets/trade-landscapers.jpg";
 import tradeTilers from "@/assets/trade-tilers.jpg";
 import tradeGasEngineers from "@/assets/trade-gas-engineers.jpg";
 import heroScrewdriver from "@/assets/hero-screwdriver.jpg";
-import campaignHammer from "@/assets/campaign-hammer.jpg";
 import brandTapeMeasure from "@/assets/brand-tape-measure.png";
 import projectBathroom from "@/assets/project-bathroom.jpg";
 import projectKitchenSage from "@/assets/project-kitchen-sage.jpg";
@@ -337,30 +336,6 @@ const Index = () => {
           ))}
         </div>
       </section>
-
-      {/* ═══ 8. CAMPAIGN BANNER — JOINERS ════════════════ */}
-      <section className="relative overflow-hidden">
-        <img src={campaignHammer} alt="Velvet hammer — joiner campaign visual" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
-        <div className="relative z-10 px-6 sm:px-10 lg:px-20 py-20 lg:py-28">
-          <p className="text-[10px] tracking-[0.2em] uppercase text-white/55 font-semibold mb-4 font-sans">Joiners</p>
-          <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(52px,5.5vw,86px)] text-white leading-[1.4] tracking-tight mb-5">
-            MADE TO<br />MEASURE.
-          </h2>
-          <p className="text-[15px] leading-relaxed text-white/70 max-w-[360px] mb-10">
-            The perfect fit starts with the right joiner. Bespoke furniture, fitted wardrobes, staircases and more.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link to="/trades/joiners" className="inline-block bg-white text-foreground px-8 py-3.5 text-[11px] tracking-[0.14em] uppercase font-bold font-sans hover:bg-foreground hover:text-white transition-colors">
-              Find a Joiner
-            </Link>
-            <Link to="/signup" className="inline-block bg-transparent text-white px-8 py-3 text-[11px] tracking-[0.14em] uppercase font-bold font-sans border-[1.5px] border-white/45 hover:border-white hover:bg-white/[0.08] transition-all">
-              Sign Up
-            </Link>
-          </div>
-        </div>
-      </section>
-
 
 
       {/* ═══ 10. PROVIDER CTA ════════════════════════════ */}
