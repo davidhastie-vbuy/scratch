@@ -13,6 +13,7 @@ import tradePlumbers from "@/assets/trade-plumbers.jpg";
 import tradeRoofers from "@/assets/trade-roofers.jpg";
 import tradeLandscapers from "@/assets/trade-landscapers.jpg";
 import tradeTilers from "@/assets/trade-tilers.jpg";
+import tradeGasEngineers from "@/assets/trade-gas-engineers.jpg";
 
 /* ─── TRADE DATA ─────────────────────────────────────────── */
 
@@ -109,6 +110,16 @@ const TRADES: Record<
     mark: "T",
     img: tradeTilers,
   },
+  "gas-engineers": {
+    name: "Gas Engineers",
+    tagline: "Safe, Warm, Efficient",
+    description: "Gas Safe registered engineers for boilers, central heating and gas appliances",
+    bg: "bg-trade-copper",
+    text: "text-trade-copper",
+    border: "border-trade-copper",
+    mark: "G",
+    img: tradeGasEngineers,
+  },
 };
 
 const TRADE_SLUGS: { slug: string; name: string }[] = [
@@ -120,6 +131,7 @@ const TRADE_SLUGS: { slug: string; name: string }[] = [
   { slug: "roofers", name: "Roofers" },
   { slug: "landscapers", name: "Landscapers" },
   { slug: "tilers", name: "Tilers" },
+  { slug: "gas-engineers", name: "Gas Engineers" },
 ];
 
 /* ─── COMPONENT ──────────────────────────────────────────── */
@@ -275,6 +287,11 @@ const TradeCategory = () => {
                   { name: "Precision Tiling Co.", initials: "PT", bio: "Floor and wall tiling, mosaic work and underfloor heating installations.", years: "12 years", rating: 4.9, reviews: 51, color: "bg-trade-stone" },
                   { name: "Metro Tile & Stone", initials: "MT", bio: "Large format porcelain, natural stone and wet room specialists. Commercial and domestic.", years: "15 years", rating: 4.8, reviews: 38, color: "bg-trade-aqua" },
                   { name: "TileWorks Pro", initials: "TW", bio: "Bathroom and kitchen tiling, splashbacks and outdoor tiling. Mapei-certified installer.", years: "7 years", rating: 4.7, reviews: 24, color: "bg-trade-cobalt" },
+                ],
+                "gas-engineers": [
+                  { name: "HeatSafe Gas Services", initials: "HS", bio: "Gas Safe registered. Boiler installations, servicing and repairs. Vaillant and Worcester Bosch accredited.", years: "18 years", rating: 4.9, reviews: 74, color: "bg-trade-copper" },
+                  { name: "Central Heating Direct", initials: "CH", bio: "Full central heating systems, powerflush specialists and smart thermostat installations.", years: "12 years", rating: 4.8, reviews: 53, color: "bg-trade-aqua" },
+                  { name: "BoilerPro UK", initials: "BP", bio: "Emergency boiler repairs, annual servicing and landlord gas safety certificates. 24/7 callout.", years: "9 years", rating: 4.7, reviews: 31, color: "bg-trade-slate" },
                 ],
               };
 

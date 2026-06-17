@@ -79,6 +79,7 @@ export default {
           slate: "hsl(var(--trade-slate))",
           forest: "hsl(var(--trade-forest))",
           stone: "hsl(var(--trade-stone))",
+          copper: "hsl(var(--trade-copper))",
         },
       },
       borderRadius: {

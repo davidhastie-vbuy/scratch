@@ -76,6 +76,7 @@
     --trade-slate: 210 8% 38%;     /* Roofers */
     --trade-forest: 148 33% 28%;   /* Landscapers */
     --trade-stone: 40 25% 69%;     /* Tilers */
+    --trade-copper: 20 50% 48%;     /* Gas Engineers */
   }
 
   .dark {

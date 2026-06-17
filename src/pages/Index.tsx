@@ -17,6 +17,7 @@ import tradePlumbers from "@/assets/trade-plumbers.jpg";
 import tradeRoofers from "@/assets/trade-roofers.jpg";
 import tradeLandscapers from "@/assets/trade-landscapers.jpg";
 import tradeTilers from "@/assets/trade-tilers.jpg";
+import tradeGasEngineers from "@/assets/trade-gas-engineers.jpg";
 import heroScrewdriver from "@/assets/hero-screwdriver.jpg";
 import campaignHammer from "@/assets/campaign-hammer.jpg";
 import brandTapeMeasure from "@/assets/brand-tape-measure.png";
@@ -37,6 +38,7 @@ const TRADES = [
   { slug: "roofers",         name: "Roofers",          tagline: "The Roof Over Everything",  sub: "Protection starts at the top. Built to last",        mark: "R", bg: "bg-trade-slate",   img: tradeRoofers },
   { slug: "landscapers",     name: "Landscapers",      tagline: "Bring the Outside to Life", sub: "Gardens that work beautifully, year-round",          mark: "L", bg: "bg-trade-forest",  img: tradeLandscapers },
   { slug: "tilers",          name: "Tilers",           tagline: "Every Detail Aligned",      sub: "Find skilled tilers who get the finish right",        mark: "T", bg: "bg-trade-stone",   img: tradeTilers },
+  { slug: "gas-engineers",   name: "Gas Engineers",    tagline: "Safe, Warm, Efficient",     sub: "Gas Safe registered engineers for boilers & heating", mark: "G", bg: "bg-trade-copper",  img: tradeGasEngineers },
 ];
 
 /* ── Review ticker data ──────────────────────────────── */
