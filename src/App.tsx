@@ -51,6 +51,12 @@ import LegalPage from "@/pages/LegalPage";
 
 // Public
 import TradeCategory from "@/pages/TradeCategory";
+import HowItWorks from "@/pages/HowItWorks";
+import HowItWorksProvider from "@/pages/HowItWorksProvider";
+import TrustAndSafety from "@/pages/TrustAndSafety";
+import Pricing from "@/pages/Pricing";
+import HelpCentre from "@/pages/HelpCentre";
+import Contact from "@/pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +77,12 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/auth/confirm" element={<AuthConfirm />} />
             <Route path="/trades/:slug" element={<TradeCategory />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/how-it-works-provider" element={<HowItWorksProvider />} />
+            <Route path="/trust-and-safety" element={<TrustAndSafety />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/help-centre" element={<HelpCentre />} />
+            <Route path="/contact" element={<Contact />} />
 
             {/* Customer routes */}
             <Route

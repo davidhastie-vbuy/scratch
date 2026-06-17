@@ -429,14 +429,15 @@ const Index = () => {
               <img src={logo} alt="BOOKaTRADE" className="h-8 brightness-0 invert" />
             </Link>
             <p className="text-[13px] leading-relaxed text-white/[0.42] max-w-[250px]">
-              Connecting homes with trusted tradespeople across the UK. Find the right trade, first time.
+              Connecting homeowners with locally trusted and recommended tradespeople across the UK. Find the right tradesperson, first time.
             </p>
             <div className="flex gap-2.5 mt-5">
-              {[{ label: "in" }, { label: "ig" }, { label: "fb" }].map((s) => (
-                <a key={s.label} href="#" className="w-[34px] h-[34px] border border-white/[0.18] flex items-center justify-center text-[11px] text-white/45 font-sans hover:border-white/55 hover:text-white transition-colors">
-                  {s.label}
-                </a>
-              ))}
+              <a href="https://www.instagram.com/bookatrade" target="_blank" rel="noopener noreferrer" className="w-[34px] h-[34px] border border-white/[0.18] flex items-center justify-center text-[11px] text-white/45 font-sans hover:border-white/55 hover:text-white transition-colors">
+                ig
+              </a>
+              <a href="https://www.facebook.com/profile.php?id=61589269814365" target="_blank" rel="noopener noreferrer" className="w-[34px] h-[34px] border border-white/[0.18] flex items-center justify-center text-[11px] text-white/45 font-sans hover:border-white/55 hover:text-white transition-colors">
+                fb
+              </a>
             </div>
           </div>
           {/* Find a Trade */}
@@ -454,22 +455,20 @@ const Index = () => {
           <div>
             <h4 className="text-[10px] tracking-[0.16em] uppercase text-white/[0.35] font-semibold mb-5 font-sans">Platform</h4>
             <ul className="space-y-2.5">
-              {["How It Works", "Post a Job", "Recent Works", "Reviews", "Trust & Safety"].map((link) => (
-                <li key={link}>
-                  <Link to="/signup" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">{link}</Link>
-                </li>
-              ))}
+              <li><Link to="/how-it-works" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">How It Works</Link></li>
+              <li><Link to="/signup" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">Post a Job</Link></li>
+              <li><Link to="/trust-and-safety" target="_blank" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">Trust & Safety</Link></li>
             </ul>
           </div>
           {/* For Trades */}
           <div>
             <h4 className="text-[10px] tracking-[0.16em] uppercase text-white/[0.35] font-semibold mb-5 font-sans">For Trades</h4>
             <ul className="space-y-2.5">
-              {["Join as a Provider", "How It Works", "Pricing", "Help Centre", "Contact Us"].map((link) => (
-                <li key={link}>
-                  <Link to="/signup" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">{link}</Link>
-                </li>
-              ))}
+              <li><Link to="/signup?role=provider" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">Join as a Provider</Link></li>
+              <li><Link to="/how-it-works-provider" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">How It Works</Link></li>
+              <li><Link to="/pricing" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">Pricing</Link></li>
+              <li><Link to="/help-centre" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">Help Centre</Link></li>
+              <li><Link to="/contact" className="text-[13px] text-white/[0.58] hover:text-white transition-colors font-sans">Contact Us</Link></li>
             </ul>
           </div>
         </div>

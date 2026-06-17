@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Shield, Users, Wrench, Tag, HelpCircle, UserPlus, Star, MessageSquareWarning, Banknote, FileText, LayoutGrid } from "lucide-react";
+import { LogOut, Shield, Users, Wrench, Tag, HelpCircle, UserPlus, Star, MessageSquareWarning, Banknote, FileText, LayoutGrid, CircleHelp } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import AdminCustomerList from "@/components/admin/AdminCustomerList";
 import AdminProviderList from "@/components/admin/AdminProviderList";
@@ -13,6 +13,7 @@ import AdminDisputes from "@/components/admin/AdminDisputes";
 import AdminPayouts from "@/components/admin/AdminPayouts";
 import AdminLegalPages from "@/components/admin/AdminLegalPages";
 import AdminProviderSlots from "@/components/admin/AdminProviderSlots";
+import AdminFAQs from "@/components/admin/AdminFAQs";
 
 const AdminDashboard = () => {
   const { signOut } = useAuth();
@@ -97,6 +98,11 @@ const AdminDashboard = () => {
                 <span className="hidden sm:inline">Provider Slots</span>
                 <span className="sm:hidden">Slots</span>
               </TabsTrigger>
+              <TabsTrigger value="faqs" className="gap-1 sm:gap-1.5 text-xs sm:text-sm px-2 sm:px-3">
+                <CircleHelp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">FAQs</span>
+                <span className="sm:hidden">FAQ</span>
+              </TabsTrigger>
             </TabsList>
           </div>
           <TabsContent value="providers">
@@ -128,6 +134,9 @@ const AdminDashboard = () => {
           </TabsContent>
           <TabsContent value="slots">
             <AdminProviderSlots />
+          </TabsContent>
+          <TabsContent value="faqs">
+            <AdminFAQs />
           </TabsContent>
         </Tabs>
       </main>
