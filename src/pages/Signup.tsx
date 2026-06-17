@@ -17,7 +17,7 @@ import tradeKitchen from "@/assets/trade-kitchen.jpg";
 const Signup = () => {
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get("role") === "provider" ? "provider" : "customer";
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"customer" | "provider">(initialRole);
   const [loading, setLoading] = useState(false);
@@ -42,6 +42,7 @@ const Signup = () => {
     return 11 + (Math.abs(hash) % 19); // 11-29
   }, [searchPostcode]);
   const hasSearchContext = !!(searchTrade || searchPostcode);
+  const projectsContext = searchParams.get("context") === "projects";
 
   // Optional recommendation
   const [recommendation, setRecommendation] = useState("");
@@ -166,6 +167,15 @@ const Signup = () => {
                 ) : (
                   <>Register below to find a recommended, local, trusted tradesperson near you.</>
                 )}
+              </p>
+            </div>
+          )}
+
+          {/* Projects context banner */}
+          {projectsContext && !hasSearchContext && (
+            <div className="mb-5 border border-[#6B7F5E]/20 bg-[#6B7F5E]/5 p-4">
+              <p className="text-sm text-foreground leading-relaxed">
+                Please <span className="font-bold">register</span> or <span className="font-bold">login</span> to view the latest work from our vetted tradespeople.
               </p>
             </div>
           )}

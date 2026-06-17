@@ -376,7 +376,7 @@ const TradeCategory = () => {
                   </div>
                   <span className={cn(
                     "text-sm font-medium transition-colors",
-                    isActive ? "text-primary-foreground" : "text-primary-foreground/58 group-hover:text-primary-foreground"
+                    isActive ? "text-primary-foreground" : "text-primary-foreground/80 group-hover:text-primary-foreground"
                   )}>
                     {t.name}
                   </span>

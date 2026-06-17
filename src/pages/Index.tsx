@@ -26,9 +26,8 @@ import projectKitchenSage from "@/assets/project-kitchen-sage.jpg";
 import projectExterior from "@/assets/project-exterior.jpg";
 import projectKitchenWarm from "@/assets/project-kitchen-warm.jpg";
 import projectJoinery from "@/assets/project-joinery.jpg";
-import heroGarden from "@/assets/hero-garden.png";
-import projectKitchenDark from "@/assets/project-kitchen-dark.jpg";
-import projectBathroomGreen from "@/assets/project-bathroom-green.jpg";
+
+
 
 /* ── Trade tile data ─────────────────────────────────── */
 const TRADES = [
@@ -70,6 +69,7 @@ const Index = () => {
   const { categories: tradeCategories } = useTradeCategories(true);
   const [searchTrade, setSearchTrade] = useState("");
   const [searchPostcode, setSearchPostcode] = useState("");
+  const [ctaEmail, setCtaEmail] = useState("");
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,15 +135,15 @@ const Index = () => {
 
       {/* ═══ 2. HERO ═════════════════════════════════════ */}
       <section className="bg-background">
-        <div className="grid lg:grid-cols-2 min-h-[75vh] lg:min-h-[88vh]">
+        <div className="grid lg:grid-cols-2 min-h-[60vh] lg:min-h-[75vh]">
           {/* Left column */}
           <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-16 xl:px-20 py-16 lg:py-20 animate-fade-in">
-            <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-5">Craftsmanship Starts Here</p>
+            <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-5">TRUST STARTS HERE</p>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] tracking-tight text-foreground leading-[1.4] mb-7">
-              Find the Right<br />Trade.<br />First Time.
+              Find the Right<br />Tradesperson.<br />First Time.
             </h1>
             <p className="text-base leading-relaxed text-foreground/60 max-w-[380px] mb-10">
-              Connect with trusted, vetted tradespeople for every home project. From small fixes to full transformations.
+              Connect with locally recommended tradespeople whatever the need. From fixes to full transformations.
             </p>
 
             {/* Search bar */}
@@ -183,7 +183,7 @@ const Index = () => {
 
             {/* Trust pills */}
             <div className="flex gap-7 mt-7 flex-wrap">
-              {["Vetted Tradespeople", "No Spam", "Limited Quotes Only"].map((pill) => (
+              {["Vetted Tradespeople", "No Hidden Costs", "You Stay in Full Control"].map((pill) => (
                 <span key={pill} className="text-[11px] text-foreground/50 flex items-center gap-1.5 tracking-[0.04em]">
                   <span className="w-[5px] h-[5px] rounded-full bg-primary flex-shrink-0" />
                   {pill}
@@ -228,7 +228,7 @@ const Index = () => {
         <div className="px-6 sm:px-10 lg:px-20 pt-20 lg:pt-24 pb-10 lg:pb-12">
           <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Browse by Trade</p>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-foreground">
-            Every Home Project,<br />One Trusted Platform.
+            Every Project. Every Problem.<br />One Trusted Platform.
           </h2>
         </div>
         <div className="px-6 sm:px-10 lg:px-20 pb-20 lg:pb-24">
@@ -247,7 +247,7 @@ const Index = () => {
                 <div className="relative z-[2]">
                   <p className="text-[9px] tracking-[0.18em] uppercase text-white/65 mb-1 font-sans">{t.tagline}</p>
                   <h3 className="font-display text-xl sm:text-[22px] text-white leading-none">{t.name}</h3>
-                  <p className="text-[11px] text-white/[0.62] mt-1 leading-snug">{t.sub}</p>
+                  <p className="text-[11px] text-white/[0.62] mt-1 leading-snug">Find {t.name.toLowerCase()} in your area</p>
                 </div>
               </Link>
             ))}
@@ -256,23 +256,23 @@ const Index = () => {
       </section>
 
       {/* ═══ 5. HOW IT WORKS ═════════════════════════════ */}
-      <section id="how-it-works" className="bg-foreground px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
+      <section id="how-it-works" className="bg-foreground px-6 sm:px-10 lg:px-20 py-14 lg:py-16">
         <p className="text-[11px] tracking-[0.22em] uppercase text-trade-stone font-semibold mb-3.5">How It Works</p>
-        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-white mb-14 lg:mb-16">
+        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-white mb-8 lg:mb-10">
           Create a Job in<br />Under 2 Minutes.
         </h2>
         <div className="grid lg:grid-cols-3">
           {[
-            { num: "01", title: "Post Your Job", copy: "Tell us what you need done, where and when. It takes under two minutes and there's no commitment required." },
+            { num: "01", title: "Post Your Job", copy: "Tell us what you need done, where and when. It takes under two minutes and there's no commitment. The more detail, the more reliable the quote." },
             { num: "02", title: "Compare Trusted Trades", copy: "Receive a limited number of quotes from vetted, reviewed tradespeople. No spam. No endless follow-up calls." },
-            { num: "03", title: "Book with Confidence", copy: "Review profiles, read verified local reviews, compare quotes — then book the right trade for your home." },
+            { num: "03", title: "Book with Confidence", copy: "Review profiles, read verified local reviews, compare quotes. Choose what's right for you." },
           ].map((step, i) => (
             <div
               key={step.num}
-              className={`py-8 lg:py-0 ${i > 0 ? "lg:pl-12 border-t lg:border-t-0 lg:border-l" : ""} ${i < 2 ? "lg:pr-12 border-white/[0.1]" : ""}`}
+              className={`py-6 lg:py-0 ${i > 0 ? "lg:pl-12 border-t lg:border-t-0 lg:border-l" : ""} ${i < 2 ? "lg:pr-12 border-white/[0.1]" : ""}`}
             >
-              <div className="font-display text-6xl lg:text-7xl text-primary leading-none mb-5 tracking-[-2px]">{step.num}</div>
-              <h3 className="text-[11px] tracking-[0.16em] uppercase text-white font-bold mb-3 font-sans">{step.title}</h3>
+              <div className="font-display text-6xl lg:text-7xl text-primary leading-none mb-4 tracking-[-2px]">{step.num}</div>
+              <h3 className="text-[11px] tracking-[0.16em] uppercase text-white font-bold mb-2 font-sans">{step.title}</h3>
               <p className="text-sm leading-relaxed text-white/50">{step.copy}</p>
             </div>
           ))}
@@ -285,10 +285,10 @@ const Index = () => {
           <div>
             <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-3.5">Recent Works</p>
             <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-foreground">
-              Beautiful Homes.<br />Skilled Hands.
+              Beautiful Homes.<br />Skilled Hands.<br />Problems Solved.
             </h2>
           </div>
-          <Link to="/signup" className="hidden sm:inline-block text-[11px] tracking-[0.13em] uppercase text-foreground/55 border-b border-current pb-0.5 font-semibold font-sans hover:opacity-100 transition-opacity">
+          <Link to="/signup?context=projects" className="hidden sm:inline-block text-[11px] tracking-[0.13em] uppercase text-foreground/55 border-b border-current pb-0.5 font-semibold font-sans hover:opacity-100 transition-opacity">
             View All Projects →
           </Link>
         </div>
@@ -296,7 +296,7 @@ const Index = () => {
           {WORKS.map((w, i) => (
             <div
               key={i}
-              className={`group relative overflow-hidden cursor-pointer ${i === 0 ? "sm:row-span-2" : ""}`}
+              className={`group relative overflow-hidden ${i === 0 ? "sm:row-span-2" : ""}`}
             >
               {/* Project image */}
               <img src={w.img} alt={w.title.replace('\n', ' ')} className={`w-full object-cover transition-transform duration-400 group-hover:scale-[1.04] ${i === 0 ? "aspect-[3/4] h-full" : "aspect-square"}`} />
@@ -324,10 +324,10 @@ const Index = () => {
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 border border-foreground/[0.09]">
           {[
-            { title: "No Spam",          copy: "We limit the number of quotes per job so tradespeople compete on quality, not volume. No endless calls.",              barColor: "bg-primary" },
+            { title: "No Spam",          copy: "We limit the number of quotes per job so tradespeople compete on quality, not volume. No endless calls. No data sharing.",              barColor: "bg-primary" },
             { title: "Vetted Providers",  copy: "Every tradesperson on BOOKaTRADE is reviewed, checked and verified before they can quote on your job.",               barColor: "bg-trade-olive" },
-            { title: "Local Reviews",     copy: "Real reviews from real homeowners in your area. Compare with confidence before you commit to anything.",               barColor: "bg-foreground" },
-            { title: "Secure & Simple",   copy: "Post your job in under two minutes. Safe, straightforward, built around how homeowners actually work.",                barColor: "bg-trade-stone" },
+            { title: "Locally Recommended & Reliable",     copy: "Real reviews from friends and neighbours in your area. Compare with confidence before you commit to anything.",               barColor: "bg-foreground" },
+            { title: "Secure & Simple",   copy: "Post your job in under two minutes. Accept or decline any quote. Complete control and no commitment. Only pay once you're completely satisfied.",                barColor: "bg-trade-stone" },
           ].map((cell, i) => (
             <div key={i} className={`p-8 lg:p-10 ${i < 3 ? "border-b sm:border-b lg:border-b-0 lg:border-r border-foreground/[0.09]" : ""} ${i % 2 === 0 ? "sm:border-r lg:border-r" : "sm:border-r-0 lg:border-r"} ${i === 3 ? "lg:border-r-0" : ""}`}>
               <div className={`w-9 h-0.5 ${cell.barColor} mb-6`} />
@@ -361,28 +361,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ═══ 9. INSPIRATION GRID ═════════════════════════ */}
-      <section className="bg-foreground px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
-        <p className="text-[11px] tracking-[0.22em] uppercase text-trade-stone font-semibold">Inspiration</p>
-        <h2 className="font-display text-3xl sm:text-4xl lg:text-[clamp(36px,3.6vw,58px)] leading-[1.4] tracking-tight text-white mt-3.5 mb-10 lg:mb-12">
-          From Vision<br />to Reality.
-        </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-          {[
-            { type: "Landscaping",    title: "Bring the Outside to Life",    img: heroGarden },
-            { type: "Kitchen Fitting", title: "Every Piece Has Its Place",   img: projectKitchenDark },
-            { type: "Bathroom",       title: "Smooth Starts Here",           img: projectBathroomGreen },
-          ].map((card, i) => (
-            <div key={i} className="group relative overflow-hidden cursor-pointer">
-              <img src={card.img} alt={card.title} className="w-full aspect-[4/5] object-cover transition-transform duration-400 group-hover:scale-[1.04]" />
-              <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-12 bg-gradient-to-t from-black/[0.62] to-transparent">
-                <p className="text-[9px] tracking-[0.18em] uppercase text-white/55 mb-1 font-sans">{card.type}</p>
-                <p className="font-display text-xl text-white leading-[1.4]">{card.title}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+
 
       {/* ═══ 10. PROVIDER CTA ════════════════════════════ */}
       <section id="for-providers" className="relative overflow-hidden">
@@ -391,21 +370,21 @@ const Index = () => {
         <div className="relative z-10 px-6 sm:px-10 lg:px-20 py-20 lg:py-28 max-w-3xl">
           <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 font-semibold mb-4 font-sans">For Trade Professionals</p>
           <h2 className="font-display text-4xl sm:text-5xl lg:text-[clamp(40px,4.2vw,68px)] text-white leading-[1.4] tracking-tight mb-5">
-            Better Jobs.<br />Better Customers.<br />Less Noise.
+            Stop Paying for Leads.<br />Real Jobs. Guaranteed Payment.
           </h2>
           <p className="text-[15px] leading-relaxed text-white/70 max-w-[400px] mb-9">
-            Grow your pipeline without chasing dead leads. BOOKaTRADE connects you with homeowners who are ready to book — not just browsing.
+            Grow your pipeline without chasing dead leads. BOOKaTRADE connects you with homeowners who are ready to book.
           </p>
           <ul className="grid grid-cols-2 gap-3 mb-10 list-none">
-            {["Quality local leads", "Verified reviews", "Limited quotes per job", "No cold canvassing", "Job management tools", "Payment confidence"].map((ben) => (
+            {["Quality local leads — free", "Verified reviews", "Less competition per job", "No monthly fees — we charge a small % on completion", "Job management tools", "Payment confidence"].map((ben) => (
               <li key={ben} className="text-[13px] text-white/75 flex items-center gap-2">
                 <span className="w-3.5 h-[1.5px] bg-white/40 flex-shrink-0" />
                 {ben}
               </li>
             ))}
           </ul>
-          <Link to="/signup" className="inline-block bg-white text-foreground px-8 py-3.5 text-[11px] tracking-[0.14em] uppercase font-bold font-sans hover:bg-foreground hover:text-white transition-colors">
-            Join as a Trade
+          <Link to="/signup?role=provider" className="inline-block bg-white text-foreground px-8 py-3.5 text-[11px] tracking-[0.14em] uppercase font-bold font-sans hover:bg-foreground hover:text-white transition-colors">
+            Join as a Tradesperson
           </Link>
         </div>
       </section>
@@ -423,11 +402,16 @@ const Index = () => {
           <input
             type="email"
             placeholder="Enter your email address"
+            value={ctaEmail}
+            onChange={(e) => setCtaEmail(e.target.value)}
             className="flex-1 px-5 py-4 text-sm border-none outline-none font-sans bg-transparent"
-            onFocus={() => navigate("/signup")}
           />
           <button
-            onClick={() => navigate("/signup")}
+            onClick={() => {
+              const params = new URLSearchParams();
+              if (ctaEmail.trim()) params.set('email', ctaEmail.trim());
+              navigate(`/signup${params.toString() ? '?' + params.toString() : ''}`);
+            }}
             className="bg-foreground text-white border-none px-7 text-[11px] tracking-[0.14em] uppercase font-bold font-sans cursor-pointer hover:bg-primary transition-colors whitespace-nowrap"
           >
             Post a Job Free
