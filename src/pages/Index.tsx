@@ -138,7 +138,7 @@ const Index = () => {
           {/* Left column */}
           <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-16 xl:px-20 py-16 lg:py-20 animate-fade-in">
             <p className="text-[11px] tracking-[0.22em] uppercase text-primary font-semibold mb-5">TRUST STARTS HERE</p>
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] tracking-tight text-foreground leading-[1.4] mb-7">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] tracking-tight text-foreground leading-[0.91] mb-7">
               Find the Right<br />Tradesperson.<br />First Time.
             </h1>
             <p className="text-base leading-relaxed text-foreground/60 max-w-[380px] mb-10">
