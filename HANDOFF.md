@@ -54,6 +54,21 @@ A UK-focused marketplace connecting homeowners with vetted, locally recommended 
 Each trade has a unique accent color (used for badges, cards, monograms):
 - Joiners: olive | Kitchen Fitters: orange | Electricians: lilac | Painters: cobalt
 - Plumbers: aqua | Roofers: slate | Landscapers: forest | Tilers: stone
+- Gas Engineers: copper
+
+### ⚠️ CRITICAL: Bauhaus Font Line-Height Bug
+
+The Bauhaus font (`src/fonts/BauhausRegular.ttf`, `BauhausBold.ttf`) has extreme vertical metrics baked into the font file. **CSS `line-height` has NO visual effect** on reducing spacing between lines — not via Tailwind `leading-*` classes, not via inline `style={{ lineHeight }}`, not via `!important`. The font's internal ascent/descent values create a minimum spacing floor.
+
+**Solution**: Use `display: block` spans with **negative margin-top** to control line spacing:
+```tsx
+<h1 className="font-display text-4xl sm:text-5xl lg:text-6xl">
+  <span className="block">Line One</span>
+  <span className="block -mt-3 sm:-mt-4 lg:-mt-5 xl:-mt-7">Line Two</span>
+</h1>
+```
+
+Additionally, Tailwind's responsive `text-*` utilities (e.g. `sm:text-5xl`) include built-in `line-height` that overrides standalone `leading-*` classes at responsive breakpoints.
 
 ---
 
